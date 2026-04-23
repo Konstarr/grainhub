@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { HERO_STATS } from '../../data/homeData.js';
+import CountUp from './CountUp.jsx';
 
 export default function Hero() {
   return (
@@ -25,7 +26,9 @@ export default function Hero() {
         <div className="hero-stats">
           {HERO_STATS.map((s) => (
             <div key={s.label} className="stat-card">
-              <div className="stat-num">{s.num}</div>
+              <div className="stat-num">
+                <CountUp value={s.num} />
+              </div>
               <div className="stat-label">{s.label}</div>
             </div>
           ))}
