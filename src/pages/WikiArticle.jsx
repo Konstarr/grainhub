@@ -121,7 +121,7 @@ function ArticleContent() {
 
 export default function WikiArticle() {
   return (
-    <div className="page-wrap">
+    <div className="wa-wrap">
       <TableOfContents />
       <ArticleContent />
     </div>

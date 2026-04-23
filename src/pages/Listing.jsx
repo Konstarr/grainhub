@@ -31,7 +31,7 @@ export default function Listing() {
       </div>
 
       {/* PAGE */}
-      <div className="page-wrap">
+      <div className="listing-wrap">
         <div>
           {/* GALLERY */}
           <Gallery />

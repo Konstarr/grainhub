@@ -34,7 +34,7 @@ export default function ForumThread() {
         <span className="bc-sep">›</span>
         <span>{THREAD_HEADER.title}</span>
       </div>
-      <div className="page-wrap">
+      <div className="ft-wrap">
         <div>
           <ThreadHeader data={THREAD_HEADER} onReply={() => setScrollToReply(true)} />
           <SortBar data={SORT_SECTION} />

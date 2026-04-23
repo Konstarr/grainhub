@@ -63,7 +63,7 @@ export default function NewsArticle() {
         <span>Cabinet & Millwork Revenue Up 8.4%...</span>
       </div>
 
-      <div className="page-wrap">
+      <div className="na-wrap">
         <article>
           <div className="article-header">
             <div className="article-cat-row">
