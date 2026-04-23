@@ -1,6 +1,8 @@
-import { useState, useMemo, useCallback, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { GoogleMap, Marker, InfoWindow, useJsApiLoader } from '@react-google-maps/api';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import {
   SUPPLIER_LIST,
   SUPPLIER_CATEGORIES,
@@ -8,37 +10,39 @@ import {
 } from '../../data/suppliersData.js';
 import { matchesTrade } from '../../lib/trades.js';
 
-// Center of the continental US — a good default zoom-to-fit starting point.
-const US_CENTER = { lat: 39.5, lng: -98.35 };
+// ── Marker icon fix for Leaflet + bundlers ────────────────────────────────────
+// Leaflet ships its marker PNGs at runtime relative to the CSS, which Vite
+// breaks. Point the defaults at the CDN copies so pins render on every host.
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+});
+
+// Continental US center + fit-all-pins view.
+const US_CENTER = [39.5, -98.35];
 const DEFAULT_ZOOM = 4;
 
-const MAP_CONTAINER = { width: '100%', height: '480px' };
-
-// Clean wood-toned Google Maps styling. Strips noisy POIs and warms the
-// base layer so the map blends with the rest of the site rather than
-// looking like a drop-in iframe.
-const MAP_STYLES = [
-  { featureType: 'poi', elementType: 'labels', stylers: [{ visibility: 'off' }] },
-  { featureType: 'transit', stylers: [{ visibility: 'off' }] },
-  { featureType: 'landscape', elementType: 'geometry', stylers: [{ color: '#F5EFE6' }] },
-  { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#D7E3E8' }] },
-  { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#FFFFFF' }] },
-  { featureType: 'road', elementType: 'labels.text.fill', stylers: [{ color: '#8A6E4A' }] },
-  { featureType: 'administrative', elementType: 'geometry.stroke', stylers: [{ color: '#C9B69A' }] },
-];
+// Helper: pans/zooms the map so every visible marker fits in the viewport.
+// Runs whenever the filtered list changes.
+function FitToMarkers({ points }) {
+  const map = useMap();
+  useEffect(() => {
+    if (!points.length) return;
+    if (points.length === 1) {
+      map.setView([points[0].lat, points[0].lng], 10);
+      return;
+    }
+    const bounds = L.latLngBounds(points.map((p) => [p.lat, p.lng]));
+    map.fitBounds(bounds, { padding: [40, 40], maxZoom: 9 });
+  }, [map, points]);
+  return null;
+}
 
 export default function SuppliersMap({ activeCategory, onCategoryChange }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const trade = searchParams.get('trade') || '';
   const [query, setQuery] = useState('');
-  const [openIdx, setOpenIdx] = useState(null);
-
-  const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-
-  const { isLoaded, loadError } = useJsApiLoader({
-    id: 'grainhub-google-maps',
-    googleMapsApiKey: apiKey || '',
-  });
 
   // Filtered supplier set. Combines the three filter sources:
   //   1. activeCategory — the big tile grid (hardware, lumber, …)
@@ -57,13 +61,6 @@ export default function SuppliersMap({ activeCategory, onCategoryChange }) {
     });
   }, [activeCategory, trade, query]);
 
-  // Close the info window whenever the filter set shrinks past the open pin.
-  useEffect(() => {
-    if (openIdx != null && !visible.find((s) => s.name === openIdx)) {
-      setOpenIdx(null);
-    }
-  }, [visible, openIdx]);
-
   const handleClearFilters = useCallback(() => {
     setQuery('');
     if (onCategoryChange) onCategoryChange('');
@@ -74,35 +71,7 @@ export default function SuppliersMap({ activeCategory, onCategoryChange }) {
     }
   }, [onCategoryChange, searchParams, setSearchParams, trade]);
 
-  // Quiet fallback when the API key is missing — don't blow up the page.
-  if (!apiKey) {
-    return (
-      <div style={wrapperStyle}>
-        <div style={emptyStateStyle}>
-          <div style={{ fontSize: '28px', marginBottom: '0.5rem' }}>🗺️</div>
-          <div style={{ fontWeight: 600, marginBottom: '0.25rem' }}>Map unavailable</div>
-          <div style={{ fontSize: '13px', color: 'var(--text-muted)', maxWidth: '420px' }}>
-            Set <code>VITE_GOOGLE_MAPS_API_KEY</code> in your environment to
-            enable the supplier map. The list below still works.
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (loadError) {
-    return (
-      <div style={wrapperStyle}>
-        <div style={emptyStateStyle}>
-          <div style={{ fontSize: '28px', marginBottom: '0.5rem' }}>⚠️</div>
-          <div style={{ fontWeight: 600 }}>Couldn't load Google Maps</div>
-          <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
-            Check that your API key is valid and the Maps JavaScript API is enabled.
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const hasActiveFilter = query || activeCategory || trade;
 
   return (
     <div style={wrapperStyle}>
@@ -130,12 +99,12 @@ export default function SuppliersMap({ activeCategory, onCategoryChange }) {
           </select>
         </div>
 
-        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
           <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
             <strong style={{ color: 'var(--text-primary)' }}>{visible.length}</strong>{' '}
             {visible.length === 1 ? 'supplier' : 'suppliers'} shown
           </div>
-          {(query || activeCategory || trade) && (
+          {hasActiveFilter && (
             <button type="button" onClick={handleClearFilters} style={clearBtnStyle}>
               Clear filters
             </button>
@@ -145,75 +114,62 @@ export default function SuppliersMap({ activeCategory, onCategoryChange }) {
 
       {/* Map canvas */}
       <div style={{ position: 'relative' }}>
-        {!isLoaded ? (
-          <div style={{ ...MAP_CONTAINER, ...emptyStateStyle }}>
-            <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Loading map…</div>
-          </div>
-        ) : (
-          <GoogleMap
-            mapContainerStyle={MAP_CONTAINER}
-            center={US_CENTER}
-            zoom={DEFAULT_ZOOM}
-            options={{
-              styles: MAP_STYLES,
-              mapTypeControl: false,
-              streetViewControl: false,
-              fullscreenControl: true,
-              clickableIcons: false,
-              gestureHandling: 'greedy',
-            }}
-          >
-            {visible.map((s) => (
-              <Marker
-                key={s.name}
-                position={{ lat: s.lat, lng: s.lng }}
-                onClick={() => setOpenIdx(s.name)}
-                title={s.name}
-              />
-            ))}
-
-            {openIdx &&
-              (() => {
-                const s = visible.find((x) => x.name === openIdx);
-                if (!s) return null;
-                return (
-                  <InfoWindow
-                    position={{ lat: s.lat, lng: s.lng }}
-                    onCloseClick={() => setOpenIdx(null)}
+        <MapContainer
+          center={US_CENTER}
+          zoom={DEFAULT_ZOOM}
+          style={{ width: '100%', height: '480px' }}
+          scrollWheelZoom
+        >
+          <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          />
+          <FitToMarkers points={visible} />
+          {visible.map((s) => (
+            <Marker key={s.name} position={[s.lat, s.lng]}>
+              <Popup>
+                <div style={{ minWidth: '200px', fontFamily: "'DM Sans', sans-serif" }}>
+                  <div style={{ fontWeight: 700, fontSize: '14px', marginBottom: '2px' }}>
+                    {s.name}
+                  </div>
+                  <div style={{ fontSize: '12px', color: '#666', marginBottom: '6px' }}>
+                    {s.category}
+                  </div>
+                  <div style={{ fontSize: '12px', color: '#333', lineHeight: 1.4 }}>
+                    {s.address}
+                    <br />
+                    {s.city}, {s.state} {s.zip || ''}
+                  </div>
+                  <div style={{ fontSize: '12px', marginTop: '6px', color: '#333' }}>
+                    ⭐ {s.rating} · {s.reviews} reviews
+                  </div>
+                  <Link
+                    to="/suppliers/profile"
+                    style={{
+                      display: 'inline-block',
+                      marginTop: '8px',
+                      fontSize: '12px',
+                      fontWeight: 600,
+                      color: '#A0522D',
+                      textDecoration: 'none',
+                    }}
                   >
-                    <div style={{ minWidth: '200px', fontFamily: "'DM Sans', sans-serif" }}>
-                      <div style={{ fontWeight: 700, fontSize: '14px', marginBottom: '2px' }}>
-                        {s.name}
-                      </div>
-                      <div style={{ fontSize: '12px', color: '#666', marginBottom: '6px' }}>
-                        {s.category}
-                      </div>
-                      <div style={{ fontSize: '12px', color: '#333', lineHeight: 1.4 }}>
-                        {s.address}
-                        <br />
-                        {s.city}, {s.state} {s.zip || ''}
-                      </div>
-                      <div style={{ fontSize: '12px', marginTop: '6px', color: '#333' }}>
-                        ⭐ {s.rating} · {s.reviews} reviews
-                      </div>
-                      <Link
-                        to="/suppliers/profile"
-                        style={{
-                          display: 'inline-block',
-                          marginTop: '8px',
-                          fontSize: '12px',
-                          fontWeight: 600,
-                          color: '#A0522D',
-                          textDecoration: 'none',
-                        }}
-                      >
-                        View profile →
-                      </Link>
-                    </div>
-                  </InfoWindow>
-                );
-              })()}
-          </GoogleMap>
+                    View profile →
+                  </Link>
+                </div>
+              </Popup>
+            </Marker>
+          ))}
+        </MapContainer>
+
+        {visible.length === 0 && (
+          <div style={overlayEmptyStyle}>
+            <div style={{ fontSize: '22px', marginBottom: '0.25rem' }}>🔍</div>
+            <div style={{ fontWeight: 600, fontSize: '14px' }}>No suppliers match your filters</div>
+            <button type="button" onClick={handleClearFilters} style={{ ...clearBtnStyle, marginTop: '0.75rem' }}>
+              Clear filters
+            </button>
+          </div>
         )}
       </div>
     </div>
@@ -272,13 +228,17 @@ const clearBtnStyle = {
   fontFamily: "'DM Sans', sans-serif",
 };
 
-const emptyStateStyle = {
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  justifyContent: 'center',
-  padding: '3rem 1rem',
+const overlayEmptyStyle = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  background: 'rgba(255,255,255,0.96)',
+  border: '1px solid var(--border)',
+  borderRadius: '10px',
+  padding: '1rem 1.25rem',
   textAlign: 'center',
-  background: 'var(--wood-paper)',
-  color: 'var(--text-primary)',
+  boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+  zIndex: 500,
+  pointerEvents: 'auto',
 };
