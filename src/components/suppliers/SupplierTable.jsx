@@ -1,15 +1,17 @@
 import { Link, useSearchParams } from 'react-router-dom';
-import { SUPPLIER_LIST } from '../../data/suppliersData.js';
+import { SUPPLIER_LIST, supplierMatchesCategoryId } from '../../data/suppliersData.js';
 import { matchesTrade } from '../../lib/trades.js';
 import TradeFilterBanner from '../layout/TradeFilterBanner.jsx';
 
-export default function SupplierTable() {
+export default function SupplierTable({ activeCategory = '' }) {
   const [searchParams] = useSearchParams();
   const trade = searchParams.get('trade') || '';
 
-  const visible = trade
-    ? SUPPLIER_LIST.filter((s) => matchesTrade(s, trade))
-    : SUPPLIER_LIST;
+  const visible = SUPPLIER_LIST.filter((s) => {
+    if (!supplierMatchesCategoryId(s, activeCategory)) return false;
+    if (trade && !matchesTrade(s, trade)) return false;
+    return true;
+  });
 
   return (
     <div className="main-wrap">
@@ -18,18 +20,18 @@ export default function SupplierTable() {
         <div style={{ background: 'var(--white)', border: '1px solid var(--border)', borderRadius: '12px', overflow: 'hidden' }}>
           <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--border-light)', background: 'var(--white)' }}>
             <div style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text-primary)' }}>
-              Featured Suppliers {trade && `— ${visible.length} match${visible.length === 1 ? '' : 'es'}`}
+              Featured Suppliers {(trade || activeCategory) && `\u2014 ${visible.length} match${visible.length === 1 ? '' : 'es'}`}
             </div>
           </div>
 
           {visible.length === 0 ? (
             <div className="trade-empty">
-              No suppliers match this trade yet. Clear the filter above to see all suppliers.
+              No suppliers match this filter. Clear the filters above to see all suppliers.
             </div>
           ) : (
             visible.map((supplier) => (
               <Link
-                key={supplier.logo}
+                key={supplier.name}
                 to="/suppliers/profile"
                 style={{
                   padding: '1.25rem 1.5rem',
@@ -38,6 +40,8 @@ export default function SupplierTable() {
                   alignItems: 'center',
                   gap: '1rem',
                   cursor: 'pointer',
+                  textDecoration: 'none',
+                  color: 'inherit',
                 }}
               >
                 <div
@@ -64,6 +68,7 @@ export default function SupplierTable() {
                   </div>
                   <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '4px' }}>
                     {supplier.category}
+                    {supplier.location ? `  \u00b7  ${supplier.location}` : ''}
                   </div>
                   <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                     {supplier.badges.map((badge) => (

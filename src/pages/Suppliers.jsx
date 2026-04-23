@@ -2,10 +2,13 @@ import '../styles/suppliers.css';
 import { useState } from 'react';
 import PlatinumBar from '../components/suppliers/PlatinumBar.jsx';
 import SupplierTable from '../components/suppliers/SupplierTable.jsx';
+import SuppliersMap from '../components/suppliers/SuppliersMap.jsx';
 import { SUPPLIERS_HEADER, SUPPLIER_CATEGORIES } from '../data/suppliersData.js';
 
 export default function Suppliers() {
-  const [activeCategory, setActiveCategory] = useState('hardware');
+  // Start with NO category selected so the map shows every supplier. Users
+  // can drill into a category via the tiles or the map's own filter bar.
+  const [activeCategory, setActiveCategory] = useState('');
 
   return (
     <>
@@ -51,6 +54,16 @@ export default function Suppliers() {
       {/* PLATINUM SPONSORS */}
       <PlatinumBar />
 
+      {/* MAP - between the sponsor bar and the category tiles, above the list.
+          Shares activeCategory state with the tile grid below so selecting a
+          tile filters the map, and vice versa via the map's category dropdown. */}
+      <div className="main-wrap">
+        <SuppliersMap
+          activeCategory={activeCategory}
+          onCategoryChange={setActiveCategory}
+        />
+      </div>
+
       {/* CATEGORY HIGHWAY */}
       <div className="cat-highway">
         <div className="cat-highway-inner">
@@ -58,9 +71,14 @@ export default function Suppliers() {
             <div
               key={cat.id}
               className={`cat-tile ${activeCategory === cat.id ? 'active' : ''}`}
-              onClick={() => setActiveCategory(cat.id)}
+              onClick={() =>
+                setActiveCategory(activeCategory === cat.id ? '' : cat.id)
+              }
             >
-              <div className="cat-tile-icon" style={{ background: 'linear-gradient(135deg, #2C1A0E, #6B3F1F)' }}>
+              <div
+                className="cat-tile-icon"
+                style={{ background: 'linear-gradient(135deg, #2C1A0E, #6B3F1F)' }}
+              >
                 {cat.icon}
               </div>
               <div className="cat-tile-name">{cat.name}</div>
