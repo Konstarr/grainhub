@@ -1,5 +1,5 @@
 import { Link, useSearchParams } from 'react-router-dom';
-import { SUPPLIER_LIST, supplierMatchesCategoryId } from '../../data/suppliersData.js';
+import { supplierMatchesCategoryId } from '../../data/suppliersData.js';
 import { matchesTrade } from '../../lib/trades.js';
 import TradeFilterBanner from '../layout/TradeFilterBanner.jsx';
 
@@ -7,7 +7,7 @@ export default function SupplierTable({ activeCategory = '', suppliers }) {
   const [searchParams] = useSearchParams();
   const trade = searchParams.get('trade') || '';
 
-  const source = suppliers && suppliers.length ? suppliers : SUPPLIER_LIST;
+  const source = suppliers || [];
 
   const visible = source.filter((s) => {
     if (supplierMatchesCategoryId(s, activeCategory) === false) return false;

@@ -1,17 +1,12 @@
 import '../styles/events.css';
 import EventsPageHeader from '../components/events/EventsPageHeader.jsx';
 import EventsFilterTabs from '../components/events/EventsFilterTabs.jsx';
-import FeaturedEvent from '../components/events/FeaturedEvent.jsx';
 import EventsGrid from '../components/events/EventsGrid.jsx';
 import EventsSidebar from '../components/events/EventsSidebar.jsx';
 import {
   EVENTS_PAGE_HEADER,
   EVENTS_FILTER_TABS,
-  FEATURED_EVENT,
-  EVENT_LISTINGS,
   SUBMIT_EVENT_CARD,
-  SAVE_THE_DATE,
-  SPONSOR_AD,
   NEWSLETTER,
 } from '../data/eventsData.js';
 import { useSupabaseList } from '../hooks/useSupabaseList.js';
@@ -24,7 +19,7 @@ export default function Events() {
     limit: 40,
   });
 
-  const liveEvents = rows.length ? rows.map(mapEventRow) : EVENT_LISTINGS;
+  const liveEvents = rows.map(mapEventRow);
 
   return (
     <>
@@ -33,13 +28,16 @@ export default function Events() {
 
       <div className="main-wrap">
         <div className="content">
-          <FeaturedEvent event={FEATURED_EVENT} />
-          <EventsGrid events={liveEvents} />
+          {liveEvents.length === 0 ? (
+            <div style={{ padding: '3rem 2rem', textAlign: 'center', color: 'var(--text-muted)', border: '1px solid var(--border)', borderRadius: '12px', background: 'var(--white)' }}>
+              No upcoming events yet.
+            </div>
+          ) : (
+            <EventsGrid events={liveEvents} />
+          )}
         </div>
         <EventsSidebar
           submitCard={SUBMIT_EVENT_CARD}
-          saveTheDate={SAVE_THE_DATE}
-          sponsor={SPONSOR_AD}
           newsletter={NEWSLETTER}
         />
       </div>

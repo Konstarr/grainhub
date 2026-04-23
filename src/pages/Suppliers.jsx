@@ -1,6 +1,5 @@
 import '../styles/suppliers.css';
 import { useState } from 'react';
-import PlatinumBar from '../components/suppliers/PlatinumBar.jsx';
 import SupplierTable from '../components/suppliers/SupplierTable.jsx';
 import SuppliersMap from '../components/suppliers/SuppliersMap.jsx';
 import { SUPPLIERS_HEADER, SUPPLIER_CATEGORIES } from '../data/suppliersData.js';
@@ -16,21 +15,19 @@ export default function Suppliers() {
     order: { column: 'rating', ascending: false },
     limit: 100,
   });
-  const liveSuppliers = rows.length
-    ? rows.map((r) => {
-        const m = mapSupplierRow(r);
-        return {
-          logo: m.logo,
-          name: m.name,
-          category: m.category || '',
-          rating: m.rating || '',
-          reviews: String(m.reviewCount || 0),
-          location: m.address || '',
-          badges: m.badges || [],
-          trade: m.trade,
-        };
-      })
-    : null;
+  const liveSuppliers = rows.map((r) => {
+    const m = mapSupplierRow(r);
+    return {
+      logo: m.logo,
+      name: m.name,
+      category: m.category || '',
+      rating: m.rating || '',
+      reviews: String(m.reviewCount || 0),
+      location: m.address || '',
+      badges: m.badges || [],
+      trade: m.trade,
+    };
+  });
 
   return (
     <>
@@ -70,8 +67,6 @@ export default function Suppliers() {
           </div>
         </div>
       </div>
-
-      <PlatinumBar />
 
       <div className="main-wrap" style={{ marginTop: '1.5rem' }}>
         <button
@@ -119,7 +114,7 @@ export default function Suppliers() {
         </div>
       </div>
 
-      <SupplierTable activeCategory={activeCategory} suppliers={liveSuppliers || undefined} />
+      <SupplierTable activeCategory={activeCategory} suppliers={liveSuppliers} />
     </>
   );
 }
