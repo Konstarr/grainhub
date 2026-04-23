@@ -221,7 +221,7 @@
   margin: 0 auto;
   padding: 1.5rem 1.5rem 2.5rem;
   display: grid;
-  grid-template-columns: 170px minmax(0, 1fr) 200px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) minmax(0, 1fr);
   gap: 1.25rem;
   align-items: start;
 }
@@ -272,7 +272,7 @@
 
 @media (max-width: 1180px) {
   .wiki-grid {
-    grid-template-columns: 170px minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 3fr);
   }
   .wiki-grid > .right-col {
     display: none;
