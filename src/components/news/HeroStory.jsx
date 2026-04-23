@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom';
 import { HERO_STORY } from '../../data/newsData.js';
 
-export default function HeroStory() {
+export default function HeroStory({ story }) {
+  const s = story || HERO_STORY;
   const colorClasses = {
     default: 'default',
     green: 'green',
@@ -14,25 +15,25 @@ export default function HeroStory() {
 
   return (
     <Link to="/news/article" className="hero-story">
-      <div className="hero-story-img" style={{ background: HERO_STORY.imgGradient }}>
-        <span className={`story-kicker ${colorClasses[HERO_STORY.kicker.color]}`}>
-          {HERO_STORY.kicker.label}
+      <div className="hero-story-img" style={{ background: s.imgGradient }}>
+        <span className={`story-kicker ${colorClasses[s.kicker.color]}`}>
+          {s.kicker.label}
         </span>
       </div>
       <div className="hero-story-body">
         <div className="story-meta-top">
-          <span>{HERO_STORY.category}</span>
-          <span className="story-meta-dot">·</span>
-          <span>{HERO_STORY.publishedDate}</span>
-          <span className="story-meta-dot">·</span>
-          <span>{HERO_STORY.readTime}</span>
+          <span>{s.category}</span>
+          <span className="story-meta-dot">.</span>
+          <span>{s.publishedDate}</span>
+          <span className="story-meta-dot">.</span>
+          <span>{s.readTime}</span>
         </div>
-        <h2 className="hero-story-title">{HERO_STORY.title}</h2>
-        <p className="hero-story-excerpt">{HERO_STORY.excerpt}</p>
+        <h2 className="hero-story-title">{s.title}</h2>
+        <p className="hero-story-excerpt">{s.excerpt}</p>
         <div className="story-footer">
           <div className="story-author">
-            <div className="author-avatar">{HERO_STORY.author.initials}</div>
-            <span>{HERO_STORY.author.name}</span>
+            <div className="author-avatar">{s.author.initials}</div>
+            <span>{s.author.name}</span>
           </div>
         </div>
       </div>

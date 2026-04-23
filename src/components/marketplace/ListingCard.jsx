@@ -8,16 +8,17 @@ export default function ListingCard({ listing, section }) {
   else if (section.includes('Surplus')) catBadgeClass = 'cb-surplus';
   else if (section.includes('Finishing')) catBadgeClass = 'cb-finishing';
 
+  const condition = listing.condition || '';
   let condClass = 'cond-excellent';
-  if (listing.condition.includes('Good')) condClass = 'cond-good';
-  else if (listing.condition.includes('Fair')) condClass = 'cond-fair';
-  else if (listing.condition.includes('New')) condClass = 'cond-new';
+  if (condition.includes('Good')) condClass = 'cond-good';
+  else if (condition.includes('Fair')) condClass = 'cond-fair';
+  else if (condition.includes('New')) condClass = 'cond-new';
 
   return (
     <Link to="/marketplace/listing" className="listing-card">
       <div className={`card-img-area ${listing.imgClass}`} style={listing.imgStyle}>
         {listing.emoji}
-        <button className="card-save-btn">🔖</button>
+        <button className="card-save-btn">Save</button>
         {listing.isNew && <span className="new-badge">NEW</span>}
         {listing.badge && <span className="new-badge">{listing.badge}</span>}
       </div>
@@ -30,12 +31,12 @@ export default function ListingCard({ listing, section }) {
         <div className="card-specs">
           {listing.year && (
             <div className="card-spec">
-              📅 {listing.year} &nbsp;·&nbsp; 📍 {listing.location}
+              {listing.year} - {listing.location}
             </div>
           )}
           {listing.year === undefined && (
             <div className="card-spec">
-              📍 {listing.location} &nbsp;·&nbsp; {listing.shipping}
+              {listing.location} - {listing.shipping}
             </div>
           )}
           {listing.specs && <div className="card-spec">{listing.specs}</div>}

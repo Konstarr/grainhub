@@ -1,10 +1,9 @@
 import FeaturedListing from './FeaturedListing.jsx';
-import ListingCard from './ListingCard.jsx';
 import ListingSection from './ListingSection.jsx';
 import SellCTA from './SellCTA.jsx';
 import { FEATURED_LISTING, MACHINERY_LISTINGS, LUMBER_LISTINGS, SHEET_GOODS_LISTINGS, VEHICLE_LISTINGS, SURPLUS_LISTINGS } from '../../data/marketplaceData.js';
 
-export default function ListingsArea() {
+export default function ListingsArea({ recent }) {
   return (
     <div className="listings-col">
       <div className="listings-toolbar">
@@ -31,6 +30,10 @@ export default function ListingsArea() {
       </div>
 
       <FeaturedListing listing={FEATURED_LISTING} />
+
+      {recent && recent.length > 0 && (
+        <ListingSection title="🆕 Latest Listings" link={`See all ${recent.length} →`} listings={recent} />
+      )}
 
       <ListingSection title="⚙️ Machinery & Equipment" link="See all 892 →" listings={MACHINERY_LISTINGS} />
       <ListingSection title="🪵 Lumber & Hardwood" link="See all 484 →" listings={LUMBER_LISTINGS} />

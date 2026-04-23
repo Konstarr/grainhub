@@ -12,7 +12,7 @@ function ArticleCard({ article }) {
         <div className="ac-cat">{article.category}</div>
         <div className="ac-title">{article.title}</div>
         <div className="ac-footer">
-          <span className="ac-rating">★ {article.rating}</span>
+          <span className="ac-rating">{article.rating}</span>
           <span>{article.views}</span>
         </div>
       </div>
@@ -20,16 +20,17 @@ function ArticleCard({ article }) {
   );
 }
 
-export default function RecentlyUpdated() {
+export default function RecentlyUpdated({ articles }) {
+  const list = articles && articles.length ? articles : RECENTLY_UPDATED_ARTICLES;
   return (
     <>
       <div className="section-header">
         <h2 className="section-title">Recently Updated</h2>
-        <span className="section-link">All recent edits →</span>
+        <span className="section-link">All recent edits</span>
       </div>
       <div className="articles-grid">
-        {RECENTLY_UPDATED_ARTICLES.map((article) => (
-          <ArticleCard key={article.title} article={article} />
+        {list.map((article) => (
+          <ArticleCard key={article.id || article.title} article={article} />
         ))}
       </div>
     </>

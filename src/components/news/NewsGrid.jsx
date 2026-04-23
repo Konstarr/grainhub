@@ -22,9 +22,9 @@ function NewsCard({ story }) {
       <div className="news-card-body">
         <div className="story-meta-top">
           <span>{story.category}</span>
-          <span className="story-meta-dot">·</span>
+          <span className="story-meta-dot">.</span>
           <span>{story.publishedDate}</span>
-          <span className="story-meta-dot">·</span>
+          <span className="story-meta-dot">.</span>
           <span>{story.readTime}</span>
         </div>
         <h3 className="news-card-title">{story.title}</h3>
@@ -40,11 +40,12 @@ function NewsCard({ story }) {
   );
 }
 
-export default function NewsGrid() {
+export default function NewsGrid({ stories }) {
+  const list = stories && stories.length ? stories : NEWS_STORIES;
   return (
     <div className="news-grid">
-      {NEWS_STORIES.map((story) => (
-        <NewsCard key={story.title} story={story} />
+      {list.map((story) => (
+        <NewsCard key={story.id || story.title} story={story} />
       ))}
     </div>
   );

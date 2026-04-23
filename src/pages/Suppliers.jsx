@@ -4,18 +4,36 @@ import PlatinumBar from '../components/suppliers/PlatinumBar.jsx';
 import SupplierTable from '../components/suppliers/SupplierTable.jsx';
 import SuppliersMap from '../components/suppliers/SuppliersMap.jsx';
 import { SUPPLIERS_HEADER, SUPPLIER_CATEGORIES } from '../data/suppliersData.js';
+import { useSupabaseList } from '../hooks/useSupabaseList.js';
+import { mapSupplierRow } from '../lib/mappers.js';
 
 export default function Suppliers() {
-  // Start with NO category selected so the map shows every supplier. Users
-  // can drill into a category via the tiles or the map's own filter bar.
   const [activeCategory, setActiveCategory] = useState('');
-  // Map is hidden by default so the page feels lighter. Users opt in via
-  // the "Show map" toggle above the category tiles.
   const [showMap, setShowMap] = useState(false);
+
+  const { data: rows } = useSupabaseList('suppliers', {
+    filter: (q) => q.eq('is_approved', true),
+    order: { column: 'rating', ascending: false },
+    limit: 100,
+  });
+  const liveSuppliers = rows.length
+    ? rows.map((r) => {
+        const m = mapSupplierRow(r);
+        return {
+          logo: m.logo,
+          name: m.name,
+          category: m.category || '',
+          rating: m.rating || '',
+          reviews: String(m.reviewCount || 0),
+          location: m.address || '',
+          badges: m.badges || [],
+          trade: m.trade,
+        };
+      })
+    : null;
 
   return (
     <>
-      {/* PAGE HEADER */}
       <div className="page-header">
         <div className="header-inner">
           <div className="header-top">
@@ -34,7 +52,6 @@ export default function Suppliers() {
             </div>
           </div>
 
-          {/* SEARCH HERO */}
           <div className="search-hero">
             <div className="search-input-wrap">
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -49,28 +66,23 @@ export default function Suppliers() {
                 <option key={cat.id}>{cat.name}</option>
               ))}
             </select>
-            <button className="search-btn">Search Suppliers →</button>
+            <button className="search-btn">Search Suppliers</button>
           </div>
         </div>
       </div>
 
-      {/* PLATINUM SPONSORS */}
       <PlatinumBar />
 
-      {/* MAP TOGGLE - hidden by default to keep the page light. Clicking the
-          pill reveals the full map between the sponsor bar and category tiles.
-          Shares activeCategory state with the tile grid below so selecting a
-          tile filters the map, and vice versa via the map's category dropdown. */}
       <div className="main-wrap" style={{ marginTop: '1.5rem' }}>
         <button
           type="button"
-          onClick={() => setShowMap((v) => !v)}
+          onClick={() => setShowMap((v) => (v ? false : true))}
           aria-expanded={showMap}
           style={mapTogglePillStyle}
         >
-          <span style={{ fontSize: '16px' }}>{showMap ? '✕' : '🗺'}</span>
+          <span style={{ fontSize: '16px' }}>{showMap ? 'X' : 'M'}</span>
           <span>
-            {showMap ? 'Hide map' : 'Show map — find suppliers near you'}
+            {showMap ? 'Hide map' : 'Show map - find suppliers near you'}
           </span>
         </button>
 
@@ -84,7 +96,6 @@ export default function Suppliers() {
         )}
       </div>
 
-      {/* CATEGORY HIGHWAY */}
       <div className="cat-highway">
         <div className="cat-highway-inner">
           {SUPPLIER_CATEGORIES.map((cat) => (
@@ -108,8 +119,7 @@ export default function Suppliers() {
         </div>
       </div>
 
-      {/* SUPPLIERS TABLE */}
-      <SupplierTable activeCategory={activeCategory} />
+      <SupplierTable activeCategory={activeCategory} suppliers={liveSuppliers || undefined} />
     </>
   );
 }

@@ -3,13 +3,15 @@ import { SUPPLIER_LIST, supplierMatchesCategoryId } from '../../data/suppliersDa
 import { matchesTrade } from '../../lib/trades.js';
 import TradeFilterBanner from '../layout/TradeFilterBanner.jsx';
 
-export default function SupplierTable({ activeCategory = '' }) {
+export default function SupplierTable({ activeCategory = '', suppliers }) {
   const [searchParams] = useSearchParams();
   const trade = searchParams.get('trade') || '';
 
-  const visible = SUPPLIER_LIST.filter((s) => {
-    if (!supplierMatchesCategoryId(s, activeCategory)) return false;
-    if (trade && !matchesTrade(s, trade)) return false;
+  const source = suppliers && suppliers.length ? suppliers : SUPPLIER_LIST;
+
+  const visible = source.filter((s) => {
+    if (supplierMatchesCategoryId(s, activeCategory) === false) return false;
+    if (trade && matchesTrade(s, trade) === false) return false;
     return true;
   });
 
@@ -68,7 +70,7 @@ export default function SupplierTable({ activeCategory = '' }) {
                   </div>
                   <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '4px' }}>
                     {supplier.category}
-                    {supplier.location ? `  \u00b7  ${supplier.location}` : ''}
+                    {supplier.location ? ` - ${supplier.location}` : ''}
                   </div>
                   <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                     {supplier.badges.map((badge) => (
@@ -90,7 +92,7 @@ export default function SupplierTable({ activeCategory = '' }) {
                 </div>
                 <div style={{ textAlign: 'right', flexShrink: 0 }}>
                   <div style={{ fontSize: '18px', fontWeight: '500', color: 'var(--text-primary)' }}>
-                    ⭐ {supplier.rating}
+                    {supplier.rating}
                   </div>
                   <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>
                     {supplier.reviews} reviews

@@ -14,8 +14,18 @@ import {
   SPONSOR_AD,
   NEWSLETTER,
 } from '../data/eventsData.js';
+import { useSupabaseList } from '../hooks/useSupabaseList.js';
+import { mapEventRow } from '../lib/mappers.js';
 
 export default function Events() {
+  const { data: rows } = useSupabaseList('events', {
+    filter: (q) => q.eq('is_approved', true).gte('start_date', new Date(Date.now() - 30 * 86400000).toISOString()),
+    order: { column: 'start_date', ascending: true },
+    limit: 40,
+  });
+
+  const liveEvents = rows.length ? rows.map(mapEventRow) : EVENT_LISTINGS;
+
   return (
     <>
       <EventsPageHeader data={EVENTS_PAGE_HEADER} />
@@ -24,7 +34,7 @@ export default function Events() {
       <div className="main-wrap">
         <div className="content">
           <FeaturedEvent event={FEATURED_EVENT} />
-          <EventsGrid events={EVENT_LISTINGS} />
+          <EventsGrid events={liveEvents} />
         </div>
         <EventsSidebar
           submitCard={SUBMIT_EVENT_CARD}

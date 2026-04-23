@@ -4,14 +4,64 @@ import CategoryHighway from '../components/marketplace/CategoryHighway.jsx';
 import FilterSidebar from '../components/marketplace/FilterSidebar.jsx';
 import ListingsArea from '../components/marketplace/ListingsArea.jsx';
 import { MARKETPLACE_HEADER } from '../data/marketplaceData.js';
+import { useSupabaseList } from '../hooks/useSupabaseList.js';
+import { mapMarketplaceRow } from '../lib/mappers.js';
+
+const COND_LABEL = {
+  'new': 'New',
+  'used-excellent': 'Excellent',
+  'used-good': 'Good',
+  'used-fair': 'Fair',
+};
+const EMOJI_BY_CAT = {
+  'CNC Machinery': 'CNC',
+  'Edgebanders': 'EB',
+  'Moulders': 'M',
+  'Finishing': 'F',
+  'Stationary Tools': 'ST',
+  'Combination': 'C',
+  'Hand/Power Tools': 'HP',
+  'Panel Saws': 'PS',
+  'Dust Collection': 'DC',
+  'Lumber': 'L',
+  'Sheet Goods': 'SG',
+  'Hardware': 'H',
+  'Sanders': 'SA',
+  'Tooling': 'T',
+};
+
+function toListingCard(row) {
+  const m = mapMarketplaceRow(row);
+  return {
+    id: m.id,
+    category: m.category || 'Misc',
+    condition: COND_LABEL[m.condition] || 'Used',
+    title: m.title,
+    location: m.location || 'U.S.',
+    shipping: 'Local pickup',
+    price: m.price || 'Contact',
+    priceUnit: '',
+    emoji: EMOJI_BY_CAT[m.category] || 'Item',
+    imgClass: 'mk-img-default',
+    imgStyle: { background: 'linear-gradient(135deg, #2C1A0E, #6B3F1F)' },
+    specs: m.description ? m.description.slice(0, 80) + (m.description.length > 80 ? '...' : '') : '',
+    isNew: false,
+  };
+}
 
 export default function Marketplace() {
   const [activeCategory, setActiveCategory] = useState('all');
   const [filters, setFilters] = useState({ conditions: ['New', 'Excellent', 'Good'] });
 
+  const { data: rows } = useSupabaseList('marketplace_listings', {
+    filter: (q) => q.eq('is_approved', true).eq('is_sold', false),
+    order: { column: 'created_at', ascending: false },
+    limit: 12,
+  });
+  const recent = rows.map(toListingCard);
+
   return (
     <>
-      {/* PAGE HEADER */}
       <div className="page-header">
         <div className="header-inner">
           <div className="header-top">
@@ -30,7 +80,6 @@ export default function Marketplace() {
             </div>
           </div>
 
-          {/* SEARCH HERO */}
           <div className="search-hero">
             <div className="search-hero-input">
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -59,18 +108,16 @@ export default function Marketplace() {
               <option>West US</option>
               <option>Canada</option>
             </select>
-            <button className="search-btn">Search Listings →</button>
+            <button className="search-btn">Search Listings</button>
           </div>
         </div>
       </div>
 
-      {/* CATEGORY HIGHWAY */}
       <CategoryHighway activeCategory={activeCategory} onCategorySelect={setActiveCategory} />
 
-      {/* MAIN */}
       <div className="mk-wrap">
         <FilterSidebar filters={filters} onFilterChange={setFilters} />
-        <ListingsArea />
+        <ListingsArea recent={recent} />
       </div>
     </>
   );
