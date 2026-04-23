@@ -4,8 +4,8 @@
  */
 
 export const BREADCRUMB = [
-  { label: 'Suppliers', href: '#' },
-  { label: 'Hardware & Hinges', href: '#' },
+  { label: 'Suppliers', href: '/suppliers' },
+  { label: 'Hardware & Hinges', href: '/suppliers' },
   { label: 'Julius Blum GmbH', current: true },
 ];
 
@@ -18,7 +18,7 @@ export const SUPPLIER_HERO = {
     { label: 'Ships Worldwide', class: 'hb-muted' },
   ],
   name: 'Julius Blum GmbH',
-  description: 'The world\'s leading manufacturer of functional cabinet hardware — hinges, drawer systems, and lift systems for the professional trade. Founded 1952, Höchst, Austria.',
+  description: "The world's leading manufacturer of functional cabinet hardware — hinges, drawer systems, and lift systems for the professional trade. Founded 1952, Höchst, Austria.",
   rating: '4.9',
   stars: '★★★★★',
   reviews: '1,284 reviews',
@@ -37,8 +37,8 @@ export const HERO_TABS = [
 
 export const ABOUT = {
   paragraphs: [
-    'Founded in 1952 in Höchst, Vorarlberg, Austria, Julius Blum GmbH is the world\'s leading manufacturer of functional cabinet hardware. The company began as a die-casting business and pivoted to cabinet hardware in the 1950s, recognizing the growing demand for precision hinge systems in postwar European furniture production.',
-    'Today Blum employs over 9,000 people worldwide, manufactures from seven plants in Austria and one in the United States, and distributes to more than 120 countries. Their CLIP top hinge system is the most widely specified concealed hinge in the world. In North America, Blum operates from Stanley, NC with regional reps, certified trainers, and dedicated technical support serving the custom cabinet, semi-custom, and production markets.',
+    "Founded in 1952 in Höchst, Vorarlberg, Austria, Julius Blum GmbH is the world's leading manufacturer of functional cabinet hardware. The company began as a die-casting business and pivoted to cabinet hardware in the 1950s, recognizing the growing demand for precision hinge systems in postwar European furniture production.",
+    "Today Blum employs over 9,000 people worldwide, manufactures from seven plants in Austria and one in the United States, and distributes to more than 120 countries. Their CLIP top hinge system is the most widely specified concealed hinge in the world. In North America, Blum operates from Stanley, NC with regional reps, certified trainers, and dedicated technical support serving the custom cabinet, semi-custom, and production markets.",
   ],
   details: [
     { label: 'Founded', value: '1952 · Höchst, Austria' },
@@ -83,7 +83,7 @@ export const SAMPLE_REVIEWS = [
     stars: '★★★★★',
     date: 'March 2025',
     tag: 'CLIP top BLUMOTION',
-    body: 'We\'ve been spec\'ing Blum exclusively for five years. The CLIP top BLUMOTION is the hinge I\'d choose for every job — the ±2mm side adjustment has saved us on countless out-of-square installations in old houses. When we had a batch issue, customer service replaced the whole box immediately, no questions.',
+    body: "We've been spec'ing Blum exclusively for five years. The CLIP top BLUMOTION is the hinge I'd choose for every job — the ±2mm side adjustment has saved us on countless out-of-square installations in old houses. When we had a batch issue, customer service replaced the whole box immediately, no questions.",
     helpful: '32 members found this helpful',
   },
   {
@@ -93,7 +93,7 @@ export const SAMPLE_REVIEWS = [
     stars: '★★★★★',
     date: 'February 2025',
     tag: 'LEGRABOX pure',
-    body: 'The LEGRABOX is what I spec on every high-end residential project. The movement quality is exceptional — clients notice it even when they don\'t know what they\'re looking at. Soft-close is whisper-quiet after years of daily use on demo units. Only gripe is 600mm orion grey lead times running 2–3 weeks.',
+    body: "The LEGRABOX is what I spec on every high-end residential project. The movement quality is exceptional — clients notice it even when they don't know what they're looking at. Soft-close is whisper-quiet after years of daily use on demo units. Only gripe is 600mm orion grey lead times running 2–3 weeks.",
     helpful: '18 members found this helpful',
   },
   {
@@ -103,7 +103,7 @@ export const SAMPLE_REVIEWS = [
     stars: '★★★★☆',
     date: 'January 2025',
     tag: 'AVENTOS HK-S',
-    body: 'Great product once you understand power range calibration — took our shop two or three installs to consistently nail the door weight matching. Tech support always picks up and gives real answers. Installation videos are excellent. Docking one star for the learning curve, not the product itself.',
+    body: "Great product once you understand power range calibration — took our shop two or three installs to consistently nail the door weight matching. Tech support always picks up and gives real answers. Installation videos are excellent. Docking one star for the learning curve, not the product itself.",
     helpful: '24 members found this helpful',
   },
 ];

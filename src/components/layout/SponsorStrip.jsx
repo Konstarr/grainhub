@@ -1,9 +1,11 @@
+import { Link } from 'react-router-dom';
+
 const SPONSORS = [
   'Blum Hardware',
   'Biesse America',
   'Lamello AG',
   'SCM Group',
-  'Dürr Systems',
+  'Durr Systems',
   'Homag Group',
 ];
 
@@ -18,7 +20,7 @@ export default function SponsorStrip() {
           </div>
         ))}
       </div>
-      <span className="sponsor-cta">Become a Sponsor →</span>
+      <Link to="/sponsor" className="sponsor-cta">Become a Sponsor →</Link>
     </div>
   );
 }

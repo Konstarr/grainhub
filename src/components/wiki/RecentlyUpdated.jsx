@@ -1,9 +1,10 @@
+import { Link } from 'react-router-dom';
 import { RECENTLY_UPDATED_ARTICLES } from '../../data/wikiData.js';
 
 function ArticleCard({ article }) {
   const variantClass = article.badge.variant === 'featured' ? 'ab-featured' : 'ab-new';
   return (
-    <div className="article-card">
+    <Link to="/wiki/article" className="article-card">
       <div className="ac-img" style={{ background: article.imgGradient }}>
         <span className={`ac-badge ${variantClass}`}>{article.badge.label}</span>
       </div>
@@ -15,7 +16,7 @@ function ArticleCard({ article }) {
           <span>{article.views}</span>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
 

@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+
 export default function JobsSidebar({ salaryGuide, topCompanies, postJobCta, talentCta }) {
   return (
     <aside className="right-col">
@@ -5,7 +7,7 @@ export default function JobsSidebar({ salaryGuide, topCompanies, postJobCta, tal
         <div className="pjc-eyebrow">{postJobCta.eyebrow}</div>
         <div className="pjc-title">{postJobCta.title}</div>
         <div className="pjc-sub">{postJobCta.description}</div>
-        <button className="pjc-btn">Post a Job Now →</button>
+        <Link to="/sponsor" className="pjc-btn">Post a Job Now →</Link>
         <div className="pjc-pricing">
           {postJobCta.tiers.map((tier, idx) => (
             <div key={idx} className="pjc-tier">
@@ -19,11 +21,11 @@ export default function JobsSidebar({ salaryGuide, topCompanies, postJobCta, tal
       <div className="talent-card">
         <div className="tc-title">{talentCta.title}</div>
         <div className="tc-sub">{talentCta.description}</div>
-        <button className="tc-btn">Create Your Profile →</button>
+        <Link to="/signup" className="tc-btn">Create Your Profile →</Link>
       </div>
 
       <div className="rs-card">
-        <div className="rs-header">💰 2025 Salary Guide</div>
+        <div className="rs-header">2025 Salary Guide</div>
         <div className="rs-body">
           {salaryGuide.map((row, idx) => (
             <div key={idx} className="salary-row">
@@ -43,7 +45,7 @@ export default function JobsSidebar({ salaryGuide, topCompanies, postJobCta, tal
       </div>
 
       <div className="rs-card">
-        <div className="rs-header">🏭 Top Hiring Companies</div>
+        <div className="rs-header">Top Hiring Companies</div>
         <div className="rs-body">
           {topCompanies.map((company, idx) => (
             <div key={idx} className="employer-item">

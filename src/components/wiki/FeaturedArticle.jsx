@@ -1,8 +1,9 @@
+import { Link } from 'react-router-dom';
 import { FEATURED_ARTICLE } from '../../data/wikiData.js';
 
 export default function FeaturedArticle() {
   return (
-    <div className="featured-article">
+    <Link to="/wiki/article" className="featured-article">
       <div className="fa-img" style={{ background: 'linear-gradient(135deg,#1C0E05,#3D2010,#6B3820)' }}>
         <div className="fa-badge">⭐ Featured Article</div>
       </div>
@@ -20,6 +21,6 @@ export default function FeaturedArticle() {
           <span className="read-more">Read Article →</span>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }

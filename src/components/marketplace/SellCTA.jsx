@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { SELL_CTA } from '../../data/marketplaceData.js';
 
 export default function SellCTA() {
@@ -7,8 +8,8 @@ export default function SellCTA() {
         <h3>{SELL_CTA.heading}</h3>
         <p>{SELL_CTA.description}</p>
         <div className="sell-cta-actions">
-          <button className="sell-btn-primary">Post a Listing Now →</button>
-          <button className="sell-btn-outline">View Pricing & Plans</button>
+          <Link to="/sponsor" className="sell-btn-primary">Post a Listing Now →</Link>
+          <Link to="/sponsor" className="sell-btn-outline">View Pricing & Plans</Link>
         </div>
       </div>
       <div className="sell-pricing-grid">

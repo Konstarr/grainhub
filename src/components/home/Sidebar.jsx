@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { JOB_LISTINGS, MACHINERY_LISTINGS, SUPPLIER_LINKS } from '../../data/homeData.js';
 
 function SponsorAd() {
@@ -9,7 +10,7 @@ function SponsorAd() {
         Effortless electronic opening of lift systems for all panel sizes — touch-to-open, fully
         integrated.
       </div>
-      <button className="sp-btn">Learn More &amp; Download Spec →</button>
+      <Link to="/sponsor" className="sp-btn">Learn More &amp; Download Spec →</Link>
     </div>
   );
 }
@@ -32,8 +33,8 @@ function JobsCard() {
             </div>
           </div>
         ))}
-        <button className="sidebar-post-btn">Post a Job — from $149/month</button>
-        <button className="sidebar-outline-btn">Browse All 142 Openings →</button>
+        <Link to="/sponsor" className="sidebar-post-btn">Post a Job — from $149/month</Link>
+        <Link to="/jobs" className="sidebar-outline-btn">Browse All 142 Openings →</Link>
       </div>
     </div>
   );
@@ -45,17 +46,17 @@ function MachineryCard() {
       <div className="sidebar-card-header">Machinery Marketplace</div>
       <div className="sidebar-card-body">
         {MACHINERY_LISTINGS.map((m) => (
-          <div key={m.title} className="machine-item">
+          <Link key={m.title} to="/marketplace/listing" className="machine-item">
             <div className="machine-thumb">{m.thumb}</div>
             <div>
               <div className="machine-title">{m.title}</div>
               <div className="machine-price">{m.price}</div>
               <div className="machine-loc">{m.loc}</div>
             </div>
-          </div>
+          </Link>
         ))}
-        <button className="sidebar-post-btn secondary">List Your Machine — from $29</button>
-        <button className="sidebar-outline-btn">Browse 890 Listings →</button>
+        <Link to="/sponsor" className="sidebar-post-btn secondary">List Your Machine — from $29</Link>
+        <Link to="/marketplace" className="sidebar-outline-btn">Browse 890 Listings →</Link>
       </div>
     </div>
   );
@@ -68,13 +69,13 @@ function SupplierCard() {
       <div className="sidebar-card-body compact">
         <div className="supplier-links">
           {SUPPLIER_LINKS.map((s) => (
-            <div key={s.label} className="supplier-link">
+            <Link key={s.label} to="/suppliers/profile" className="supplier-link">
               <span className="supplier-icon">{s.icon}</span>
               {s.label}
-            </div>
+            </Link>
           ))}
         </div>
-        <button className="sidebar-outline-btn">List Your Company — from $299/yr</button>
+        <Link to="/sponsor" className="sidebar-outline-btn">List Your Company — from $299/yr</Link>
       </div>
     </div>
   );

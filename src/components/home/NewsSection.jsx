@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import SectionHeader from './SectionHeader.jsx';
 import { FEATURED_NEWS, NEWS_ITEMS } from '../../data/homeData.js';
 
@@ -9,10 +10,10 @@ function NewsTag({ label, color = 'default' }) {
 export default function NewsSection() {
   return (
     <>
-      <SectionHeader title="Industry News" linkLabel="All news →" />
+      <SectionHeader title="Industry News" linkLabel="All news →" linkTo="/news" />
 
       {/* Featured article */}
-      <div className="news-featured">
+      <Link to="/news/article" className="news-featured">
         <div className="news-featured-img">
           <NewsTag label={FEATURED_NEWS.tag} color={FEATURED_NEWS.tagColor} />
         </div>
@@ -24,19 +25,19 @@ export default function NewsSection() {
             {FEATURED_NEWS.readTime}
           </div>
         </div>
-      </div>
+      </Link>
 
       {/* Secondary stories */}
       <div className="news-list">
         {NEWS_ITEMS.map((item) => (
-          <div key={item.title} className="news-item">
+          <Link key={item.title} to="/news/article" className="news-item">
             <div className={`news-icon ${item.iconColor}`}>{item.icon}</div>
             <div className="news-item-body">
               <div className="news-item-title">{item.title}</div>
               <div className="news-item-meta">{item.meta}</div>
             </div>
             <NewsTag label={item.tag} color={item.tagColor} />
-          </div>
+          </Link>
         ))}
       </div>
     </>

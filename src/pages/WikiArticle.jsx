@@ -1,4 +1,5 @@
 import '../styles/wikiArticle.css';
+import { Link } from 'react-router-dom';
 import { ARTICLE_DATA, ARTICLE_BODY, INFOBOX, RELATED_ARTICLES, ARTICLE_FOOTER, COMMENTS } from '../data/wikiArticleData.js';
 
 function TableOfContents() {
@@ -81,7 +82,7 @@ function ArticleContent() {
           <h2 className="related-title">Related Articles</h2>
           <div className="related-grid">
             {RELATED_ARTICLES.map((article) => (
-              <div key={article.title} className="related-card">
+              <Link key={article.title} to="/wiki/article" className="related-card" style={{ textDecoration: 'none', color: 'inherit' }}>
                 <div className="rc-img" style={{ background: article.imgGradient }}>
                   <span className="rc-cat" style={{ background: article.badge === 'Featured' ? 'var(--wood-warm)' : 'var(--accent-green)' }}>
                     {article.badge}
@@ -89,7 +90,7 @@ function ArticleContent() {
                 </div>
                 <div className="rc-title">{article.title}</div>
                 <div className="rc-meta">{article.category}</div>
-              </div>
+              </Link>
             ))}
           </div>
         </div>

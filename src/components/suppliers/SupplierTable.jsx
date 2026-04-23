@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { SUPPLIER_LIST } from '../../data/suppliersData.js';
 
 export default function SupplierTable() {
@@ -12,8 +13,9 @@ export default function SupplierTable() {
           </div>
 
           {SUPPLIER_LIST.map((supplier) => (
-            <div
+            <Link
               key={supplier.logo}
+              to="/suppliers/profile"
               style={{
                 padding: '1.25rem 1.5rem',
                 borderBottom: '1px solid var(--border-light)',
@@ -74,7 +76,7 @@ export default function SupplierTable() {
                   {supplier.reviews} reviews
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>

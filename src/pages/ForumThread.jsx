@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import '../styles/forumThread.css';
 import ThreadHeader from '../components/forumThread/ThreadHeader.jsx';
 import SortBar from '../components/forumThread/SortBar.jsx';
@@ -28,6 +29,11 @@ export default function ForumThread() {
 
   return (
     <>
+      <div className="breadcrumb-bar">
+        <Link to="/forums">Forums</Link>
+        <span className="bc-sep">›</span>
+        <span>{THREAD_HEADER.title}</span>
+      </div>
       <div className="page-wrap">
         <div>
           <ThreadHeader data={THREAD_HEADER} onReply={() => setScrollToReply(true)} />

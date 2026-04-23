@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { HERO_STATS } from '../../data/homeData.js';
 
 export default function Hero() {
@@ -16,8 +17,8 @@ export default function Hero() {
             forums, machinery listings, job postings, and a living wiki. All in one place.
           </p>
           <div className="hero-actions">
-            <button className="btn-hero-primary">Join Free — It Takes 30 Seconds →</button>
-            <button className="btn-hero-outline">Browse the Wiki</button>
+            <Link to="/signup" className="btn-hero-primary">Join Free — It Takes 30 Seconds →</Link>
+            <Link to="/wiki" className="btn-hero-outline">Browse the Wiki</Link>
           </div>
         </div>
 

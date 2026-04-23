@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { HERO_STORY } from '../../data/newsData.js';
 
 export default function HeroStory() {
@@ -12,7 +13,7 @@ export default function HeroStory() {
   };
 
   return (
-    <div className="hero-story">
+    <Link to="/news/article" className="hero-story">
       <div className="hero-story-img" style={{ background: HERO_STORY.imgGradient }}>
         <span className={`story-kicker ${colorClasses[HERO_STORY.kicker.color]}`}>
           {HERO_STORY.kicker.label}
@@ -35,6 +36,6 @@ export default function HeroStory() {
           </div>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }

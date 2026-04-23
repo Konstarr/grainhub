@@ -1,4 +1,5 @@
 import '../styles/listing.css';
+import { Link } from 'react-router-dom';
 import Gallery from '../components/listing/Gallery.jsx';
 import SpecsSection from '../components/listing/SpecsSection.jsx';
 import DescriptionSection from '../components/listing/DescriptionSection.jsx';
@@ -21,7 +22,7 @@ export default function Listing() {
               <span>{item.label}</span>
             ) : (
               <>
-                <a href={item.href}>{item.label}</a>
+                <Link to={item.href}>{item.label}</Link>
                 <span className="bc-sep">›</span>
               </>
             )}

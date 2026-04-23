@@ -1,6 +1,8 @@
+import { Link } from 'react-router-dom';
+
 export default function FeaturedListing({ listing }) {
   return (
-    <div className="featured-listing">
+    <Link to="/marketplace/listing" className="featured-listing">
       <span className="featured-badge">{listing.badge}</span>
       <div className={`listing-img ${listing.imgClass}`}>{listing.imgEmoji}</div>
       <div className="featured-body">
@@ -47,6 +49,6 @@ export default function FeaturedListing({ listing }) {
           </div>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }

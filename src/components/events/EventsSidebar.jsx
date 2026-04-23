@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+
 export default function EventsSidebar({ submitCard, saveTheDate, sponsor, newsletter }) {
   return (
     <aside className="sidebar">
@@ -18,7 +20,7 @@ export default function EventsSidebar({ submitCard, saveTheDate, sponsor, newsle
               <div className="std-loc">{event.location}</div>
             </div>
           ))}
-          <button className="sidebar-outline-btn">Browse All Events →</button>
+          <Link to="/events" className="sidebar-outline-btn">Browse All Events →</Link>
         </div>
       </div>
 
@@ -26,7 +28,7 @@ export default function EventsSidebar({ submitCard, saveTheDate, sponsor, newsle
         <div className="sec-label">{submitCard.label}</div>
         <div className="sec-title">{submitCard.title}</div>
         <div className="sec-sub">{submitCard.description}</div>
-        <button className="sidebar-post-btn">{submitCard.cta}</button>
+        <Link to="/sponsor" className="sidebar-post-btn">{submitCard.cta}</Link>
       </div>
 
       <div className="newsletter-card">

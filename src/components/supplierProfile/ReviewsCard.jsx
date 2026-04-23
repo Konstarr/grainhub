@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { RATING_BREAKDOWN, SAMPLE_REVIEWS } from '../../data/supplierProfileData.js';
 
 export default function ReviewsCard() {
@@ -54,7 +55,7 @@ export default function ReviewsCard() {
         </div>
       ))}
 
-      <button className="write-rev">✏ Write a Review</button>
+      <Link to="/signup" className="write-rev">✏ Write a Review</Link>
     </div>
   );
 }

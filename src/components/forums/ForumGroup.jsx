@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+
 export default function ForumGroup({ group }) {
   const getIconGradient = (color) => {
     const gradients = {
@@ -43,7 +45,7 @@ export default function ForumGroup({ group }) {
       </div>
       <div className="forum-categories">
         {group.categories.map((cat) => (
-          <div key={cat.id} className={`forum-cat ${cat.isNew ? 'has-new' : ''}`}>
+          <Link key={cat.id} to="/forums/thread" className={`forum-cat ${cat.isNew ? 'has-new' : ''}`}>
             <div className="cat-icon-cell">
               <div className="cat-icon" style={{ background: getCategoryIconGradient(cat.iconColor) }}>
                 {cat.icon}
@@ -72,7 +74,7 @@ export default function ForumGroup({ group }) {
                 <div className="cat-stat-label">Threads</div>
               </div>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
     </div>

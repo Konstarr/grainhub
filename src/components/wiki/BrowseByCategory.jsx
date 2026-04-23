@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { BROWSE_BY_CATEGORY } from '../../data/wikiData.js';
 
 export default function BrowseByCategory() {
@@ -9,7 +10,7 @@ export default function BrowseByCategory() {
       </div>
       <div className="cat-cards-grid">
         {BROWSE_BY_CATEGORY.map((cat) => (
-          <div key={cat.name} className="cat-card">
+          <Link key={cat.name} to="/wiki/article" className="cat-card">
             <div className={`cat-card-icon ${cat.iconClass}`}>{cat.icon}</div>
             <div className="cat-card-info">
               <div className="cat-card-name">{cat.name}</div>
@@ -23,7 +24,7 @@ export default function BrowseByCategory() {
                 ))}
               </div>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
     </div>

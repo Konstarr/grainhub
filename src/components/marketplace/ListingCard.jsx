@@ -1,5 +1,6 @@
+import { Link } from 'react-router-dom';
+
 export default function ListingCard({ listing, section }) {
-  // Determine category badge color based on section
   let catBadgeClass = 'cb-machinery';
   if (section.includes('Lumber')) catBadgeClass = 'cb-lumber';
   else if (section.includes('Sheet')) catBadgeClass = 'cb-sheet';
@@ -7,14 +8,13 @@ export default function ListingCard({ listing, section }) {
   else if (section.includes('Surplus')) catBadgeClass = 'cb-surplus';
   else if (section.includes('Finishing')) catBadgeClass = 'cb-finishing';
 
-  // Determine condition badge color
   let condClass = 'cond-excellent';
   if (listing.condition.includes('Good')) condClass = 'cond-good';
   else if (listing.condition.includes('Fair')) condClass = 'cond-fair';
   else if (listing.condition.includes('New')) condClass = 'cond-new';
 
   return (
-    <div className="listing-card">
+    <Link to="/marketplace/listing" className="listing-card">
       <div className={`card-img-area ${listing.imgClass}`} style={listing.imgStyle}>
         {listing.emoji}
         <button className="card-save-btn">🔖</button>
@@ -33,7 +33,7 @@ export default function ListingCard({ listing, section }) {
               📅 {listing.year} &nbsp;·&nbsp; 📍 {listing.location}
             </div>
           )}
-          {!listing.year && (
+          {listing.year === undefined && (
             <div className="card-spec">
               📍 {listing.location} &nbsp;·&nbsp; {listing.shipping}
             </div>
@@ -49,6 +49,6 @@ export default function ListingCard({ listing, section }) {
           <button className="card-contact">Contact</button>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }

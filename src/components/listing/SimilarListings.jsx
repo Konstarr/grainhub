@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { SIMILAR_LISTINGS } from '../../data/listingData.js';
 
 export default function SimilarListings() {
@@ -6,7 +7,7 @@ export default function SimilarListings() {
       <div className="similar-title">Similar Listings</div>
       <div className="similar-grid">
         {SIMILAR_LISTINGS.map((listing, idx) => (
-          <div key={idx} className="similar-card">
+          <Link key={idx} to="/marketplace/listing" className="similar-card" style={{ textDecoration: 'none' }}>
             <div className="sim-img" style={listing.imgStyle}>
               {listing.emoji}
             </div>
@@ -18,7 +19,7 @@ export default function SimilarListings() {
               <div className="sim-price">{listing.price}</div>
               <div className="sim-loc">{listing.location}</div>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
     </div>

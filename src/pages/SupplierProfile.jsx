@@ -1,4 +1,5 @@
 import '../styles/supplierProfile.css';
+import { Link } from 'react-router-dom';
 import HeroSection from '../components/supplierProfile/HeroSection.jsx';
 import AboutCard from '../components/supplierProfile/AboutCard.jsx';
 import ReviewsCard from '../components/supplierProfile/ReviewsCard.jsx';
@@ -17,7 +18,7 @@ export default function SupplierProfile() {
               <span>{item.label}</span>
             ) : (
               <>
-                <a href={item.href}>{item.label}</a>
+                <Link to={item.href}>{item.label}</Link>
                 <span className="bc-sep">›</span>
               </>
             )}
@@ -63,9 +64,9 @@ export default function SupplierProfile() {
             <div className="sc-head">📖 Related Wiki Articles</div>
             <div className="sc-body">
               {RELATED_ARTICLES.map((article) => (
-                <div key={article} className="wiki-row">
+                <Link key={article} to="/wiki/article" className="wiki-row" style={{ textDecoration: 'none', color: 'inherit' }}>
                   → {article}
-                </div>
+                </Link>
               ))}
             </div>
           </div>
@@ -75,7 +76,7 @@ export default function SupplierProfile() {
             <div className="sc-head">🏢 Similar Suppliers</div>
             <div className="sc-body">
               {SIMILAR_SUPPLIERS.map((supplier) => (
-                <div key={supplier.name} className="sim-row">
+                <Link key={supplier.name} to="/suppliers/profile" className="sim-row" style={{ textDecoration: 'none', color: 'inherit' }}>
                   <div
                     className="sim-logo"
                     style={{
@@ -90,7 +91,7 @@ export default function SupplierProfile() {
                     <div className="sim-cat">{supplier.category}</div>
                   </div>
                   <span className="sim-rating">{supplier.rating}</span>
-                </div>
+                </Link>
               ))}
             </div>
           </div>

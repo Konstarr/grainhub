@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { TRENDING_ARTICLES, FORUM_HIGHLIGHTS, SPONSOR_AD } from '../../data/newsData.js';
 
 function TrendingCard() {
@@ -42,7 +43,7 @@ function SponsorCard() {
       <div className="sp-label">{SPONSOR_AD.label}</div>
       <div className="sp-title">{SPONSOR_AD.title}</div>
       <div className="sp-sub">{SPONSOR_AD.description}</div>
-      <button className="sp-btn">Learn More &amp; Download Spec →</button>
+      <Link to="/sponsor" className="sp-btn">Learn More &amp; Download Spec →</Link>
     </div>
   );
 }

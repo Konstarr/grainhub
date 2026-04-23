@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+
 export default function RecentActivity({ items }) {
   return (
     <div className="recent-activity">
@@ -7,7 +9,7 @@ export default function RecentActivity({ items }) {
       </div>
       <div className="activity-list">
         {items.map((item) => (
-          <div key={item.id} className={`activity-item ${item.isUnread ? 'unread' : ''}`}>
+          <Link key={item.id} to="/forums/thread" className={`activity-item ${item.isUnread ? 'unread' : ''}`}>
             <div className={`act-avatar ${item.avatarColor}`}>{item.avatar}</div>
             <div className="act-body">
               <div className="act-title">{item.title}</div>
@@ -35,7 +37,7 @@ export default function RecentActivity({ items }) {
                 </span>
               ))}
             </div>
-          </div>
+          </Link>
         ))}
       </div>
     </div>

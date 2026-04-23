@@ -4,9 +4,9 @@
  */
 
 export const BREADCRUMB = [
-  { label: 'Marketplace', href: '#' },
-  { label: 'Machinery & Equipment', href: '#' },
-  { label: 'CNC Routers', href: '#' },
+  { label: 'Marketplace', href: '/marketplace' },
+  { label: 'Machinery & Equipment', href: '/marketplace' },
+  { label: 'CNC Routers', href: '/marketplace' },
   { label: 'Biesse Rover A FT 1536 — 5-Axis', current: true },
 ];
 
@@ -46,7 +46,7 @@ export const SPECS = [
 export const DESCRIPTION = {
   paragraphs: [
     "We're selling this machine due to shop consolidation — we're merging two facilities and our larger Biesse at the other location makes this one redundant. This is not a distressed sale; the machine is in excellent working condition and has been professionally maintained throughout our ownership.",
-    'The Rover A FT was our primary nesting machine for cabinet carcasses and flat-panel work. It\'s configured for nested-based manufacturing with:',
+    "The Rover A FT was our primary nesting machine for cabinet carcasses and flat-panel work. It's configured for nested-based manufacturing with:",
   ],
   bullets: [
     'Full BSolid 2021 software license (transferable with manufacturer approval)',
@@ -57,7 +57,7 @@ export const DESCRIPTION = {
   ],
   closing: [
     'Service records are complete and available for review. Biesse performed the most recent PM in February 2025 — all wear parts replaced, spindle tested and certified. We have every service record since delivery in April 2021.',
-    'A Biesse-certified service technician is available to assist the buyer with commissioning at the new location (travel within the Pacific Northwest included in our offer; outside the region at buyer\'s cost). We can also arrange operator training for your team.',
+    "A Biesse-certified service technician is available to assist the buyer with commissioning at the new location (travel within the Pacific Northwest included in our offer; outside the region at buyer's cost). We can also arrange operator training for your team.",
     'Serious inquiries only. We can accommodate inspections at our facility in Seattle Monday–Friday with 48 hours notice. Machine is currently running production — you can see it operate.',
   ],
 };

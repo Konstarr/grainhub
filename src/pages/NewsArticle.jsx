@@ -1,4 +1,5 @@
 import '../styles/newsArticle.css';
+import { Link } from 'react-router-dom';
 import { NEWS_ARTICLE, NEWS_ARTICLE_BODY, PULL_QUOTE, DATA_CALLOUT, INLINE_CHART, INFO_BOX, ARTICLE_TAGS, ARTICLE_FOOTER_DATA, RELATED_NEWS, FORUM_RELATED } from '../data/newsArticleData.js';
 
 function RelatedSidebar() {
@@ -8,11 +9,11 @@ function RelatedSidebar() {
         <div className="rs-header">🔥 Related News</div>
         <div className="rs-body">
           {RELATED_NEWS.map((article) => (
-            <div key={article.title} className="trending-item">
+            <Link key={article.title} to="/news/article" className="trending-item" style={{ textDecoration: 'none', color: 'inherit' }}>
               <div className="ti-num">{article.num}</div>
               <div className="ti-title">{article.title}</div>
               <div className="ti-meta">{article.meta}</div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>
@@ -21,11 +22,11 @@ function RelatedSidebar() {
         <div className="rs-header">💬 Forum Highlights</div>
         <div className="rs-body">
           {FORUM_RELATED.map((thread) => (
-            <div key={thread.title} className="forum-thread-item">
+            <Link key={thread.title} to="/forums/thread" className="forum-thread-item" style={{ textDecoration: 'none', color: 'inherit' }}>
               <div className="ft-cat">{thread.category}</div>
               <div className="ft-title">{thread.title}</div>
               <div className="ft-meta">{thread.meta}</div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>
@@ -47,7 +48,7 @@ function RelatedSidebar() {
         <div className="sp-sub">
           Effortless electronic opening of lift systems for all panel sizes — touch-to-open, fully integrated.
         </div>
-        <button className="sp-btn">Learn More &amp; Download Spec →</button>
+        <Link to="/sponsor" className="sp-btn">Learn More &amp; Download Spec →</Link>
       </div>
     </aside>
   );
@@ -57,7 +58,7 @@ export default function NewsArticle() {
   return (
     <>
       <div className="breadcrumb-bar">
-        <a href="/news">News</a>
+        <Link to="/news">News</Link>
         <span className="bc-sep">·</span>
         <span>Cabinet & Millwork Revenue Up 8.4%...</span>
       </div>
@@ -173,11 +174,11 @@ export default function NewsArticle() {
               <h2 className="related-title">More on this topic</h2>
               <div className="related-grid">
                 {RELATED_NEWS.map((article) => (
-                  <div key={article.title} className="related-item">
+                  <Link key={article.title} to="/news/article" className="related-item" style={{ textDecoration: 'none', color: 'inherit' }}>
                     <div className="ri-num">{article.num}</div>
                     <div className="ri-title">{article.title}</div>
                     <div className="ri-meta">{article.meta}</div>
-                  </div>
+                  </Link>
                 ))}
               </div>
             </div>
@@ -187,5 +188,8 @@ export default function NewsArticle() {
         <RelatedSidebar />
       </div>
     </>
+  );
+}
+/>
   );
 }

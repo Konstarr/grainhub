@@ -1,9 +1,6 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
 import Logo from './Logo.jsx';
 
-// The top-level pages shown in the primary nav bar.
-// Routes not built yet still highlight correctly because NavLink
-// compares the current URL against each path.
 const NAV_ITEMS = [
   { label: 'Home', to: '/' },
   { label: 'Forums', to: '/forums' },
@@ -47,8 +44,8 @@ export default function Nav() {
           </svg>
           <input type="text" placeholder="Search GrainHub..." />
         </div>
-        <button className="nav-btn">Sign In</button>
-        <button className="nav-btn primary">Join Free</button>
+        <Link to="/signup" className="nav-btn">Sign In</Link>
+        <Link to="/signup" className="nav-btn primary">Join Free</Link>
       </div>
     </nav>
   );
