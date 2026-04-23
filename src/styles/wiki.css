@@ -217,20 +217,62 @@
    Left and right are fixed widths so the center gets maximum breathing room.
    Collapses gracefully on narrower viewports. */
 .wiki-grid {
-  max-width: 1420px;
+  max-width: 1520px;
   margin: 0 auto;
-  padding: 2rem 2.5rem 2.5rem;
+  padding: 1.5rem 1.5rem 2.5rem;
   display: grid;
-  grid-template-columns: 240px minmax(0, 1fr) 260px;
-  gap: 2rem;
+  grid-template-columns: 210px minmax(0, 1fr) 240px;
+  gap: 1.5rem;
   align-items: start;
 }
 .wiki-content {
   min-width: 0;
 }
+
+/* The legacy inner grids (featured-article 340px image, 3-col article grid,
+   2-col category cards) are too wide for the constrained center column. These
+   overrides only apply inside .wiki-grid, so the Wiki Article page (which also
+   uses some of these classes) is unaffected. */
+.wiki-grid .featured-article {
+  grid-template-columns: 220px 1fr;
+}
+.wiki-grid .fa-img { min-height: 200px; }
+.wiki-grid .fa-body { padding: 1.25rem 1.5rem; }
+.wiki-grid .fa-title { font-size: 20px; }
+.wiki-grid .articles-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.wiki-grid .cat-cards-grid {
+  grid-template-columns: 1fr;
+}
+.wiki-grid .species-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.wiki-grid .rt-header,
+.wiki-grid .rt-row {
+  grid-template-columns: 2fr 1fr 1.1fr 0.8fr;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+}
+
+@media (min-width: 1280px) {
+  .wiki-grid .featured-article {
+    grid-template-columns: 280px 1fr;
+  }
+  .wiki-grid .articles-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .wiki-grid .cat-cards-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .wiki-grid .species-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 1180px) {
   .wiki-grid {
-    grid-template-columns: 220px minmax(0, 1fr);
+    grid-template-columns: 200px minmax(0, 1fr);
   }
   .wiki-grid > .right-col {
     display: none;
@@ -1059,7 +1101,6 @@
   gap: 10px;
   padding: 7px 0;
   border-bottom: 1px solid var(--border-light);
-}
 .contrib-item:last-child {
   border-bottom: none;
 }
