@@ -1,4 +1,3 @@
-import SecondaryNav from '../components/layout/SecondaryNav.jsx';
 import SponsorStrip from '../components/layout/SponsorStrip.jsx';
 import Hero from '../components/home/Hero.jsx';
 import NewsSection from '../components/home/NewsSection.jsx';
@@ -10,7 +9,6 @@ import Sidebar from '../components/home/Sidebar.jsx';
 export default function Home() {
   return (
     <>
-      <SecondaryNav />
       <Hero />
       <SponsorStrip />
 

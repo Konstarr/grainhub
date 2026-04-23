@@ -868,3 +868,52 @@ footer.site-footer {
 
 .footer-bottom a { color: #7A6858; cursor: pointer; }
 .footer-bottom a:hover { color: var(--wood-cream); }
+
+/* ── TRADE FILTER BANNER ── */
+.trade-filter-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--wood-cream);
+  border: 1px solid var(--wood-light);
+  border-radius: 8px;
+  padding: 8px 14px;
+  margin-bottom: 1rem;
+  font-size: 13px;
+}
+.tfb-label {
+  color: var(--text-muted);
+}
+.tfb-value {
+  font-weight: 600;
+  color: var(--wood-warm);
+}
+.tfb-clear {
+  margin-left: auto;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 4px 10px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+}
+.tfb-clear:hover {
+  background: var(--white);
+  border-color: var(--wood-warm);
+  color: var(--wood-warm);
+}
+
+/* Empty state shared by filterable pages */
+.forum-empty,
+.trade-empty {
+  background: var(--white);
+  border: 1px dashed var(--border);
+  border-radius: 10px;
+  padding: 2rem;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 14px;
+  margin: 1rem 0;
+}

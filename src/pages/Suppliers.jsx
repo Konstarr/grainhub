@@ -1,6 +1,5 @@
 import '../styles/suppliers.css';
 import { useState } from 'react';
-import SecondaryNav from '../components/layout/SecondaryNav.jsx';
 import PlatinumBar from '../components/suppliers/PlatinumBar.jsx';
 import SupplierTable from '../components/suppliers/SupplierTable.jsx';
 import { SUPPLIERS_HEADER, SUPPLIER_CATEGORIES } from '../data/suppliersData.js';
@@ -10,8 +9,6 @@ export default function Suppliers() {
 
   return (
     <>
-      <SecondaryNav />
-
       {/* PAGE HEADER */}
       <div className="page-header">
         <div className="header-inner">

@@ -1,6 +1,5 @@
 import '../styles/marketplace.css';
 import { useState } from 'react';
-import SecondaryNav from '../components/layout/SecondaryNav.jsx';
 import CategoryHighway from '../components/marketplace/CategoryHighway.jsx';
 import FilterSidebar from '../components/marketplace/FilterSidebar.jsx';
 import ListingsArea from '../components/marketplace/ListingsArea.jsx';
@@ -12,8 +11,6 @@ export default function Marketplace() {
 
   return (
     <>
-      <SecondaryNav />
-
       {/* PAGE HEADER */}
       <div className="page-header">
         <div className="header-inner">

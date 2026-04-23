@@ -1,6 +1,5 @@
-import { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import '../styles/forums.css';
-import SecondaryNav from '../components/layout/SecondaryNav.jsx';
 import PageHeader from '../components/forums/PageHeader.jsx';
 import ToolbarSection from '../components/forums/ToolbarSection.jsx';
 import OnlineUsersStrip from '../components/forums/OnlineUsersStrip.jsx';
@@ -12,25 +11,47 @@ import ForumStats from '../components/forums/ForumStats.jsx';
 import ForumGuidelines from '../components/forums/ForumGuidelines.jsx';
 import ThreadLegend from '../components/forums/ThreadLegend.jsx';
 import SponsorCard from '../components/forums/SponsorCard.jsx';
+import TradeFilterBanner from '../components/layout/TradeFilterBanner.jsx';
+import { matchesTrade } from '../lib/trades.js';
 import { FORUMS_PAGE_HEADER, FORUM_GROUPS, RECENT_ACTIVITY_ITEMS, TOP_CONTRIBUTORS, FORUM_STATS, FORUM_GUIDELINES, THREAD_LEGEND, ONLINE_MEMBERS, HOT_TOPICS } from '../data/forumsData.js';
 
 export default function Forums() {
+  const [searchParams] = useSearchParams();
+  const trade = searchParams.get('trade') || '';
+
+  // Filter nested forum categories by trade; drop groups with 0 matches.
+  const filteredGroups = trade
+    ? FORUM_GROUPS
+        .map((g) => ({ ...g, categories: g.categories.filter((c) => matchesTrade(c, trade)) }))
+        .filter((g) => g.categories.length > 0)
+    : FORUM_GROUPS;
+
+  const filteredActivity = trade
+    ? RECENT_ACTIVITY_ITEMS.filter((item) => matchesTrade(item, trade))
+    : RECENT_ACTIVITY_ITEMS;
+
   return (
     <>
-      <SecondaryNav />
       <PageHeader data={FORUMS_PAGE_HEADER} />
       <ToolbarSection />
 
       <div className="main-wrap">
         <div>
+          <TradeFilterBanner />
           <OnlineUsersStrip data={ONLINE_MEMBERS} />
           <HotTopicsStrip topics={HOT_TOPICS} />
 
-          {FORUM_GROUPS.map((group) => (
-            <ForumGroup key={group.id} group={group} />
-          ))}
+          {filteredGroups.length === 0 ? (
+            <div className="forum-empty">
+              No forum categories match this trade yet. Try another, or clear the filter.
+            </div>
+          ) : (
+            filteredGroups.map((group) => (
+              <ForumGroup key={group.id} group={group} />
+            ))
+          )}
 
-          <RecentActivity items={RECENT_ACTIVITY_ITEMS} />
+          <RecentActivity items={filteredActivity} />
         </div>
 
         <aside className="right-col">

@@ -261,4 +261,3 @@ footer { background: var(--wood-dark); margin-top: 4rem; padding: 3rem 2.5rem 2r
 .footer-col a:hover { color: var(--wood-cream); }
 .footer-bottom { max-width: 1380px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #5A4838; flex-wrap: wrap; gap: 0.5rem; }
 .footer-bottom a { color: #7A6858; }
- }
