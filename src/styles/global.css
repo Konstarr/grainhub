@@ -322,18 +322,23 @@ nav.site-nav {
   flex: 1;
   overflow: hidden;
   position: relative;
+  /* Wide edge fades so chips ease in on the right and dissolve on the left */
   mask-image: linear-gradient(
     to right,
     transparent 0,
-    #000 48px,
-    #000 calc(100% - 48px),
+    rgba(0,0,0,0.35) 6%,
+    #000 18%,
+    #000 82%,
+    rgba(0,0,0,0.35) 94%,
     transparent 100%
   );
   -webkit-mask-image: linear-gradient(
     to right,
     transparent 0,
-    #000 48px,
-    #000 calc(100% - 48px),
+    rgba(0,0,0,0.35) 6%,
+    #000 18%,
+    #000 82%,
+    rgba(0,0,0,0.35) 94%,
     transparent 100%
   );
 }
@@ -341,10 +346,9 @@ nav.site-nav {
 .sponsor-track {
   display: flex;
   width: max-content;
-  animation: sponsor-scroll 22s linear infinite;
+  animation: sponsor-scroll 28s linear infinite;
   will-change: transform;
 }
-.sponsor-marquee:hover .sponsor-track { animation-play-state: paused; }
 
 .sponsor-group {
   display: flex;
