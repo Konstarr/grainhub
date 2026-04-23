@@ -1,4 +1,7 @@
 import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext.jsx';
+import { supabase } from '../../lib/supabase.js';
 import {
   ROLE_OPTIONS,
   STATE_OPTIONS,
@@ -8,9 +11,13 @@ import {
 } from '../../data/signupData.js';
 
 export default function SignupForm() {
+  const { signUp, user } = useAuth();
+  const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const [passwordStrength, setPasswordStrength] = useState('');
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [authError, setAuthError] = useState('');
 
   // Step 1 form state
   const [firstName, setFirstName] = useState('');
@@ -55,15 +62,51 @@ export default function SignupForm() {
   };
 
   const handleGoStep2 = () => {
-    if (!firstName.trim() || !email.trim()) {
-      alert('Please fill in your name and email to continue.');
+    setAuthError('');
+    if (!firstName.trim() || !email.trim() || !username.trim() || password.length < 8) {
+      setAuthError('Please fill in your name, email, username, and a password of 8+ characters.');
+      return;
+    }
+    if (!termsAccepted) {
+      setAuthError('Please accept the Terms of Service to continue.');
       return;
     }
     setCurrentStep(2);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleGoStep3 = () => {
+  // Step 2 → Step 3: actually create the account.
+  const handleGoStep3 = async () => {
+    setAuthError('');
+    setSubmitting(true);
+    const fullName = [firstName, lastName].filter(Boolean).join(' ').trim();
+    const { error, data } = await signUp({
+      email,
+      password,
+      fullName,
+      username: username.trim().toLowerCase(),
+    });
+    if (error) {
+      setSubmitting(false);
+      setAuthError(error.message || 'Could not create your account. Please try again.');
+      return;
+    }
+    // If Supabase email confirmation is ON, data.user exists but data.session is null.
+    // If email confirmation is OFF, the user is signed in immediately.
+    // Either way, patch the rest of the profile info (best-effort — fails silently
+    // if the user isn't logged in yet, which is fine; they can fill it in later).
+    if (data?.user?.id) {
+      await supabase
+        .from('profiles')
+        .update({
+          full_name: fullName || null,
+          trade: shopType || null,
+          location: [city, state].filter(Boolean).join(', ') || null,
+          bio: role || null,
+        })
+        .eq('id', data.user.id);
+    }
+    setSubmitting(false);
     setCurrentStep(3);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -77,27 +120,15 @@ export default function SignupForm() {
     setShopType(value);
   };
 
+  // Prevent accidental form submits (the old mock behavior).
   const handleFormSubmit = (e) => {
     e.preventDefault();
-    // Mock form submission
-    const formData = {
-      step: currentStep,
-      firstName,
-      lastName,
-      email,
-      username,
-      password,
-      termsAccepted,
-      role,
-      company,
-      shopType,
-      city,
-      state,
-      referral,
-    };
-    console.log('Signup form submitted:', formData);
-    alert('Form submitted! Check console for details.');
   };
+
+  // If already logged in, bounce home.
+  if (user && currentStep !== 3) {
+    navigate('/', { replace: true });
+  }
 
   const strengthScore = getPasswordStrengthClass(password);
 
@@ -262,9 +293,36 @@ export default function SignupForm() {
                   </label>
                 </div>
 
+                {authError && (
+                  <div
+                    style={{
+                      background: 'rgba(220,53,69,0.08)',
+                      border: '1px solid rgba(220,53,69,0.25)',
+                      color: '#B02A37',
+                      padding: '0.75rem 1rem',
+                      borderRadius: '8px',
+                      fontSize: '13px',
+                      lineHeight: 1.5,
+                    }}
+                  >
+                    {authError}
+                  </div>
+                )}
+
                 <button type="button" className="signup-submit-btn" onClick={handleGoStep2}>
                   Continue — Set Up Your Shop Profile →
                 </button>
+
+                <div
+                  style={{
+                    textAlign: 'center',
+                    fontSize: '13px',
+                    color: 'var(--text-muted)',
+                    marginTop: '0.5rem',
+                  }}
+                >
+                  Already have an account? <Link to="/login" style={{ color: 'var(--wood-warm)', fontWeight: 600 }}>Log in</Link>
+                </div>
               </form>
             </div>
 
@@ -390,12 +448,34 @@ export default function SignupForm() {
                   </select>
                 </div>
 
+                {authError && (
+                  <div
+                    style={{
+                      background: 'rgba(220,53,69,0.08)',
+                      border: '1px solid rgba(220,53,69,0.25)',
+                      color: '#B02A37',
+                      padding: '0.75rem 1rem',
+                      borderRadius: '8px',
+                      fontSize: '13px',
+                      lineHeight: 1.5,
+                    }}
+                  >
+                    {authError}
+                  </div>
+                )}
+
                 <div style={{ display: 'flex', gap: '10px', marginTop: '6px' }}>
-                  <button type="button" className="signup-back-btn" onClick={handleGoStep1}>
+                  <button type="button" className="signup-back-btn" onClick={handleGoStep1} disabled={submitting}>
                     ← Back
                   </button>
-                  <button type="button" className="signup-submit-btn" style={{ flex: 1 }} onClick={handleGoStep3}>
-                    Create My Free Account →
+                  <button
+                    type="button"
+                    className="signup-submit-btn"
+                    style={{ flex: 1, opacity: submitting ? 0.6 : 1, cursor: submitting ? 'wait' : 'pointer' }}
+                    onClick={handleGoStep3}
+                    disabled={submitting}
+                  >
+                    {submitting ? 'Creating account…' : 'Create My Free Account →'}
                   </button>
                 </div>
 
@@ -422,11 +502,11 @@ export default function SignupForm() {
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '1.5rem' }}>
-                <button className="signup-success-btn" style={{ width: '100%' }}>
+                <Link to="/forums" className="signup-success-btn" style={{ width: '100%', textDecoration: 'none', textAlign: 'center' }}>
                   Go to the Forums →
-                </button>
-                <button
-                  type="button"
+                </Link>
+                <Link
+                  to="/wiki"
                   style={{
                     width: '100%',
                     background: 'transparent',
@@ -438,12 +518,15 @@ export default function SignupForm() {
                     fontWeight: '500',
                     cursor: 'pointer',
                     fontFamily: "'DM Sans',sans-serif",
+                    textDecoration: 'none',
+                    textAlign: 'center',
+                    boxSizing: 'border-box',
                   }}
                 >
                   Browse the Wiki
-                </button>
-                <button
-                  type="button"
+                </Link>
+                <Link
+                  to="/marketplace"
                   style={{
                     width: '100%',
                     background: 'transparent',
@@ -454,10 +537,114 @@ export default function SignupForm() {
                     fontSize: '14px',
                     cursor: 'pointer',
                     fontFamily: "'DM Sans',sans-serif",
+                    textDecoration: 'none',
+                    textAlign: 'center',
+                    boxSizing: 'border-box',
                   }}
                 >
                   Explore the Marketplace
+                </Link>
+              </div>
+
+              <div
+                style={{
+                  background: 'var(--wood-paper)',
+                  border: '1px solid var(--border)',
+                  borderRadius: '10px',
+                  padding: '1rem 1.25rem',
+                  textAlign: 'left',
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: '12px',
+                    fontWeight: '600',
+                    color: 'var(--text-secondary)',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.8px',
+                    marginBottom: '8px',
+                  }}
+                >
+                  Want even more? Upgrade to Pro
+                </div>
+                <div
+                  style={{
+                    fontSize: '13px',
+                    color: 'var(--text-muted)',
+                    lineHeight: '1.6',
+                    marginBottom: '10px',
+                  }}
+                >
+                  Unlock all 98 business templates, estimating calculators, ad-free forums, and
+                  priority placement. $19/month — cancel anytime.
+                </div>
+                <button
+                  type="button"
+                  style={{
+                    background: 'var(--wood-dark)',
+                    color: 'var(--wood-cream)',
+                    border: 'none',
+                    padding: '8px 18px',
+                    borderRadius: '7px',
+                    fontSize: '13px',
+                    fontWeight: '500',
+                    cursor: 'pointer',
+                    fontFamily: "'DM Sans',sans-serif",
+                  }}
+                >
+                  See Pro Features
                 </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+ '10px', marginBottom: '1.5rem' }}>
+                <Link to="/forums" className="signup-success-btn" style={{ width: '100%', textDecoration: 'none', textAlign: 'center' }}>
+                  Go to the Forums →
+                </Link>
+                <Link
+                  to="/wiki"
+                  style={{
+                    width: '100%',
+                    background: 'transparent',
+                    color: 'var(--wood-warm)',
+                    border: '1.5px solid var(--wood-warm)',
+                    padding: '11px 28px',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    cursor: 'pointer',
+                    fontFamily: "'DM Sans',sans-serif",
+                    textDecoration: 'none',
+                    textAlign: 'center',
+                    boxSizing: 'border-box',
+                  }}
+                >
+                  Browse the Wiki
+                </Link>
+                <Link
+                  to="/marketplace"
+                  style={{
+                    width: '100%',
+                    background: 'transparent',
+                    color: 'var(--text-secondary)',
+                    border: '1px solid var(--border)',
+                    padding: '11px 28px',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    cursor: 'pointer',
+                    fontFamily: "'DM Sans',sans-serif",
+                    textDecoration: 'none',
+                    textAlign: 'center',
+                    boxSizing: 'border-box',
+                  }}
+                >
+                  Explore the Marketplace
+                </Link>
               </div>
 
               <div

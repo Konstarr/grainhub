@@ -1,4 +1,5 @@
 import { Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext.jsx';
 import Layout from './components/layout/Layout.jsx';
 import Home from './pages/Home.jsx';
 import Forums from './pages/Forums.jsx';
@@ -13,29 +14,33 @@ import Listing from './pages/Listing.jsx';
 import Suppliers from './pages/Suppliers.jsx';
 import SupplierProfile from './pages/SupplierProfile.jsx';
 import Signup from './pages/Signup.jsx';
+import Login from './pages/Login.jsx';
 import Sponsor from './pages/Sponsor.jsx';
 import Events from './pages/Events.jsx';
 
 export default function App() {
   return (
-    <Routes>
-      <Route element={<Layout />}>
-        <Route path="/" element={<Home />} />
-        <Route path="/forums" element={<Forums />} />
-        <Route path="/forums/thread" element={<ForumThread />} />
-        <Route path="/jobs" element={<Jobs />} />
-        <Route path="/wiki" element={<Wiki />} />
-        <Route path="/wiki/article" element={<WikiArticle />} />
-        <Route path="/news" element={<News />} />
-        <Route path="/news/article" element={<NewsArticle />} />
-        <Route path="/marketplace" element={<Marketplace />} />
-        <Route path="/marketplace/listing" element={<Listing />} />
-        <Route path="/suppliers" element={<Suppliers />} />
-        <Route path="/suppliers/profile" element={<SupplierProfile />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/sponsor" element={<Sponsor />} />
-        <Route path="/events" element={<Events />} />
-      </Route>
-    </Routes>
+    <AuthProvider>
+      <Routes>
+        <Route element={<Layout />}>
+          <Route path="/" element={<Home />} />
+          <Route path="/forums" element={<Forums />} />
+          <Route path="/forums/thread" element={<ForumThread />} />
+          <Route path="/jobs" element={<Jobs />} />
+          <Route path="/wiki" element={<Wiki />} />
+          <Route path="/wiki/article" element={<WikiArticle />} />
+          <Route path="/news" element={<News />} />
+          <Route path="/news/article" element={<NewsArticle />} />
+          <Route path="/marketplace" element={<Marketplace />} />
+          <Route path="/marketplace/listing" element={<Listing />} />
+          <Route path="/suppliers" element={<Suppliers />} />
+          <Route path="/suppliers/profile" element={<SupplierProfile />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/sponsor" element={<Sponsor />} />
+          <Route path="/events" element={<Events />} />
+        </Route>
+      </Routes>
+    </AuthProvider>
   );
 }

@@ -1,5 +1,6 @@
-import { NavLink, Link } from 'react-router-dom';
+import { NavLink, Link, useNavigate } from 'react-router-dom';
 import Logo from './Logo.jsx';
+import { useAuth } from '../../context/AuthContext.jsx';
 
 const NAV_ITEMS = [
   { label: 'Home', to: '/' },
@@ -12,7 +13,28 @@ const NAV_ITEMS = [
   { label: 'Events', to: '/events' },
 ];
 
+function initialsFromProfile(profile, user) {
+  if (profile?.full_name) {
+    return profile.full_name
+      .split(/\s+/)
+      .slice(0, 2)
+      .map((p) => p[0]?.toUpperCase() || '')
+      .join('');
+  }
+  if (profile?.username) return profile.username.slice(0, 2).toUpperCase();
+  if (user?.email) return user.email.slice(0, 2).toUpperCase();
+  return '..';
+}
+
 export default function Nav() {
+  const { isAuthed, user, profile, signOut } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/', { replace: true });
+  };
+
   return (
     <nav className="site-nav">
       <Logo />
@@ -44,8 +66,49 @@ export default function Nav() {
           </svg>
           <input type="text" placeholder="Search GrainHub..." />
         </div>
-        <Link to="/signup" className="nav-btn">Sign In</Link>
-        <Link to="/signup" className="nav-btn primary">Join Free</Link>
+
+        {isAuthed ? (
+          <>
+            <div
+              className="nav-avatar"
+              title={profile?.username || user?.email}
+              aria-label="Your profile"
+              style={{
+                width: '34px',
+                height: '34px',
+                borderRadius: '50%',
+                background: 'linear-gradient(135deg, #6B3F1F, #A0522D)',
+                color: 'white',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '12px',
+                fontWeight: 700,
+                letterSpacing: '0.5px',
+              }}
+            >
+              {initialsFromProfile(profile, user)}
+            </div>
+            <button
+              type="button"
+              className="nav-btn"
+              onClick={handleSignOut}
+              style={{
+                background: 'transparent',
+                border: '1px solid rgba(255,255,255,0.2)',
+                color: 'inherit',
+                cursor: 'pointer',
+              }}
+            >
+              Sign Out
+            </button>
+          </>
+        ) : (
+          <>
+            <Link to="/login" className="nav-btn">Log In</Link>
+            <Link to="/signup" className="nav-btn primary">Join Free</Link>
+          </>
+        )}
       </div>
     </nav>
   );
