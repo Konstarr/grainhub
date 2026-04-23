@@ -9,6 +9,9 @@ export default function Suppliers() {
   // Start with NO category selected so the map shows every supplier. Users
   // can drill into a category via the tiles or the map's own filter bar.
   const [activeCategory, setActiveCategory] = useState('');
+  // Map is hidden by default so the page feels lighter. Users opt in via
+  // the "Show map" toggle above the category tiles.
+  const [showMap, setShowMap] = useState(false);
 
   return (
     <>
@@ -54,14 +57,31 @@ export default function Suppliers() {
       {/* PLATINUM SPONSORS */}
       <PlatinumBar />
 
-      {/* MAP - between the sponsor bar and the category tiles, above the list.
+      {/* MAP TOGGLE - hidden by default to keep the page light. Clicking the
+          pill reveals the full map between the sponsor bar and category tiles.
           Shares activeCategory state with the tile grid below so selecting a
           tile filters the map, and vice versa via the map's category dropdown. */}
-      <div className="main-wrap">
-        <SuppliersMap
-          activeCategory={activeCategory}
-          onCategoryChange={setActiveCategory}
-        />
+      <div className="main-wrap" style={{ marginTop: '1.5rem' }}>
+        <button
+          type="button"
+          onClick={() => setShowMap((v) => !v)}
+          aria-expanded={showMap}
+          style={mapTogglePillStyle}
+        >
+          <span style={{ fontSize: '16px' }}>{showMap ? '✕' : '🗺'}</span>
+          <span>
+            {showMap ? 'Hide map' : 'Show map — find suppliers near you'}
+          </span>
+        </button>
+
+        {showMap && (
+          <div style={{ marginTop: '1rem' }}>
+            <SuppliersMap
+              activeCategory={activeCategory}
+              onCategoryChange={setActiveCategory}
+            />
+          </div>
+        )}
       </div>
 
       {/* CATEGORY HIGHWAY */}
@@ -93,3 +113,19 @@ export default function Suppliers() {
     </>
   );
 }
+
+const mapTogglePillStyle = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: '0.5rem',
+  padding: '0.55rem 1rem',
+  border: '1px solid var(--border)',
+  borderRadius: '999px',
+  background: 'var(--white)',
+  color: 'var(--text-primary)',
+  fontFamily: "'DM Sans', sans-serif",
+  fontSize: '13px',
+  fontWeight: 600,
+  cursor: 'pointer',
+  boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
+};
