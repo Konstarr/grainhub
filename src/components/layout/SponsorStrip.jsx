@@ -2,6 +2,9 @@ import { Link } from 'react-router-dom';
 import { useSupabaseList } from '../../hooks/useSupabaseList.js';
 import { mapSupplierRow } from '../../lib/mappers.js';
 
+const MIN_CHIPS_PER_GROUP = 10;
+const SECONDS_PER_CHIP = 3.2;
+
 export default function SponsorStrip() {
   const { data: rows } = useSupabaseList('suppliers', {
     filter: (q) => q.eq('is_approved', true),
@@ -17,11 +20,17 @@ export default function SponsorStrip() {
     return null;
   }
 
+  const reps = Math.max(1, Math.ceil(MIN_CHIPS_PER_GROUP / sponsors.length));
+  const expanded = Array.from({ length: reps }).flatMap((_, r) =>
+    sponsors.map((s) => ({ ...s, _rep: r }))
+  );
+  const durationSeconds = Math.max(24, Math.round(expanded.length * SECONDS_PER_CHIP));
+
   const renderGroup = (keyPrefix) => (
     <div className="sponsor-group" aria-hidden={keyPrefix === 'b' ? 'true' : undefined}>
-      {sponsors.map((s) => (
+      {expanded.map((s) => (
         <Link
-          key={keyPrefix + '-' + s.id}
+          key={keyPrefix + '-' + s._rep + '-' + s.id}
           to="/suppliers/profile"
           className="sponsor-logo"
           title={s.name}
@@ -37,7 +46,10 @@ export default function SponsorStrip() {
     <div className="sponsor-strip">
       <span className="sponsor-label">Sponsors</span>
       <div className="sponsor-marquee" aria-label="Featured sponsors">
-        <div className="sponsor-track">
+        <div
+          className="sponsor-track"
+          style={{ ['--sponsor-duration']: durationSeconds + 's' }}
+        >
           {renderGroup('a')}
           {renderGroup('b')}
         </div>

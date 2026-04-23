@@ -346,7 +346,7 @@ nav.site-nav {
 .sponsor-track {
   display: flex;
   width: max-content;
-  animation: sponsor-scroll 28s linear infinite;
+  animation: sponsor-scroll var(--sponsor-duration, 28s) linear infinite;
   will-change: transform;
 }
 
