@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
 import '../../styles/signup.css';
@@ -16,6 +17,16 @@ import '../../styles/signup.css';
 export default function RequireAuth({ children }) {
   const { isAuthed, loading } = useAuth();
   const location = useLocation();
+
+  // When the gate renders, snap the viewport to the top of the page. Without
+  // this, a visitor who scrolled halfway down an index page and then clicked
+  // into a detail route would see the gate card mid-scroll, or worse — below
+  // the fold. This runs on every path change so the gate always opens focused.
+  useEffect(() => {
+    if (!isAuthed && !loading) {
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    }
+  }, [isAuthed, loading, location.pathname]);
 
   // While the Supabase session is still being resolved on first paint, show
   // nothing rather than flashing the gate. (Auth check is async on mount.)
@@ -56,15 +67,18 @@ export default function RequireAuth({ children }) {
                   className="signup-free-badge"
                   style={{ margin: '0 auto 1rem' }}
                 >
-                  🔒 Members Only
+                  🪵 Free Forever — No Credit Card
                 </div>
                 <h2 style={{ marginBottom: '0.75rem' }}>
-                  Create a free account to keep reading
+                  Pull up a stool. The shop's open inside.
                 </h2>
-                <p style={{ maxWidth: '440px', margin: '0 auto' }}>
-                  GrainHub is a community for millwork and cabinet pros. Sign up
-                  free to unlock threads, wiki articles, marketplace listings,
-                  supplier profiles, and more — no credit card required.
+                <p style={{ maxWidth: '460px', margin: '0 auto', lineHeight: 1.6 }}>
+                  GrainHub is built by woodworkers, for woodworkers — a home
+                  for the questions you'd ask the old-timer at the next bench,
+                  the tips you'd share over coffee, and the wins worth showing
+                  off. Thousands of millwork pros already hang out here every
+                  day. Come join us — it takes about 30 seconds and it's
+                  always free.
                 </p>
               </div>
 
@@ -82,7 +96,7 @@ export default function RequireAuth({ children }) {
                   className="signup-submit-btn"
                   style={{ textAlign: 'center', textDecoration: 'none' }}
                 >
-                  Join Free →
+                  Create My Free Account →
                 </Link>
 
                 <div
@@ -91,7 +105,7 @@ export default function RequireAuth({ children }) {
                     color: 'var(--text-muted)',
                   }}
                 >
-                  Already a member?{' '}
+                  Already part of the crew?{' '}
                   <Link
                     to="/login"
                     state={{ from }}
@@ -116,15 +130,15 @@ export default function RequireAuth({ children }) {
               >
                 <div>
                   <div style={{ fontSize: '18px', marginBottom: '0.25rem' }}>💬</div>
-                  Forum threads &amp; replies
+                  Ask &amp; answer in the forums
                 </div>
                 <div>
                   <div style={{ fontSize: '18px', marginBottom: '0.25rem' }}>📚</div>
-                  Wiki &amp; news archive
+                  Full wiki &amp; news archive
                 </div>
                 <div>
                   <div style={{ fontSize: '18px', marginBottom: '0.25rem' }}>🛠️</div>
-                  Supplier &amp; job details
+                  Supplier, job &amp; listing details
                 </div>
               </div>
             </div>
