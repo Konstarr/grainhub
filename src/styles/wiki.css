@@ -1,7 +1,7 @@
 /* ── WIKI HERO ── */
 .wiki-hero {
   background: var(--wood-dark);
-  padding: 3.5rem 2.5rem 0;
+  padding: 2rem 2.5rem 0;
   position: relative;
   overflow: hidden;
 }
@@ -28,10 +28,10 @@
 }
 .hero-top {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 4rem;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: 2.5rem;
   align-items: center;
-  padding-bottom: 3rem;
+  padding-bottom: 1.75rem;
 }
 
 .hero-left {}
@@ -45,22 +45,22 @@
 }
 .hero-title {
   font-family: 'DM Serif Display', serif;
-  font-size: clamp(36px, 4vw, 52px);
+  font-size: clamp(30px, 3.4vw, 44px);
   color: var(--wood-cream);
-  line-height: 1.1;
+  line-height: 1.15;
   letter-spacing: -0.5px;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 .hero-title em {
   font-style: italic;
   color: var(--wood-light);
 }
 .hero-sub {
-  font-size: 15px;
+  font-size: 14px;
   color: #9A8070;
-  line-height: 1.75;
-  max-width: 480px;
-  margin-bottom: 2rem;
+  line-height: 1.55;
+  max-width: 520px;
+  margin-bottom: 1.25rem;
 }
 
 /* SEARCH BOX */
@@ -139,7 +139,7 @@
   background: rgba(255,255,255,0.06);
   border: 1px solid rgba(255,255,255,0.1);
   border-radius: 12px;
-  padding: 1.25rem;
+  padding: 0.9rem 1rem;
   transition: background 0.15s;
   cursor: default;
 }
@@ -148,10 +148,10 @@
 }
 .hs-num {
   font-family: 'DM Serif Display', serif;
-  font-size: 32px;
+  font-size: 26px;
   color: var(--wood-light);
   line-height: 1;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
 .hs-label {
   font-size: 13px;
@@ -221,8 +221,8 @@
   margin: 0 auto;
   padding: 1.5rem 1.5rem 2.5rem;
   display: grid;
-  grid-template-columns: 210px minmax(0, 1fr) 240px;
-  gap: 1.5rem;
+  grid-template-columns: 170px minmax(0, 1fr) 200px;
+  gap: 1.25rem;
   align-items: start;
 }
 .wiki-content {
@@ -272,7 +272,7 @@
 
 @media (max-width: 1180px) {
   .wiki-grid {
-    grid-template-columns: 200px minmax(0, 1fr);
+    grid-template-columns: 170px minmax(0, 1fr);
   }
   .wiki-grid > .right-col {
     display: none;

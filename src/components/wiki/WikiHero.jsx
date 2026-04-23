@@ -7,7 +7,7 @@ export default function WikiHero() {
         <div className="hero-top">
           <div className="hero-left">
             <div className="hero-eyebrow">GrainHub Industry Wiki</div>
-            <h1 className="hero-title">The trade's<br /><em>knowledge base.</em><br />Written by the pros.</h1>
+            <h1 className="hero-title">The trade's <em>knowledge base.</em> Written by the pros.</h1>
             <p className="hero-sub">
               3,600 community-written articles covering every aspect of millwork and cabinet work — construction methods, species profiles, machine operation, finishing systems, standards, and business templates.
             </p>
