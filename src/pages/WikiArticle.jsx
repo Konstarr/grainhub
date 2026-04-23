@@ -1,5 +1,6 @@
 import '../styles/wikiArticle.css';
 import { Link } from 'react-router-dom';
+import PageBack from '../components/shared/PageBack.jsx';
 import { ARTICLE_DATA, ARTICLE_BODY, INFOBOX, RELATED_ARTICLES, ARTICLE_FOOTER, COMMENTS } from '../data/wikiArticleData.js';
 
 function TableOfContents() {
@@ -121,9 +122,20 @@ function ArticleContent() {
 
 export default function WikiArticle() {
   return (
-    <div className="wa-wrap">
-      <TableOfContents />
-      <ArticleContent />
-    </div>
+    <>
+      <PageBack
+        backTo="/wiki"
+        backLabel="Back to Wiki"
+        crumbs={[
+          { label: 'Home', to: '/' },
+          { label: 'Wiki', to: '/wiki' },
+          { label: ARTICLE_DATA.title },
+        ]}
+      />
+      <div className="wa-wrap">
+        <TableOfContents />
+        <ArticleContent />
+      </div>
+    </>
   );
 }

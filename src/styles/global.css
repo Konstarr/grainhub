@@ -917,3 +917,88 @@ footer.site-footer {
   font-size: 14px;
   margin: 1rem 0;
 }
+
+/* ── PageBack: shared back-pill + breadcrumb bar for every detail page.
+   Left: pill button that returns to the parent list. Right: compact
+   breadcrumb trail. Reads well on mobile: breadcrumbs wrap below the pill. */
+.page-back-bar {
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  padding: 0.55rem 2.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+  font-family: 'DM Sans', sans-serif;
+}
+.pb-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px 6px 10px;
+  border-radius: 999px;
+  background: var(--wood-paper);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  font-size: 12.5px;
+  font-weight: 500;
+  text-decoration: none;
+  line-height: 1;
+  transition: background 0.12s, border-color 0.12s, color 0.12s, transform 0.12s;
+}
+.pb-back:hover {
+  background: var(--wood-light);
+  border-color: var(--wood-warm);
+  color: var(--wood-dark);
+  transform: translateX(-1px);
+}
+.pb-arrow {
+  font-size: 14px;
+  line-height: 1;
+}
+.pb-crumbs {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.pb-crumb {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.pb-crumb a {
+  color: var(--wood-warm);
+  text-decoration: none;
+  transition: color 0.12s;
+}
+.pb-crumb a:hover {
+  color: var(--wood-dark);
+  text-decoration: underline;
+}
+.pb-crumb-current {
+  color: var(--text-primary);
+  font-weight: 500;
+  max-width: 340px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: inline-block;
+  vertical-align: bottom;
+}
+.pb-sep {
+  color: var(--border);
+  font-size: 11px;
+}
+@media (max-width: 720px) {
+  .page-back-bar {
+    padding: 0.5rem 1.25rem;
+  }
+  .pb-crumbs {
+    margin-left: 0;
+    width: 100%;
+  }
+}

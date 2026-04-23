@@ -1,5 +1,6 @@
 import '../styles/newsArticle.css';
 import { Link } from 'react-router-dom';
+import PageBack from '../components/shared/PageBack.jsx';
 import { NEWS_ARTICLE, NEWS_ARTICLE_BODY, PULL_QUOTE, DATA_CALLOUT, INLINE_CHART, INFO_BOX, ARTICLE_TAGS, ARTICLE_FOOTER_DATA, RELATED_NEWS, FORUM_RELATED } from '../data/newsArticleData.js';
 
 function RelatedSidebar() {
@@ -57,11 +58,15 @@ function RelatedSidebar() {
 export default function NewsArticle() {
   return (
     <>
-      <div className="breadcrumb-bar">
-        <Link to="/news">News</Link>
-        <span className="bc-sep">·</span>
-        <span>Cabinet & Millwork Revenue Up 8.4%...</span>
-      </div>
+      <PageBack
+        backTo="/news"
+        backLabel="Back to News"
+        crumbs={[
+          { label: 'Home', to: '/' },
+          { label: 'News', to: '/news' },
+          { label: NEWS_ARTICLE.title },
+        ]}
+      />
 
       <div className="na-wrap">
         <article>

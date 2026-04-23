@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
 import '../styles/forumThread.css';
+import PageBack from '../components/shared/PageBack.jsx';
 import ThreadHeader from '../components/forumThread/ThreadHeader.jsx';
 import SortBar from '../components/forumThread/SortBar.jsx';
 import Post from '../components/forumThread/Post.jsx';
@@ -29,11 +29,15 @@ export default function ForumThread() {
 
   return (
     <>
-      <div className="breadcrumb-bar">
-        <Link to="/forums">Forums</Link>
-        <span className="bc-sep">›</span>
-        <span>{THREAD_HEADER.title}</span>
-      </div>
+      <PageBack
+        backTo="/forums"
+        backLabel="Back to Forums"
+        crumbs={[
+          { label: 'Home', to: '/' },
+          { label: 'Forums', to: '/forums' },
+          { label: THREAD_HEADER.title },
+        ]}
+      />
       <div className="ft-wrap">
         <div>
           <ThreadHeader data={THREAD_HEADER} onReply={() => setScrollToReply(true)} />

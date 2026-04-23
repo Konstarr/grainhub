@@ -5,26 +5,22 @@ import AboutCard from '../components/supplierProfile/AboutCard.jsx';
 import ReviewsCard from '../components/supplierProfile/ReviewsCard.jsx';
 import ContactCard from '../components/supplierProfile/ContactCard.jsx';
 import SalesRepsCard from '../components/supplierProfile/SalesRepsCard.jsx';
-import { BREADCRUMB, DOWNLOADS, RELATED_ARTICLES, SIMILAR_SUPPLIERS } from '../data/supplierProfileData.js';
+import PageBack from '../components/shared/PageBack.jsx';
+import { DOWNLOADS, RELATED_ARTICLES, SIMILAR_SUPPLIERS, SUPPLIER_HERO } from '../data/supplierProfileData.js';
 
 export default function SupplierProfile() {
   return (
     <>
       {/* BREADCRUMB */}
-      <div className="bc">
-        {BREADCRUMB.map((item, idx) => (
-          <div key={idx}>
-            {item.current ? (
-              <span>{item.label}</span>
-            ) : (
-              <>
-                <Link to={item.href}>{item.label}</Link>
-                <span className="bc-sep">›</span>
-              </>
-            )}
-          </div>
-        ))}
-      </div>
+      <PageBack
+        backTo="/suppliers"
+        backLabel="Back to Suppliers"
+        crumbs={[
+          { label: 'Home', to: '/' },
+          { label: 'Suppliers', to: '/suppliers' },
+          { label: SUPPLIER_HERO.name },
+        ]}
+      />
 
       {/* HERO */}
       <HeroSection />

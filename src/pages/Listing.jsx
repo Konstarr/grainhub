@@ -1,5 +1,4 @@
 import '../styles/listing.css';
-import { Link } from 'react-router-dom';
 import Gallery from '../components/listing/Gallery.jsx';
 import SpecsSection from '../components/listing/SpecsSection.jsx';
 import DescriptionSection from '../components/listing/DescriptionSection.jsx';
@@ -9,26 +8,22 @@ import SimilarListings from '../components/listing/SimilarListings.jsx';
 import PriceCard from '../components/listing/PriceCard.jsx';
 import QuickDetails from '../components/listing/QuickDetails.jsx';
 import SafetyCard from '../components/listing/SafetyCard.jsx';
-import { BREADCRUMB, LISTING_HEADER } from '../data/listingData.js';
+import PageBack from '../components/shared/PageBack.jsx';
+import { LISTING_HEADER } from '../data/listingData.js';
 
 export default function Listing() {
   return (
     <>
       {/* BREADCRUMB */}
-      <div className="breadcrumb-bar">
-        {BREADCRUMB.map((item, idx) => (
-          <div key={idx}>
-            {item.current ? (
-              <span>{item.label}</span>
-            ) : (
-              <>
-                <Link to={item.href}>{item.label}</Link>
-                <span className="bc-sep">›</span>
-              </>
-            )}
-          </div>
-        ))}
-      </div>
+      <PageBack
+        backTo="/marketplace"
+        backLabel="Back to Marketplace"
+        crumbs={[
+          { label: 'Home', to: '/' },
+          { label: 'Marketplace', to: '/marketplace' },
+          { label: LISTING_HEADER.title },
+        ]}
+      />
 
       {/* PAGE */}
       <div className="listing-wrap">
