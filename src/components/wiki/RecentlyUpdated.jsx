@@ -1,0 +1,36 @@
+import { RECENTLY_UPDATED_ARTICLES } from '../../data/wikiData.js';
+
+function ArticleCard({ article }) {
+  const variantClass = article.badge.variant === 'featured' ? 'ab-featured' : 'ab-new';
+  return (
+    <div className="article-card">
+      <div className="ac-img" style={{ background: article.imgGradient }}>
+        <span className={`ac-badge ${variantClass}`}>{article.badge.label}</span>
+      </div>
+      <div className="ac-body">
+        <div className="ac-cat">{article.category}</div>
+        <div className="ac-title">{article.title}</div>
+        <div className="ac-footer">
+          <span className="ac-rating">★ {article.rating}</span>
+          <span>{article.views}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function RecentlyUpdated() {
+  return (
+    <>
+      <div className="section-header">
+        <h2 className="section-title">Recently Updated</h2>
+        <span className="section-link">All recent edits →</span>
+      </div>
+      <div className="articles-grid">
+        {RECENTLY_UPDATED_ARTICLES.map((article) => (
+          <ArticleCard key={article.title} article={article} />
+        ))}
+      </div>
+    </>
+  );
+}

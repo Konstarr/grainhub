@@ -1,0 +1,4 @@
+This is a test file.
+Line 2.
+Line 3 ends with "a.jsx';"
+Line 4 final.
