@@ -17,24 +17,29 @@ export default function SponsorStrip() {
     return null;
   }
 
-  const loop = [...sponsors, ...sponsors];
+  const renderGroup = (keyPrefix) => (
+    <div className="sponsor-group" aria-hidden={keyPrefix === 'b' ? 'true' : undefined}>
+      {sponsors.map((s) => (
+        <Link
+          key={keyPrefix + '-' + s.id}
+          to="/suppliers/profile"
+          className="sponsor-logo"
+          title={s.name}
+        >
+          <span className={'sponsor-logo-badge ' + (s.logoColor || '')}>{s.logo}</span>
+          <span className="sponsor-logo-name">{s.name}</span>
+        </Link>
+      ))}
+    </div>
+  );
 
   return (
     <div className="sponsor-strip">
       <span className="sponsor-label">Sponsors</span>
       <div className="sponsor-marquee" aria-label="Featured sponsors">
         <div className="sponsor-track">
-          {loop.map((s, idx) => (
-            <Link
-              key={s.id + '-' + idx}
-              to="/suppliers/profile"
-              className="sponsor-logo"
-              title={s.name}
-            >
-              <span className={'sponsor-logo-badge ' + (s.logoColor || '')}>{s.logo}</span>
-              <span className="sponsor-logo-name">{s.name}</span>
-            </Link>
-          ))}
+          {renderGroup('a')}
+          {renderGroup('b')}
         </div>
       </div>
       <Link to="/sponsor" className="sponsor-cta">Become a Sponsor</Link>
