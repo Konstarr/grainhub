@@ -22,9 +22,9 @@ function NewsCard({ story }) {
       <div className="news-card-body">
         <div className="story-meta-top">
           <span>{story.category}</span>
-          <span className="story-meta-dot">.</span>
+          <span className="story-meta-dot">·</span>
           <span>{story.publishedDate}</span>
-          <span className="story-meta-dot">.</span>
+          <span className="story-meta-dot">·</span>
           <span>{story.readTime}</span>
         </div>
         <h3 className="news-card-title">{story.title}</h3>

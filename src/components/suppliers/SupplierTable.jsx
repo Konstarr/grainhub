@@ -70,7 +70,7 @@ export default function SupplierTable({ activeCategory = '', suppliers }) {
                   </div>
                   <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '4px' }}>
                     {supplier.category}
-                    {supplier.location ? ` - ${supplier.location}` : ''}
+                    {supplier.location ? `  ·  ${supplier.location}` : ''}
                   </div>
                   <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                     {supplier.badges.map((badge) => (
@@ -92,7 +92,7 @@ export default function SupplierTable({ activeCategory = '', suppliers }) {
                 </div>
                 <div style={{ textAlign: 'right', flexShrink: 0 }}>
                   <div style={{ fontSize: '18px', fontWeight: '500', color: 'var(--text-primary)' }}>
-                    {supplier.rating}
+                    ⭐ {supplier.rating}
                   </div>
                   <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>
                     {supplier.reviews} reviews

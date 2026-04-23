@@ -18,7 +18,7 @@ export default function ListingCard({ listing, section }) {
     <Link to="/marketplace/listing" className="listing-card">
       <div className={`card-img-area ${listing.imgClass}`} style={listing.imgStyle}>
         {listing.emoji}
-        <button className="card-save-btn">Save</button>
+        <button className="card-save-btn">🔖</button>
         {listing.isNew && <span className="new-badge">NEW</span>}
         {listing.badge && <span className="new-badge">{listing.badge}</span>}
       </div>
@@ -31,12 +31,12 @@ export default function ListingCard({ listing, section }) {
         <div className="card-specs">
           {listing.year && (
             <div className="card-spec">
-              {listing.year} - {listing.location}
+              📅 {listing.year} &nbsp;·&nbsp; 📍 {listing.location}
             </div>
           )}
           {listing.year === undefined && (
             <div className="card-spec">
-              {listing.location} - {listing.shipping}
+              📍 {listing.location} &nbsp;·&nbsp; {listing.shipping}
             </div>
           )}
           {listing.specs && <div className="card-spec">{listing.specs}</div>}

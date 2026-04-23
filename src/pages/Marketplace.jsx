@@ -14,20 +14,20 @@ const COND_LABEL = {
   'used-fair': 'Fair',
 };
 const EMOJI_BY_CAT = {
-  'CNC Machinery': 'CNC',
-  'Edgebanders': 'EB',
-  'Moulders': 'M',
-  'Finishing': 'F',
-  'Stationary Tools': 'ST',
-  'Combination': 'C',
-  'Hand/Power Tools': 'HP',
-  'Panel Saws': 'PS',
-  'Dust Collection': 'DC',
-  'Lumber': 'L',
-  'Sheet Goods': 'SG',
-  'Hardware': 'H',
-  'Sanders': 'SA',
-  'Tooling': 'T',
+  'CNC Machinery': '⚙️',
+  'Edgebanders': '🔧',
+  'Moulders': '🏭',
+  'Finishing': '🎨',
+  'Stationary Tools': '🪚',
+  'Combination': '🛠',
+  'Hand/Power Tools': '🔌',
+  'Panel Saws': '📐',
+  'Dust Collection': '💨',
+  'Lumber': '🪵',
+  'Sheet Goods': '📋',
+  'Hardware': '🔩',
+  'Sanders': '🧽',
+  'Tooling': '🔩',
 };
 
 function toListingCard(row) {
@@ -41,10 +41,10 @@ function toListingCard(row) {
     shipping: 'Local pickup',
     price: m.price || 'Contact',
     priceUnit: '',
-    emoji: EMOJI_BY_CAT[m.category] || 'Item',
+    emoji: EMOJI_BY_CAT[m.category] || '📦',
     imgClass: 'mk-img-default',
     imgStyle: { background: 'linear-gradient(135deg, #2C1A0E, #6B3F1F)' },
-    specs: m.description ? m.description.slice(0, 80) + (m.description.length > 80 ? '...' : '') : '',
+    specs: m.description ? m.description.slice(0, 80) + (m.description.length > 80 ? '…' : '') : '',
     isNew: false,
   };
 }
@@ -108,7 +108,7 @@ export default function Marketplace() {
               <option>West US</option>
               <option>Canada</option>
             </select>
-            <button className="search-btn">Search Listings</button>
+            <button className="search-btn">Search Listings →</button>
           </div>
         </div>
       </div>

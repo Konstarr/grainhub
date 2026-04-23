@@ -36,10 +36,10 @@ function toActivityItem(row) {
   const avatarColor = AV_PALETTE[h % AV_PALETTE.length];
   const cat = CAT_COLORS[h % CAT_COLORS.length];
   const badges = [];
-  if (t.isPinned) badges.push({ label: 'Pinned', className: 'tb-pinned' });
-  if (t.isSolved) badges.push({ label: 'Solved', className: 'tb-solved' });
-  if (t.isLocked) badges.push({ label: 'Locked', className: 'tb-locked' });
-  if (t.viewCount > 500 && t.isPinned === false) badges.push({ label: 'Hot', className: 'tb-hot' });
+  if (t.isPinned) badges.push({ label: '📌 Pinned', className: 'tb-pinned' });
+  if (t.isSolved) badges.push({ label: '✓ Solved', className: 'tb-solved' });
+  if (t.isLocked) badges.push({ label: '🔒 Locked', className: 'tb-locked' });
+  if (t.viewCount > 500 && t.isPinned === false) badges.push({ label: '🔥 Hot', className: 'tb-hot' });
   const initials = (t.title || '??').split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase() || 'GH';
   return {
     id: t.id,
@@ -106,23 +106,23 @@ export default function Forums() {
           <TopContributors contributors={TOP_CONTRIBUTORS} />
           <SponsorCard />
           <div className="rs-card">
-            <div className="rs-header">Quick Start</div>
+            <div className="rs-header">⚡ Quick Start</div>
             <div className="rs-body">
               <div className="qs-grid">
                 <div className="qs-item">
-                  <div className="qs-icon">N</div>
+                  <div className="qs-icon">✏️</div>
                   <div className="qs-label">New Thread</div>
                 </div>
                 <div className="qs-item">
-                  <div className="qs-icon">?</div>
+                  <div className="qs-icon">❓</div>
                   <div className="qs-label">Ask a Question</div>
                 </div>
                 <div className="qs-item">
-                  <div className="qs-icon">P</div>
+                  <div className="qs-icon">📸</div>
                   <div className="qs-label">Show Your Work</div>
                 </div>
                 <div className="qs-item">
-                  <div className="qs-icon">H</div>
+                  <div className="qs-icon">👋</div>
                   <div className="qs-label">Introduce Yourself</div>
                 </div>
               </div>
@@ -134,7 +134,5 @@ export default function Forums() {
         </aside>
       </div>
     </>
-  );
-}
   );
 }

@@ -23,9 +23,9 @@ export default function HeroStory({ story }) {
       <div className="hero-story-body">
         <div className="story-meta-top">
           <span>{s.category}</span>
-          <span className="story-meta-dot">.</span>
+          <span className="story-meta-dot">·</span>
           <span>{s.publishedDate}</span>
-          <span className="story-meta-dot">.</span>
+          <span className="story-meta-dot">·</span>
           <span>{s.readTime}</span>
         </div>
         <h2 className="hero-story-title">{s.title}</h2>

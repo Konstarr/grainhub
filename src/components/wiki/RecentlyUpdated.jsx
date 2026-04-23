@@ -12,7 +12,7 @@ function ArticleCard({ article }) {
         <div className="ac-cat">{article.category}</div>
         <div className="ac-title">{article.title}</div>
         <div className="ac-footer">
-          <span className="ac-rating">{article.rating}</span>
+          <span className="ac-rating">★ {article.rating}</span>
           <span>{article.views}</span>
         </div>
       </div>
@@ -26,7 +26,7 @@ export default function RecentlyUpdated({ articles }) {
     <>
       <div className="section-header">
         <h2 className="section-title">Recently Updated</h2>
-        <span className="section-link">All recent edits</span>
+        <span className="section-link">All recent edits →</span>
       </div>
       <div className="articles-grid">
         {list.map((article) => (

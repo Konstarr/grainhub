@@ -78,8 +78,8 @@ export function mapJobRow(row) {
     tags,
     description: row.description,
     metadata: [
-      { icon: 'loc', label: row.location },
-      { icon: 'cal', label: posted },
+      { icon: '📍', label: row.location },
+      { icon: '📅', label: posted },
     ],
   };
 }
@@ -123,10 +123,10 @@ export function mapEventRow(row) {
     categoryColor: type.color,
     date: dateStr,
     location: row.is_online ? 'Online' : (row.location || row.venue_name || ''),
-    excerpt: row.description ? row.description.slice(0, 240) + (row.description.length > 240 ? '...' : '') : '',
+    excerpt: row.description ? row.description.slice(0, 240) + (row.description.length > 240 ? '…' : '') : '',
     imgGradient,
     attendees: row.is_online ? 'Online event' : 'In-person',
-    price: row.registration_url ? 'Register' : 'Details',
+    price: row.registration_url ? 'Register →' : 'Details',
     registrationUrl: row.registration_url,
     isOnline: Boolean(row.is_online),
     trade: row.trade,

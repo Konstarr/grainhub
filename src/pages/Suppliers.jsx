@@ -66,7 +66,7 @@ export default function Suppliers() {
                 <option key={cat.id}>{cat.name}</option>
               ))}
             </select>
-            <button className="search-btn">Search Suppliers</button>
+            <button className="search-btn">Search Suppliers →</button>
           </div>
         </div>
       </div>
@@ -80,9 +80,9 @@ export default function Suppliers() {
           aria-expanded={showMap}
           style={mapTogglePillStyle}
         >
-          <span style={{ fontSize: '16px' }}>{showMap ? 'X' : 'M'}</span>
+          <span style={{ fontSize: '16px' }}>{showMap ? '✕' : '🗺'}</span>
           <span>
-            {showMap ? 'Hide map' : 'Show map - find suppliers near you'}
+            {showMap ? 'Hide map' : 'Show map — find suppliers near you'}
           </span>
         </button>
 
