@@ -1,5 +1,6 @@
 import { Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext.jsx';
+import RequireAuth from './components/auth/RequireAuth.jsx';
 import Layout from './components/layout/Layout.jsx';
 import Home from './pages/Home.jsx';
 import Forums from './pages/Forums.jsx';
@@ -23,22 +24,62 @@ export default function App() {
     <AuthProvider>
       <Routes>
         <Route element={<Layout />}>
+          {/* Public pages — anyone can browse these to get a feel for the site. */}
           <Route path="/" element={<Home />} />
           <Route path="/forums" element={<Forums />} />
-          <Route path="/forums/thread" element={<ForumThread />} />
           <Route path="/jobs" element={<Jobs />} />
           <Route path="/wiki" element={<Wiki />} />
-          <Route path="/wiki/article" element={<WikiArticle />} />
           <Route path="/news" element={<News />} />
-          <Route path="/news/article" element={<NewsArticle />} />
           <Route path="/marketplace" element={<Marketplace />} />
-          <Route path="/marketplace/listing" element={<Listing />} />
           <Route path="/suppliers" element={<Suppliers />} />
-          <Route path="/suppliers/profile" element={<SupplierProfile />} />
+          <Route path="/events" element={<Events />} />
+          <Route path="/sponsor" element={<Sponsor />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/sponsor" element={<Sponsor />} />
-          <Route path="/events" element={<Events />} />
+
+          {/* Gated detail pages — members only. Signed-out visitors see a
+              branded "Create a free account" gate, with post-auth bounce
+              back to the URL they were trying to reach. */}
+          <Route
+            path="/forums/thread"
+            element={
+              <RequireAuth>
+                <ForumThread />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/wiki/article"
+            element={
+              <RequireAuth>
+                <WikiArticle />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/news/article"
+            element={
+              <RequireAuth>
+                <NewsArticle />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/marketplace/listing"
+            element={
+              <RequireAuth>
+                <Listing />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/suppliers/profile"
+            element={
+              <RequireAuth>
+                <SupplierProfile />
+              </RequireAuth>
+            }
+          />
         </Route>
       </Routes>
     </AuthProvider>
