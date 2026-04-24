@@ -77,6 +77,8 @@ export function mapJobRow(row) {
     salaryNote,
     tags,
     description: row.description,
+    applyUrl: row.apply_url || null,
+    applyEmail: row.apply_email || null,
     metadata: [
       { icon: '\u{1F4CD}', label: row.location },
       { icon: '\u{1F4C5}', label: posted },

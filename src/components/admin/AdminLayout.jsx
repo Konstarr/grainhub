@@ -16,6 +16,7 @@ export const ADMIN_SECTIONS = [
     items: [
       { to: '/admin/news',     label: 'News',      icon: <IconNews />,     enabled: true  },
       { to: '/admin/events',   label: 'Events',    icon: <IconCal />,      enabled: true  },
+      { to: '/admin/jobs',     label: 'Jobs',      icon: <IconBriefcase />, enabled: true },
       { to: '/admin/listings', label: 'Listings',  icon: <IconTag />,      enabled: false },
       { to: '/admin/sponsors', label: 'Sponsors',  icon: <IconStar />,     enabled: true  },
     ],
@@ -107,3 +108,4 @@ function IconShield() { return (<svg {...svg}><path d="M12 22s8-4 8-10V5l-8-3-8 
 function IconFlag()   { return (<svg {...svg}><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>); }
 function IconUsers()  { return (<svg {...svg}><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>); }
 function IconStar()   { return (<svg {...svg}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>); }
+function IconBriefcase() { return (<svg {...svg}><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>); }

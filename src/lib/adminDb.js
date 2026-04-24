@@ -202,6 +202,81 @@ export async function deleteEvent(id) {
 }
 
 // ------------------------------------------------------------
+// Jobs
+// ------------------------------------------------------------
+
+export async function listJobs({ search = '', limit = 200 } = {}) {
+  let q = supabase
+    .from('jobs')
+    .select('id, title, company, location, employment_type, salary_min, salary_max, salary_period, trade, is_approved, is_filled, posted_at, expires_at, author_id')
+    .order('posted_at', { ascending: false })
+    .limit(limit);
+  if (search && search.trim()) {
+    const s = search.trim();
+    q = q.or(`title.ilike.%${s}%,company.ilike.%${s}%,location.ilike.%${s}%`);
+  }
+  const { data, error } = await q;
+  return { data: data || [], error };
+}
+
+export async function getJob(id) {
+  const { data, error } = await supabase
+    .from('jobs')
+    .select('*')
+    .eq('id', id)
+    .maybeSingle();
+  return { data, error };
+}
+
+export async function createJob(row) {
+  const payload = {
+    author_id:       row.author_id || null,
+    title:           row.title,
+    company:         row.company,
+    location:        row.location,
+    trade:           row.trade || null,
+    employment_type: row.employment_type || null,
+    salary_min:      row.salary_min == null || row.salary_min === '' ? null : Number(row.salary_min),
+    salary_max:      row.salary_max == null || row.salary_max === '' ? null : Number(row.salary_max),
+    salary_period:   row.salary_period || 'year',
+    description:     row.description,
+    requirements:    row.requirements || null,
+    benefits:        row.benefits || null,
+    apply_url:       row.apply_url || null,
+    apply_email:     row.apply_email || null,
+    is_approved:     !!row.is_approved,
+    is_filled:       !!row.is_filled,
+    expires_at:      row.expires_at || null,
+  };
+  const { data, error } = await supabase
+    .from('jobs')
+    .insert(payload)
+    .select('*')
+    .maybeSingle();
+  return { data, error };
+}
+
+export async function updateJob(id, patch) {
+  const p = { ...patch };
+  if (p.salary_min === '' || p.salary_min == null) p.salary_min = null;
+  else p.salary_min = Number(p.salary_min);
+  if (p.salary_max === '' || p.salary_max == null) p.salary_max = null;
+  else p.salary_max = Number(p.salary_max);
+  const { data, error } = await supabase
+    .from('jobs')
+    .update(p)
+    .eq('id', id)
+    .select('*')
+    .maybeSingle();
+  return { data, error };
+}
+
+export async function deleteJob(id) {
+  const { error } = await supabase.from('jobs').delete().eq('id', id);
+  return { error };
+}
+
+// ------------------------------------------------------------
 // Users / profiles
 // ------------------------------------------------------------
 

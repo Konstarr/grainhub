@@ -9,6 +9,7 @@ import ForumCategory from './pages/ForumCategory.jsx';
 import ForumThread from './pages/ForumThread.jsx';
 import NewThread from './pages/NewThread.jsx';
 import Jobs from './pages/Jobs.jsx';
+import JobDetail from './pages/JobDetail.jsx';
 import Wiki from './pages/Wiki.jsx';
 import WikiArticle from './pages/WikiArticle.jsx';
 import News from './pages/News.jsx';
@@ -27,6 +28,8 @@ import AdminNews from './pages/admin/AdminNews.jsx';
 import AdminNewsEdit from './pages/admin/AdminNewsEdit.jsx';
 import AdminEvents from './pages/admin/AdminEvents.jsx';
 import AdminEventsEdit from './pages/admin/AdminEventsEdit.jsx';
+import AdminJobs from './pages/admin/AdminJobs.jsx';
+import AdminJobsEdit from './pages/admin/AdminJobsEdit.jsx';
 import AdminUsers from './pages/admin/AdminUsers.jsx';
 import AdminUserEdit from './pages/admin/AdminUserEdit.jsx';
 import AdminSponsors from './pages/admin/AdminSponsors.jsx';
@@ -40,6 +43,8 @@ export default function App() {
         <Route path="/admin/news/:id" element={<RequireStaff level="admin"><AdminNewsEdit /></RequireStaff>} />
         <Route path="/admin/events" element={<RequireStaff level="admin"><AdminEvents /></RequireStaff>} />
         <Route path="/admin/events/:id" element={<RequireStaff level="admin"><AdminEventsEdit /></RequireStaff>} />
+        <Route path="/admin/jobs" element={<RequireStaff level="mod"><AdminJobs /></RequireStaff>} />
+        <Route path="/admin/jobs/:id" element={<RequireStaff level="mod"><AdminJobsEdit /></RequireStaff>} />
         <Route path="/admin/users" element={<RequireStaff level="admin"><AdminUsers /></RequireStaff>} />
         <Route path="/admin/users/:id" element={<RequireStaff level="admin"><AdminUserEdit /></RequireStaff>} />
         <Route path="/admin/sponsors" element={<RequireStaff level="admin"><AdminSponsors /></RequireStaff>} />
@@ -48,6 +53,7 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/forums" element={<Forums />} />
           <Route path="/jobs" element={<Jobs />} />
+          <Route path="/jobs/:id" element={<RequireAuth><JobDetail /></RequireAuth>} />
           <Route path="/wiki" element={<Wiki />} />
           <Route path="/news" element={<News />} />
           <Route path="/marketplace" element={<Marketplace />} />

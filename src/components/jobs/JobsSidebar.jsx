@@ -9,7 +9,7 @@ export default function JobsSidebar({ postJobCta, talentCta }) {
         <div className="pjc-eyebrow">{postJobCta.eyebrow}</div>
         <div className="pjc-title">{postJobCta.title}</div>
         <div className="pjc-sub">{postJobCta.description}</div>
-        <Link to="/sponsor" className="pjc-btn">Post a Job Now →</Link>
+        <Link to="/admin/jobs/new" className="pjc-btn">Post a Job Now →</Link>
         <div className="pjc-pricing">
           {postJobCta.tiers.map((tier, idx) => (
             <div key={idx} className="pjc-tier">
