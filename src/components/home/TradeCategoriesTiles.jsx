@@ -51,7 +51,6 @@ export default function TradeCategoriesTiles() {
               {/* Color-tinted scrim on top of the photo — pulls each tile
                   into the palette AND keeps the title readable. */}
               <span className="home-trade-scrim" style={{ backgroundImage: t.color }} aria-hidden="true" />
-              <span className="home-trade-icon" aria-hidden="true">{t.icon}</span>
               <span className="home-trade-name">{t.name}</span>
               <span className="home-trade-arrow" aria-hidden="true">→</span>
             </Link>

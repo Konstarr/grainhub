@@ -910,23 +910,24 @@ nav.site-nav {
   isolation: isolate;
 }
 /* Color-tinted scrim: layered gradient pulled from the trade's
-   palette, partially transparent so the underlying photo shows
-   through. Strong at the bottom (readable title), lighter at the top. */
+   palette, partially transparent so the photo shows through. Subtle
+   tint only — the photo is the star, the scrim is just for palette
+   cohesion. */
 .home-trade-scrim {
   position: absolute;
   inset: 0;
   z-index: 0;
-  opacity: 0.78;
+  opacity: 0.4;
   mix-blend-mode: multiply;
 }
-/* A second, plain darkening layer at the bottom just for text
-   legibility. Sits above the colored scrim, below the content. */
+/* Thin darken-at-the-bottom layer purely for title legibility,
+   starts very subtle and only gets dark at the very bottom edge. */
 .home-trade-tile::after {
   content: '';
   position: absolute;
   inset: 0;
   z-index: 1;
-  background: linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.55) 100%);
+  background: linear-gradient(180deg, rgba(0,0,0,0) 55%, rgba(0,0,0,0.45) 100%);
   pointer-events: none;
 }
 .home-trade-tile:hover {
@@ -935,14 +936,7 @@ nav.site-nav {
   text-decoration: none;
 }
 .home-trade-tile:hover .home-trade-scrim {
-  opacity: 0.55;
-}
-.home-trade-icon {
-  position: relative;
-  z-index: 2;
-  font-size: 32px;
-  line-height: 1;
-  filter: drop-shadow(0 1px 3px rgba(0,0,0,0.4));
+  opacity: 0.22;
 }
 .home-trade-name {
   position: relative;
