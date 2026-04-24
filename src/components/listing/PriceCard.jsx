@@ -1,16 +1,20 @@
 import { useState } from 'react';
 import { PRICE_INFO } from '../../data/listingData.js';
 
-export default function PriceCard() {
+export default function PriceCard({ listing }) {
   const [modalOpen, setModalOpen] = useState(false);
+
+  const displayPrice = listing && listing.price ? listing.price : PRICE_INFO.main;
+  const displayNote = listing ? '' : PRICE_INFO.note;
+  const displayFinancing = listing ? '' : PRICE_INFO.financing;
 
   return (
     <>
       <div className="price-card">
         <div className="price-card-header">
-          <div className="price-main">{PRICE_INFO.main}</div>
-          <div className="price-note">{PRICE_INFO.note}</div>
-          <div className="price-financing">{PRICE_INFO.financing}</div>
+          <div className="price-main">{displayPrice}</div>
+          {displayNote && <div className="price-note">{displayNote}</div>}
+          {displayFinancing && <div className="price-financing">{displayFinancing}</div>}
         </div>
 
         <div className="price-card-body">
@@ -38,7 +42,6 @@ export default function PriceCard() {
         </div>
       </div>
 
-      {/* CONTACT MODAL */}
       {modalOpen && (
         <div className="modal-overlay open" onClick={(e) => e.target === e.currentTarget && setModalOpen(false)}>
           <div className="modal">
@@ -49,18 +52,20 @@ export default function PriceCard() {
               </button>
             </div>
             <div className="modal-body">
-              <div className="modal-listing-ref">
-                <div className="mlr-icon">🖥️</div>
-                <div className="mlr-text">
-                  <strong>Biesse Rover A FT 1536 CNC — 5-Axis</strong>
-                  Listing #GH-4821 &nbsp;·&nbsp; $68,500 &nbsp;·&nbsp; Seattle, WA
+              {listing && (
+                <div className="modal-listing-ref">
+                  <div className="mlr-icon">🖥️</div>
+                  <div className="mlr-text">
+                    <strong>{listing.title}</strong>
+                    {listing.price} · {listing.location}
+                  </div>
                 </div>
-              </div>
+              )}
               <div className="modal-fields">
                 <div className="mf-row">
                   <div>
                     <div className="mf-label">Your Name</div>
-                    <input className="mf-input" type="text" placeholder="Tom Kowalski" />
+                    <input className="mf-input" type="text" placeholder="Your name" />
                   </div>
                   <div>
                     <div className="mf-label">Phone</div>
@@ -69,13 +74,11 @@ export default function PriceCard() {
                 </div>
                 <div>
                   <div className="mf-label">Email</div>
-                  <input className="mf-input" type="email" placeholder="tom@heritagemill.com" />
+                  <input className="mf-input" type="email" placeholder="you@example.com" />
                 </div>
                 <div>
                   <div className="mf-label">Your Message</div>
-                  <textarea className="mf-textarea" placeholder="Hi — I'm interested in the Biesse Rover A FT. Can you share the full service records? I'm in Colorado and can arrange transport. What's your timeline for the sale?">
-                    Hi — I'm interested in the Biesse Rover A FT. Can you share the full service records? I'm in Colorado and can arrange transport. What's your timeline for the sale?
-                  </textarea>
+                  <textarea className="mf-textarea" placeholder="Hi — I'm interested in this listing. Can you share more details?" defaultValue="" />
                 </div>
               </div>
               <div className="modal-checkboxes">

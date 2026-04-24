@@ -24,7 +24,6 @@ export default function App() {
     <AuthProvider>
       <Routes>
         <Route element={<Layout />}>
-          {/* Public pages — anyone can browse these to get a feel for the site. */}
           <Route path="/" element={<Home />} />
           <Route path="/forums" element={<Forums />} />
           <Route path="/jobs" element={<Jobs />} />
@@ -37,9 +36,6 @@ export default function App() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
 
-          {/* Gated detail pages — members only. Signed-out visitors see a
-              branded "Create a free account" gate, with post-auth bounce
-              back to the URL they were trying to reach. */}
           <Route
             path="/forums/thread"
             element={
@@ -61,6 +57,14 @@ export default function App() {
             element={
               <RequireAuth>
                 <NewsArticle />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/marketplace/listing/:slug"
+            element={
+              <RequireAuth>
+                <Listing />
               </RequireAuth>
             }
           />

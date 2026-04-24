@@ -1,4 +1,6 @@
 import '../styles/listing.css';
+import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import Gallery from '../components/listing/Gallery.jsx';
 import SpecsSection from '../components/listing/SpecsSection.jsx';
 import DescriptionSection from '../components/listing/DescriptionSection.jsx';
@@ -10,72 +12,93 @@ import QuickDetails from '../components/listing/QuickDetails.jsx';
 import SafetyCard from '../components/listing/SafetyCard.jsx';
 import PageBack from '../components/shared/PageBack.jsx';
 import { LISTING_HEADER } from '../data/listingData.js';
+import { supabase } from '../lib/supabase.js';
+import { mapMarketplaceRow } from '../lib/mappers.js';
 
 export default function Listing() {
+  const { slug } = useParams();
+  const [listing, setListing] = useState(null);
+  const [loading, setLoading] = useState(Boolean(slug));
+
+  useEffect(() => {
+    if (!slug) { setListing(null); setLoading(false); return; }
+    let cancelled = false;
+    (async () => {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('marketplace_listings')
+        .select('*')
+        .eq('slug', slug)
+        .maybeSingle();
+      if (cancelled) return;
+      if (error || !data) {
+        setListing(null);
+      } else {
+        setListing(mapMarketplaceRow(data));
+      }
+      setLoading(false);
+    })();
+    return () => { cancelled = true; };
+  }, [slug]);
+
+  const title = listing ? listing.title : LISTING_HEADER.title;
+  const category = listing ? listing.category : (LISTING_HEADER.categories || [])[0];
+  const location = listing ? listing.location : '';
+
   return (
     <>
-      {/* BREADCRUMB */}
       <PageBack
         backTo="/marketplace"
         backLabel="Back to Marketplace"
         crumbs={[
           { label: 'Home', to: '/' },
           { label: 'Marketplace', to: '/marketplace' },
-          { label: LISTING_HEADER.title },
+          { label: title || 'Listing' },
         ]}
       />
 
-      {/* PAGE */}
       <div className="listing-wrap">
         <div>
-          {/* GALLERY */}
-          <Gallery />
+          <Gallery listing={listing} />
 
-          {/* LISTING HEADER */}
           <div className="listing-header">
             <div className="listing-cat-row">
-              {LISTING_HEADER.categories.map((cat) => (
-                <span key={cat} className="lcat lcat-cnc">
-                  {cat}
-                </span>
-              ))}
-              <span className="lcat-id">{LISTING_HEADER.id}</span>
-              <span className="lcat-views">{LISTING_HEADER.views} &nbsp;·&nbsp; {LISTING_HEADER.saves}</span>
+              {listing ? (
+                <span className="lcat lcat-cnc">{category || 'Listing'}</span>
+              ) : (
+                LISTING_HEADER.categories.map((cat) => (
+                  <span key={cat} className="lcat lcat-cnc">{cat}</span>
+                ))
+              )}
+              {listing && listing.id && (
+                <span className="lcat-id">#{String(listing.id).slice(0, 8)}</span>
+              )}
             </div>
-            <h1 className="listing-title">{LISTING_HEADER.title}</h1>
-            <div className="listing-meta-row">
-              {LISTING_HEADER.meta.map((item, idx) => (
-                <div
-                  key={idx}
-                  className="lm-item"
-                  style={item.highlight ? { marginLeft: 'auto', color: '#8B5E08', fontWeight: '500' } : {}}
-                >
-                  {item.icon} {item.text}
-                </div>
-              ))}
-            </div>
+            <h1 className="listing-title">{title}</h1>
+            {listing && (
+              <div className="listing-meta-row">
+                {location && <div className="lm-item">📍 {location}</div>}
+                {listing.condition && <div className="lm-item">✓ {listing.condition}</div>}
+              </div>
+            )}
+            {loading && <div style={{ color: 'var(--text-muted)', fontSize: '13px' }}>Loading listing...</div>}
+            {!loading && slug && !listing && (
+              <div style={{ color: 'var(--text-muted)', fontSize: '13px' }}>
+                Listing not found. It may have been sold or removed.
+              </div>
+            )}
           </div>
 
-          {/* SPECS TABLE */}
           <SpecsSection />
-
-          {/* DESCRIPTION */}
-          <DescriptionSection />
-
-          {/* CONDITION REPORT */}
+          <DescriptionSection listing={listing} />
           <ConditionSection />
-
-          {/* SELLER */}
           <SellerSection />
-
-          {/* SIMILAR */}
           <SimilarListings />
         </div>
 
-        {/* RIGHT STICKY PANEL */}
         <aside className="right-col">
-          <PriceCard />
-          <QuickDetails />
+          <PriceCard listing={listing} />
+          <QuickDetails listing={listing} />
           <SafetyCard />
         </aside>
       </div>

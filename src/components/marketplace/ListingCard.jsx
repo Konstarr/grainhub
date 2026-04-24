@@ -20,7 +20,7 @@ export default function ListingCard({ listing, section }) {
     : listing.imgStyle;
 
   return (
-    <Link to="/marketplace/listing" className="listing-card">
+    <Link to={listing.slug ? ('/marketplace/listing/' + listing.slug) : '/marketplace/listing'} className="listing-card">
       <div className={'card-img-area ' + (firstImage ? '' : (listing.imgClass || ''))} style={imgStyle}>
         {firstImage ? null : listing.emoji}
         <button className="card-save-btn">🔖</button>
@@ -36,12 +36,12 @@ export default function ListingCard({ listing, section }) {
         <div className="card-specs">
           {listing.year && (
             <div className="card-spec">
-              📅 {listing.year} &nbsp;·&nbsp; 📍 {listing.location}
+              📅 {listing.year} · 📍 {listing.location}
             </div>
           )}
           {listing.year === undefined && (
             <div className="card-spec">
-              📍 {listing.location} &nbsp;·&nbsp; {listing.shipping}
+              📍 {listing.location} · {listing.shipping}
             </div>
           )}
           {listing.specs && <div className="card-spec">{listing.specs}</div>}

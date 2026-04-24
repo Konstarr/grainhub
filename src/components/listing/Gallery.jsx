@@ -1,37 +1,51 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
-export default function Gallery() {
-  const [activeThumb, setActiveThumb] = useState(0);
+export default function Gallery({ listing }) {
+  const images = (listing && Array.isArray(listing.images)) ? listing.images : [];
+  const [active, setActive] = useState(0);
+  useEffect(() => { setActive(0); }, [listing && listing.id]);
 
-  const thumbs = [
-    { id: 0, class: 'gt-1', emoji: '🖥️' },
-    { id: 1, class: 'gt-2', emoji: '⚙️' },
-    { id: 2, class: 'gt-3', emoji: '🔧' },
-    { id: 3, class: 'gt-4', emoji: '📋' },
-    { id: 4, class: 'gt-5', emoji: '📐' },
-  ];
+  if (images.length === 0) {
+    return (
+      <div className="gallery">
+        <div className="gallery-main" style={{ background: 'linear-gradient(135deg,#2C1A0E,#6B3F1F)' }}>
+          <div className="gallery-badges">
+            {listing && listing.condition && (
+              <span className="gallery-badge gb-cond">{listing.condition}</span>
+            )}
+          </div>
+          <span style={{ position: 'relative', zIndex: 1, fontSize: '64px' }}>📦</span>
+          <div className="gallery-zoom">No photos uploaded yet</div>
+        </div>
+      </div>
+    );
+  }
 
+  const activeUrl = images[active] || images[0];
   return (
     <div className="gallery">
-      <div className="gallery-main">
+      <div
+        className="gallery-main"
+        style={{ background: 'url("' + activeUrl + '") center/cover no-repeat, #2C1A0E' }}
+      >
         <div className="gallery-badges">
-          <span className="gallery-badge gb-featured">⭐ Featured Listing</span>
-          <span className="gallery-badge gb-cond">Excellent Condition</span>
+          {listing && listing.condition && (
+            <span className="gallery-badge gb-cond">{listing.condition}</span>
+          )}
         </div>
-        <span style={{ position: 'relative', zIndex: 1 }}>🖥️</span>
-        <div className="gallery-zoom">🔍 Tap to zoom</div>
       </div>
-      <div className="gallery-thumbs">
-        {thumbs.map((thumb) => (
-          <div
-            key={thumb.id}
-            className={`gallery-thumb ${thumb.class} ${activeThumb === thumb.id ? 'active' : ''}`}
-            onClick={() => setActiveThumb(thumb.id)}
-          >
-            {thumb.emoji}
-          </div>
-        ))}
-      </div>
+      {images.length > 1 && (
+        <div className="gallery-thumbs">
+          {images.map((url, idx) => (
+            <div
+              key={url + '-' + idx}
+              className={'gallery-thumb ' + (active === idx ? 'active' : '')}
+              onClick={() => setActive(idx)}
+              style={{ background: 'url("' + url + '") center/cover no-repeat' }}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
