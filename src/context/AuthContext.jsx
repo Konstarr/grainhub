@@ -146,22 +146,30 @@ export function AuthProvider({ children }) {
   const refreshProfile = async () => {
     const uid = session?.user?.id;
     if (!uid) return;
-    const { data } = await supabase
-      .from('profiles')
-      .select(`
-        id, username, full_name, bio, avatar_url, trade, location, website,
-        role, reputation, thread_count, post_count, joined_at, created_at,
-        is_verified, is_suspended,
-        account_type, business_name, business_website, business_verified,
-        business_contact_email, business_phone, business_trade, business_size,
-        sponsor_tier, sponsor_company,
-        can_post_forums, can_post_marketplace, can_post_jobs, can_submit_events,
-        email_digest, notify_mentions, notify_replies, newsletter_optin,
-        profile_public, show_on_leaderboard, email_visible
-      `)
-      .eq('id', uid)
-      .maybeSingle();
-    setProfile(data);
+    // Use the SECURITY DEFINER RPC so we can read ALL columns on the
+    // caller's own row — direct SELECT on public.profiles is column-
+    // restricted to the safe public projection (see migration-hardening.sql).
+    const { data, error } = await supabase.rpc('get_my_profile');
+    if (error) {
+      // Fallback: read the safe public projection so the app still boots
+      // with the role column populated (admin menu will still work).
+      const fb = await supabase
+        .from('profiles')
+        .select(
+          'id, username, full_name, bio, avatar_url, trade, location, website,' +
+          'role, reputation, thread_count, post_count, joined_at, created_at,' +
+          'is_verified, is_suspended,' +
+          'account_type, business_name, business_website, business_verified,' +
+          'sponsor_tier, sponsor_company,' +
+          'profile_public, show_on_leaderboard, email_visible'
+        )
+        .eq('id', uid)
+        .maybeSingle();
+      setProfile(fb.data || null);
+      return;
+    }
+    // RPC returns an array (setof); take the first row.
+    setProfile(Array.isArray(data) ? data[0] || null : data || null);
   };
 
   const role = profile?.role || 'member';
