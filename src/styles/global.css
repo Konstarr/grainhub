@@ -446,31 +446,79 @@ nav.site-nav {
 }
 .gh-hero .stats-row        { margin-top: 0.75rem !important; }
 
-/* Home hero is the only one with CTA buttons + stat cards + headline —
-   let it breathe with a taller box, just on Home. Override the generic
-   "hide extras" rule so Home's actions + right column stay visible. */
+/* Home hero is the only one with CTA buttons + headline — let it
+   breathe with a taller box, just on Home. Stats have moved to the
+   dedicated StatsStrip below, so the hero is copy + CTAs only. */
 .hero.gh-hero {
   height: auto;
-  min-height: 380px;
+  min-height: 460px;
   max-height: none;
-  padding: 2.5rem 2.5rem !important;
+  padding: 3rem 2.5rem !important;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;                /* keep the scrim contained */
 }
-.hero.gh-hero .hero-actions,
-.hero.gh-hero .hero-right,
-.hero.gh-hero .hero-stats { display: flex !important; }
+.hero.gh-hero .hero-actions { display: flex !important; }
 /* Home headline gets full size back since it's iconic */
 .hero.gh-hero h1 {
-  font-size: 3rem !important;
+  font-size: 3.2rem !important;
   line-height: 1.05 !important;
-  margin: 0 0 0.75rem !important;
+  margin: 0 0 0.85rem !important;
+  color: #F5EAD6 !important;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.4);
 }
-.hero.gh-hero .hero-sub  { font-size: 1.05rem !important; margin: 0 0 1rem !important; }
+.hero.gh-hero h1 em {
+  color: var(--wood-light, #D9A97A) !important;
+  font-style: italic;
+}
+.hero.gh-hero .hero-sub  {
+  font-size: 1.05rem !important;
+  margin: 0 0 1rem !important;
+  color: rgba(245, 234, 214, 0.88) !important;
+  max-width: 580px;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.35);
+}
+.hero.gh-hero .hero-eyebrow {
+  color: var(--wood-light, #D9A97A) !important;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.35);
+}
 .hero.gh-hero .hero-inner {
-  flex-direction: row !important;
-  align-items: center !important;
-  gap: 2rem;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: 0.75rem;
+  max-width: 780px;
+  position: relative;
+  z-index: 2;
 }
-.hero.gh-hero .hero-actions { margin-top: 0.75rem; }
+.hero-inner-left { width: 100%; }
+.hero.gh-hero .hero-actions {
+  margin-top: 1rem;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* ── Image-backed hero variant ────────────────────────── */
+/* The photo layer sits behind everything at z-index 0; a warm brown
+   scrim on top at z-index 1 pulls the workshop photo toward the site
+   palette while keeping enough contrast for the copy at z-index 2. */
+.hero-image .hero-image-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image: url('https://images.unsplash.com/photo-1572297870735-1fb8b5acfc99?q=80&w=2000&auto=format&fit=crop');
+  background-size: cover;
+  background-position: center;
+  filter: saturate(0.85) contrast(1.05);
+}
+.hero-image .hero-image-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    linear-gradient(90deg, rgba(28, 14, 5, 0.85) 0%, rgba(44, 26, 14, 0.65) 45%, rgba(44, 26, 14, 0.35) 75%, rgba(44, 26, 14, 0.15) 100%),
+    linear-gradient(180deg, rgba(44, 26, 14, 0) 0%, rgba(44, 26, 14, 0.5) 100%);
+  pointer-events: none;
+}
 .gh-hero .header-top,
 .gh-hero .header-left,
 .gh-hero .hero-left,
