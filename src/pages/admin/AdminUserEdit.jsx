@@ -3,8 +3,20 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import AdminLayout from '../../components/admin/AdminLayout.jsx';
 import CoverImageUploader from '../../components/admin/CoverImageUploader.jsx';
 import SponsorMediaEditor from '../../components/admin/SponsorMediaEditor.jsx';
-import { getProfile, updateProfileAdmin } from '../../lib/adminDb.js';
+import {
+  getProfile,
+  updateProfileAdmin,
+  fetchSubscriptionPacks,
+  setSubscriptionPack,
+  removeSubscriptionPack,
+} from '../../lib/adminDb.js';
 import { useAuth } from '../../context/AuthContext.jsx';
+import {
+  INDIVIDUAL_TIERS,
+  BUSINESS_TIERS,
+  ROLE_PACKS,
+  formatPrice,
+} from '../../lib/pricing.js';
 
 const ROLE_OPTIONS = [
   { value: 'member',    label: 'Member' },
@@ -36,12 +48,17 @@ export default function AdminUserEdit() {
   const [error, setError]     = useState(null);
   const [okMsg, setOkMsg]     = useState(null);
   const [form, setForm]       = useState(null);
+  // Role-pack map: { recruiter: 'growth', vendor: 'starter', supplier: null, ... }
+  const [packs, setPacks]     = useState({});
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
       setLoading(true);
-      const { data, error } = await getProfile(id);
+      const [{ data, error }, packRes] = await Promise.all([
+        getProfile(id),
+        fetchSubscriptionPacks(id),
+      ]);
       if (cancelled) return;
       if (error || !data) {
         setError(error?.message || 'User not found');
@@ -49,10 +66,25 @@ export default function AdminUserEdit() {
         return;
       }
       setForm(data);
+      setPacks(packRes.data || {});
       setLoading(false);
     })();
     return () => { cancelled = true; };
   }, [id]);
+
+  // Pack mutations — write-through to DB so there's no "save" step to
+  // remember. Simple and matches the sponsor_tier row-level feel.
+  const handlePackChange = async (packSlug, tierSlug) => {
+    if (!tierSlug) {
+      const { error: e } = await removeSubscriptionPack(id, packSlug);
+      if (e) { alert('Could not remove pack: ' + e.message); return; }
+      setPacks((p) => { const n = { ...p }; delete n[packSlug]; return n; });
+    } else {
+      const { error: e } = await setSubscriptionPack(id, packSlug, tierSlug);
+      if (e) { alert('Could not set pack: ' + e.message); return; }
+      setPacks((p) => ({ ...p, [packSlug]: tierSlug }));
+    }
+  };
 
   const set = (k) => (v) => setForm((f) => ({ ...f, [k]: v }));
   const toggle = (k) => () => setForm((f) => ({ ...f, [k]: !f[k] }));
@@ -317,6 +349,85 @@ export default function AdminUserEdit() {
 
       {/* ------------- Sponsor (business accounts only) ------------- */}
       <div className="adm-card">
+        <div className="adm-card-title" style={{ fontFamily: 'var(--font-display)', fontSize: 17, color: 'var(--text-primary)', marginBottom: 12 }}>
+          Plan &amp; packs
+        </div>
+
+        {/* Membership tier picker — applies to both account types. */}
+        <div className="adm-form-grid">
+          <div className="adm-field">
+            <label className="adm-label">Membership tier</label>
+            <select
+              className="adm-select"
+              value={form.membership_tier || 'free'}
+              onChange={(e) => set('membership_tier')(e.target.value)}
+            >
+              {(form.account_type === 'business' ? BUSINESS_TIERS : INDIVIDUAL_TIERS).map((t) => (
+                <option key={t.id} value={t.id}>
+                  {t.name} {t.priceMonthly != null ? '(' + formatPrice(t.priceMonthly) + (t.priceMonthly > 0 ? '/mo' : '') + ')' : ''}
+                </option>
+              ))}
+            </select>
+            <div className="adm-hint">
+              {form.account_type === 'business'
+                ? 'Business-tier features: job posting caps, employee seats, analytics.'
+                : 'Individual-tier features: forum posting, marketplace caps, ad-free browsing.'}
+            </div>
+          </div>
+        </div>
+
+        {/* Role packs — business accounts only */}
+        {form.account_type === 'business' && (
+          <div style={{ marginTop: 18, paddingTop: 14, borderTop: '1px solid var(--border)' }}>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: 15, color: 'var(--text-primary)', marginBottom: 10 }}>
+              Role packs
+            </div>
+            <div style={{ display: 'grid', gap: 12 }}>
+              {ROLE_PACKS.map((pack) => {
+                const currentTier = packs[pack.id] || '';
+                return (
+                  <div key={pack.id} style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 200px',
+                    gap: 12,
+                    alignItems: 'center',
+                    padding: '10px 12px',
+                    border: '1px solid var(--border)',
+                    borderRadius: 8,
+                    background: currentTier ? '#FDFBF5' : 'transparent',
+                  }}>
+                    <div>
+                      <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--text-primary)' }}>
+                        {pack.name}
+                      </div>
+                      <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>
+                        {pack.forPersona}
+                      </div>
+                    </div>
+                    <select
+                      className="adm-select"
+                      value={currentTier}
+                      onChange={(e) => handlePackChange(pack.id, e.target.value || null)}
+                    >
+                      <option value="">— inactive —</option>
+                      {pack.tiers.map((t) => (
+                        <option key={t.id} value={t.id}>
+                          {t.name} {t.priceMonthly != null ? '(' + formatPrice(t.priceMonthly) + '/mo)' : '(custom)'}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="adm-hint" style={{ marginTop: 8 }}>
+              Pack changes save immediately. Removing a pack revokes its features at the next page load.
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="adm-card" style={{ padding: '1rem 1.25rem', marginBottom: 16 }}>
         <div className="adm-card-title" style={{ fontFamily: 'var(--font-display)', fontSize: 17, color: 'var(--text-primary)', marginBottom: 12 }}>
           Sponsor
         </div>

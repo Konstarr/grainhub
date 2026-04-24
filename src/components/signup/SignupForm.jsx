@@ -632,8 +632,31 @@ export default function SignupForm() {
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '1.5rem' }}>
-                <Link to="/forums" className="signup-success-btn" style={{ width: '100%', textDecoration: 'none', textAlign: 'center' }}>
-                  Go to the Forums →
+                <Link
+                  to={accountType === 'business' ? '/pricing?persona=business' : '/pricing'}
+                  className="signup-success-btn"
+                  style={{ width: '100%', textDecoration: 'none', textAlign: 'center' }}
+                >
+                  {accountType === 'business' ? 'See business plans & role packs' : 'Pick a membership plan'} →
+                </Link>
+                <Link
+                  to="/forums"
+                  style={{
+                    width: '100%',
+                    background: 'transparent',
+                    color: 'var(--text-secondary)',
+                    border: '1px solid var(--border)',
+                    padding: '11px 28px',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    cursor: 'pointer',
+                    fontFamily: "'DM Sans',sans-serif',sans-serif",
+                    textDecoration: 'none',
+                    textAlign: 'center',
+                    boxSizing: 'border-box',
+                  }}
+                >
+                  Skip — start with Free
                 </Link>
                 <Link
                   to="/wiki"

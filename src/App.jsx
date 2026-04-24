@@ -21,6 +21,7 @@ import SupplierProfile from './pages/SupplierProfile.jsx';
 import Signup from './pages/Signup.jsx';
 import Login from './pages/Login.jsx';
 import Sponsor from './pages/Sponsor.jsx';
+import Pricing from './pages/Pricing.jsx';
 import Events from './pages/Events.jsx';
 import EventDetail from './pages/EventDetail.jsx';
 import Profile from './pages/Profile.jsx';
@@ -67,6 +68,7 @@ export default function App() {
           <Route path="/events" element={<Events />} />
           <Route path="/events/:slug" element={<RequireAuth><EventDetail /></RequireAuth>} />
           <Route path="/sponsor" element={<Sponsor />} />
+          <Route path="/pricing" element={<Pricing />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
 

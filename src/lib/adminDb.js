@@ -431,6 +431,51 @@ export async function updateProfileAdmin(id, patch) {
   return { data, error };
 }
 
+// ── Subscription packs (admin) ────────────────────────────
+// Role packs (recruiter / vendor / supplier) live in their own table;
+// each row is (profile_id, pack_slug) → tier_slug. These helpers let
+// AdminUserEdit load and mutate that map.
+
+export async function fetchSubscriptionPacks(profileId) {
+  if (!profileId) return { data: {}, error: null };
+  const { data, error } = await supabase
+    .from('subscription_packs')
+    .select('pack_slug, tier_slug')
+    .eq('profile_id', profileId);
+  if (error) return { data: {}, error };
+  const map = {};
+  (data || []).forEach((r) => { map[r.pack_slug] = r.tier_slug; });
+  return { data: map, error: null };
+}
+
+export async function setSubscriptionPack(profileId, packSlug, tierSlug) {
+  if (!profileId || !packSlug) {
+    return { data: null, error: new Error('Missing id or pack') };
+  }
+  // Upsert: one row per (profile, pack_slug)
+  const { data, error } = await supabase
+    .from('subscription_packs')
+    .upsert(
+      { profile_id: profileId, pack_slug: packSlug, tier_slug: tierSlug },
+      { onConflict: 'profile_id,pack_slug' }
+    )
+    .select()
+    .maybeSingle();
+  return { data, error };
+}
+
+export async function removeSubscriptionPack(profileId, packSlug) {
+  if (!profileId || !packSlug) {
+    return { data: null, error: new Error('Missing id or pack') };
+  }
+  const { error } = await supabase
+    .from('subscription_packs')
+    .delete()
+    .eq('profile_id', profileId)
+    .eq('pack_slug', packSlug);
+  return { data: null, error };
+}
+
 // ------------------------------------------------------------
 // Sponsor media
 // ------------------------------------------------------------

@@ -1,0 +1,309 @@
+/* ── /pricing page ─────────────────────────────────────── */
+
+.pricing-wrap {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 2rem 4rem;
+}
+
+/* ── Persona toggle (Individual / Business) ────────────── */
+.persona-toggle {
+  position: relative;
+  display: inline-flex;
+  padding: 4px;
+  margin: 0 auto 2rem;
+  background: #ECE3D1;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.04);
+  align-self: center;
+}
+.pricing-wrap > .persona-toggle {
+  display: flex;
+  width: max-content;
+  margin-left: auto;
+  margin-right: auto;
+}
+.persona-btn {
+  position: relative;
+  z-index: 1;
+  padding: 0.6rem 1.6rem;
+  border: 0;
+  background: transparent;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: color 0.18s ease;
+  min-width: 120px;
+}
+.persona-btn.active { color: var(--wood-cream); }
+.persona-thumb {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: calc(50% - 4px);
+  height: calc(100% - 8px);
+  background: linear-gradient(135deg, var(--wood-dark), #6B3F1F);
+  border-radius: 999px;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 6px rgba(43, 26, 14, 0.25);
+  pointer-events: none;
+}
+
+/* ── Section headings ──────────────────────────────────── */
+.pricing-section { margin-top: 2.5rem; }
+.section-heading {
+  text-align: center;
+  max-width: 720px;
+  margin: 0 auto 1.5rem;
+}
+.section-heading h2 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem;
+  letter-spacing: -0.3px;
+}
+.section-heading p {
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* ── Tier grid ────────────────────────────────────────── */
+.pricing-grid {
+  display: grid;
+  gap: 1.25rem;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+.pricing-grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.pricing-grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@media (max-width: 1024px) {
+  .pricing-grid-4, .pricing-grid-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 640px) {
+  .pricing-grid-4, .pricing-grid-3, .pricing-grid { grid-template-columns: 1fr; }
+}
+
+/* ── Tier card ────────────────────────────────────────── */
+.tier-card {
+  position: relative;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.75rem 1.5rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 1px 3px rgba(43, 26, 14, 0.04);
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.12s;
+}
+.tier-card:hover {
+  border-color: var(--wood-light);
+  box-shadow: 0 6px 18px rgba(43, 26, 14, 0.08);
+}
+.tier-highlight {
+  border-color: var(--wood-warm);
+  border-width: 2px;
+  padding-top: 2rem;
+}
+.tier-ribbon {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, var(--wood-warm), #8B4316);
+  color: #fff;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  text-transform: uppercase;
+}
+.tier-name {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+.tier-price {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.1;
+  letter-spacing: -0.8px;
+  margin-top: 0.3rem;
+}
+.tier-price-sub {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-muted);
+  margin-left: 4px;
+}
+.tier-tagline {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-top: 0.75rem;
+}
+.tier-features {
+  list-style: none;
+  margin: 1.2rem 0 1.4rem;
+  padding: 0;
+  flex: 1;
+}
+.tier-features li {
+  position: relative;
+  padding-left: 22px;
+  font-size: 13.5px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: 0.55rem;
+}
+.tier-features li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: var(--wood-warm);
+  font-weight: 700;
+  font-size: 13px;
+}
+.tier-cta {
+  display: inline-block;
+  text-align: center;
+  padding: 0.7rem 1rem;
+  background: var(--wood-warm);
+  color: #fff;
+  border-radius: 8px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+.tier-cta:hover { background: #8B4316; text-decoration: none; }
+
+.tier-card:not(.tier-highlight) .tier-cta {
+  background: #fff;
+  color: var(--wood-warm);
+  border: 1.5px solid var(--wood-warm);
+}
+.tier-card:not(.tier-highlight) .tier-cta:hover {
+  background: var(--wood-warm);
+  color: #fff;
+}
+
+/* ── Pack card (with tier pill selector) ─────────────── */
+.pack-card {
+  position: relative;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 1px 3px rgba(43, 26, 14, 0.04);
+}
+.pack-card.pack-highlight {
+  border-color: var(--wood-warm);
+  border-width: 2px;
+}
+.pack-name {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.2px;
+}
+.pack-for {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  line-height: 1.45;
+  margin-top: 4px;
+  min-height: 36px;
+}
+.pack-tier-pills {
+  display: flex;
+  gap: 4px;
+  margin: 1rem 0 1.1rem;
+  padding: 3px;
+  background: #F5EDDC;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.pack-tier-pill {
+  flex: 1;
+  padding: 6px 8px;
+  border: 0;
+  background: transparent;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  border-radius: 7px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.pack-tier-pill:hover { color: var(--text-primary); }
+.pack-tier-pill.active {
+  background: var(--white);
+  color: var(--wood-warm);
+  box-shadow: 0 1px 3px rgba(43, 26, 14, 0.1);
+}
+.pack-price {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.1;
+  letter-spacing: -0.6px;
+}
+.pack-cap {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--wood-warm);
+  margin-top: 6px;
+  margin-bottom: 0.5rem;
+}
+
+/* ── FAQ ─────────────────────────────────────────────── */
+.pricing-faq {
+  margin-top: 4rem;
+  max-width: 760px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.pricing-faq h2 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+.faq-item {
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--border-light);
+}
+.faq-item:last-child { border-bottom: none; }
+.faq-q {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.35rem;
+}
+.faq-a {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
