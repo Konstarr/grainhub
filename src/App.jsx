@@ -24,6 +24,8 @@ import Sponsor from './pages/Sponsor.jsx';
 import Events from './pages/Events.jsx';
 import EventDetail from './pages/EventDetail.jsx';
 import Profile from './pages/Profile.jsx';
+import Messages from './pages/Messages.jsx';
+import MessageThread from './pages/MessageThread.jsx';
 import AdminNews from './pages/admin/AdminNews.jsx';
 import AdminNewsEdit from './pages/admin/AdminNewsEdit.jsx';
 import AdminEvents from './pages/admin/AdminEvents.jsx';
@@ -80,6 +82,8 @@ export default function App() {
 
           <Route path="/suppliers/profile" element={<RequireAuth><SupplierProfile /></RequireAuth>} />
           <Route path="/profile/:handle" element={<RequireAuth><Profile /></RequireAuth>} />
+          <Route path="/messages" element={<RequireAuth><Messages /></RequireAuth>} />
+          <Route path="/messages/:id" element={<RequireAuth><MessageThread /></RequireAuth>} />
         </Route>
       </Routes>
     </AuthProvider>

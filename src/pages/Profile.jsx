@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useParams, useSearchParams } from 'react-router-dom';
+import { Link, useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import PageBack from '../components/shared/PageBack.jsx';
 import ReportModal from '../components/shared/ReportModal.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
@@ -9,6 +9,12 @@ import {
   fetchRecentThreadsByAuthor,
   updateOwnProfile,
 } from '../lib/forumDb.js';
+import {
+  getConnection,
+  requestConnection,
+  startConversation,
+  cancelConnection,
+} from '../lib/messagingDb.js';
 import '../styles/profile.css';
 
 /**
@@ -212,9 +218,10 @@ export default function Profile() {
                   </>
                 ) : (
                   <>
-                    <button type="button" className="pf-btn" disabled title="Coming soon">
-                      Message
-                    </button>
+                    <ConnectActions
+                      targetProfile={profile}
+                      myUserId={user?.id}
+                    />
                     <button type="button" className="pf-btn ghost-danger" onClick={() => setReportOpen(true)}>
                       Report
                     </button>
@@ -494,3 +501,116 @@ function IconLink()  { return (<svg {...svgProps}><path d="M10 13a5 5 0 0 0 7.54
 function IconArrow() { return (<svg {...svgProps}><polyline points="18 15 12 9 6 15"/></svg>); }
 function IconReply() { return (<svg {...svgProps}><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>); }
 function IconEye()   { return (<svg {...svgProps}><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>); }
+
+/**
+ * ConnectActions — Connect / Requested / Message buttons. Reads the
+ * current edge between me and the target profile, lets me send, cancel,
+ * or (if we're already connected) jump into the conversation.
+ */
+function ConnectActions({ targetProfile, myUserId }) {
+  const navigate = useNavigate();
+  const [edge, setEdge] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    if (!myUserId || !targetProfile?.id) { setLoading(false); return; }
+    let cancelled = false;
+    (async () => {
+      setLoading(true);
+      const { data } = await getConnection(targetProfile.id, myUserId);
+      if (cancelled) return;
+      setEdge(data || null);
+      setLoading(false);
+    })();
+    return () => { cancelled = true; };
+  }, [targetProfile?.id, myUserId]);
+
+  if (!myUserId) return null;
+
+  const isRequester = edge?.requester_id === myUserId;
+  const isAccepted  = edge?.status === 'accepted';
+  const isPending   = edge?.status === 'pending';
+  const isDeclined  = edge?.status === 'declined';
+  const declinedAgainstMe =
+    isDeclined && edge?.requester_id === myUserId && edge?.declined_at;
+
+  const handleConnect = async () => {
+    setBusy(true);
+    const { data: newId, error } = await requestConnection(targetProfile.id);
+    setBusy(false);
+    if (error) { alert(error.message || 'Could not send request'); return; }
+    setEdge((e) => ({ ...(e || {}), id: newId, requester_id: myUserId, addressee_id: targetProfile.id, status: 'pending', declined_at: null }));
+  };
+
+  const handleCancel = async () => {
+    if (!edge?.id) return;
+    if (!confirm('Cancel your connection request?')) return;
+    setBusy(true);
+    const { error } = await cancelConnection(edge.id);
+    setBusy(false);
+    if (error) { alert(error.message || 'Could not cancel'); return; }
+    setEdge(null);
+  };
+
+  const handleMessage = async () => {
+    setBusy(true);
+    const { data: convId, error } = await startConversation(targetProfile.id);
+    setBusy(false);
+    if (error) { alert(error.message || 'Could not open chat'); return; }
+    navigate('/messages/' + convId);
+  };
+
+  if (loading) {
+    return <button type="button" className="pf-btn" disabled>…</button>;
+  }
+
+  if (isAccepted) {
+    return (
+      <>
+        <button type="button" className="pf-btn primary" onClick={handleMessage} disabled={busy}>
+          Message
+        </button>
+        <span
+          className="pf-btn"
+          style={{ opacity: 0.7, pointerEvents: 'none', display: 'inline-flex', gap: 4 }}
+          title="Connected"
+        >
+          ✓ Connected
+        </span>
+      </>
+    );
+  }
+
+  if (isPending && isRequester) {
+    return (
+      <button type="button" className="pf-btn" onClick={handleCancel} disabled={busy} title="Cancel request">
+        Requested
+      </button>
+    );
+  }
+
+  if (isPending && !isRequester) {
+    // They already sent me a request — point them to the inbox
+    return (
+      <Link to="/messages" className="pf-btn primary">
+        Respond to request →
+      </Link>
+    );
+  }
+
+  if (declinedAgainstMe) {
+    const retryAt = new Date(new Date(edge.declined_at).getTime() + 30 * 86400000);
+    return (
+      <button type="button" className="pf-btn" disabled title={'Try again after ' + retryAt.toLocaleDateString()}>
+        Request declined
+      </button>
+    );
+  }
+
+  return (
+    <button type="button" className="pf-btn primary" onClick={handleConnect} disabled={busy}>
+      {busy ? 'Sending…' : '+ Connect'}
+    </button>
+  );
+}

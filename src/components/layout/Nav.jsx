@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { NavLink, Link, useNavigate } from 'react-router-dom';
 import Logo from './Logo.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
+import { fetchUnreadCount } from '../../lib/messagingDb.js';
 
 const NAV_ITEMS = [
   { label: 'Home', to: '/' },
@@ -32,6 +33,21 @@ export default function Nav() {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
+  const [unread, setUnread] = useState(0);
+
+  // Poll the unread-count every 30s while signed in — cheap server-side
+  // count(), and only runs for authed users.
+  useEffect(() => {
+    if (!user?.id) { setUnread(0); return; }
+    let cancelled = false;
+    const tick = async () => {
+      const n = await fetchUnreadCount(user.id);
+      if (!cancelled) setUnread(n || 0);
+    };
+    tick();
+    const iv = setInterval(tick, 30000);
+    return () => { cancelled = true; clearInterval(iv); };
+  }, [user?.id]);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -161,6 +177,24 @@ export default function Nav() {
                 </MenuItem>
                 <MenuItem onClick={() => { setMenuOpen(false); navigate(profileHref + '?edit=1'); }}>
                   Edit profile
+                </MenuItem>
+                <MenuItem onClick={() => { setMenuOpen(false); navigate('/messages'); }}>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                    <span>Messages</span>
+                    {unread > 0 && (
+                      <span style={{
+                        background: 'var(--wood-warm)',
+                        color: '#fff',
+                        borderRadius: 999,
+                        padding: '1px 7px',
+                        fontSize: 10.5,
+                        fontWeight: 700,
+                        lineHeight: 1.4,
+                      }}>
+                        {unread > 99 ? '99+' : unread}
+                      </span>
+                    )}
+                  </span>
                 </MenuItem>
                 <MenuItem onClick={() => { setMenuOpen(false); navigate('/forums?view=my-posts'); }}>
                   My posts
