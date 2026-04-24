@@ -116,7 +116,7 @@ export default function ForumCategory() {
               {groupName}
             </div>
             <h1 style={{
-              fontFamily: "'DM Serif Display', serif",
+              fontFamily: "'Montserrat', sans-serif",
               fontSize: '32px',
               color: 'var(--text-primary)',
               margin: 0,

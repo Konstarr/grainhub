@@ -16,7 +16,7 @@
   width: 80px; height: 80px; border-radius: 14px;
   background: var(--wood-paper); border: 1px solid var(--border-light);
   display: flex; align-items: center; justify-content: center;
-  font-family: 'DM Serif Display', serif; font-size: 26px; color: var(--text-secondary);
+  font-family: 'Montserrat', sans-serif; font-size: 26px; color: var(--text-secondary);
   letter-spacing: -1px; flex-shrink: 0;
 }
 
@@ -27,11 +27,11 @@
 .hb-green { background: rgba(45,80,22,0.25); color: #8BC34A; border: 1px solid rgba(139,195,74,0.2); }
 .hb-muted { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.45); border: 1px solid rgba(255,255,255,0.1); }
 
-.hero-name { font-family: 'DM Serif Display', serif; font-size: 34px; color: var(--wood-cream); line-height: 1.1; margin-bottom: 6px; letter-spacing: -0.3px; }
+.hero-name { font-family: 'Montserrat', sans-serif; font-size: 34px; color: var(--wood-cream); line-height: 1.1; margin-bottom: 6px; letter-spacing: -0.3px; }
 .hero-sub { font-size: 14px; color: #9A8070; line-height: 1.65; max-width: 600px; margin-bottom: 1.25rem; }
 
 .hero-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-.hbtn { padding: 9px 22px; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s; }
+.hbtn { padding: 9px 22px; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'Montserrat', sans-serif; transition: all 0.15s; }
 .hbtn-primary { background: var(--wood-warm); color: #fff; border: none; }
 .hbtn-primary:hover { background: #8B4316; }
 .hbtn-ghost { background: rgba(255,255,255,0.08); color: var(--wood-cream); border: 1px solid rgba(255,255,255,0.18); }
@@ -39,7 +39,7 @@
 
 /* rating strip inside hero */
 .hero-rating { display: flex; align-items: center; gap: 1.5rem; padding-top: 0.75rem; flex-wrap: wrap; }
-.hr-score { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--wood-cream); }
+.hr-score { font-family: 'Montserrat', sans-serif; font-size: 22px; color: var(--wood-cream); }
 .hr-stars { color: var(--wood-light); font-size: 14px; letter-spacing: 2px; }
 .hr-count { font-size: 13px; color: #7A6858; }
 .hr-div { width: 1px; height: 16px; background: rgba(255,255,255,0.12); }
@@ -80,7 +80,7 @@
 
 /* RATINGS */
 .rating-block { display: grid; grid-template-columns: auto 1fr; gap: 2.5rem; align-items: center; padding: 1.5rem; border-bottom: 1px solid var(--border-light); }
-.big-score { font-family: 'DM Serif Display', serif; font-size: 56px; color: var(--text-primary); line-height: 1; text-align: center; }
+.big-score { font-family: 'Montserrat', sans-serif; font-size: 56px; color: var(--text-primary); line-height: 1; text-align: center; }
 .big-stars { color: var(--wood-warm); font-size: 15px; letter-spacing: 2px; text-align: center; margin: 4px 0; }
 .big-count { font-size: 12px; color: var(--text-muted); text-align: center; }
 .bars { display: flex; flex-direction: column; gap: 7px; }
@@ -109,9 +109,9 @@
 .rev-tag { display: inline-block; background: var(--wood-paper); border: 1px solid var(--border-light); color: var(--text-secondary); font-size: 11px; font-weight: 600; padding: 2px 10px; border-radius: 4px; margin-bottom: 7px; }
 .rev-body { font-size: 14px; color: var(--text-secondary); line-height: 1.8; }
 .rev-foot { font-size: 12px; color: var(--text-muted); margin-top: 8px; }
-.rev-foot button { background: none; border: none; color: var(--wood-warm); font-size: 12px; cursor: pointer; font-family: 'DM Sans', sans-serif; padding: 0; }
+.rev-foot button { background: none; border: none; color: var(--wood-warm); font-size: 12px; cursor: pointer; font-family: 'Montserrat', sans-serif; padding: 0; }
 
-.write-rev { display: block; margin: 1.25rem 1.5rem; padding: 10px; background: transparent; border: 1.5px dashed var(--border); border-radius: 8px; font-size: 13px; font-weight: 500; color: var(--text-muted); cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s; text-align: center; }
+.write-rev { display: block; margin: 1.25rem 1.5rem; padding: 10px; background: transparent; border: 1.5px dashed var(--border); border-radius: 8px; font-size: 13px; font-weight: 500; color: var(--text-muted); cursor: pointer; font-family: 'Montserrat', sans-serif; transition: all 0.15s; text-align: center; }
 .write-rev:hover { border-color: var(--wood-warm); color: var(--wood-warm); background: #fff8ee; }
 
 /* FORUM MENTIONS */
@@ -142,7 +142,7 @@
 /* contact card */
 .contact { background: var(--white); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
 .contact-head { background: var(--wood-dark); padding: 1.1rem 1.25rem; }
-.contact-head-title { font-family: 'DM Serif Display', serif; font-size: 17px; color: var(--wood-cream); }
+.contact-head-title { font-family: 'Montserrat', sans-serif; font-size: 17px; color: var(--wood-cream); }
 .contact-head-sub { font-size: 12px; color: #7A6858; margin-top: 2px; }
 .contact-rows { padding: 0.5rem 1.25rem; }
 .cro { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border-light); }
@@ -152,9 +152,9 @@
 .cro-val { font-size: 13px; font-weight: 500; color: var(--text-primary); }
 .cro-val a { color: var(--wood-warm); }
 .contact-btns { padding: 1rem 1.25rem; border-top: 1px solid var(--border-light); display: flex; flex-direction: column; gap: 7px; }
-.cta1 { background: var(--wood-warm); color: #fff; border: none; padding: 10px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: background 0.15s; }
+.cta1 { background: var(--wood-warm); color: #fff; border: none; padding: 10px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'Montserrat', sans-serif; transition: background 0.15s; }
 .cta1:hover { background: #8B4316; }
-.cta2 { background: transparent; color: var(--text-secondary); border: 1px solid var(--border); padding: 8px; border-radius: 8px; font-size: 12px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.12s; }
+.cta2 { background: transparent; color: var(--text-secondary); border: 1px solid var(--border); padding: 8px; border-radius: 8px; font-size: 12px; cursor: pointer; font-family: 'Montserrat', sans-serif; transition: all 0.12s; }
 .cta2:hover { border-color: var(--wood-warm); color: var(--wood-warm); }
 
 /* sidebar card */

@@ -70,7 +70,7 @@ export default function SponsorPlacements() {
                 page load. The highest-visibility placement on GrainHub.
               </div>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
-                <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '20px', color: 'var(--wood-warm)' }}>
+                <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: '20px', color: 'var(--wood-warm)' }}>
                   Included in Platinum
                 </div>
                 <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
@@ -107,7 +107,7 @@ export default function SponsorPlacements() {
                 >
                   Sponsored · Cabinet Making
                 </div>
-                <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '14px', marginBottom: '4px' }}>
+                <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: '14px', marginBottom: '4px' }}>
                   Blum CLIP top BLUMOTION
                 </div>
                 <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.6)', marginBottom: '8px' }}>
@@ -124,7 +124,7 @@ export default function SponsorPlacements() {
                     fontSize: '11px',
                     fontWeight: '500',
                     cursor: 'pointer',
-                    fontFamily: "'DM Sans', sans-serif",
+                    fontFamily: "'Montserrat', sans-serif",
                   }}
                 >
                   Download Spec Sheet →
@@ -140,7 +140,7 @@ export default function SponsorPlacements() {
                 Cabinet Making forum. A coating brand in Finishing. Always contextual.
               </div>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
-                <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '20px', color: 'var(--wood-warm)' }}>
+                <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: '20px', color: 'var(--wood-warm)' }}>
                   From $600/month
                 </div>
                 <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
@@ -200,7 +200,7 @@ export default function SponsorPlacements() {
                     fontSize: '11px',
                     fontWeight: '500',
                     cursor: 'pointer',
-                    fontFamily: "'DM Sans', sans-serif",
+                    fontFamily: "'Montserrat', sans-serif",
                     whiteSpace: 'nowrap',
                   }}
                 >
@@ -237,7 +237,7 @@ export default function SponsorPlacements() {
                 ads.
               </div>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
-                <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '20px', color: 'var(--wood-warm)' }}>
+                <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: '20px', color: 'var(--wood-warm)' }}>
                   From $800/month
                 </div>
                 <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
@@ -291,7 +291,7 @@ export default function SponsorPlacements() {
                     fontSize: '11px',
                     fontWeight: '500',
                     cursor: 'pointer',
-                    fontFamily: "'DM Sans', sans-serif",
+                    fontFamily: "'Montserrat', sans-serif",
                   }}
                 >
                   Download Catalog →
@@ -311,7 +311,7 @@ export default function SponsorPlacements() {
                 guide. Intent-matched advertising.
               </div>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
-                <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: '20px', color: 'var(--wood-warm)' }}>
+                <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: '20px', color: 'var(--wood-warm)' }}>
                   From $400/month
                 </div>
                 <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>

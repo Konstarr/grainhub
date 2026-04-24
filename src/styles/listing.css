@@ -62,7 +62,7 @@
 .lcat-id { font-size: 12px; color: var(--text-muted); }
 .lcat-views { font-size: 12px; color: var(--text-muted); margin-left: auto; }
 
-.listing-title { font-family: 'DM Serif Display', serif; font-size: 30px; color: var(--text-primary); line-height: 1.18; margin-bottom: 10px; letter-spacing: -0.3px; }
+.listing-title { font-family: 'Montserrat', sans-serif; font-size: 30px; color: var(--text-primary); line-height: 1.18; margin-bottom: 10px; letter-spacing: -0.3px; }
 
 .listing-meta-row { display: flex; align-items: center; gap: 1.25rem; flex-wrap: wrap; font-size: 13px; color: var(--text-muted); margin-bottom: 1.25rem; }
 .lm-item { display: flex; align-items: center; gap: 5px; }
@@ -70,7 +70,7 @@
 /* SPECS TABLE */
 .specs-section { background: var(--white); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 1.75rem; }
 .specs-header { background: var(--wood-dark); padding: 0.85rem 1.5rem; display: flex; align-items: center; justify-content: space-between; }
-.specs-header-title { font-family: 'DM Serif Display', serif; font-size: 16px; color: var(--wood-cream); }
+.specs-header-title { font-family: 'Montserrat', sans-serif; font-size: 16px; color: var(--wood-cream); }
 .specs-header-badge { font-size: 11px; font-weight: 600; background: rgba(255,255,255,0.12); color: var(--wood-light); padding: 3px 10px; border-radius: 4px; }
 .specs-body { padding: 0; }
 .specs-grid { display: grid; grid-template-columns: 1fr 1fr; }
@@ -84,7 +84,7 @@
 
 /* DESCRIPTION */
 .desc-section { background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.75rem; }
-.desc-title { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--text-primary); margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border-light); }
+.desc-title { font-family: 'Montserrat', sans-serif; font-size: 18px; color: var(--text-primary); margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border-light); }
 .desc-body { font-size: 14px; color: var(--text-secondary); line-height: 1.85; }
 .desc-body p { margin-bottom: 1rem; }
 .desc-body p:last-child { margin-bottom: 0; }
@@ -96,7 +96,7 @@
 /* CONDITION REPORT */
 .condition-section { background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.75rem; }
 .condition-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border-light); }
-.condition-title { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--text-primary); }
+.condition-title { font-family: 'Montserrat', sans-serif; font-size: 18px; color: var(--text-primary); }
 .condition-badge-large { background: #EAF3DE; color: #2D5016; font-size: 13px; font-weight: 700; padding: 5px 14px; border-radius: 6px; }
 .condition-items { display: flex; flex-direction: column; gap: 10px; }
 .condition-item { display: flex; align-items: flex-start; gap: 12px; padding: 10px; border: 1px solid var(--border-light); border-radius: 8px; background: var(--wood-paper); }
@@ -110,9 +110,9 @@
 
 /* SELLER INFO */
 .seller-section { background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.75rem; }
-.seller-header { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--text-primary); margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border-light); }
+.seller-header { font-family: 'Montserrat', sans-serif; font-size: 18px; color: var(--text-primary); margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border-light); }
 .seller-profile { display: flex; gap: 14px; align-items: flex-start; }
-.seller-av { width: 56px; height: 56px; border-radius: 12px; background: linear-gradient(135deg, #1A3A10, #3A6A20); display: flex; align-items: center; justify-content: center; font-family: 'DM Serif Display', serif; font-size: 20px; font-weight: 700; color: white; flex-shrink: 0; }
+.seller-av { width: 56px; height: 56px; border-radius: 12px; background: linear-gradient(135deg, #1A3A10, #3A6A20); display: flex; align-items: center; justify-content: center; font-family: 'Montserrat', sans-serif; font-size: 20px; font-weight: 700; color: white; flex-shrink: 0; }
 .seller-info { flex: 1; }
 .seller-name { font-size: 16px; font-weight: 600; color: var(--text-primary); margin-bottom: 3px; }
 .seller-badges { display: flex; gap: 5px; margin-bottom: 5px; flex-wrap: wrap; }
@@ -127,7 +127,7 @@
 
 /* SIMILAR LISTINGS */
 .similar-section { margin-top: 2rem; }
-.similar-title { font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--text-primary); margin-bottom: 1rem; padding-bottom: 0.6rem; border-bottom: 2px solid var(--border); }
+.similar-title { font-family: 'Montserrat', sans-serif; font-size: 20px; color: var(--text-primary); margin-bottom: 1rem; padding-bottom: 0.6rem; border-bottom: 2px solid var(--border); }
 .similar-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
 .similar-card { background: var(--white); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; cursor: pointer; transition: all 0.15s; }
 .similar-card:hover { border-color: var(--wood-light); box-shadow: 0 4px 16px rgba(44,26,14,0.1); transform: translateY(-2px); }
@@ -135,7 +135,7 @@
 .sim-body { padding: 0.85rem; }
 .sim-cat { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 4px; display: inline-block; margin-bottom: 5px; }
 .sim-title { font-size: 13px; font-weight: 500; color: var(--text-primary); line-height: 1.35; margin-bottom: 5px; }
-.sim-price { font-family: 'DM Serif Display', serif; font-size: 17px; color: var(--wood-warm); }
+.sim-price { font-family: 'Montserrat', sans-serif; font-size: 17px; color: var(--wood-warm); }
 .sim-loc { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
 
 /* ── RIGHT: STICKY PANEL ── */
@@ -145,7 +145,7 @@
 .price-card { background: var(--white); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; box-shadow: 0 4px 20px rgba(44,26,14,0.08); }
 
 .price-card-header { padding: 1.5rem 1.5rem 1rem; border-bottom: 1px solid var(--border-light); }
-.price-main { font-family: 'DM Serif Display', serif; font-size: 42px; color: var(--wood-warm); line-height: 1; margin-bottom: 4px; }
+.price-main { font-family: 'Montserrat', sans-serif; font-size: 42px; color: var(--wood-warm); line-height: 1; margin-bottom: 4px; }
 .price-note { font-size: 13px; color: var(--text-muted); }
 .price-financing { margin-top: 10px; background: #EAF3DE; border: 1px solid #B5D590; border-radius: 7px; padding: 8px 12px; font-size: 12px; color: #2D5016; }
 .price-financing strong { font-weight: 600; }
@@ -157,7 +157,7 @@
   background: var(--wood-warm); color: white; border: none;
   padding: 13px; border-radius: 9px;
   font-size: 15px; font-weight: 600; cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   transition: background 0.15s;
   text-align: center;
   box-shadow: 0 4px 14px rgba(160,82,45,0.3);
@@ -170,7 +170,7 @@
   border: 1.5px solid var(--wood-warm);
   padding: 11px; border-radius: 9px;
   font-size: 14px; font-weight: 500; cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   transition: all 0.15s;
   text-align: center;
 }
@@ -181,7 +181,7 @@
   display: flex; align-items: center; justify-content: center; gap: 6px;
   padding: 9px; border: 1px solid var(--border); border-radius: 8px;
   font-size: 13px; color: var(--text-secondary); cursor: pointer;
-  background: var(--white); font-family: 'DM Sans', sans-serif;
+  background: var(--white); font-family: 'Montserrat', sans-serif;
   transition: all 0.12s;
 }
 .btn-icon:hover { border-color: var(--wood-warm); color: var(--wood-warm); background: #FFF8EE; }
@@ -192,7 +192,7 @@
 
 /* KEY DETAILS CARD */
 .details-card { background: var(--white); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
-.dc-header { background: var(--wood-dark); padding: 0.75rem 1.25rem; font-family: 'DM Serif Display', serif; font-size: 15px; color: var(--wood-cream); }
+.dc-header { background: var(--wood-dark); padding: 0.75rem 1.25rem; font-family: 'Montserrat', sans-serif; font-size: 15px; color: var(--wood-cream); }
 .dc-body { padding: 0.85rem 1.25rem; }
 .dc-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--border-light); font-size: 13px; }
 .dc-row:last-child { border-bottom: none; }
@@ -212,9 +212,9 @@
 /* SPONSOR */
 .sponsor-card { background: linear-gradient(140deg, #1C2E48, #2D4A78); border-radius: 12px; padding: 1.1rem; color: white; }
 .sp-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(255,255,255,0.4); margin-bottom: 6px; }
-.sp-title { font-family: 'DM Serif Display', serif; font-size: 15px; margin-bottom: 4px; }
+.sp-title { font-family: 'Montserrat', sans-serif; font-size: 15px; margin-bottom: 4px; }
 .sp-sub { font-size: 12px; color: rgba(255,255,255,0.65); margin-bottom: 10px; line-height: 1.6; }
-.sp-btn { background: #4A7FE0; color: white; border: none; padding: 8px; border-radius: 7px; font-size: 12px; font-weight: 500; cursor: pointer; width: 100%; font-family: 'DM Sans', sans-serif; }
+.sp-btn { background: #4A7FE0; color: white; border: none; padding: 8px; border-radius: 7px; font-size: 12px; font-weight: 500; cursor: pointer; width: 100%; font-family: 'Montserrat', sans-serif; }
 
 /* CONTACT MODAL */
 .modal-overlay {
@@ -232,7 +232,7 @@
   box-shadow: 0 24px 60px rgba(0,0,0,0.4);
 }
 .modal-header { background: var(--wood-dark); padding: 1.25rem 1.5rem; display: flex; align-items: center; justify-content: space-between; }
-.modal-title { font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--wood-cream); }
+.modal-title { font-family: 'Montserrat', sans-serif; font-size: 20px; color: var(--wood-cream); }
 .modal-close { background: none; border: none; color: rgba(255,255,255,0.5); font-size: 22px; cursor: pointer; line-height: 1; padding: 0 4px; }
 .modal-close:hover { color: white; }
 .modal-body { padding: 1.5rem; }
@@ -242,13 +242,13 @@
 .modal-fields { display: flex; flex-direction: column; gap: 12px; margin-bottom: 1.25rem; }
 .mf-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .mf-label { font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
-.mf-input, .mf-textarea { width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: 7px; font-size: 13px; font-family: 'DM Sans', sans-serif; color: var(--text-primary); background: var(--white); outline: none; transition: border-color 0.15s; }
+.mf-input, .mf-textarea { width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: 7px; font-size: 13px; font-family: 'Montserrat', sans-serif; color: var(--text-primary); background: var(--white); outline: none; transition: border-color 0.15s; }
 .mf-input:focus, .mf-textarea:focus { border-color: var(--wood-warm); }
 .mf-textarea { min-height: 90px; resize: vertical; }
 .modal-checkboxes { display: flex; flex-direction: column; gap: 7px; margin-bottom: 1.25rem; font-size: 13px; color: var(--text-muted); }
 .modal-checkboxes label { display: flex; align-items: center; gap: 8px; cursor: pointer; }
 .modal-checkboxes input { accent-color: var(--wood-warm); }
-.modal-submit { width: 100%; background: var(--wood-warm); color: white; border: none; padding: 12px; border-radius: 9px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: background 0.15s; }
+.modal-submit { width: 100%; background: var(--wood-warm); color: white; border: none; padding: 12px; border-radius: 9px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'Montserrat', sans-serif; transition: background 0.15s; }
 .modal-submit:hover { background: #8B4316; }
 .modal-note { font-size: 11px; color: var(--text-muted); text-align: center; margin-top: 8px; }
 

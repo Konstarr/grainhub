@@ -95,7 +95,7 @@
 }
 
 .signup-left-panel h1 {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: clamp(32px, 3.5vw, 48px);
   color: #FFFFFF;
   line-height: 1.1;
@@ -292,7 +292,7 @@
 .signup-form-header { margin-bottom: 1.75rem; }
 
 .signup-form-header h2 {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 24px;
   color: var(--text-primary);
   margin-bottom: 4px;
@@ -339,7 +339,7 @@
   font-weight: 500;
   color: var(--text-secondary);
   cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   transition: all 0.12s;
 }
 
@@ -405,7 +405,7 @@
   border: 1px solid var(--border);
   border-radius: 8px;
   font-size: 14px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   color: var(--text-primary);
   background: var(--white);
   outline: none;
@@ -540,7 +540,7 @@
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   transition: background 0.15s, transform 0.12s;
   box-shadow: 0 4px 16px rgba(160,82,45,0.35);
 }
@@ -600,7 +600,7 @@
 }
 
 .signup-success-title {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 26px;
   color: var(--text-primary);
   margin-bottom: 0.75rem;
@@ -622,7 +622,7 @@
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
 }
 
 .signup-success-btn:hover { background: #8B4316; }
@@ -637,7 +637,7 @@
   border-radius: 9px;
   font-size: 14px;
   cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   white-space: nowrap;
   transition: all 0.12s;
 }

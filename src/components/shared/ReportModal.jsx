@@ -98,12 +98,12 @@ export default function ReportModal({ open, onClose, targetType, targetId }) {
           background: 'var(--white, #fff)', borderRadius: 12, padding: '1.5rem',
           maxWidth: 480, width: '100%',
           boxShadow: '0 10px 40px rgba(0,0,0,0.3)',
-          fontFamily: "'DM Sans', sans-serif",
+          fontFamily: "'Montserrat', sans-serif",
         }}
       >
         {done ? (
           <>
-            <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: 22, marginBottom: 8 }}>
+            <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 22, marginBottom: 8 }}>
               Report submitted
             </div>
             <p style={{ color: 'var(--text-muted)', fontSize: 14, marginBottom: 16 }}>
@@ -122,7 +122,7 @@ export default function ReportModal({ open, onClose, targetType, targetId }) {
         ) : (
           <form onSubmit={handleSubmit}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 4 }}>
-              <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: 22 }}>
+              <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: 22 }}>
                 Report this {targetLabel}
               </div>
               <button

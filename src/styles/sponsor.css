@@ -49,7 +49,7 @@
 }
 
 .sponsor-hero h1 {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: clamp(36px, 5vw, 60px);
   color: var(--wood-cream);
   line-height: 1.1;
@@ -89,7 +89,7 @@
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   border: none;
   transition: all 0.15s;
 }
@@ -130,7 +130,7 @@
 }
 
 .sponsor-proof-num {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 34px;
   color: var(--wood-light);
   line-height: 1;
@@ -223,7 +223,7 @@
 }
 
 .sponsor-section-title {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: clamp(28px, 3.5vw, 44px);
   color: var(--text-primary);
   line-height: 1.12;
@@ -271,7 +271,7 @@
 }
 
 .sponsor-aud-stat-num {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 32px;
   color: var(--wood-warm);
   line-height: 1;
@@ -297,7 +297,7 @@
 }
 
 .sponsor-demo-header-title {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 16px;
   color: var(--wood-cream);
   margin-bottom: 2px;
@@ -440,21 +440,21 @@
 }
 
 .sponsor-pkg-name {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 26px;
   color: var(--text-primary);
   margin-bottom: 6px;
 }
 
 .sponsor-pkg-price {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 38px;
   color: var(--wood-warm);
   line-height: 1;
 }
 
 .sponsor-pkg-price span {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 15px;
   color: var(--text-muted);
   font-weight: 400;
@@ -511,7 +511,7 @@
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   text-align: center;
   transition: all 0.15s;
   border: none;
@@ -605,13 +605,13 @@
 }
 
 .sponsor-ac-price {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 22px;
   color: var(--wood-warm);
 }
 
 .sponsor-ac-price span {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 13px;
   color: var(--text-muted);
   font-weight: 400;
@@ -653,7 +653,7 @@
 
 .sponsor-t-quote::before {
   content: '"';
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 48px;
   color: var(--border);
   line-height: 0;
@@ -716,7 +716,7 @@
 }
 
 .sponsor-cf-header-title {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 22px;
   color: var(--wood-cream);
   margin-bottom: 4px;
@@ -765,7 +765,7 @@
   border: 1px solid var(--border);
   border-radius: 8px;
   font-size: 14px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   color: var(--text-primary);
   background: var(--white);
   outline: none;
@@ -792,7 +792,7 @@
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   transition: background 0.15s;
 }
 

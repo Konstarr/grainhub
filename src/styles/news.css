@@ -40,7 +40,7 @@
 }
 
 .page-title {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 42px;
   color: var(--wood-cream);
   letter-spacing: -0.5px;
@@ -93,7 +93,7 @@
   background: rgba(255,255,255,0.08);
   color: white;
   font-size: 13px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   outline: none;
 }
 .nl-input::placeholder {
@@ -108,7 +108,7 @@
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   white-space: nowrap;
   transition: background 0.15s;
 }
@@ -265,7 +265,7 @@
 }
 
 .hero-story-title {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 26px;
   line-height: 1.22;
   color: var(--text-primary);
@@ -345,7 +345,7 @@
 }
 
 .news-card-title {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 16px;
   line-height: 1.25;
   color: var(--text-primary);
@@ -378,7 +378,7 @@
 .rs-header {
   background: var(--wood-dark);
   padding: 0.75rem 1.25rem;
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 15px;
   color: var(--wood-cream);
 }
@@ -398,7 +398,7 @@
   color: var(--wood-warm);
 }
 .ti-num {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 18px;
   color: var(--border);
   line-height: 1;
@@ -466,7 +466,7 @@
   margin-bottom: 6px;
 }
 .sp-title {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 16px;
   margin-bottom: 4px;
 }
@@ -486,7 +486,7 @@
   font-weight: 500;
   cursor: pointer;
   width: 100%;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
 }
 
 .newsletter-card {
@@ -496,7 +496,7 @@
   color: white;
 }
 .nl-title {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 17px;
   margin-bottom: 5px;
 }
@@ -518,7 +518,7 @@
   background: rgba(255,255,255,0.1);
   color: white;
   font-size: 13px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   outline: none;
   margin-bottom: 8px;
 }
@@ -534,6 +534,4 @@
   border-radius: 7px;
   font-size: 13px;
   font-weight: 700;
-  cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
-}
+  curs

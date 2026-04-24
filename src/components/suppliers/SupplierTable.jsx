@@ -71,7 +71,7 @@ export default function SupplierTable({ activeCategory = '', suppliers }) {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      fontFamily: "'DM Serif Display', serif",
+                      fontFamily: "'Montserrat', sans-serif",
                       fontSize: '18px',
                       color: 'white',
                       fontWeight: '600',

@@ -3,9 +3,9 @@ import { Link } from 'react-router-dom';
 export default function RecentActivity({ items }) {
   return (
     <div className="recent-activity">
-      <div style={{ fontFamily: "'DM Serif Display',serif", fontSize: '20px', color: 'var(--text-primary)', marginBottom: '1rem', paddingBottom: '0.6rem', borderBottom: '2px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div style={{ fontFamily: "'Montserrat',serif", fontSize: '20px', color: 'var(--text-primary)', marginBottom: '1rem', paddingBottom: '0.6rem', borderBottom: '2px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         Recent Activity
-        <span style={{ fontFamily: "'DM Sans',sans-serif", fontSize: '13px', color: 'var(--wood-warm)', fontWeight: '500', cursor: 'pointer' }}>See all →</span>
+        <span style={{ fontFamily: "'Montserrat',sans-serif", fontSize: '13px', color: 'var(--wood-warm)', fontWeight: '500', cursor: 'pointer' }}>See all →</span>
       </div>
       <div className="activity-list">
         {items.map((item) => (

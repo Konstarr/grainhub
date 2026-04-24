@@ -33,7 +33,7 @@
 .wiki-hero .hero-left { max-width: 720px; flex: 1; }
 
 .hero-eyebrow {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 11px;
   letter-spacing: 0.15em;
   text-transform: uppercase;
@@ -42,7 +42,7 @@
   font-weight: 700;
 }
 .hero-title {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 44px;
   line-height: 1.1;
   color: var(--text-primary);
@@ -55,7 +55,7 @@
   color: var(--wood-warm);
 }
 .hero-sub {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 16px;
   line-height: 1.6;
   color: var(--text-secondary);
@@ -88,7 +88,7 @@
   border: 0;
   outline: 0;
   padding: 0.85rem 0.5rem;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 14px;
   background: transparent;
   color: var(--text-primary);
@@ -98,7 +98,7 @@
   background: var(--wood-warm);
   border: 0;
   padding: 0.85rem 1.5rem;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 13px;
   font-weight: 600;
   color: var(--white);
@@ -112,7 +112,7 @@
   flex-wrap: wrap;
   gap: 0.5rem;
   margin-top: 0.9rem;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 13px;
   align-items: center;
 }
@@ -143,14 +143,14 @@
 }
 .hero-stat:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(44, 26, 14, 0.08); }
 .hs-num {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 28px;
   color: var(--wood-dark);
   font-weight: 400;
   line-height: 1;
 }
 .hs-label {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 11px;
   color: var(--text-muted);
   text-transform: uppercase;
@@ -181,7 +181,7 @@
   box-shadow: 0 1px 4px rgba(44, 26, 14, 0.04);
 }
 .wln-header {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 16px;
   color: var(--text-primary);
   padding-bottom: 0.75rem;
@@ -194,7 +194,7 @@
   padding: 0.5rem 0.75rem;
   border: 1px solid var(--border-light);
   border-radius: 7px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 13px;
   background: var(--wood-paper);
   outline: none;
@@ -214,7 +214,7 @@
   border-radius: 7px;
   text-align: left;
   cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 13.5px;
   color: var(--text-secondary);
   width: 100%;
@@ -264,7 +264,7 @@
   margin: 0 0 1.25rem;
 }
 .wiki-content .section-title {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 26px;
   font-weight: 400;
   color: var(--text-primary);
@@ -272,7 +272,7 @@
   letter-spacing: -0.01em;
 }
 .wiki-content .section-link {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 12px;
   color: var(--text-muted);
   font-variant-numeric: tabular-nums;
@@ -302,7 +302,7 @@
 .fa-img { display: none; }
 .fa-body { padding: 0; }
 .fa-cat {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.12em;
@@ -311,7 +311,7 @@
   font-weight: 700;
 }
 .fa-title {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 26px;
   color: var(--text-primary);
   font-weight: 400;
@@ -320,14 +320,14 @@
   letter-spacing: -0.01em;
 }
 .fa-excerpt {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 14.5px;
   line-height: 1.6;
   color: var(--text-secondary);
   margin-bottom: 1rem;
 }
 .fa-meta {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 12px;
   color: var(--text-muted);
   display: flex;
@@ -367,7 +367,7 @@
 .ac-img { display: none; }
 .ac-body { min-width: 0; }
 .ac-cat {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 10.5px;
   text-transform: uppercase;
   letter-spacing: 0.12em;
@@ -376,7 +376,7 @@
   margin-bottom: 0.25rem;
 }
 .ac-title {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 19px;
   color: var(--text-primary);
   line-height: 1.3;
@@ -385,12 +385,12 @@
 }
 .article-card:hover .ac-title { color: var(--wood-warm); }
 .ac-body > div:not(.ac-cat):not(.ac-title):not(.ac-footer) {
-  font-family: 'DM Sans', sans-serif \!important;
+  font-family: 'Montserrat', sans-serif \!important;
   color: var(--text-secondary) \!important;
   font-size: 13.5px \!important;
 }
 .ac-footer {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 11.5px;
   color: var(--text-muted);
   margin-top: 0.35rem;
@@ -414,13 +414,13 @@
   box-shadow: 0 4px 14px rgba(44, 26, 14, 0.18);
 }
 .cc-title {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 22px;
   color: var(--wood-cream);
   margin-bottom: 0.5rem;
 }
 .cc-sub {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 14px;
   line-height: 1.65;
   color: rgba(245, 236, 215, 0.85);
@@ -428,7 +428,7 @@
 }
 .cc-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
 .btn-contribute, .btn-contribute-outline {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 13px;
   padding: 0.6rem 1.15rem;
   border-radius: 7px;
@@ -451,12 +451,12 @@
 .cc-right { display: flex; gap: 1.5rem; flex-shrink: 0; }
 .cc-stat { text-align: center; }
 .cc-stat-num {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 28px;
   color: var(--wood-light);
 }
 .cc-stat-label {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -483,7 +483,7 @@
 .rs-header {
   background: var(--wood-cream);
   padding: 0.75rem 1rem;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -500,21 +500,21 @@
 }
 .popular-item:last-child { border-bottom: 0; }
 .pi-rank {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 20px;
   color: var(--wood-warm);
   width: 22px;
   flex-shrink: 0;
 }
 .pi-title {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 13px;
   color: var(--text-primary);
   line-height: 1.3;
   margin-bottom: 2px;
   font-weight: 600;
 }
-.pi-meta { font-family: 'DM Sans', sans-serif; font-size: 11px; color: var(--text-muted); }
+.pi-meta { font-family: 'Montserrat', sans-serif; font-size: 11px; color: var(--text-muted); }
 
 .contrib-item {
   display: flex;
@@ -536,11 +536,11 @@
   font-weight: 700;
   flex-shrink: 0;
 }
-.ci-name { font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text-primary); font-weight: 600; }
-.ci-edits { font-family: 'DM Sans', sans-serif; font-size: 11px; color: var(--text-muted); }
+.ci-name { font-family: 'Montserrat', sans-serif; font-size: 13px; color: var(--text-primary); font-weight: 600; }
+.ci-edits { font-family: 'Montserrat', sans-serif; font-size: 11px; color: var(--text-muted); }
 .ci-pts {
   margin-left: auto;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 11px;
   color: var(--wood-warm);
   font-weight: 600;
@@ -555,7 +555,7 @@
   box-shadow: 0 1px 4px rgba(44, 26, 14, 0.04);
 }
 .sp-label {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -564,15 +564,15 @@
   font-weight: 700;
 }
 .sp-title {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 17px;
   color: var(--text-primary);
   margin-bottom: 0.35rem;
   line-height: 1.25;
 }
-.sp-sub { font-family: 'DM Sans', sans-serif; font-size: 12px; color: var(--text-secondary); line-height: 1.55; margin-bottom: 0.85rem; }
+.sp-sub { font-family: 'Montserrat', sans-serif; font-size: 12px; color: var(--text-secondary); line-height: 1.55; margin-bottom: 0.85rem; }
 .sp-btn {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 12px;
   padding: 0.45rem 0.85rem;
   background: var(--wood-warm);

@@ -94,7 +94,7 @@
   background: var(--wood-cream, #FBF6EC);
   padding: 1px 7px;
   border-radius: 4px;
-  font-family: 'DM Mono', 'Courier New', monospace;
+  font-family: 'Montserrat', 'Courier New', monospace;
   font-size: 0.9em;
 }
 
@@ -104,7 +104,7 @@
   padding: 0.9rem 1rem;
   border-radius: 8px;
   overflow-x: auto;
-  font-family: 'DM Mono', 'Courier New', monospace;
+  font-family: 'Montserrat', 'Courier New', monospace;
   font-size: 13px;
   line-height: 1.6;
 }
@@ -257,7 +257,7 @@
   background: var(--wood-cream, #FBF6EC);
   padding: 1px 7px;
   border-radius: 4px;
-  font-family: 'DM Mono', 'Courier New', monospace;
+  font-family: 'Montserrat', 'Courier New', monospace;
   font-size: 0.9em;
 }
 .gh-article pre {
@@ -266,7 +266,7 @@
   padding: 0.9rem 1rem;
   border-radius: 8px;
   overflow-x: auto;
-  font-family: 'DM Mono', 'Courier New', monospace;
+  font-family: 'Montserrat', 'Courier New', monospace;
   font-size: 13.5px;
   line-height: 1.6;
 }

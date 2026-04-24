@@ -48,9 +48,9 @@ export default function ListingCard({ listing, section }) {
           {listing.meta && <div className="card-spec">{listing.meta}</div>}
         </div>
         <div className="card-footer">
-          <div className="card-price" style={listing.price === 'Make Offer' ? { fontSize: '14px', fontFamily: "'DM Sans',sans-serif", color: 'var(--text-secondary)' } : {}}>
+          <div className="card-price" style={listing.price === 'Make Offer' ? { fontSize: '14px', fontFamily: "'Montserrat',sans-serif", color: 'var(--text-secondary)' } : {}}>
             {listing.price}
-            {listing.priceUnit && <span style={{ fontSize: '12px', fontFamily: "'DM Sans',sans-serif", color: 'var(--text-muted)' }}>{listing.priceUnit}</span>}
+            {listing.priceUnit && <span style={{ fontSize: '12px', fontFamily: "'Montserrat',sans-serif", color: 'var(--text-muted)' }}>{listing.priceUnit}</span>}
           </div>
           <button className="card-contact">Contact</button>
         </div>

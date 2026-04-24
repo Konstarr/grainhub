@@ -160,7 +160,7 @@ export default function Nav() {
                   boxShadow: '0 10px 30px rgba(0,0,0,0.25)',
                   padding: 6,
                   zIndex: 200,
-                  fontFamily: "'DM Sans', sans-serif",
+                  fontFamily: "'Montserrat', sans-serif",
                 }}
               >
                 <div style={{ padding: '0.55rem 0.75rem', borderBottom: '1px solid var(--border)', marginBottom: 4 }}>
@@ -215,56 +215,4 @@ export default function Nav() {
                           width: 18, height: 18,
                           borderRadius: 4,
                           background: 'linear-gradient(135deg, #c07a3c, #8a5030)',
-                          color: '#fff',
-                          fontSize: 10,
-                          fontWeight: 700,
-                        }}>A</span>
-                        Admin panel
-                      </span>
-                    </MenuItem>
-                  </>
-                )}
-
-                <div style={{ borderTop: '1px solid var(--border)', margin: '4px 0' }} />
-                <MenuItem onClick={handleSignOut}>
-                  Sign out
-                </MenuItem>
-              </div>
-            )}
-          </div>
-        ) : (
-          <>
-            <Link to="/login" className="nav-btn">Log In</Link>
-            <Link to="/signup" className="nav-btn primary">Join Free</Link>
-          </>
-        )}
-      </div>
-    </nav>
-  );
-}
-
-function MenuItem({ children, onClick }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      role="menuitem"
-      style={{
-        width: '100%',
-        textAlign: 'left',
-        background: 'transparent',
-        border: 'none',
-        padding: '0.55rem 0.75rem',
-        fontSize: 14,
-        color: 'inherit',
-        borderRadius: 6,
-        cursor: 'pointer',
-        fontFamily: 'inherit',
-      }}
-      onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--wood-cream, #f5ead6)'; }}
-      onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
-    >
-      {children}
-    </button>
-  );
-}
+    

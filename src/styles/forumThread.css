@@ -47,7 +47,7 @@
 .tag-solved { background: #EAF3DE; color: #2D5016; }
 
 .thread-title {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 26px;
   line-height: 1.2;
   color: var(--text-primary);
@@ -86,7 +86,7 @@
   font-size: 13px;
   color: var(--text-secondary);
   cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   transition: all 0.12s;
 }
 .act-btn:hover { border-color: var(--wood-light); background: var(--wood-cream); }
@@ -115,7 +115,7 @@
   font-size: 12px;
   color: var(--text-secondary);
   cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   transition: all 0.12s;
 }
 .sort-opt:hover { border-color: var(--wood-light); }
@@ -368,7 +368,7 @@
   gap: 4px;
   border: none;
   background: transparent;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
 }
 .post-action:hover { background: var(--wood-cream); color: var(--text-secondary); }
 .post-action.liked { color: var(--wood-warm); font-weight: 500; }
@@ -406,7 +406,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   transition: all 0.12s;
 }
 .page-btn:hover:not(.active) { border-color: var(--wood-light); }
@@ -425,7 +425,7 @@
 .reply-box-header {
   background: var(--wood-dark);
   padding: 0.85rem 1.5rem;
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 16px;
   color: var(--wood-cream);
 }
@@ -453,7 +453,7 @@
   align-items: center;
   justify-content: center;
   transition: all 0.12s;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
 }
 .tool-btn:hover { background: var(--wood-cream); border-color: var(--wood-light); }
 
@@ -465,7 +465,7 @@
   border: none;
   padding: 1.25rem 1.5rem;
   font-size: 14px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   color: var(--text-primary);
   background: var(--white);
   resize: vertical;
@@ -537,9 +537,9 @@
 }
 
 .sp-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(255,255,255,0.4); margin-bottom: 6px; }
-.sp-title { font-family: 'DM Serif Display', serif; font-size: 15px; margin-bottom: 5px; }
+.sp-title { font-family: 'Montserrat', sans-serif; font-size: 15px; margin-bottom: 5px; }
 .sp-sub { font-size: 13px; color: rgba(255,255,255,0.65); margin-bottom: 12px; line-height: 1.6; }
-.sp-btn { background: #4A7FE0; color: white; border: none; padding: 8px 16px; border-radius: 7px; font-size: 13px; font-weight: 500; cursor: pointer; width: 100%; font-family: 'DM Sans', sans-serif; transition: background 0.15s; }
+.sp-btn { background: #4A7FE0; color: white; border: none; padding: 8px 16px; border-radius: 7px; font-size: 13px; font-weight: 500; cursor: pointer; width: 100%; font-family: 'Montserrat', sans-serif; transition: background 0.15s; }
 .sp-btn:hover { background: #3A6FD0; }
 
 .related-thread {

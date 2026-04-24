@@ -54,7 +54,7 @@
 }
 
 .page-title {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 46px;
   color: var(--wood-cream);
   letter-spacing: -0.5px;
@@ -77,7 +77,7 @@
 }
 
 .hstat-num {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 34px;
   color: var(--wood-light);
   line-height: 1;
@@ -117,7 +117,7 @@
   border: none;
   outline: none;
   font-size: 14px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   color: var(--text-primary);
   width: 100%;
   background: transparent;
@@ -135,7 +135,7 @@
   background: rgba(255,255,255,0.08);
   color: rgba(255,255,255,0.8);
   font-size: 14px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   cursor: pointer;
   outline: none;
   min-width: 160px;
@@ -156,7 +156,7 @@
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   transition: background 0.15s;
   white-space: nowrap;
 }
@@ -250,7 +250,7 @@
 .filter-header {
   background: var(--wood-dark);
   padding: 0.75rem 1.25rem;
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 15px;
   color: var(--wood-cream);
   display: flex;
@@ -259,7 +259,7 @@
 }
 
 .filter-clear {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 12px;
   color: var(--wood-light);
   cursor: pointer;
@@ -336,7 +336,7 @@
   border: 1px solid var(--border);
   border-radius: 7px;
   font-size: 13px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   color: var(--text-primary);
   background: var(--white);
   outline: none;
@@ -357,7 +357,7 @@
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   margin-top: 1rem;
   transition: background 0.15s;
 }
@@ -397,7 +397,7 @@
   border: 1px solid var(--border);
   border-radius: 8px;
   font-size: 13px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   color: var(--text-secondary);
   background: var(--white);
   cursor: pointer;
@@ -530,7 +530,7 @@
 .job-title-wrap {}
 
 .job-title {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 18px;
   color: var(--text-primary);
   line-height: 1.25;
@@ -563,7 +563,7 @@
 }
 
 .salary-range-text {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 18px;
   color: var(--accent-green);
   line-height: 1;
@@ -642,7 +642,7 @@
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   transition: background 0.15s;
 }
 
@@ -658,7 +658,7 @@
   border-radius: 7px;
   font-size: 13px;
   cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   transition: all 0.12s;
 }
 
@@ -687,7 +687,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   transition: all 0.12s;
 }
 
@@ -721,7 +721,7 @@
 .rs-header {
   background: var(--wood-dark);
   padding: 0.75rem 1.25rem;
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 15px;
   color: var(--wood-cream);
 }
@@ -761,7 +761,7 @@
 }
 
 .pjc-title {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 18px;
   margin-bottom: 6px;
 }
@@ -784,7 +784,7 @@
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   text-align: center;
   transition: background 0.15s;
   margin-bottom: 8px;
@@ -832,7 +832,7 @@
 }
 
 .tc-title {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 16px;
   margin-bottom: 5px;
 }
@@ -855,7 +855,7 @@
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   text-align: center;
   transition: opacity 0.15s;
 }

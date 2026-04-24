@@ -242,7 +242,7 @@ export default function Forums() {
           )}
 
           <div style={{ marginTop: '2rem' }}>
-            <h2 style={{ fontFamily: "'DM Serif Display', serif", fontSize: '24px', color: 'var(--text-primary)', margin: '0 0 1rem 0' }}>
+            <h2 style={{ fontFamily: "'Montserrat', sans-serif", fontSize: '24px', color: 'var(--text-primary)', margin: '0 0 1rem 0' }}>
               {viewTitle}
             </h2>
             {customLoading ? (
@@ -260,14 +260,4 @@ export default function Forums() {
         </div>
 
         <aside className="right-col">
-          <SponsorSidebar />
-          <ForumStats stats={liveStats} />
-          <TopContributors contributors={liveContribs} />
-          <ForumGuidelines guidelines={FORUM_GUIDELINES} />
-          <ThreadLegend items={THREAD_LEGEND} />
-          <SponsorCard />
-        </aside>
-      </div>
-    </>
-  );
-}
+          <SponsorSideba

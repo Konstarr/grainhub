@@ -76,7 +76,7 @@ article {}
 }
 
 .article-title {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: clamp(28px, 4vw, 42px);
   color: var(--text-primary);
   line-height: 1.15;
@@ -218,7 +218,7 @@ article {}
 }
 
 .article-body h2 {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 26px;
   color: var(--text-primary);
   margin: 2.5rem 0 1rem;
@@ -255,7 +255,7 @@ article {}
   margin: 2rem 0;
 }
 .pq-text {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 22px;
   color: var(--text-primary);
   line-height: 1.45;
@@ -291,7 +291,7 @@ article {}
 }
 .dc-stat {}
 .dc-num {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 32px;
   color: var(--wood-light);
   line-height: 1;
@@ -481,7 +481,7 @@ article {}
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   white-space: nowrap;
 }
 
@@ -490,7 +490,7 @@ article {}
   margin-top: 3rem;
 }
 .related-title {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 22px;
   color: var(--text-primary);
   margin-bottom: 1.25rem;
@@ -514,7 +514,7 @@ article {}
   color: var(--wood-warm);
 }
 .ri-num {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 16px;
   color: var(--border);
   margin-bottom: 3px;
@@ -549,7 +549,7 @@ article {}
 .rs-header {
   background: var(--wood-dark);
   padding: 0.75rem 1.25rem;
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 15px;
   color: var(--wood-cream);
 }
@@ -569,7 +569,7 @@ article {}
   color: var(--wood-warm);
 }
 .ti-num {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 18px;
   color: var(--border);
   line-height: 1;
@@ -629,7 +629,7 @@ article {}
   color: white;
 }
 .nl-title {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 17px;
   margin-bottom: 5px;
 }
@@ -651,7 +651,7 @@ article {}
   background: rgba(255,255,255,0.1);
   color: white;
   font-size: 13px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   outline: none;
 }
 .nl-input::placeholder {
@@ -666,7 +666,7 @@ article {}
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   white-space: nowrap;
 }
 
@@ -685,7 +685,7 @@ article {}
   margin-bottom: 6px;
 }
 .sp-title {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 16px;
   margin-bottom: 4px;
 }
@@ -705,5 +705,5 @@ article {}
   font-weight: 500;
   cursor: pointer;
   width: 100%;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Montserrat', sans-serif;
 }

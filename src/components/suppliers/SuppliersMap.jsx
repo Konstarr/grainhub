@@ -128,7 +128,7 @@ export default function SuppliersMap({ activeCategory, onCategoryChange }) {
           {visible.map((s) => (
             <Marker key={s.name} position={[s.lat, s.lng]}>
               <Popup>
-                <div style={{ minWidth: '200px', fontFamily: "'DM Sans', sans-serif" }}>
+                <div style={{ minWidth: '200px', fontFamily: "'Montserrat', sans-serif" }}>
                   <div style={{ fontWeight: 700, fontSize: '14px', marginBottom: '2px' }}>
                     {s.name}
                   </div>
@@ -202,7 +202,7 @@ const searchInputStyle = {
   border: '1px solid var(--border)',
   borderRadius: '8px',
   fontSize: '13px',
-  fontFamily: "'DM Sans', sans-serif",
+  fontFamily: "'Montserrat', sans-serif",
   background: 'var(--white)',
 };
 
@@ -211,7 +211,7 @@ const selectStyle = {
   border: '1px solid var(--border)',
   borderRadius: '8px',
   fontSize: '13px',
-  fontFamily: "'DM Sans', sans-serif",
+  fontFamily: "'Montserrat', sans-serif",
   background: 'var(--white)',
   cursor: 'pointer',
 };
@@ -225,7 +225,7 @@ const clearBtnStyle = {
   background: 'var(--white)',
   color: 'var(--text-secondary)',
   cursor: 'pointer',
-  fontFamily: "'DM Sans', sans-serif",
+  fontFamily: "'Montserrat', sans-serif",
 };
 
 const overlayEmptyStyle = {
