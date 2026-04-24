@@ -150,7 +150,7 @@ export function AuthProvider({ children }) {
       .from('profiles')
       .select(`
         id, username, full_name, bio, avatar_url, trade, location, website,
-        role, reputation, thread_count, post_count, badge_count, joined_at, created_at,
+        role, reputation, thread_count, post_count, joined_at, created_at,
         is_verified, is_suspended,
         account_type, business_name, business_website, business_verified,
         business_contact_email, business_phone, business_trade, business_size,
