@@ -46,7 +46,11 @@ export function AuthProvider({ children }) {
     };
   }, []);
 
-  // Whenever the user changes, pull their profile row.
+  // Whenever the user changes, pull their profile row. We deliberately
+  // enumerate the columns we need in the app rather than select('*') —
+  // moderation-only fields (mod_note, is_shadowbanned) and sensitive
+  // notes (sponsor_notes) shouldn't be pulled into client state where
+  // they could be surfaced accidentally via devtools or bug reports.
   useEffect(() => {
     const uid = session?.user?.id;
     if (!uid) {
@@ -57,7 +61,17 @@ export function AuthProvider({ children }) {
     (async () => {
       const { data, error } = await supabase
         .from('profiles')
-        .select('*')
+        .select(`
+          id, username, full_name, bio, avatar_url, trade, location, website,
+          role, reputation, thread_count, post_count, joined_at, created_at,
+          is_verified, is_suspended,
+          account_type, business_name, business_website, business_verified,
+          business_contact_email, business_phone, business_trade, business_size,
+          sponsor_tier, sponsor_company,
+          can_post_forums, can_post_marketplace, can_post_jobs, can_submit_events,
+          email_digest, notify_mentions, notify_replies, newsletter_optin,
+          profile_public, show_on_leaderboard, email_visible
+        `)
         .eq('id', uid)
         .maybeSingle();
       if (cancelled) return;
@@ -132,7 +146,21 @@ export function AuthProvider({ children }) {
   const refreshProfile = async () => {
     const uid = session?.user?.id;
     if (!uid) return;
-    const { data } = await supabase.from('profiles').select('*').eq('id', uid).maybeSingle();
+    const { data } = await supabase
+      .from('profiles')
+      .select(`
+        id, username, full_name, bio, avatar_url, trade, location, website,
+        role, reputation, thread_count, post_count, badge_count, joined_at, created_at,
+        is_verified, is_suspended,
+        account_type, business_name, business_website, business_verified,
+        business_contact_email, business_phone, business_trade, business_size,
+        sponsor_tier, sponsor_company,
+        can_post_forums, can_post_marketplace, can_post_jobs, can_submit_events,
+        email_digest, notify_mentions, notify_replies, newsletter_optin,
+        profile_public, show_on_leaderboard, email_visible
+      `)
+      .eq('id', uid)
+      .maybeSingle();
     setProfile(data);
   };
 

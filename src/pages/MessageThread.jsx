@@ -69,24 +69,30 @@ export default function MessageThread() {
   // Poll for new messages while the tab is open
   useEffect(() => {
     if (!id || !user?.id) return;
+    let cancelled = false;
     const tick = setInterval(async () => {
-      const { data } = await fetchMessages(id, { limit: 200 });
+      const { data, error } = await fetchMessages(id, { limit: 200 });
+      if (cancelled || error) return;
+      const next = Array.isArray(data) ? data : [];
       setMessages((prev) => {
         // Only update if the newest id changed (avoids re-renders on idle polls)
         const prevLast = prev[prev.length - 1]?.id;
-        const nextLast = data?.[data.length - 1]?.id;
-        if (prevLast === nextLast && prev.length === (data || []).length) return prev;
-        return data || [];
+        const nextLast = next[next.length - 1]?.id;
+        if (prevLast === nextLast && prev.length === next.length) return prev;
+        return next;
       });
     }, POLL_MS);
-    return () => clearInterval(tick);
+    return () => { cancelled = true; clearInterval(tick); };
   }, [id, user?.id]);
 
-  // Auto-scroll to bottom when messages change
+  // Auto-scroll to bottom when new messages arrive — but ONLY if the
+  // user was already near the bottom. If they scrolled up to read old
+  // messages, new arrivals shouldn't yank the viewport away from them.
   useEffect(() => {
     const el = streamRef.current;
     if (!el) return;
-    el.scrollTop = el.scrollHeight;
+    const nearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 160;
+    if (nearBottom) el.scrollTop = el.scrollHeight;
   }, [messages.length]);
 
   const handleSend = async () => {

@@ -116,10 +116,11 @@ export default function SignupForm() {
     }
     // If Supabase email confirmation is ON, data.user exists but data.session is null.
     // If email confirmation is OFF, the user is signed in immediately.
-    // Either way, patch the rest of the profile info (best-effort — fails silently
-    // if the user isn't logged in yet, which is fine; they can fill it in later).
+    // Patch the rest of the profile info. This can fail if RLS requires the
+    // user to be signed in (email-confirm mode) — in that case the primary
+    // signup still succeeded so we log but don't fail the flow.
     if (data?.user?.id) {
-      await supabase
+      const { error: patchErr } = await supabase
         .from('profiles')
         .update({
           full_name: fullName || null,
@@ -128,6 +129,10 @@ export default function SignupForm() {
           bio: role || null,
         })
         .eq('id', data.user.id);
+      if (patchErr) {
+        // eslint-disable-next-line no-console
+        console.warn('[signup] profile patch deferred:', patchErr.message);
+      }
     }
     setSubmitting(false);
     setCurrentStep(3);

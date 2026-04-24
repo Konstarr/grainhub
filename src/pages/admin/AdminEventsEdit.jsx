@@ -110,10 +110,17 @@ export default function AdminEventsEdit() {
 
   const set = (k) => (v) => setForm((f) => ({ ...f, [k]: v }));
 
+  // Event times — end must not be before start.
+  const datesInvalid =
+    !!form.start_date &&
+    !!form.end_date &&
+    new Date(form.end_date).getTime() < new Date(form.start_date).getTime();
+
   const canSubmit =
     form.title.trim().length >= 4 &&
     form.description.trim().length >= 10 &&
     !!form.start_date &&
+    !datesInvalid &&
     !saving;
 
   const handleSave = async (approveOverride) => {
@@ -210,6 +217,11 @@ export default function AdminEventsEdit() {
       <div className="adm-card">
         {error && <div className="adm-error" style={{ marginBottom: 12 }}>{error}</div>}
         {okMsg && <div className="adm-ok" style={{ marginBottom: 12 }}>{okMsg}</div>}
+        {datesInvalid && (
+          <div className="adm-error" style={{ marginBottom: 12 }}>
+            The end date is before the start date. Fix the dates before saving.
+          </div>
+        )}
 
         <div className="adm-form">
           <div className="adm-field">

@@ -17,6 +17,14 @@ import { supabase } from '../../lib/supabase.js';
  * external image host if you prefer.
  */
 const MAX_BYTES = 50 * 1024 * 1024; // 50 MB (Supabase default upload cap)
+const MIME_TO_EXT = {
+  'image/jpeg': 'jpg', 'image/jpg': 'jpg',
+  'image/png': 'png', 'image/webp': 'webp',
+  'image/gif': 'gif', 'image/svg+xml': 'svg',
+};
+function randomId() {
+  return Math.random().toString(36).slice(2, 10) + Math.random().toString(36).slice(2, 10);
+}
 
 export default function CoverImageUploader({ value, onChange, folder = 'news' }) {
   const inputRef = useRef(null);
@@ -37,8 +45,13 @@ export default function CoverImageUploader({ value, onChange, folder = 'news' })
     setError(null);
     const file = files?.[0];
     if (!file) return;
-    if (!file.type.startsWith('image/')) {
+    if (!file.type || !file.type.startsWith('image/')) {
       setError('Please pick an image file (jpg, png, webp, gif).');
+      return;
+    }
+    const ext = MIME_TO_EXT[file.type.toLowerCase()];
+    if (!ext) {
+      setError('That image format isn\u2019t supported. Try JPG, PNG, WEBP, or GIF.');
       return;
     }
     if (file.size > MAX_BYTES) {
@@ -47,15 +60,10 @@ export default function CoverImageUploader({ value, onChange, folder = 'news' })
     }
     setBusy(true);
     try {
-      const ext = (file.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '');
-      const safeBase = file.name
-        .replace(/\.[^/.]+$/, '')
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-+|-+$/g, '')
-        .slice(0, 40) || 'cover';
-      const rand = Math.random().toString(36).slice(2, 8);
-      const key = `${folder}/${Date.now()}-${rand}-${safeBase}.${ext}`;
+      // User filename is intentionally discarded — MIME decides the ext,
+      // the rest is a random id so malformed / malicious names never hit
+      // storage paths.
+      const key = `${folder}/${Date.now()}-${randomId()}.${ext}`;
 
       const { error: upErr } = await supabase.storage
         .from('media')

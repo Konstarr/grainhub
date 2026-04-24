@@ -106,9 +106,13 @@ export default function JobDetail() {
 
   const ApplyCTA = () => {
     if (applyUrl) {
+      // Parsing can throw on pathological inputs even after normalize — guard.
+      let host = '';
+      try { host = new URL(applyUrl).hostname.replace(/^www\./, ''); }
+      catch { host = ''; }
       return (
         <a href={applyUrl} target="_blank" rel="noopener noreferrer" className="jd-apply-btn">
-          Apply on {new URL(applyUrl).hostname.replace(/^www\./, '')} →
+          {host ? 'Apply on ' + host + ' →' : 'Apply →'}
         </a>
       );
     }

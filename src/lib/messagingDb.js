@@ -176,21 +176,22 @@ export async function markConversationRead(conversationId, myId) {
 // Unread counter (for nav badge)
 // ------------------------------------------------------------
 
+/**
+ * Count unread inbound messages across all my conversations. We can express
+ * the whole thing as a single query because PostgREST lets us join the
+ * conversations predicate inline via an inner select — no round-trip.
+ *
+ * Under RLS the `messages_read` policy already limits `messages` reads to
+ * conversations the user is in, so we don't need an explicit
+ * `conversation_id.in.(…)` filter — RLS does the heavy lifting.
+ */
 export async function fetchUnreadCount(myId) {
   if (!myId) return 0;
-  // Find conversations I'm in, then count messages in them not sent by me
-  // that are still unread.
-  const { data: convs } = await supabase
-    .from('conversations')
-    .select('id')
-    .or('user_a.eq.' + myId + ',user_b.eq.' + myId);
-  const ids = (convs || []).map((c) => c.id);
-  if (ids.length === 0) return 0;
-  const { count } = await supabase
+  const { count, error } = await supabase
     .from('messages')
     .select('id', { count: 'exact', head: true })
-    .in('conversation_id', ids)
     .neq('sender_id', myId)
     .is('read_at', null);
+  if (error) return 0;
   return count || 0;
 }

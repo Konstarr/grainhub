@@ -94,11 +94,20 @@ export default function AdminJobsEdit() {
 
   const set = (k) => (v) => setForm((f) => ({ ...f, [k]: v }));
 
+  // Salary sanity — reject negative numbers and inverted ranges.
+  const rawMin = form.salary_min === '' ? null : Number(form.salary_min);
+  const rawMax = form.salary_max === '' ? null : Number(form.salary_max);
+  const salaryInvalid =
+    (rawMin != null && (!isFinite(rawMin) || rawMin < 0)) ||
+    (rawMax != null && (!isFinite(rawMax) || rawMax < 0)) ||
+    (rawMin != null && rawMax != null && rawMin > rawMax);
+
   const canSubmit =
     form.title.trim().length >= 4 &&
     form.company.trim().length >= 2 &&
     form.location.trim().length >= 2 &&
     form.description.trim().length >= 20 &&
+    !salaryInvalid &&
     !saving;
 
   const buildPayload = (approveOverride) => ({
@@ -182,6 +191,11 @@ export default function AdminJobsEdit() {
       <div className="adm-card">
         {error && <div className="adm-error" style={{ marginBottom: 12 }}>{error}</div>}
         {okMsg && <div className="adm-ok" style={{ marginBottom: 12 }}>{okMsg}</div>}
+        {salaryInvalid && (
+          <div className="adm-error" style={{ marginBottom: 12 }}>
+            Salary range doesn&apos;t look right. Check for negative values or a min that&apos;s higher than max.
+          </div>
+        )}
 
         <div className="adm-form">
           <div className="adm-form-grid">
