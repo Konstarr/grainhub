@@ -13,7 +13,7 @@ export default function Suppliers() {
   const navCategory = searchParams.get('category') || '';
 
   const [activeCategory, setActiveCategory] = useState('');
-  const [showMap, setShowMap] = useState(false);
+  const [view, setView] = useState('list'); // 'list' | 'map'
 
   // Mirror the secondary-nav ?category= into the in-page active category.
   useEffect(() => {
@@ -78,29 +78,6 @@ export default function Suppliers() {
         </div>
       </div>
 
-      <div className="main-wrap" style={{ marginTop: '1.5rem' }}>
-        <button
-          type="button"
-          onClick={() => setShowMap((v) => (v ? false : true))}
-          aria-expanded={showMap}
-          style={mapTogglePillStyle}
-        >
-          <span style={{ fontSize: '16px' }}>{showMap ? '✕' : '🗺'}</span>
-          <span>
-            {showMap ? 'Hide map' : 'Show map — find suppliers near you'}
-          </span>
-        </button>
-
-        {showMap && (
-          <div style={{ marginTop: '1rem' }}>
-            <SuppliersMap
-              activeCategory={activeCategory}
-              onCategoryChange={setActiveCategory}
-            />
-          </div>
-        )}
-      </div>
-
       <div className="cat-highway">
         <div className="cat-highway-inner">
           {SUPPLIER_CATEGORIES.map((cat) => (
@@ -126,7 +103,56 @@ export default function Suppliers() {
 
       <div className="main-wrap">
         <div>
-          <SupplierTable activeCategory={activeCategory} suppliers={liveSuppliers} />
+          {/* Sleek view switcher — lives at the top of the center column.
+              Same width as the list/map below, so swapping views doesn't
+              shift the layout. */}
+          <div className="view-switch-row">
+            <div className="view-switch-label">
+              {view === 'map' ? 'Map view' : 'Directory view'}
+            </div>
+            <div className="view-switch" role="tablist" aria-label="View mode">
+              <button
+                type="button"
+                role="tab"
+                aria-selected={view === 'list'}
+                className={`view-switch-btn ${view === 'list' ? 'active' : ''}`}
+                onClick={() => setView('list')}
+              >
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <path d="M2 3.5h12M2 8h12M2 12.5h12" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+                </svg>
+                List
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={view === 'map'}
+                className={`view-switch-btn ${view === 'map' ? 'active' : ''}`}
+                onClick={() => setView('map')}
+              >
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <path d="M1.5 3.5 5.5 2l5 1.5 4-1.5v10l-4 1.5-5-1.5-4 1.5v-10Z" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" />
+                  <path d="M5.5 2v11M10.5 3.5v11" stroke="currentColor" strokeWidth="1.4" />
+                </svg>
+                Map
+              </button>
+              {/* Animated slider pill behind the active tab */}
+              <span
+                className="view-switch-thumb"
+                style={{ transform: view === 'list' ? 'translateX(0%)' : 'translateX(100%)' }}
+                aria-hidden="true"
+              />
+            </div>
+          </div>
+
+          {view === 'list' ? (
+            <SupplierTable activeCategory={activeCategory} suppliers={liveSuppliers} />
+          ) : (
+            <SuppliersMap
+              activeCategory={activeCategory}
+              onCategoryChange={setActiveCategory}
+            />
+          )}
         </div>
         <aside className="right-col">
           <SponsorSidebar />
@@ -135,19 +161,3 @@ export default function Suppliers() {
     </>
   );
 }
-
-const mapTogglePillStyle = {
-  display: 'inline-flex',
-  alignItems: 'center',
-  gap: '0.5rem',
-  padding: '0.55rem 1rem',
-  border: '1px solid var(--border)',
-  borderRadius: '999px',
-  background: 'var(--white)',
-  color: 'var(--text-primary)',
-  fontFamily: "'DM Sans', sans-serif",
-  fontSize: '13px',
-  fontWeight: 600,
-  cursor: 'pointer',
-  boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
-};

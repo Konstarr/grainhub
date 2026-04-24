@@ -117,7 +117,7 @@ export default function SuppliersMap({ activeCategory, onCategoryChange }) {
         <MapContainer
           center={US_CENTER}
           zoom={DEFAULT_ZOOM}
-          style={{ width: '100%', height: '480px' }}
+          style={{ width: '100%', height: '560px' }}
           scrollWheelZoom
         >
           <TileLayer
@@ -182,16 +182,16 @@ const wrapperStyle = {
   border: '1px solid var(--border)',
   borderRadius: '12px',
   overflow: 'hidden',
-  marginBottom: '1.5rem',
+  boxShadow: '0 1px 3px rgba(43, 26, 14, 0.04)',
 };
 
 const filterBarStyle = {
   display: 'flex',
   gap: '1rem',
   alignItems: 'center',
-  padding: '0.9rem 1rem',
+  padding: '0.85rem 1rem',
   borderBottom: '1px solid var(--border-light)',
-  background: 'var(--wood-paper)',
+  background: '#FAF6EE',
   flexWrap: 'wrap',
 };
 
