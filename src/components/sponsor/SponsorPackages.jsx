@@ -1,5 +1,15 @@
-import { PRICING_PACKAGES } from '../../data/sponsorData.js';
+import { Link } from 'react-router-dom';
+import { SPONSOR_TIERS, formatPrice } from '../../lib/pricing.js';
 
+/**
+ * The three sponsorship tiers (Silver / Gold / Platinum) — read
+ * straight from lib/pricing.js so this section stays in sync with
+ * the unified /pricing page, the admin editor, and the gating logic.
+ *
+ * Highlight tier (Gold) gets the "Most popular" ribbon. Each card's
+ * CTA routes to the unified pricing page so the entire purchase flow
+ * lives in one place.
+ */
 export default function SponsorPackages() {
   return (
     <section className="sponsor-section sponsor-packages-section" id="sponsor-packages">
@@ -12,45 +22,43 @@ export default function SponsorPackages() {
             </h2>
           </div>
           <p>
-            All packages include a verified supplier directory listing, analytics dashboard, and a
-            dedicated account manager. Custom packages available for enterprise brands.
+            Three flat tiers, billed monthly, no per-impression fees. Stack with any business
+            membership or role pack on the <Link to="/pricing">pricing page</Link>.
           </p>
         </div>
 
         <div className="sponsor-packages-grid">
-          {PRICING_PACKAGES.map((pkg) => (
+          {SPONSOR_TIERS.map((tier) => (
             <div
-              key={pkg.id}
-              className={`sponsor-pkg-card ${pkg.featured ? 'featured' : ''}`}
+              key={tier.id}
+              className={'sponsor-pkg-card ' + (tier.highlight ? 'featured' : '')}
             >
               <div className="sponsor-pkg-header">
-                {pkg.featured && <div className="sponsor-pkg-featured-tag">Most Popular</div>}
-                <div className="sponsor-pkg-tier">{pkg.tier}</div>
-                <div className="sponsor-pkg-name">{pkg.name}</div>
+                {tier.highlight && <div className="sponsor-pkg-featured-tag">Most popular</div>}
+                <div className="sponsor-pkg-tier">{tier.id.toUpperCase()}</div>
+                <div className="sponsor-pkg-name">{tier.name.replace(' Sponsor', '')}</div>
                 <div className="sponsor-pkg-price">
-                  {pkg.price} <span>{pkg.period}</span>
+                  {formatPrice(tier.priceMonthly)}
+                  {tier.priceMonthly > 0 && <span>/mo</span>}
                 </div>
-                <div className="sponsor-pkg-desc">{pkg.desc}</div>
+                <div className="sponsor-pkg-desc">{tier.tagline}</div>
               </div>
               <div className="sponsor-pkg-body">
                 <div className="sponsor-pkg-features">
-                  {pkg.features.map((feat) => (
-                    <div
-                      key={feat.text}
-                      className={`sponsor-pkg-feat ${feat.included ? '' : 'muted'}`}
-                    >
-                      <span className="sponsor-pkg-check">
-                        {feat.included ? '✓' : '–'}
-                      </span>
-                      {feat.text}
+                  {tier.features.map((feat) => (
+                    <div key={feat} className="sponsor-pkg-feat">
+                      <span className="sponsor-pkg-check">✓</span>
+                      {feat}
                     </div>
                   ))}
                 </div>
-                <button
-                  className={`sponsor-pkg-btn sponsor-pkg-btn-${pkg.buttonVariant}`}
+                <Link
+                  to="/pricing?persona=business"
+                  className={'sponsor-pkg-btn sponsor-pkg-btn-' + (tier.highlight ? 'primary' : 'secondary')}
+                  style={{ textDecoration: 'none', display: 'inline-block', textAlign: 'center' }}
                 >
-                  {pkg.button}
-                </button>
+                  Become {tier.name.replace(' Sponsor', '')}
+                </Link>
               </div>
             </div>
           ))}

@@ -579,8 +579,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 22px;
+  font-size: 24px;
   margin-bottom: 1rem;
+  /* Default warm cream tile so emoji icons read clearly. The
+     per-color modifiers below still win when applied. */
+  background: var(--wood-cream, #F5EAD6);
+  border: 1px solid var(--border, #E8DFCB);
 }
 
 .sponsor-ac-icon-brown { background: linear-gradient(135deg, #4A2A12, #8A5030); }
