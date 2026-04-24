@@ -10,6 +10,9 @@ import {
   fetchRecentThreadsByAuthor,
   updateOwnProfile,
 } from '../lib/forumDb.js';
+import { fetchMutualCommunities } from '../lib/communityDb.js';
+import { supabase } from '../lib/supabase.js';
+import { CommunityIcon } from './Communities.jsx';
 import {
   getConnection,
   requestConnection,
@@ -32,6 +35,8 @@ export default function Profile() {
   const [profile, setProfile] = useState(null);
   const [badges, setBadges] = useState([]);
   const [threads, setThreads] = useState([]);
+  const [communities, setCommunities] = useState([]);   // joined by the VIEWED profile
+  const [mutual, setMutual] = useState([]);             // mutual with signed-in user
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
@@ -88,13 +93,28 @@ export default function Profile() {
         website: data.website || '',
         avatar_url: data.avatar_url || '',
       });
-      const [{ data: b }, { data: t }] = await Promise.all([
+      const [{ data: b }, { data: t }, cRes, mRes] = await Promise.all([
         fetchProfileBadges(data.id),
         fetchRecentThreadsByAuthor(data.id, 25),
+        // Communities the viewed profile has joined (public rows).
+        supabase
+          .from('community_members')
+          .select('role, community:community_id(id, slug, name, icon_url, member_count, is_public)')
+          .eq('profile_id', data.id),
+        // Mutual with signed-in user — empty if same user / not signed in.
+        user?.id && user.id !== data.id
+          ? fetchMutualCommunities(data.id)
+          : Promise.resolve({ data: [] }),
       ]);
       if (cancelled) return;
       setBadges(b || []);
       setThreads(t || []);
+      setCommunities(
+        (cRes.data || [])
+          .map((r) => r.community)
+          .filter((c) => c && c.is_public !== false)
+      );
+      setMutual(mRes.data || []);
       setLoading(false);
     })();
     return () => { cancelled = true; };
@@ -318,6 +338,42 @@ export default function Profile() {
                   <button type="button" className="pf-card-link" onClick={() => setTab('badges')}>
                     +{badges.length - 6} more →
                   </button>
+                )}
+              </div>
+            )}
+
+            {/* Mutual communities — only when viewing someone else's profile */}
+            {!isMe && mutual.length > 0 && (
+              <div className="pf-mutual-banner">
+                <span>🔗</span>
+                <span>
+                  You both belong to{' '}
+                  <strong>
+                    {mutual.slice(0, 3).map((m, i) => (
+                      <span key={m.id}>
+                        <Link to={`/c/${m.slug}`} style={{ color: 'inherit', textDecoration: 'underline' }}>{m.name}</Link>
+                        {i < Math.min(mutual.length, 3) - 1 ? ', ' : ''}
+                      </span>
+                    ))}
+                    {mutual.length > 3 && ` +${mutual.length - 3} more`}
+                  </strong>
+                </span>
+              </div>
+            )}
+
+            {/* Communities joined */}
+            {communities.length > 0 && (
+              <div className="pf-communities">
+                {communities.slice(0, 10).map((c) => (
+                  <Link key={c.id} to={`/c/${c.slug}`} className="pf-comm-chip">
+                    <CommunityIcon c={c} size={20} />
+                    <span>{c.name}</span>
+                  </Link>
+                ))}
+                {communities.length > 10 && (
+                  <span style={{ fontSize: 12, color: 'var(--text-muted)', alignSelf: 'center' }}>
+                    +{communities.length - 10} more
+                  </span>
                 )}
               </div>
             )}

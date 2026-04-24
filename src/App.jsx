@@ -22,6 +22,9 @@ import Signup from './pages/Signup.jsx';
 import Login from './pages/Login.jsx';
 import Sponsor from './pages/Sponsor.jsx';
 import Pricing from './pages/Pricing.jsx';
+import Communities from './pages/Communities.jsx';
+import CommunityNew from './pages/CommunityNew.jsx';
+import CommunityHome from './pages/CommunityHome.jsx';
 import AuthCallback from './pages/AuthCallback.jsx';
 import Events from './pages/Events.jsx';
 import EventDetail from './pages/EventDetail.jsx';
@@ -70,6 +73,9 @@ export default function App() {
           <Route path="/suppliers" element={<Suppliers />} />
           <Route path="/events" element={<Events />} />
           <Route path="/events/:slug" element={<RequireAuth><EventDetail /></RequireAuth>} />
+          <Route path="/communities" element={<Communities />} />
+          <Route path="/communities/new" element={<RequireAuth><CommunityNew /></RequireAuth>} />
+          <Route path="/c/:slug" element={<CommunityHome />} />
           <Route path="/sponsor" element={<Sponsor />} />
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/signup" element={<Signup />} />

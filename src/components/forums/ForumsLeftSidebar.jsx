@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { FORUM_GROUPS } from '../../data/forumsData.js';
 import { useAuth } from '../../context/AuthContext.jsx';
+import { fetchMyCommunities } from '../../lib/communityDb.js';
 
 /**
  * Reddit-style left navigation for the Forums section.
@@ -30,10 +31,11 @@ export function recordForumRecent({ slug, title }) {
 }
 
 export default function ForumsLeftSidebar() {
-  const { isAdmin } = useAuth();
+  const { isAuthed } = useAuth();
   const location = useLocation();
   const [recents, setRecents] = useState([]);
-  const [openGroups, setOpenGroups] = useState({});
+  const [myCommunities, setMyCommunities] = useState([]);
+  const [openGroups, setOpenGroups] = useState({ browse: false });
 
   // Read recents on mount + whenever the route changes (so opening a
   // thread bumps the list without a full reload).
@@ -43,6 +45,17 @@ export default function ForumsLeftSidebar() {
       setRecents(raw ? JSON.parse(raw) : []);
     } catch (_) { setRecents([]); }
   }, [location.pathname]);
+
+  // Load joined communities for the logged-in user.
+  useEffect(() => {
+    if (!isAuthed) { setMyCommunities([]); return; }
+    let cancelled = false;
+    (async () => {
+      const { data } = await fetchMyCommunities();
+      if (!cancelled) setMyCommunities(data || []);
+    })();
+    return () => { cancelled = true; };
+  }, [isAuthed, location.pathname]);
 
   const toggleGroup = (id) =>
     setOpenGroups((o) => ({ ...o, [id]: !(o[id] ?? true) }));
@@ -57,14 +70,25 @@ export default function ForumsLeftSidebar() {
 
       {/* ── Actions ── */}
       <Section>
-        <NavItem
-          to={isAdmin ? '/admin/forums/new' : '/forums?request=new-community'}
-          icon={<IconPlus />}
-          label="Start a community"
-        />
-        <NavItem to="/forums?view=subscriptions" icon={<IconBookmark />} label="Join a community" />
+        <NavItem to="/communities/new" icon={<IconPlus />} label="Start a community" />
+        <NavItem to="/communities" icon={<IconBookmark />} label="Browse communities" />
         <NavItem to="/forums/new" icon={<IconPen />} label="Start a thread" />
       </Section>
+
+      {/* ── Joined communities ── */}
+      {myCommunities.length > 0 && (
+        <Section title="Your communities">
+          {myCommunities.map((c) => (
+            <Link key={c.id} to={`/c/${c.slug}`} className="fs-item fs-item-community fs-item-with-icon">
+              <CommIconSmall c={c} />
+              <span className="fs-item-text">{c.name}</span>
+            </Link>
+          ))}
+          <Link to="/communities" className="fs-item fs-item-muted" style={{ paddingLeft: 12 }}>
+            <span className="fs-item-text">See all →</span>
+          </Link>
+        </Section>
+      )}
 
       {/* ── Recents ── */}
       {recents.length > 0 && (
@@ -89,8 +113,8 @@ export default function ForumsLeftSidebar() {
         </Section>
       )}
 
-      {/* ── Communities (groups + categories) ── */}
-      <Section title="Communities">
+      {/* ── Forum topic groups (the built-in taxonomy) ── */}
+      <Section title="Browse topics">
         {FORUM_GROUPS.map((group) => {
           const isOpen = openGroups[group.id] ?? true;
           return (
@@ -159,3 +183,24 @@ function IconFlame()    { return <svg {...svg}><path d="M12 2c2 4 5 6 5 10a5 5 0
 function IconPlus()     { return <svg {...svg}><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>; }
 function IconBookmark() { return <svg {...svg}><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" /></svg>; }
 function IconPen()      { return <svg {...svg}><path d="M12 20h9" /><path d="M16.5 3.5a2.12 2.12 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z" /></svg>; }
+
+/* Tiny round icon used inside the "Your communities" sidebar list. */
+function CommIconSmall({ c }) {
+  if (c.icon_url) {
+    return <img src={c.icon_url} alt="" width="20" height="20" style={{ borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />;
+  }
+  const initials = (c.name || '??')
+    .split(/\s+/).filter(Boolean).slice(0, 2)
+    .map((w) => w[0]).join('').toUpperCase();
+  return (
+    <span style={{
+      width: 20, height: 20, borderRadius: '50%',
+      background: 'linear-gradient(135deg, #6B3F1F, #A0522D)',
+      color: '#fff', fontSize: 9, fontWeight: 700,
+      display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+      flexShrink: 0, letterSpacing: 0.3,
+    }}>
+      {initials}
+    </span>
+  );
+}

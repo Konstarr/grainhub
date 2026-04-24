@@ -309,6 +309,7 @@
   font-weight: 500;
   color: var(--text-secondary);
 }
+.fs-item-with-icon { padding-left: 10px; }
 .fs-item-recent:hover,
 .fs-item-community:hover { color: var(--text-primary); }
 .fs-item-recent:hover .fs-item-dot,
