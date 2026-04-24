@@ -29,9 +29,9 @@ export default function Home() {
       <Hero />
       <StatsStrip />
       <SponsorStrip />
-      <CommunitiesShowcase />
       <TradeCategoriesTiles />
 
+      {/* Feed section — News on top, Forum + Wiki below, with sidebar */}
       <section className="home-section home-section-cream">
         <div className="home-section-inner">
           <div className="home-section-head">
@@ -54,6 +54,10 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Communities — moved below the news/forum feed so the feed
+          owns the "fresh activity" real estate first. */}
+      <CommunitiesShowcase />
 
       <JoinBanner />
     </>

@@ -26,7 +26,7 @@ export default function CommunitiesShowcase() {
   if (!loaded) return null;
 
   return (
-    <section className="home-section home-section-cream">
+    <section className="home-section">
       <div className="home-section-inner">
         <div className="home-section-head">
           <div>
