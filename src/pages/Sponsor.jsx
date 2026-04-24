@@ -1,5 +1,6 @@
 import '../styles/sponsor.css';
 import SponsorHero from '../components/sponsor/SponsorHero.jsx';
+import SponsorEligibilityBanner from '../components/sponsor/SponsorEligibilityBanner.jsx';
 import SponsorCurrentSponsors from '../components/sponsor/SponsorCurrentSponsors.jsx';
 import SponsorAudience from '../components/sponsor/SponsorAudience.jsx';
 import SponsorPackages from '../components/sponsor/SponsorPackages.jsx';
@@ -12,6 +13,7 @@ export default function Sponsor() {
   return (
     <>
       <SponsorHero />
+      <SponsorEligibilityBanner />
       <SponsorCurrentSponsors />
       <SponsorAudience />
       <SponsorPackages />

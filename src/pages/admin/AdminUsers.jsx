@@ -12,47 +12,82 @@ export default function AdminUsers() {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [typeFilter, setTypeFilter] = useState(''); // '' | 'individual' | 'business'
   const [error, setError] = useState(null);
 
-  const load = async (q) => {
+  const load = async (q, type) => {
     setLoading(true);
     setError(null);
-    const { data, error } = await listProfiles({ search: q || '' });
+    const { data, error } = await listProfiles({ search: q || '', accountType: type || null });
     if (error) setError(error.message || 'Failed to load users');
     setRows(data || []);
     setLoading(false);
   };
 
-  useEffect(() => { load(''); }, []);
+  useEffect(() => { load('', ''); }, []);
   useEffect(() => {
-    const t = setTimeout(() => load(search), 250);
+    const t = setTimeout(() => load(search, typeFilter), 250);
     return () => clearTimeout(t);
-  }, [search]);
+  }, [search, typeFilter]);
+
+  const counts = {
+    individual: rows.filter((r) => r.account_type === 'individual').length,
+    business:   rows.filter((r) => r.account_type === 'business').length,
+  };
 
   return (
     <AdminLayout
       title="Users"
-      subtitle={loading ? 'Loading…' : `${rows.length} total`}
+      subtitle={loading
+        ? 'Loading…'
+        : `${rows.length} shown · ${counts.individual} individual · ${counts.business} business`}
     >
       <div className="adm-card" style={{ padding: '1rem 1.25rem' }}>
-        <div className="adm-search">
-          <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-            <circle cx="7" cy="7" r="5.5" stroke="currentColor" strokeWidth="1.5" opacity="0.6"/>
-            <path d="M11 11 L14 14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" opacity="0.6"/>
-          </svg>
-          <input
-            type="text"
-            placeholder="Search by username or full name…"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-          {search && (
-            <button
-              type="button"
-              onClick={() => setSearch('')}
-              style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}
-            >×</button>
-          )}
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+          <div className="adm-search">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+              <circle cx="7" cy="7" r="5.5" stroke="currentColor" strokeWidth="1.5" opacity="0.6"/>
+              <path d="M11 11 L14 14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" opacity="0.6"/>
+            </svg>
+            <input
+              type="text"
+              placeholder="Search by name, username or company…"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+            {search && (
+              <button
+                type="button"
+                onClick={() => setSearch('')}
+                style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}
+              >×</button>
+            )}
+          </div>
+          <div style={{ display: 'inline-flex', gap: 0, border: '1px solid var(--border)', borderRadius: 999, overflow: 'hidden' }}>
+            {[
+              { key: '',           label: 'All' },
+              { key: 'individual', label: 'Individuals' },
+              { key: 'business',   label: 'Businesses' },
+            ].map((t) => (
+              <button
+                key={t.key || 'all'}
+                type="button"
+                onClick={() => setTypeFilter(t.key)}
+                style={{
+                  padding: '0.4rem 0.9rem',
+                  border: 'none',
+                  cursor: 'pointer',
+                  font: 'inherit',
+                  fontSize: 12.5,
+                  fontWeight: 500,
+                  background: typeFilter === t.key ? 'var(--wood-warm)' : 'var(--white)',
+                  color: typeFilter === t.key ? '#fff' : 'var(--text-secondary)',
+                }}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -70,6 +105,7 @@ export default function AdminUsers() {
             <thead>
               <tr>
                 <th>User</th>
+                <th style={{ width: 110 }}>Type</th>
                 <th style={{ width: 110 }}>Role</th>
                 <th style={{ width: 140 }}>Sponsor</th>
                 <th style={{ width: 160 }}>Flags</th>
@@ -95,13 +131,28 @@ export default function AdminUsers() {
                         </div>
                         <div style={{ minWidth: 0 }}>
                           <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>
-                            {p.full_name || p.username}
+                            {p.account_type === 'business'
+                              ? (p.business_name || p.full_name || p.username)
+                              : (p.full_name || p.username)}
                           </div>
                           <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
                             @{p.username} {p.trade ? '· ' + p.trade : ''}
                           </div>
                         </div>
                       </div>
+                    </td>
+                    <td>
+                      <span
+                        className="adm-pill"
+                        style={{
+                          textTransform: 'capitalize',
+                          background: p.account_type === 'business' ? '#E6F1FB' : 'var(--wood-cream, #FBF6EC)',
+                          color:      p.account_type === 'business' ? '#185FA5' : 'var(--text-secondary)',
+                          border:     '1px solid ' + (p.account_type === 'business' ? '#BFDCEF' : 'var(--border)'),
+                        }}
+                      >
+                        {p.account_type || 'individual'}
+                      </span>
                     </td>
                     <td>
                       <span className={'adm-pill ' + (p.role === 'owner' || p.role === 'admin' ? 'pub' : 'draft')}

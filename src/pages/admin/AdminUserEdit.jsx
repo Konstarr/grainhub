@@ -213,54 +213,108 @@ export default function AdminUserEdit() {
         <CheckRow label="Newsletter opt-in"    checked={!!form.newsletter_optin} onChange={toggle('newsletter_optin')} />
       </div>
 
-      {/* ------------- Sponsor ------------- */}
+      {/* ------------- Business details (only for business accounts) ------------- */}
+      {form.account_type === 'business' && (
+        <div className="adm-card">
+          <div className="adm-card-title" style={{ fontFamily: 'var(--font-display)', fontSize: 17, color: 'var(--text-primary)', marginBottom: 12 }}>
+            Business details
+          </div>
+          <div className="adm-form-grid">
+            <Field label="Business name"   value={form.business_name || ''}           onChange={set('business_name')} />
+            <Field label="Website"         value={form.business_website || ''}        onChange={set('business_website')} />
+            <Field label="Contact email"   value={form.business_contact_email || ''}  onChange={set('business_contact_email')} />
+            <Field label="Phone"           value={form.business_phone || ''}          onChange={set('business_phone')} />
+            <div className="adm-field">
+              <label className="adm-label">Primary trade</label>
+              <select className="adm-select" value={form.business_trade || ''} onChange={(e) => set('business_trade')(e.target.value)}>
+                <option value="">—</option>
+                <option>Cabinetmaking</option>
+                <option>Millwork</option>
+                <option>Flooring</option>
+                <option>Finishing</option>
+                <option>CNC</option>
+                <option>Supply / Distribution</option>
+                <option>General</option>
+              </select>
+            </div>
+            <div className="adm-field">
+              <label className="adm-label">Company size</label>
+              <select className="adm-select" value={form.business_size || ''} onChange={(e) => set('business_size')(e.target.value)}>
+                <option value="">—</option>
+                <option value="1-9">1 – 9</option>
+                <option value="10-49">10 – 49</option>
+                <option value="50-249">50 – 249</option>
+                <option value="250+">250+</option>
+              </select>
+            </div>
+          </div>
+          <CheckRow
+            label="Business verified"
+            desc="Confirms the business has been checked by staff. Shows a trust marker on their listings and ads."
+            checked={!!form.business_verified}
+            onChange={toggle('business_verified')}
+          />
+        </div>
+      )}
+
+      {/* ------------- Sponsor (business accounts only) ------------- */}
       <div className="adm-card">
         <div className="adm-card-title" style={{ fontFamily: 'var(--font-display)', fontSize: 17, color: 'var(--text-primary)', marginBottom: 12 }}>
           Sponsor
         </div>
-        <div className="adm-form-grid">
-          <div className="adm-field">
-            <label className="adm-label">Tier</label>
-            <select
-              className="adm-select"
-              value={form.sponsor_tier || ''}
-              onChange={(e) => set('sponsor_tier')(e.target.value || null)}
-            >
-              {TIER_OPTIONS.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
-            </select>
-            <div className="adm-hint">
-              Sets what ad slots this user's uploaded media can appear in.
-            </div>
-          </div>
-          <div className="adm-field">
-            <label className="adm-label">Sponsor company</label>
-            <input
-              type="text"
-              className="adm-input"
-              value={form.sponsor_company || ''}
-              onChange={(e) => set('sponsor_company')(e.target.value)}
-              placeholder="e.g. Blum North America"
-            />
-          </div>
-          <div className="adm-field full">
-            <label className="adm-label">Notes</label>
-            <textarea
-              className="adm-input"
-              style={{ fontFamily: 'inherit', minHeight: 70 }}
-              value={form.sponsor_notes || ''}
-              onChange={(e) => set('sponsor_notes')(e.target.value)}
-              placeholder="Contract dates, contact, renewal reminders."
-            />
-          </div>
-        </div>
 
-        {form.sponsor_tier && (
-          <div style={{ marginTop: 18, paddingTop: 14, borderTop: '1px solid var(--border)' }}>
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: 15, color: 'var(--text-primary)', marginBottom: 8 }}>
-              Ad placements &amp; media
-            </div>
-            <SponsorMediaEditor ownerId={form.id} tier={form.sponsor_tier} />
+        {form.account_type !== 'business' ? (
+          <div className="adm-empty" style={{ marginTop: 0 }}>
+            Sponsorship is only available to business accounts. This user is an individual.
+            {/* Admins can still change account_type if needed */}
           </div>
+        ) : (
+          <>
+            <div className="adm-form-grid">
+              <div className="adm-field">
+                <label className="adm-label">Tier</label>
+                <select
+                  className="adm-select"
+                  value={form.sponsor_tier || ''}
+                  onChange={(e) => set('sponsor_tier')(e.target.value || null)}
+                >
+                  {TIER_OPTIONS.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
+                </select>
+                <div className="adm-hint">
+                  Sets what ad slots this sponsor&apos;s media can appear in.
+                </div>
+              </div>
+              <div className="adm-field">
+                <label className="adm-label">Sponsor company (display)</label>
+                <input
+                  type="text"
+                  className="adm-input"
+                  value={form.sponsor_company || ''}
+                  onChange={(e) => set('sponsor_company')(e.target.value)}
+                  placeholder="Leave blank to use Business name"
+                />
+              </div>
+              <div className="adm-field full">
+                <label className="adm-label">Internal notes</label>
+                <textarea
+                  className="adm-input"
+                  style={{ fontFamily: 'inherit', minHeight: 70 }}
+                  value={form.sponsor_notes || ''}
+                  onChange={(e) => set('sponsor_notes')(e.target.value)}
+                  placeholder="Contract dates, contact, renewal reminders."
+                />
+              </div>
+            </div>
+
+            {form.sponsor_tier && (
+              <div style={{ marginTop: 18, paddingTop: 14, borderTop: '1px solid var(--border)' }}>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: 15, color: 'var(--text-primary)', marginBottom: 8 }}>
+                  Ad placements &amp; media
+                </div>
+                <SponsorMediaEditor ownerId={form.id} tier={form.sponsor_tier} />
+              </div>
+            )}
+          </>
         )}
       </div>
 

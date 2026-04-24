@@ -74,20 +74,42 @@ export function AuthProvider({ children }) {
     };
   }, [session?.user?.id]);
 
-  const signUp = async ({ email, password, fullName, username }) => {
+  const signUp = async ({
+    email,
+    password,
+    fullName,
+    username,
+    accountType = 'individual',     // 'individual' | 'business'
+    businessName,
+    businessWebsite,
+    businessContactEmail,
+    businessPhone,
+    businessTrade,
+    businessSize,
+  }) => {
+    const metadata = {
+      full_name: fullName,
+      preferred_username: username,
+      account_type: accountType,
+    };
+    if (accountType === 'business') {
+      metadata.business_name           = businessName || null;
+      metadata.business_website        = businessWebsite || null;
+      metadata.business_contact_email  = businessContactEmail || null;
+      metadata.business_phone          = businessPhone || null;
+      metadata.business_trade          = businessTrade || null;
+      metadata.business_size           = businessSize || null;
+    }
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: {
-        data: {
-          full_name: fullName,
-          preferred_username: username,
-        },
-      },
+      options: { data: metadata },
     });
     if (error) return { error };
-    // Profile row is auto-created by the on_auth_user_created trigger (see schema.sql).
-    // If a username was provided, patch it in.
+    // Profile row is auto-created by the on_auth_user_created trigger
+    // (see migration-business-accounts.sql), which reads everything out
+    // of the metadata block above. We patch the username as a best-effort
+    // in case the caller wanted a value that didn't survive a collision.
     if (data.user && username) {
       await supabase
         .from('profiles')

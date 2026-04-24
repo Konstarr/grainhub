@@ -205,15 +205,18 @@ export async function deleteEvent(id) {
 // Users / profiles
 // ------------------------------------------------------------
 
-export async function listProfiles({ search = '', limit = 200 } = {}) {
+export async function listProfiles({ search = '', accountType = null, limit = 200 } = {}) {
   let q = supabase
     .from('profiles')
-    .select('id, username, full_name, avatar_url, role, sponsor_tier, is_suspended, is_verified, trade, location, created_at')
+    .select('id, username, full_name, avatar_url, role, account_type, business_name, sponsor_tier, is_suspended, is_verified, trade, location, created_at')
     .order('created_at', { ascending: false })
     .limit(limit);
+  if (accountType === 'individual' || accountType === 'business') {
+    q = q.eq('account_type', accountType);
+  }
   if (search && search.trim()) {
     const s = search.trim();
-    q = q.or(`username.ilike.%${s}%,full_name.ilike.%${s}%`);
+    q = q.or(`username.ilike.%${s}%,full_name.ilike.%${s}%,business_name.ilike.%${s}%`);
   }
   const { data, error } = await q;
   return { data: data || [], error };

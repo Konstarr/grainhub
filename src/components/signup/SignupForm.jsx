@@ -13,11 +13,15 @@ import {
 export default function SignupForm() {
   const { signUp, user } = useAuth();
   const navigate = useNavigate();
-  const [currentStep, setCurrentStep] = useState(1);
+  // 'picker' step lets the user choose Individual vs Business before the form
+  const [currentStep, setCurrentStep] = useState('picker');
   const [passwordStrength, setPasswordStrength] = useState('');
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [authError, setAuthError] = useState('');
+
+  // Individual vs Business
+  const [accountType, setAccountType] = useState('individual');
 
   // Step 1 form state
   const [firstName, setFirstName] = useState('');
@@ -34,6 +38,14 @@ export default function SignupForm() {
   const [city, setCity] = useState('');
   const [state, setState] = useState('');
   const [referral, setReferral] = useState('');
+
+  // Business-only fields (only collected if accountType === 'business')
+  const [businessName, setBusinessName]           = useState('');
+  const [businessWebsite, setBusinessWebsite]     = useState('');
+  const [businessContactEmail, setBusinessContactEmail] = useState('');
+  const [businessPhone, setBusinessPhone]         = useState('');
+  const [businessTrade, setBusinessTrade]         = useState('');
+  const [businessSize, setBusinessSize]           = useState('');
 
   const checkPasswordStrength = (val) => {
     let score = 0;
@@ -78,6 +90,10 @@ export default function SignupForm() {
   // Step 2 → Step 3: actually create the account.
   const handleGoStep3 = async () => {
     setAuthError('');
+    if (accountType === 'business' && !businessName.trim()) {
+      setAuthError('Business name is required for business accounts.');
+      return;
+    }
     setSubmitting(true);
     const fullName = [firstName, lastName].filter(Boolean).join(' ').trim();
     const { error, data } = await signUp({
@@ -85,6 +101,13 @@ export default function SignupForm() {
       password,
       fullName,
       username: username.trim().toLowerCase(),
+      accountType,
+      businessName,
+      businessWebsite,
+      businessContactEmail,
+      businessPhone,
+      businessTrade,
+      businessSize,
     });
     if (error) {
       setSubmitting(false);
@@ -135,7 +158,64 @@ export default function SignupForm() {
   return (
     <div className="signup-right-panel">
       <div className="signup-form-card">
+        {/* ACCOUNT TYPE PICKER */}
+        {currentStep === 'picker' && (
+          <div className="signup-step-container active">
+            <div className="signup-form-body">
+              <div className="signup-form-header">
+                <div className="signup-free-badge">✓ Free to join</div>
+                <h2>How will you use GrainHub?</h2>
+                <p>Pick the account type that fits. You can't switch later &mdash; pick carefully.</p>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1.5rem' }}>
+                <AccountTypeCard
+                  title="Individual"
+                  tag="For makers & pros"
+                  icon="👷"
+                  bullets={[
+                    'Post in forums, ask questions',
+                    'Buy / sell in the Marketplace',
+                    'Apply to jobs, save listings',
+                    'Build your portfolio and rep',
+                  ]}
+                  selected={accountType === 'individual'}
+                  onClick={() => setAccountType('individual')}
+                />
+                <AccountTypeCard
+                  title="Business"
+                  tag="For companies & brands"
+                  icon="🏢"
+                  bullets={[
+                    'Everything in an Individual account',
+                    'List your company in Suppliers',
+                    'Post jobs + drive hiring',
+                    'Eligible for sponsorship + ads',
+                  ]}
+                  selected={accountType === 'business'}
+                  onClick={() => setAccountType('business')}
+                />
+              </div>
+
+              <div style={{ marginTop: '1.5rem', display: 'flex', justifyContent: 'flex-end' }}>
+                <button
+                  type="button"
+                  className="signup-submit-btn"
+                  onClick={() => { setCurrentStep(1); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                >
+                  Continue &rarr;
+                </button>
+              </div>
+
+              <div style={{ marginTop: '1rem', fontSize: 12.5, color: 'var(--text-muted)', textAlign: 'center' }}>
+                Already have an account? <Link to="/login" style={{ color: 'var(--wood-warm)', fontWeight: 600 }}>Log in</Link>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* STEP TABS */}
+        {currentStep !== 'picker' && (
         <div className="signup-step-tabs">
           <div className={`signup-step-tab ${currentStep === 1 ? 'active' : ''} ${currentStep > 1 ? 'done' : ''}`}>
             <div className="signup-step-num">{currentStep > 1 ? '✓' : '1'}</div>
@@ -144,7 +224,7 @@ export default function SignupForm() {
           </div>
           <div className={`signup-step-tab ${currentStep === 2 ? 'active' : ''} ${currentStep > 2 ? 'done' : ''}`}>
             <div className="signup-step-num">{currentStep > 2 ? '✓' : '2'}</div>
-            <span>Your Shop</span>
+            <span>{accountType === 'business' ? 'Your Business' : 'Your Shop'}</span>
             <div className="signup-step-connector"></div>
           </div>
           <div className={`signup-step-tab ${currentStep === 3 ? 'active' : ''}`}>
@@ -152,6 +232,37 @@ export default function SignupForm() {
             <span>Done</span>
           </div>
         </div>
+        )}
+
+        {/* Account type strip + change link, visible while filling out steps */}
+        {currentStep !== 'picker' && currentStep !== 3 && (
+          <div style={{
+            background: 'var(--wood-cream, #FBF6EC)',
+            padding: '0.55rem 0.9rem',
+            borderRadius: 8,
+            fontSize: 12.5,
+            color: 'var(--text-secondary)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            margin: '0 0 1rem',
+          }}>
+            <span>
+              Creating a <strong style={{ textTransform: 'capitalize', color: 'var(--text-primary)' }}>{accountType}</strong> account
+              {accountType === 'business' ? ' — includes sponsorship eligibility' : ''}
+            </span>
+            <button
+              type="button"
+              onClick={() => setCurrentStep('picker')}
+              style={{
+                background: 'transparent', border: 0, cursor: 'pointer',
+                color: 'var(--wood-warm)', fontWeight: 600, fontSize: 12.5,
+              }}
+            >
+              Change
+            </button>
+          </div>
+        )}
 
         {/* STEP 1 */}
         {currentStep === 1 && (
@@ -342,12 +453,26 @@ export default function SignupForm() {
           <div className="signup-step-container active">
             <div className="signup-form-body">
               <div className="signup-form-header">
-                <h2>Tell us about your shop</h2>
+                <h2>{accountType === 'business' ? 'Tell us about your business' : 'Tell us about your shop'}</h2>
                 <p>
-                  This helps us show you the most relevant content and connect you with the right
-                  people. You can always update this later.
+                  {accountType === 'business'
+                    ? 'Business accounts unlock sponsorship eligibility, job posting, and marketplace listings. You can update any of this later.'
+                    : 'This helps us show you the most relevant content and connect you with the right people. You can always update this later.'}
                 </p>
               </div>
+
+              {accountType === 'business' && (
+                <div style={{ marginBottom: '1.25rem' }}>
+                  <BusinessFields
+                    businessName={businessName} setBusinessName={setBusinessName}
+                    businessWebsite={businessWebsite} setBusinessWebsite={setBusinessWebsite}
+                    businessContactEmail={businessContactEmail} setBusinessContactEmail={setBusinessContactEmail}
+                    businessPhone={businessPhone} setBusinessPhone={setBusinessPhone}
+                    businessTrade={businessTrade} setBusinessTrade={setBusinessTrade}
+                    businessSize={businessSize} setBusinessSize={setBusinessSize}
+                  />
+                </div>
+              )}
 
               <div className="signup-form-grid">
                 <div className="signup-field">
@@ -598,6 +723,147 @@ export default function SignupForm() {
             </div>
           </div>
         )}
+      </div>
+    </div>
+  );
+}
+
+/* Account type selector card used on the picker step. */
+function AccountTypeCard({ title, tag, icon, bullets, selected, onClick }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      style={{
+        textAlign: 'left',
+        background: selected ? 'var(--wood-cream, #FBF6EC)' : 'var(--white)',
+        border: '2px solid ' + (selected ? 'var(--wood-warm, #8a5030)' : 'var(--border)'),
+        borderRadius: 14,
+        padding: '1.1rem 1.15rem',
+        cursor: 'pointer',
+        transition: 'border-color 120ms, background 120ms, transform 100ms',
+        fontFamily: 'inherit',
+        boxShadow: selected ? '0 4px 12px rgba(138, 80, 48, 0.12)' : 'none',
+      }}
+      onMouseEnter={(e) => { if (!selected) e.currentTarget.style.borderColor = 'var(--wood-warm)'; }}
+      onMouseLeave={(e) => { if (!selected) e.currentTarget.style.borderColor = 'var(--border)'; }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
+        <div style={{ fontSize: 22 }}>{icon}</div>
+        <div>
+          <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: 18, color: 'var(--text-primary)', lineHeight: 1.1 }}>
+            {title}
+          </div>
+          <div style={{ fontSize: 11, color: 'var(--text-muted)', letterSpacing: '0.05em', textTransform: 'uppercase', fontWeight: 600, marginTop: 2 }}>
+            {tag}
+          </div>
+        </div>
+        {selected && (
+          <div style={{
+            marginLeft: 'auto',
+            width: 20, height: 20, borderRadius: '50%',
+            background: 'var(--wood-warm)', color: '#fff',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 12, fontWeight: 700,
+          }}>✓</div>
+        )}
+      </div>
+      <ul style={{ margin: '0.4rem 0 0', padding: '0 0 0 1rem', listStyle: 'disc', color: 'var(--text-secondary)', fontSize: 13, lineHeight: 1.55 }}>
+        {bullets.map((b, i) => <li key={i}>{b}</li>)}
+      </ul>
+    </button>
+  );
+}
+
+/* Inline business-fields block used inside step 2 when accountType === 'business'. */
+export function BusinessFields({
+  businessName, setBusinessName,
+  businessWebsite, setBusinessWebsite,
+  businessContactEmail, setBusinessContactEmail,
+  businessPhone, setBusinessPhone,
+  businessTrade, setBusinessTrade,
+  businessSize, setBusinessSize,
+}) {
+  return (
+    <div style={{ display: 'grid', gap: 12 }}>
+      <div className="signup-field-row">
+        <div className="signup-field">
+          <label className="signup-field-label">
+            Business Name <span className="required">*</span>
+          </label>
+          <input
+            className="signup-field-input"
+            type="text"
+            placeholder="Acme Millwork LLC"
+            value={businessName}
+            onChange={(e) => setBusinessName(e.target.value)}
+          />
+        </div>
+        <div className="signup-field">
+          <label className="signup-field-label">Website</label>
+          <input
+            className="signup-field-input"
+            type="text"
+            placeholder="https://…"
+            value={businessWebsite}
+            onChange={(e) => setBusinessWebsite(e.target.value)}
+          />
+        </div>
+      </div>
+      <div className="signup-field-row">
+        <div className="signup-field">
+          <label className="signup-field-label">Contact email (if different)</label>
+          <input
+            className="signup-field-input"
+            type="email"
+            placeholder="hello@yourcompany.com"
+            value={businessContactEmail}
+            onChange={(e) => setBusinessContactEmail(e.target.value)}
+          />
+        </div>
+        <div className="signup-field">
+          <label className="signup-field-label">Phone</label>
+          <input
+            className="signup-field-input"
+            type="tel"
+            placeholder="(555) 123-4567"
+            value={businessPhone}
+            onChange={(e) => setBusinessPhone(e.target.value)}
+          />
+        </div>
+      </div>
+      <div className="signup-field-row">
+        <div className="signup-field">
+          <label className="signup-field-label">Primary trade</label>
+          <select
+            className="signup-field-input"
+            value={businessTrade}
+            onChange={(e) => setBusinessTrade(e.target.value)}
+          >
+            <option value="">Select…</option>
+            <option value="Cabinetmaking">Cabinetmaking</option>
+            <option value="Millwork">Millwork</option>
+            <option value="Flooring">Flooring</option>
+            <option value="Finishing">Finishing</option>
+            <option value="CNC">CNC / Tooling</option>
+            <option value="Supply / Distribution">Supply / Distribution</option>
+            <option value="General">General</option>
+          </select>
+        </div>
+        <div className="signup-field">
+          <label className="signup-field-label">Company size</label>
+          <select
+            className="signup-field-input"
+            value={businessSize}
+            onChange={(e) => setBusinessSize(e.target.value)}
+          >
+            <option value="">Select…</option>
+            <option value="1-9">1 – 9</option>
+            <option value="10-49">10 – 49</option>
+            <option value="50-249">50 – 249</option>
+            <option value="250+">250+</option>
+          </select>
+        </div>
       </div>
     </div>
   );
