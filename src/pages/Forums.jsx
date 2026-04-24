@@ -103,6 +103,7 @@ function toActivityItem(row) {
 export default function Forums() {
   const [searchParams] = useSearchParams();
   const trade = searchParams.get('trade') || '';
+  const navGroup = searchParams.get('group') || '';   // SecondaryNav group pill
   const view = searchParams.get('view') || '';
   const { user, isAuthed } = useAuth();
 
@@ -198,7 +199,10 @@ export default function Forums() {
   const viewEmpty = VIEW_EMPTIES[view] || VIEW_EMPTIES[''];
 
   const groupsWithLive = useMemo(() => {
-    return FORUM_GROUPS.map((g) => {
+    const source = navGroup
+      ? FORUM_GROUPS.filter((g) => g.id === navGroup)
+      : FORUM_GROUPS;
+    return source.map((g) => {
       let groupPosts = 0;
       const categories = g.categories.map((c) => {
         const live = catCounts.get(c.id);
@@ -215,7 +219,7 @@ export default function Forums() {
         categories,
       };
     });
-  }, [catCounts]);
+  }, [catCounts, navGroup]);
 
   return (
     <>

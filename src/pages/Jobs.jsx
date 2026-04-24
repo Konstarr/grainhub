@@ -160,7 +160,8 @@ function rolePillsWithCounts(rows, pills) {
 
 export default function Jobs() {
   const [searchParams] = useSearchParams();
-  const tradeSlug = searchParams.get('trade') || '';
+  // The site-wide SecondaryNav on /jobs uses ?role=<keyword>.
+  const navRoleKeyword = searchParams.get('role') || '';
 
   const [activeRole, setActiveRole] = useState('All Roles');
   const [keyword, setKeyword]       = useState('');
@@ -172,18 +173,17 @@ export default function Jobs() {
   const { data: rows } = useSupabaseList('jobs', {
     filter: (q) => {
       let out = q.eq('is_approved', true).eq('is_filled', false);
-      // Trade slug from the site-wide SecondaryNav. Jobs store a
-      // human-readable trade string; the slug on the nav is kebab-case,
-      // so we match loosely against the stored value.
-      if (tradeSlug) {
-        const tradeTerm = tradeSlug.replace(/-/g, ' ');
-        out = out.or(`trade.ilike.%${tradeTerm}%,title.ilike.%${tradeTerm}%,description.ilike.%${tradeTerm}%`);
+      // Role keyword from the site-wide SecondaryNav (?role=cabinet%20maker
+      // etc.) — loose match against title + description.
+      if (navRoleKeyword) {
+        const kw = navRoleKeyword.trim();
+        out = out.or(`title.ilike.%${kw}%,description.ilike.%${kw}%`);
       }
       return out;
     },
     order: { column: 'posted_at', ascending: false },
     limit: 200,
-    deps: [tradeSlug],
+    deps: [navRoleKeyword],
   });
 
   // Live counts, re-derived whenever rows change

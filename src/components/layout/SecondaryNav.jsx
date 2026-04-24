@@ -48,13 +48,46 @@ const EVENT_TYPES = [
   { label: 'Webinars',     value: 'webinar' },
 ];
 
+/** Forum top-level groups — drives ?group= on /forums. */
+const FORUM_GROUP_PILLS = [
+  { label: 'Trade Skills',      value: 'trade-skills' },
+  { label: 'Machines & Tech',   value: 'machines-tech' },
+  { label: 'Running a Shop',    value: 'running-shop' },
+  { label: 'Wood & Materials',  value: 'wood-materials' },
+  { label: 'Community',         value: 'community' },
+];
+
+/** Job role pills — drives ?role= on /jobs. */
+const JOB_ROLE_PILLS = [
+  { label: 'Cabinet Maker',      value: 'cabinet maker' },
+  { label: 'CNC Operator',       value: 'cnc' },
+  { label: 'Estimator',          value: 'estimator' },
+  { label: 'Finishing Tech',     value: 'finish' },
+  { label: 'Shop Foreman',       value: 'foreman' },
+  { label: 'Millwork Installer', value: 'install' },
+  { label: 'Design / Drafting',  value: 'design' },
+  { label: 'Apprentice',         value: 'apprentice' },
+];
+
+/** Supplier category pills — drives ?category= on /suppliers (matches
+ *  the SUPPLIER_CATEGORIES ids from data/suppliersData.js). */
+const SUPPLIER_CATEGORY_PILLS = [
+  { label: 'Hardware',    value: 'hardware' },
+  { label: 'Lumber',      value: 'lumber' },
+  { label: 'Sheet Goods', value: 'sheet' },
+  { label: 'Finishing',   value: 'finishing' },
+  { label: 'CNC',         value: 'cnc' },
+  { label: 'Tooling',     value: 'tooling' },
+  { label: 'Edge Banding', value: 'edgebanding' },
+];
+
 /** Resolve the right bar config for the current path. Null = hide. */
 function resolveConfig(pathname) {
   if (pathname === '/')             return { mode: 'links', items: LINKS_HOME };
-  if (pathname === '/forums')       return { mode: 'trade' };
-  if (pathname === '/suppliers')    return { mode: 'trade' };
+  if (pathname === '/forums')       return { mode: 'pills', param: 'group',    items: FORUM_GROUP_PILLS };
+  if (pathname === '/jobs')         return { mode: 'pills', param: 'role',     items: JOB_ROLE_PILLS };
+  if (pathname === '/suppliers')    return { mode: 'pills', param: 'category', items: SUPPLIER_CATEGORY_PILLS };
   if (pathname === '/marketplace')  return { mode: 'trade' };
-  if (pathname === '/jobs')         return { mode: 'trade' };
   if (pathname === '/news')         return { mode: 'pills', param: 'category', items: NEWS_CATEGORIES.map((v) => ({ label: v, value: v })) };
   if (pathname === '/wiki')         return { mode: 'pills', param: 'category', items: WIKI_CATEGORIES.map((v) => ({ label: v, value: v })) };
   if (pathname === '/events')       return { mode: 'pills', param: 'type',     items: EVENT_TYPES };

@@ -1,5 +1,6 @@
 import '../styles/suppliers.css';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import SupplierTable from '../components/suppliers/SupplierTable.jsx';
 import SuppliersMap from '../components/suppliers/SuppliersMap.jsx';
 import { SUPPLIERS_HEADER, SUPPLIER_CATEGORIES } from '../data/suppliersData.js';
@@ -8,8 +9,16 @@ import { mapSupplierRow } from '../lib/mappers.js';
 import { SponsorSidebar } from '../components/sponsors/AdSlot.jsx';
 
 export default function Suppliers() {
+  const [searchParams] = useSearchParams();
+  const navCategory = searchParams.get('category') || '';
+
   const [activeCategory, setActiveCategory] = useState('');
   const [showMap, setShowMap] = useState(false);
+
+  // Mirror the secondary-nav ?category= into the in-page active category.
+  useEffect(() => {
+    setActiveCategory(navCategory);
+  }, [navCategory]);
 
   const { data: rows } = useSupabaseList('suppliers', {
     filter: (q) => q.eq('is_approved', true),
