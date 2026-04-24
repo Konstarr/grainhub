@@ -259,5 +259,16 @@ export default function Forums() {
           </div>
         </div>
 
+
         <aside className="right-col">
-          <SponsorSideba
+          <SponsorSidebar />
+          <ForumStats stats={liveStats} />
+          <TopContributors contributors={liveContribs} />
+          <ForumGuidelines guidelines={FORUM_GUIDELINES} />
+          <ThreadLegend items={THREAD_LEGEND} />
+          <SponsorCard />
+        </aside>
+      </div>
+    </>
+  );
+}
