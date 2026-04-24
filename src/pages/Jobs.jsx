@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import '../styles/jobs.css';
 import JobsPageHeader from '../components/jobs/JobsPageHeader.jsx';
 import JobsSearchHero from '../components/jobs/JobsSearchHero.jsx';
@@ -158,6 +159,9 @@ function rolePillsWithCounts(rows, pills) {
 }
 
 export default function Jobs() {
+  const [searchParams] = useSearchParams();
+  const tradeSlug = searchParams.get('trade') || '';
+
   const [activeRole, setActiveRole] = useState('All Roles');
   const [keyword, setKeyword]       = useState('');
   const [locationQ, setLocationQ]   = useState('');
@@ -166,9 +170,20 @@ export default function Jobs() {
   const [filters, setFilters]       = useState(EMPTY_FILTERS);
 
   const { data: rows } = useSupabaseList('jobs', {
-    filter: (q) => q.eq('is_approved', true).eq('is_filled', false),
+    filter: (q) => {
+      let out = q.eq('is_approved', true).eq('is_filled', false);
+      // Trade slug from the site-wide SecondaryNav. Jobs store a
+      // human-readable trade string; the slug on the nav is kebab-case,
+      // so we match loosely against the stored value.
+      if (tradeSlug) {
+        const tradeTerm = tradeSlug.replace(/-/g, ' ');
+        out = out.or(`trade.ilike.%${tradeTerm}%,title.ilike.%${tradeTerm}%,description.ilike.%${tradeTerm}%`);
+      }
+      return out;
+    },
     order: { column: 'posted_at', ascending: false },
     limit: 200,
+    deps: [tradeSlug],
   });
 
   // Live counts, re-derived whenever rows change

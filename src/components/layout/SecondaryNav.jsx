@@ -53,6 +53,8 @@ function resolveConfig(pathname) {
   if (pathname === '/')             return { mode: 'links', items: LINKS_HOME };
   if (pathname === '/forums')       return { mode: 'trade' };
   if (pathname === '/suppliers')    return { mode: 'trade' };
+  if (pathname === '/marketplace')  return { mode: 'trade' };
+  if (pathname === '/jobs')         return { mode: 'trade' };
   if (pathname === '/news')         return { mode: 'pills', param: 'category', items: NEWS_CATEGORIES.map((v) => ({ label: v, value: v })) };
   if (pathname === '/wiki')         return { mode: 'pills', param: 'category', items: WIKI_CATEGORIES.map((v) => ({ label: v, value: v })) };
   if (pathname === '/events')       return { mode: 'pills', param: 'type',     items: EVENT_TYPES };

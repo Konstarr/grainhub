@@ -1,5 +1,6 @@
 import '../styles/marketplace.css';
 import { useMemo, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import CategoryHighway from '../components/marketplace/CategoryHighway.jsx';
 import FilterSidebar from '../components/marketplace/FilterSidebar.jsx';
 import ListingsArea from '../components/marketplace/ListingsArea.jsx';
@@ -126,6 +127,9 @@ function toListingCard(row) {
 }
 
 export default function Marketplace() {
+  const [searchParams] = useSearchParams();
+  const tradeSlug = searchParams.get('trade') || '';
+
   const [activeCategory, setActiveCategory] = useState('all');
   const [filters, setFilters] = useState(DEFAULT_FILTERS);
   const [sortMode, setSortMode] = useState('newest');
@@ -136,9 +140,20 @@ export default function Marketplace() {
   const listingsRef = useRef(null);
 
   const { data: rows } = useSupabaseList('marketplace_listings', {
-    filter: (q) => q.eq('is_approved', true).eq('is_sold', false),
+    filter: (q) => {
+      let out = q.eq('is_approved', true).eq('is_sold', false);
+      // Trade slug from the site-wide SecondaryNav. Marketplace rows
+      // have a `trade` string column; fall back to a title/desc search
+      // so the filter still narrows usefully on older listings.
+      if (tradeSlug) {
+        const tradeTerm = tradeSlug.replace(/-/g, ' ');
+        out = out.or(`trade.ilike.%${tradeTerm}%,title.ilike.%${tradeTerm}%,description.ilike.%${tradeTerm}%`);
+      }
+      return out;
+    },
     order: { column: 'created_at', ascending: false },
     limit: 200,
+    deps: [tradeSlug],
   });
 
   const allListings = useMemo(() => rows.map(toListingCard), [rows]);
