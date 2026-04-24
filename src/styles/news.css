@@ -1,7 +1,7 @@
 /* ── PAGE HEADER ── */
 .page-header {
   background: var(--wood-dark);
-  padding: 3rem 2.5rem 2.5rem;
+  padding: 3.5rem 2.5rem 3rem; /* unified with Jobs/Marketplace/Suppliers/Events */
   position: relative;
   overflow: hidden;
 }
