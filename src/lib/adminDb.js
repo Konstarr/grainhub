@@ -23,15 +23,41 @@ function slugify(title) {
 // ------------------------------------------------------------
 
 export async function listNewsArticles({ search = '', limit = 200 } = {}) {
+  // Pull enough metadata to power the admin list + stats:
+  //   view_count, updated_at (requires migration-news-updated-at.sql),
+  //   plus the author profile via FK embed. Falls back gracefully if
+  //   updated_at / view_count columns don't exist yet.
+  const fullSelect =
+    'id, title, slug, category, trade, excerpt, cover_image_url, is_published, ' +
+    'published_at, created_at, updated_at, view_count, author_id, ' +
+    'author:author_id(id, username, full_name, avatar_url)';
+
   let q = supabase
     .from('news_articles')
-    .select('id, title, slug, category, trade, excerpt, cover_image_url, is_published, published_at, created_at, author_id')
+    .select(fullSelect)
     .order('created_at', { ascending: false })
     .limit(limit);
   if (search && search.trim()) {
     q = q.ilike('title', '%' + search.trim() + '%');
   }
-  const { data, error } = await q;
+  let { data, error } = await q;
+
+  // Fallback if the DB doesn't have the newer columns yet.
+  if (error) {
+    let fb = supabase
+      .from('news_articles')
+      .select(
+        'id, title, slug, category, trade, excerpt, cover_image_url, ' +
+        'is_published, published_at, created_at, author_id'
+      )
+      .order('created_at', { ascending: false })
+      .limit(limit);
+    if (search && search.trim()) fb = fb.ilike('title', '%' + search.trim() + '%');
+    const res = await fb;
+    data = res.data || [];
+    error = res.error || null;
+  }
+
   return { data: data || [], error };
 }
 
