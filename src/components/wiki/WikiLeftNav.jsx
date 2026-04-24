@@ -1,42 +1,23 @@
-import { useState, useMemo } from 'react';
-import { Link } from 'react-router-dom';
-import { BROWSE_BY_CATEGORY } from '../../data/wikiData.js';
+import { useMemo, useState } from 'react';
 
 /**
- * Left-hand category nav for the Wiki index. Sticky, scrollable, with each
- * category collapsible to reveal sub-articles. Filter input narrows the list
- * by category name or any article within it.
+ * Left rail for the Wiki. Categories are derived from real DB articles via
+ * the `categories` prop (each item is { name, count }). Clicking a category
+ * lifts the filter up to the page so the main grid re-renders.
  */
-export default function WikiLeftNav() {
-  // Default: first category expanded so new users see the pattern immediately.
-  const [open, setOpen] = useState(
-    () => new Set([BROWSE_BY_CATEGORY[0]?.name].filter(Boolean))
-  );
+export default function WikiLeftNav({ categories = [], activeCategory = 'All', onSelect }) {
   const [query, setQuery] = useState('');
 
-  const toggle = (name) => {
-    setOpen((prev) => {
-      const next = new Set(prev);
-      if (next.has(name)) next.delete(name);
-      else next.add(name);
-      return next;
-    });
-  };
-
-  // Filter: match category name OR any article title inside it.
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return BROWSE_BY_CATEGORY;
-    return BROWSE_BY_CATEGORY.filter((cat) => {
-      if (cat.name.toLowerCase().includes(q)) return true;
-      return cat.articles.some((a) => a.toLowerCase().includes(q));
-    });
-  }, [query]);
+    if (!q) return categories;
+    return categories.filter((c) => c.name.toLowerCase().includes(q));
+  }, [query, categories]);
 
-  // When filtering, auto-expand all matches so the user sees the hits.
-  const effectiveOpen = query.trim()
-    ? new Set(filtered.map((c) => c.name))
-    : open;
+  const totalCount = useMemo(
+    () => categories.reduce((sum, c) => sum + (c.count || 0), 0),
+    [categories]
+  );
 
   return (
     <aside className="wiki-left-nav">
@@ -52,36 +33,38 @@ export default function WikiLeftNav() {
       </div>
 
       <nav className="wln-list">
-        {filtered.length === 0 && (
-          <div className="wln-empty">No matches. Try a different term.</div>
+        <button
+          type="button"
+          className={'wln-cat-toggle ' + (activeCategory === 'All' ? 'open' : '')}
+          onClick={() => onSelect && onSelect('All')}
+          style={{ width: '100%' }}
+        >
+          <span className="wln-cat-icon">📚</span>
+          <span className="wln-cat-name">All Articles</span>
+          <span className="wln-cat-chev">{totalCount}</span>
+        </button>
+
+        {filtered.length === 0 && categories.length > 0 && (
+          <div className="wln-empty">No matches.</div>
         )}
+        {categories.length === 0 && (
+          <div className="wln-empty">Loading categories…</div>
+        )}
+
         {filtered.map((cat) => {
-          const isOpen = effectiveOpen.has(cat.name);
+          const isActive = activeCategory === cat.name;
           return (
-            <div key={cat.name} className="wln-cat">
-              <button
-                type="button"
-                className={`wln-cat-toggle ${isOpen ? 'open' : ''}`}
-                onClick={() => toggle(cat.name)}
-                aria-expanded={isOpen}
-              >
-                <span className="wln-cat-icon">{cat.icon}</span>
-                <span className="wln-cat-name">{cat.name}</span>
-                <span className="wln-cat-chev">{isOpen ? '−' : '+'}</span>
-              </button>
-              {isOpen && (
-                <ul className="wln-cat-subs">
-                  {cat.articles.map((article) => (
-                    <li key={article}>
-                      <Link to="/wiki/article" className="wln-sub-link">
-                        {article}
-                      </Link>
-                    </li>
-                  ))}
-                  <li className="wln-cat-count">{cat.count}</li>
-                </ul>
-              )}
-            </div>
+            <button
+              key={cat.name}
+              type="button"
+              className={'wln-cat-toggle ' + (isActive ? 'open' : '')}
+              onClick={() => onSelect && onSelect(cat.name)}
+              style={{ width: '100%' }}
+            >
+              <span className="wln-cat-icon">•</span>
+              <span className="wln-cat-name">{cat.name}</span>
+              <span className="wln-cat-chev">{cat.count}</span>
+            </button>
           );
         })}
       </nav>

@@ -1,23 +1,29 @@
 import { Link } from 'react-router-dom';
-import { FEATURED_ARTICLE } from '../../data/wikiData.js';
 
-export default function FeaturedArticle() {
+/**
+ * Featured article hero card. If an article prop is provided (from Supabase),
+ * render it as the feature. Otherwise render a static placeholder.
+ */
+export default function FeaturedArticle({ article }) {
+  if (!article) return null;
+
+  const bg = article.coverImage
+    ? 'url("' + article.coverImage + '") center/cover no-repeat, ' + article.imgGradient
+    : article.imgGradient;
+
+  const to = article.slug ? '/wiki/article/' + article.slug : '/wiki/article';
+
   return (
-    <Link to="/wiki/article" className="featured-article">
-      <div className="fa-img" style={{ background: 'linear-gradient(135deg,#1C0E05,#3D2010,#6B3820)' }}>
+    <Link to={to} className="featured-article">
+      <div className="fa-img" style={{ background: bg }}>
         <div className="fa-badge">⭐ Featured Article</div>
       </div>
       <div className="fa-body">
-        <div className="fa-cat">{FEATURED_ARTICLE.category}</div>
-        <div className="fa-title">{FEATURED_ARTICLE.title}</div>
-        <div className="fa-excerpt">{FEATURED_ARTICLE.excerpt}</div>
+        <div className="fa-cat">{article.category}</div>
+        <div className="fa-title">{article.title}</div>
+        {article.excerpt && <div className="fa-excerpt">{article.excerpt}</div>}
         <div className="fa-meta">
-          <div className="fa-rating">
-            <span className="fa-stars">★★★★★</span>
-            <span>{FEATURED_ARTICLE.rating} · {FEATURED_ARTICLE.ratingCount} ratings</span>
-          </div>
-          <span>{FEATURED_ARTICLE.monthlyViews} monthly views</span>
-          <span>Last edited {FEATURED_ARTICLE.lastEdited}</span>
+          {article.readTime && <span>{article.readTime}</span>}
           <span className="read-more">Read Article →</span>
         </div>
       </div>

@@ -1,13 +1,11 @@
+import { useMemo, useRef, useState } from 'react';
 import '../styles/wiki.css';
 import WikiHero from '../components/wiki/WikiHero.jsx';
-import FeaturedArticle from '../components/wiki/FeaturedArticle.jsx';
-import RecentlyUpdated from '../components/wiki/RecentlyUpdated.jsx';
-import BrowseByCategory from '../components/wiki/BrowseByCategory.jsx';
-import SpeciesDirectory from '../components/wiki/SpeciesDirectory.jsx';
-import RecentEdits from '../components/wiki/RecentEdits.jsx';
-import ContributeCTA from '../components/wiki/ContributeCTA.jsx';
-import WikiSidebar from '../components/wiki/WikiSidebar.jsx';
 import WikiLeftNav from '../components/wiki/WikiLeftNav.jsx';
+import WikiSidebar from '../components/wiki/WikiSidebar.jsx';
+import FeaturedArticle from '../components/wiki/FeaturedArticle.jsx';
+import WikiArticleGrid from '../components/wiki/WikiArticleGrid.jsx';
+import ContributeCTA from '../components/wiki/ContributeCTA.jsx';
 import { useSupabaseList } from '../hooks/useSupabaseList.js';
 import { mapWikiRow } from '../lib/mappers.js';
 
@@ -30,36 +28,96 @@ function toWikiCard(row) {
   const m = mapWikiRow(row);
   return {
     id: m.id,
+    slug: m.slug,
     category: m.category || 'Reference',
     title: m.title,
+    excerpt: m.excerpt,
+    coverImage: m.coverImage,
     imgGradient: gradientForSlug(m.slug || m.title || ''),
-    badge: { label: 'Updated', variant: 'new' },
-    rating: '4.8',
-    views: m.readTime || 'Reference',
+    readTime: m.readTime || '',
+    updatedAt: row.updated_at,
   };
 }
 
 export default function Wiki() {
-  const { data: rows } = useSupabaseList('wiki_articles', {
+  const { data: rows, loading } = useSupabaseList('wiki_articles', {
     filter: (q) => q.eq('is_published', true),
     order: { column: 'updated_at', ascending: false },
-    limit: 8,
+    limit: 500,
   });
-  const recent = rows.map(toWikiCard);
+
+  const articles = useMemo(() => rows.map(toWikiCard), [rows]);
+
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeCategory, setActiveCategory] = useState('All');
+
+  // Build category list from real article data
+  const categories = useMemo(() => {
+    const map = new Map();
+    articles.forEach((a) => {
+      const k = a.category || 'Reference';
+      map.set(k, (map.get(k) || 0) + 1);
+    });
+    return Array.from(map.entries())
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count);
+  }, [articles]);
+
+  // Apply filters
+  const filtered = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    return articles.filter((a) => {
+      if (activeCategory !== 'All' && a.category !== activeCategory) return false;
+      if (q) {
+        const hay = (a.title + ' ' + (a.excerpt || '') + ' ' + a.category).toLowerCase();
+        if (hay.includes(q) === false) return false;
+      }
+      return true;
+    });
+  }, [articles, searchQuery, activeCategory]);
+
+  const featured = articles[0] || null;
+  const gridArticles = featured ? filtered.filter((a) => a.id !== featured.id) : filtered;
+
+  const resultsRef = useRef(null);
+  const scrollToResults = () => {
+    if (resultsRef.current) {
+      resultsRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
 
   return (
     <>
-      <WikiHero />
+      <WikiHero
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        onSearchSubmit={scrollToResults}
+      />
 
       <div className="wiki-grid">
-        <WikiLeftNav />
+        <WikiLeftNav
+          categories={categories}
+          activeCategory={activeCategory}
+          onSelect={(name) => { setActiveCategory(name); scrollToResults(); }}
+        />
 
-        <div className="wiki-content">
-          <FeaturedArticle />
-          <RecentlyUpdated articles={recent} />
-          <BrowseByCategory />
-          <SpeciesDirectory />
-          <RecentEdits />
+        <div className="wiki-content" ref={resultsRef}>
+          {featured && activeCategory === 'All' && searchQuery.trim() === '' && (
+            <FeaturedArticle article={featured} />
+          )}
+
+          <WikiArticleGrid
+            articles={gridArticles}
+            loading={loading}
+            title={
+              searchQuery.trim()
+                ? 'Search results for "' + searchQuery.trim() + '"'
+                : (activeCategory === 'All' ? 'All Articles' : activeCategory)
+            }
+            count={gridArticles.length}
+            totalCount={articles.length}
+          />
+
           <ContributeCTA />
         </div>
 

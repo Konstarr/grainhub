@@ -45,6 +45,14 @@ export default function App() {
             }
           />
           <Route
+            path="/wiki/article/:slug"
+            element={
+              <RequireAuth>
+                <WikiArticle />
+              </RequireAuth>
+            }
+          />
+          <Route
             path="/wiki/article"
             element={
               <RequireAuth>
