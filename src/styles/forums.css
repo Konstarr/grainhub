@@ -195,21 +195,25 @@
 }
 
 /* 3-column variant used on /forums: left sidebar + feed + right rail.
-   The feed column needs enough room to breathe (forum cards were
-   designed for ~700px+), so left rail is lean and right rail drops
-   first on narrow viewports. */
-.main-wrap-3col {
-  grid-template-columns: 220px minmax(0, 1fr) 300px;
-  gap: 1.5rem;
-  max-width: 1440px;
+   Selector doubles the class (`.main-wrap.main-wrap-3col`) so we
+   outrank the `.main-wrap` rule in global.css that would otherwise
+   win the cascade and force a 2-column grid. Small right rail per
+   user request. */
+.main-wrap.main-wrap-3col {
+  grid-template-columns: 220px minmax(0, 1fr) 240px !important;
+  gap: 1.25rem !important;
+  max-width: 1440px !important;
+  padding: 2rem 2rem !important;
 }
 @media (max-width: 1180px) {
-  .main-wrap-3col { grid-template-columns: 220px minmax(0, 1fr); gap: 1.25rem; }
-  .main-wrap-3col .right-col { display: none; }
+  .main-wrap.main-wrap-3col {
+    grid-template-columns: 220px minmax(0, 1fr) !important;
+  }
+  .main-wrap.main-wrap-3col .right-col { display: none; }
 }
 @media (max-width: 820px) {
-  .main-wrap-3col { grid-template-columns: 1fr; }
-  .main-wrap-3col .fs-sidebar { display: none; }
+  .main-wrap.main-wrap-3col { grid-template-columns: 1fr !important; }
+  .main-wrap.main-wrap-3col .fs-sidebar { display: none; }
 }
 
 /* ── Left sidebar — one clean card that looks intentional ── */
