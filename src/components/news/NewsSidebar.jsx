@@ -33,7 +33,10 @@ function trendingScore(article) {
   const publishedAt = article.published_at ? new Date(article.published_at).getTime() : 0;
   const ageMs = Math.max(0, Date.now() - publishedAt);
   const ageHours = ageMs / (1000 * 60 * 60);
-  const gravity = 1.5;
+  // Gravity 1.2 (softer than classic HN 1.5) so view_count has more
+  // weight relative to age — a week-old article with real traction
+  // can still beat a brand-new zero-view one.
+  const gravity = 1.2;
   return (Number(article.view_count || 0) + 1) / Math.pow(ageHours + 2, gravity);
 }
 
@@ -88,6 +91,9 @@ function TrendingCard() {
             <div className="ti-num">{idx + 1}</div>
             <div style={{ minWidth: 0, flex: 1 }}>
               <div className="ti-title">{a.title}</div>
+              <div className="ti-meta">
+                {(a.view_count || 0).toLocaleString()} {(a.view_count || 0) === 1 ? 'view' : 'views'}
+              </div>
             </div>
           </Link>
         ))}

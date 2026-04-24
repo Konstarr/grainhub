@@ -427,7 +427,12 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
-.ti-meta { display: none; }
+.ti-meta {
+  font-size: 10.5px;
+  color: var(--text-muted);
+  margin-top: 2px;
+  letter-spacing: 0.2px;
+}
 
 .forum-thread-item {
   display: block;
