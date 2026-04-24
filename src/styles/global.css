@@ -505,7 +505,7 @@ nav.site-nav {
   position: absolute;
   inset: 0;
   z-index: 0;
-  background-image: url('https://images.unsplash.com/photo-1572297870735-1fb8b5acfc99?q=80&w=2000&auto=format&fit=crop');
+  background-image: url('https://ozjtreaqyxlgsmopvwif.supabase.co/storage/v1/object/public/media/homepage/museums-victoria-U01ptiZV3Uo-unsplash.jpg');
   background-size: cover;
   background-position: center;
   filter: saturate(0.85) contrast(1.05);
