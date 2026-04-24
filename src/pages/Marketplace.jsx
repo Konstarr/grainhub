@@ -31,12 +31,16 @@ const EMOJI_BY_CAT = {
 };
 
 const DEFAULT_FILTERS = {
+  categories: [],
   conditions: ['New', 'Excellent', 'Good', 'Fair'],
   priceMin: '',
   priceMax: '',
+  listingTypes: [],
+  locations: [],
+  timeframe: '',
 };
 
-const CATEGORY_PATTERN = {
+const HIGHWAY_PATTERN = {
   'all': () => true,
   'machinery': (c) => /machin|cnc|edgeband|moulder|saw|sander|dust|combin/i.test(c),
   'lumber': (c) => /lumber/i.test(c),
@@ -49,8 +53,42 @@ const CATEGORY_PATTERN = {
   'surplus': (c) => /surplus|closeout/i.test(c),
 };
 
+const SIDEBAR_CAT_LABEL_PATTERN = {
+  'Machinery': /machin|cnc|edgeband|moulder|saw|sander|dust|combin|panel/i,
+  'Lumber & Hardwood': /lumber|hardwood/i,
+  'Sheet Goods': /sheet/i,
+  'Hardware': /hardware/i,
+  'Finishing & Coatings': /finish|coat/i,
+  'Tooling & Bits': /tool|bit/i,
+  'Vehicles & Trailers': /vehicle|trailer|truck/i,
+  'Shop & Office': /shop|office|fixture/i,
+  'Surplus & Closeout': /surplus|closeout/i,
+};
+
+const LOCATION_LABEL_PATTERN = {
+  'Northeast US': /\b(ME|NH|VT|MA|RI|CT|NY|NJ|PA|Massachusetts|New York|Pennsylvania|New Jersey|Connecticut)\b/i,
+  'Southeast US': /\b(DE|MD|VA|WV|NC|SC|GA|FL|AL|TN|KY|MS|Virginia|Carolina|Georgia|Florida|Alabama|Tennessee|Kentucky)\b/i,
+  'Midwest US': /\b(OH|IN|IL|MI|WI|MN|IA|MO|ND|SD|NE|KS|Ohio|Indiana|Illinois|Michigan|Wisconsin|Minnesota|Iowa|Missouri|Kansas)\b/i,
+  'West US': /\b(MT|WY|CO|NM|ID|UT|AZ|NV|WA|OR|CA|AK|HI|Washington|Oregon|California|Colorado|Arizona|Nevada|Utah|Idaho|Montana)\b/i,
+  'Canada': /\b(Canada|ON|QC|BC|AB|MB|SK|NS|NB|NL|PE|Ontario|Quebec|British Columbia|Alberta)\b/i,
+  'Ships Anywhere': /ships anywhere|nationwide|any/i,
+};
+
+const TIMEFRAME_MS = {
+  'Last 24 hours': 24 * 3600 * 1000,
+  'Last 7 days': 7 * 24 * 3600 * 1000,
+  'Last 30 days': 30 * 24 * 3600 * 1000,
+  'Any time': Infinity,
+};
+
 function toListingCard(row) {
   const m = mapMarketplaceRow(row);
+  const priceStr = String(row.price_type || '').toLowerCase();
+  let inferredType = 'Fixed Price';
+  if (priceStr === 'offer' || (m.price || '').toLowerCase().includes('offer')) inferredType = 'Make an Offer';
+  else if (priceStr === 'auction') inferredType = 'Auction';
+  else if (priceStr === 'free' || m.priceNumeric === 0) inferredType = 'Free / Take It';
+
   return {
     id: m.id,
     slug: m.slug,
@@ -69,6 +107,7 @@ function toListingCard(row) {
     isNew: false,
     images: m.images,
     createdAt: row.created_at,
+    listingType: inferredType,
   };
 }
 
@@ -87,16 +126,39 @@ export default function Marketplace() {
   const allListings = useMemo(() => rows.map(toListingCard), [rows]);
 
   const visible = useMemo(() => {
-    const catMatcher = CATEGORY_PATTERN[activeCategory] || (() => true);
+    const highway = HIGHWAY_PATTERN[activeCategory] || (() => true);
     const min = filters.priceMin === '' ? null : Number(filters.priceMin);
     const max = filters.priceMax === '' ? null : Number(filters.priceMax);
     const conds = filters.conditions || [];
+    const sidebarCats = filters.categories || [];
+    const types = filters.listingTypes || [];
+    const locs = filters.locations || [];
+    const tfMs = TIMEFRAME_MS[filters.timeframe];
 
     let out = allListings.filter((l) => {
-      if (catMatcher(l.category) === false) return false;
-      if (conds.length > 0 && conds.includes(l.condition) === false) return false;
+      if (highway(l.category) === false) return false;
+      if (sidebarCats.length > 0) {
+        const anyMatch = sidebarCats.some((label) => {
+          const re = SIDEBAR_CAT_LABEL_PATTERN[label];
+          return re ? re.test(l.category) : false;
+        });
+        if (!anyMatch) return false;
+      }
+      if (conds.length > 0 && !conds.includes(l.condition)) return false;
       if (min !== null && !Number.isNaN(min) && (l.priceNumeric == null || l.priceNumeric < min)) return false;
       if (max !== null && !Number.isNaN(max) && (l.priceNumeric == null || l.priceNumeric > max)) return false;
+      if (types.length > 0 && !types.includes(l.listingType)) return false;
+      if (locs.length > 0) {
+        const anyLoc = locs.some((label) => {
+          const re = LOCATION_LABEL_PATTERN[label];
+          return re ? re.test(l.location || '') : false;
+        });
+        if (!anyLoc) return false;
+      }
+      if (tfMs && tfMs !== Infinity && l.createdAt) {
+        const ageMs = Date.now() - new Date(l.createdAt).getTime();
+        if (ageMs > tfMs) return false;
+      }
       return true;
     });
 
