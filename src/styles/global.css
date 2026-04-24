@@ -627,17 +627,8 @@ nav.site-nav {
   border-top: 1px solid rgba(139, 67, 22, 0.12);
   border-bottom: 1px solid rgba(139, 67, 22, 0.12);
 }
-.stats-strip::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: repeating-linear-gradient(
-    90deg,
-    transparent, transparent 80px,
-    rgba(139, 67, 22, 0.035) 80px, rgba(139, 67, 22, 0.035) 81px
-  );
-  pointer-events: none;
-}
+/* Removed the vertical-line texture overlay — it was showing up as
+   faint stripes against the cream background. Clean solid fill now. */
 .stats-strip-inner {
   max-width: 1280px;
   margin: 0 auto;
