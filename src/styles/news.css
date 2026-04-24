@@ -393,7 +393,8 @@
 
 /* Compact trending row: rank on the left, title wraps to the right.
    Much denser than the old stacked layout — fits ~5 items in the
-   space that used to hold 2. */
+   space that used to hold 2. Now a real <Link>, so reset the default
+   underline and inherit text color. */
 .trending-item {
   display: flex;
   align-items: flex-start;
@@ -401,6 +402,8 @@
   padding: 0.5rem 0;
   border-bottom: 1px solid var(--border-light);
   cursor: pointer;
+  text-decoration: none;
+  color: inherit;
 }
 .trending-item:last-child { border-bottom: none; }
 .trending-item:hover .ti-title { color: var(--wood-warm); }
@@ -427,9 +430,12 @@
 .ti-meta { display: none; }
 
 .forum-thread-item {
-  padding: 0.7rem 0;
+  display: block;
+  padding: 0.55rem 0;
   border-bottom: 1px solid var(--border-light);
   cursor: pointer;
+  text-decoration: none;
+  color: inherit;
 }
 .forum-thread-item:last-child {
   border-bottom: none;
