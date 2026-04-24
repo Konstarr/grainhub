@@ -1,9 +1,11 @@
 # Dependencies
 node_modules/
 
-# Build output
+# Build output — match the default `dist`, the SSR variant, and any
+# scratch `dist-*` folders left behind by past test deploys.
 dist/
 dist-ssr/
+dist-*/
 
 # Environment / secrets
 .env
