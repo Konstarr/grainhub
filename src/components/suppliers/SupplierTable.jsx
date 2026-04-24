@@ -22,7 +22,7 @@ export default function SupplierTable({ activeCategory = '', suppliers }) {
         <div style={{ background: 'var(--white)', border: '1px solid var(--border)', borderRadius: '12px', overflow: 'hidden' }}>
           <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--border-light)', background: 'var(--white)' }}>
             <div style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text-primary)' }}>
-              Featured Suppliers {(trade || activeCategory) && `\u2014 ${visible.length} match${visible.length === 1 ? '' : 'es'}`}
+              Featured Suppliers {(trade || activeCategory) && '\u2014 ' + visible.length + ' match' + (visible.length === 1 ? '' : 'es')}
             </div>
           </div>
 
@@ -46,34 +46,51 @@ export default function SupplierTable({ activeCategory = '', suppliers }) {
                   color: 'inherit',
                 }}
               >
-                <div
-                  style={{
-                    width: '56px',
-                    height: '56px',
-                    borderRadius: '10px',
-                    background: 'linear-gradient(135deg, #6B3F1F, #A0522D)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontFamily: "'DM Serif Display', serif",
-                    fontSize: '18px',
-                    color: 'white',
-                    fontWeight: '600',
-                    flexShrink: 0,
-                  }}
-                >
-                  {supplier.logo}
-                </div>
+                {supplier.logoUrl ? (
+                  <img
+                    src={supplier.logoUrl}
+                    alt={supplier.name + ' logo'}
+                    style={{
+                      width: '56px',
+                      height: '56px',
+                      borderRadius: '10px',
+                      objectFit: 'contain',
+                      background: 'white',
+                      border: '1px solid var(--border-light)',
+                      padding: '6px',
+                      flexShrink: 0,
+                    }}
+                  />
+                ) : (
+                  <div
+                    style={{
+                      width: '56px',
+                      height: '56px',
+                      borderRadius: '10px',
+                      background: 'linear-gradient(135deg, #6B3F1F, #A0522D)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontFamily: "'DM Serif Display', serif",
+                      fontSize: '18px',
+                      color: 'white',
+                      fontWeight: '600',
+                      flexShrink: 0,
+                    }}
+                  >
+                    {supplier.logo}
+                  </div>
+                )}
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: '15px', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '2px' }}>
                     {supplier.name}
                   </div>
                   <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '4px' }}>
                     {supplier.category}
-                    {supplier.location ? `  ·  ${supplier.location}` : ''}
+                    {supplier.location ? '  \u00b7  ' + supplier.location : ''}
                   </div>
                   <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                    {supplier.badges.map((badge) => (
+                    {(supplier.badges || []).map((badge) => (
                       <span
                         key={badge}
                         style={{
@@ -90,12 +107,12 @@ export default function SupplierTable({ activeCategory = '', suppliers }) {
                     ))}
                   </div>
                 </div>
-                <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                  <div style={{ fontSize: '18px', fontWeight: '500', color: 'var(--text-primary)' }}>
-                    ⭐ {supplier.rating}
+                <div style={{ textAlign: 'right' }}>
+                  <div style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text-primary)' }}>
+                    {supplier.rating ? '\u2605 ' + supplier.rating : ''}
                   </div>
-                  <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>
-                    {supplier.reviews} reviews
+                  <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                    {supplier.reviewCount ? supplier.reviewCount + ' reviews' : ''}
                   </div>
                 </div>
               </Link>

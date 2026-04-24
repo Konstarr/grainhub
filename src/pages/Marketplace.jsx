@@ -46,6 +46,7 @@ function toListingCard(row) {
     imgStyle: { background: 'linear-gradient(135deg, #2C1A0E, #6B3F1F)' },
     specs: m.description ? m.description.slice(0, 80) + (m.description.length > 80 ? '…' : '') : '',
     isNew: false,
+    images: m.images,
   };
 }
 

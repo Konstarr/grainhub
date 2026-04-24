@@ -12,12 +12,19 @@ function NewsCard({ story }) {
     teal: 'teal',
   };
 
+  const fallback = 'linear-gradient(135deg,#1C0E05,#6B3820)';
+  const bg = story.coverImage
+    ? 'url("' + story.coverImage + '") center/cover no-repeat, ' + (story.imgGradient || fallback)
+    : (story.imgGradient || fallback);
+
   return (
     <Link to="/news/article" className="news-card">
-      <div className="news-card-img" style={{ background: story.imgGradient }}>
-        <span className={`story-kicker ${colorClasses[story.kicker.color]}`}>
-          {story.kicker.label}
-        </span>
+      <div className="news-card-img" style={{ background: bg }}>
+        {story.kicker && (
+          <span className={'story-kicker ' + colorClasses[story.kicker.color]}>
+            {story.kicker.label}
+          </span>
+        )}
       </div>
       <div className="news-card-body">
         <div className="story-meta-top">
@@ -29,23 +36,25 @@ function NewsCard({ story }) {
         </div>
         <h3 className="news-card-title">{story.title}</h3>
         <p className="news-card-excerpt">{story.excerpt}</p>
-        <div className="story-footer">
-          <div className="story-author">
-            <div className="author-avatar">{story.author.initials}</div>
-            <span>{story.author.name}</span>
+        {story.author && (
+          <div className="story-footer">
+            <div className="story-author">
+              <div className="author-avatar">{story.author.initials}</div>
+              <span>{story.author.name}</span>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </Link>
   );
 }
 
 export default function NewsGrid({ stories }) {
-  const list = stories && stories.length ? stories : NEWS_STORIES;
+  const list = stories || NEWS_STORIES;
   return (
     <div className="news-grid">
-      {list.map((story) => (
-        <NewsCard key={story.id || story.title} story={story} />
+      {list.map((s) => (
+        <NewsCard key={s.id || s.slug || s.title} story={s} />
       ))}
     </div>
   );

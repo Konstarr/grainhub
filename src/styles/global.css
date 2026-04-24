@@ -404,6 +404,12 @@ nav.site-nav {
   flex-shrink: 0;
 }
 
+.sponsor-logo-img {
+  object-fit: contain;
+  background: white;
+  padding: 3px;
+}
+
 .sponsor-logo-name {
   font-size: 13px;
   font-weight: 600;

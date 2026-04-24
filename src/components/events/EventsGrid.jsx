@@ -1,10 +1,17 @@
 export default function EventsGrid({ events }) {
   return (
     <div className="events-grid">
-      {events.map((event) => (
-        <article key={event.title} className="event-card">
-          <div className="ec-img" style={{ background: event.imgGradient }}>
-            <span className={`ec-kicker ec-k-${event.categoryColor}`}>{event.category}</span>
+      {(events || []).map((event) => (
+        <article key={event.id || event.slug || event.title} className="event-card">
+          <div
+            className="ec-img"
+            style={{
+              background: event.coverImage
+                ? 'url("' + event.coverImage + '") center/cover no-repeat, ' + event.imgGradient
+                : event.imgGradient,
+            }}
+          >
+            <span className={'ec-kicker ec-k-' + event.categoryColor}>{event.category}</span>
           </div>
           <div className="ec-body">
             <h3 className="ec-title">{event.title}</h3>

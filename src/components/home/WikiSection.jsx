@@ -14,7 +14,11 @@ export default function WikiSection() {
 
   return (
     <div className="wiki-section">
-      <SectionHeader title="Industry Wiki" linkLabel={articles.length > 0 ? `Browse ${articles.length} articles` : 'All wiki'} linkTo="/wiki" />
+      <SectionHeader
+        title="Industry Wiki"
+        linkLabel={articles.length > 0 ? 'Browse ' + articles.length + ' articles' : 'All wiki'}
+        linkTo="/wiki"
+      />
       {articles.length === 0 ? (
         <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)', border: '1px solid var(--border)', borderRadius: '12px', background: 'var(--white)' }}>
           No wiki articles yet.
@@ -23,7 +27,17 @@ export default function WikiSection() {
         <div className="home-wiki-grid">
           {articles.map((a) => (
             <Link key={a.id} to="/wiki/article" className="wiki-card">
-              <div className="wiki-icon">W</div>
+              {a.coverImage ? (
+                <div
+                  className="wiki-icon"
+                  style={{
+                    background: 'url("' + a.coverImage + '") center/cover no-repeat',
+                    color: 'transparent',
+                  }}
+                />
+              ) : (
+                <div className="wiki-icon">W</div>
+              )}
               <div className="wiki-card-title">{a.title}</div>
               <div className="wiki-card-desc">{a.excerpt || a.category}</div>
               <div className="wiki-card-count">{a.readTime || ''}</div>

@@ -25,6 +25,7 @@ export default function SponsorStrip() {
     sponsors.map((s) => ({ ...s, _rep: r }))
   );
   const durationSeconds = Math.max(24, Math.round(expanded.length * SECONDS_PER_CHIP));
+  const trackStyle = { '--sponsor-duration': durationSeconds + 's' };
 
   const renderGroup = (keyPrefix) => (
     <div className="sponsor-group" aria-hidden={keyPrefix === 'b' ? 'true' : undefined}>
@@ -35,7 +36,15 @@ export default function SponsorStrip() {
           className="sponsor-logo"
           title={s.name}
         >
-          <span className={'sponsor-logo-badge ' + (s.logoColor || '')}>{s.logo}</span>
+          {s.logoUrl ? (
+            <img
+              src={s.logoUrl}
+              alt={s.name + ' logo'}
+              className="sponsor-logo-badge sponsor-logo-img"
+            />
+          ) : (
+            <span className={'sponsor-logo-badge ' + (s.logoColor || '')}>{s.logo}</span>
+          )}
           <span className="sponsor-logo-name">{s.name}</span>
         </Link>
       ))}
@@ -46,10 +55,7 @@ export default function SponsorStrip() {
     <div className="sponsor-strip">
       <span className="sponsor-label">Sponsors</span>
       <div className="sponsor-marquee" aria-label="Featured sponsors">
-        <div
-          className="sponsor-track"
-          style={{ ['--sponsor-duration']: durationSeconds + 's' }}
-        >
+        <div className="sponsor-track" style={trackStyle}>
           {renderGroup('a')}
           {renderGroup('b')}
         </div>

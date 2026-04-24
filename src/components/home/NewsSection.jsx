@@ -12,7 +12,7 @@ function tagColorFor(slug) {
 }
 
 function NewsTag({ label, color = 'default' }) {
-  const cls = color === 'default' ? 'news-tag' : `news-tag ${color}`;
+  const cls = color === 'default' ? 'news-tag' : 'news-tag ' + color;
   return <span className={cls}>{label}</span>;
 }
 
@@ -42,7 +42,14 @@ export default function NewsSection() {
     <>
       <SectionHeader title="Industry News" linkLabel="All news" linkTo="/news" />
       <Link to="/news/article" className="news-featured">
-        <div className="news-featured-img">
+        <div
+          className="news-featured-img"
+          style={
+            featured.coverImage
+              ? { background: 'url("' + featured.coverImage + '") center/cover no-repeat' }
+              : undefined
+          }
+        >
           <NewsTag label={featured.category || 'News'} color={tagColorFor(featured.slug)} />
         </div>
         <div className="news-featured-body">
@@ -58,12 +65,23 @@ export default function NewsSection() {
         <div className="news-list">
           {rest.map((item) => (
             <Link key={item.id} to="/news/article" className="news-item">
-              <div className="news-icon default">N</div>
+              {item.coverImage ? (
+                <div
+                  className="news-icon default"
+                  style={{
+                    background: 'url("' + item.coverImage + '") center/cover no-repeat',
+                    color: 'transparent',
+                  }}
+                />
+              ) : (
+                <div className={'news-icon ' + tagColorFor(item.slug)}>N</div>
+              )}
               <div className="news-item-body">
                 <div className="news-item-title">{item.title}</div>
-                <div className="news-item-meta">{item.category} &middot; {item.date}</div>
+                <div className="news-item-meta">
+                  {item.category || 'News'} &middot; {item.date}
+                </div>
               </div>
-              <NewsTag label={item.category || 'News'} color={tagColorFor(item.slug)} />
             </Link>
           ))}
         </div>

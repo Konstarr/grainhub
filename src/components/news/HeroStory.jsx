@@ -13,12 +13,19 @@ export default function HeroStory({ story }) {
     teal: 'teal',
   };
 
+  const fallbackGradient = 'linear-gradient(135deg,#1C0E05,#6B3820)';
+  const bg = s.coverImage
+    ? `url("${s.coverImage}") center/cover no-repeat, ${s.imgGradient || fallbackGradient}`
+    : (s.imgGradient || fallbackGradient);
+
   return (
     <Link to="/news/article" className="hero-story">
-      <div className="hero-story-img" style={{ background: s.imgGradient }}>
-        <span className={`story-kicker ${colorClasses[s.kicker.color]}`}>
-          {s.kicker.label}
-        </span>
+      <div className="hero-story-img" style={{ background: bg }}>
+        {s.kicker && (
+          <span className={'story-kicker ' + colorClasses[s.kicker.color]}>
+            {s.kicker.label}
+          </span>
+        )}
       </div>
       <div className="hero-story-body">
         <div className="story-meta-top">
@@ -30,12 +37,14 @@ export default function HeroStory({ story }) {
         </div>
         <h2 className="hero-story-title">{s.title}</h2>
         <p className="hero-story-excerpt">{s.excerpt}</p>
-        <div className="story-footer">
-          <div className="story-author">
-            <div className="author-avatar">{s.author.initials}</div>
-            <span>{s.author.name}</span>
+        {s.author && (
+          <div className="story-footer">
+            <div className="story-author">
+              <div className="author-avatar">{s.author.initials}</div>
+              <span>{s.author.name}</span>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </Link>
   );

@@ -78,8 +78,8 @@ export function mapJobRow(row) {
     tags,
     description: row.description,
     metadata: [
-      { icon: '📍', label: row.location },
-      { icon: '📅', label: posted },
+      { icon: '\u{1F4CD}', label: row.location },
+      { icon: '\u{1F4C5}', label: posted },
     ],
   };
 }
@@ -123,13 +123,14 @@ export function mapEventRow(row) {
     categoryColor: type.color,
     date: dateStr,
     location: row.is_online ? 'Online' : (row.location || row.venue_name || ''),
-    excerpt: row.description ? row.description.slice(0, 240) + (row.description.length > 240 ? '…' : '') : '',
+    excerpt: row.description ? row.description.slice(0, 240) + (row.description.length > 240 ? '\u2026' : '') : '',
     imgGradient,
     attendees: row.is_online ? 'Online event' : 'In-person',
-    price: row.registration_url ? 'Register →' : 'Details',
+    price: row.registration_url ? 'Register \u2192' : 'Details',
     registrationUrl: row.registration_url,
     isOnline: Boolean(row.is_online),
     trade: row.trade,
+    coverImage: row.cover_image_url || null,
   };
 }
 
@@ -152,6 +153,7 @@ export function mapSupplierRow(row) {
     reviewCount: row.review_count || 0,
     badges: row.badges || [],
     isVerified: Boolean(row.is_verified),
+    logoUrl: row.logo_url || null,
   };
 }
 
@@ -168,6 +170,7 @@ export function mapWikiRow(row) {
     readTime: row.read_time_minutes ? `${row.read_time_minutes} min read` : '',
     publishedAt: row.published_at,
     updatedAt: row.updated_at,
+    coverImage: row.cover_image_url || null,
   };
 }
 
@@ -184,6 +187,7 @@ export function mapNewsRow(row) {
     date: row.published_at ? new Date(row.published_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '',
     publishedAt: row.published_at,
     sourceUrl: row.source_url,
+    coverImage: row.cover_image_url || null,
   };
 }
 

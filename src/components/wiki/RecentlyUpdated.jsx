@@ -2,10 +2,14 @@ import { Link } from 'react-router-dom';
 
 function ArticleCard({ article }) {
   const variantClass = article.badge && article.badge.variant === 'featured' ? 'ab-featured' : 'ab-new';
+  const fallback = 'linear-gradient(135deg,#6B3F1F,#A0522D)';
+  const bg = article.coverImage
+    ? 'url("' + article.coverImage + '") center/cover no-repeat, ' + (article.imgGradient || fallback)
+    : (article.imgGradient || fallback);
   return (
     <Link to="/wiki/article" className="article-card">
-      <div className="ac-img" style={{ background: article.imgGradient }}>
-        {article.badge && <span className={`ac-badge ${variantClass}`}>{article.badge.label}</span>}
+      <div className="ac-img" style={{ background: bg }}>
+        {article.badge && <span className={'ac-badge ' + variantClass}>{article.badge.label}</span>}
       </div>
       <div className="ac-body">
         <div className="ac-cat">{article.category}</div>
@@ -33,8 +37,8 @@ export default function RecentlyUpdated({ articles }) {
         </div>
       ) : (
         <div className="articles-grid">
-          {list.map((article) => (
-            <ArticleCard key={article.id || article.title} article={article} />
+          {list.map((a) => (
+            <ArticleCard key={a.id || a.slug || a.title} article={a} />
           ))}
         </div>
       )}
