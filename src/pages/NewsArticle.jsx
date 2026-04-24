@@ -2,15 +2,18 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import '../styles/newsArticle.css';
+import '../styles/editor.css';
 import PageBack from '../components/shared/PageBack.jsx';
 import { supabase } from '../lib/supabase.js';
 
+/** Content may be either HTML (new editor) or markdown (legacy). */
+function isHtml(body) {
+  const v = String(body || '').trim();
+  return v.startsWith('<');
+}
+
 /**
  * /news/article/:slug
- *
- * Fetches a single news_articles row by slug from Supabase and renders its
- * markdown body. Also pulls 5 related articles (same category or trade,
- * newest first) for the sidebar.
  */
 export default function NewsArticle() {
   const { slug } = useParams();
@@ -31,7 +34,7 @@ export default function NewsArticle() {
         .eq('slug', slug)
         .maybeSingle();
       if (cancelled) return;
-      if (error) { setErr(error); setArticle(null); setLoading(false); return; }
+      if (error) { setErr(error); setLoading(false); return; }
       setArticle(data);
       if (data) {
         const { data: rel } = await supabase
@@ -147,18 +150,25 @@ export default function NewsArticle() {
             </div>
           </div>
 
-          <div className="article-body article-body-md" style={{ fontSize: 15.5, lineHeight: 1.75, color: 'var(--text-primary)' }}>
-            <ReactMarkdown
-              components={{
-                a: ({ node, ...props }) => (<a {...props} target="_blank" rel="noopener noreferrer" />),
-                img: ({ node, ...props }) => (
-                  <img {...props} loading="lazy" style={{ maxWidth: '100%', borderRadius: 10, border: '1px solid var(--border)', margin: '1rem 0' }} />
-                ),
-              }}
-            >
-              {article.body || ''}
-            </ReactMarkdown>
-          </div>
+          {isHtml(article.body) ? (
+            <div
+              className="gh-article"
+              dangerouslySetInnerHTML={{ __html: article.body || '' }}
+            />
+          ) : (
+            <div className="gh-article">
+              <ReactMarkdown
+                components={{
+                  a: ({ node, ...props }) => (<a {...props} target="_blank" rel="noopener noreferrer" />),
+                  img: ({ node, ...props }) => (
+                    <img {...props} loading="lazy" />
+                  ),
+                }}
+              >
+                {article.body || ''}
+              </ReactMarkdown>
+            </div>
+          )}
         </article>
 
         <aside className="right-col">

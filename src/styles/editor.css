@@ -1,0 +1,279 @@
+/* =========================================================
+   Block Editor (TipTap) + rendered article HTML styles
+   Shared between the admin editor and the public article page.
+   ========================================================= */
+
+/* ---------- Editor chrome ---------- */
+.gh-editor-root {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--white);
+  overflow: hidden;
+}
+
+.gh-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+  background: var(--wood-cream, #FBF6EC);
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+
+.gh-tb-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  padding: 4px 9px;
+  border-radius: 6px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  color: var(--text-secondary);
+  transition: background 120ms, color 120ms, border-color 120ms;
+}
+.gh-tb-btn:hover { background: rgba(138, 80, 48, 0.09); color: var(--text-primary); }
+.gh-tb-btn.active {
+  background: var(--wood-warm);
+  color: #fff;
+  border-color: var(--wood-warm);
+}
+.gh-tb-sep {
+  width: 1px;
+  height: 22px;
+  background: rgba(0, 0, 0, 0.1);
+  margin: 0 4px;
+}
+.gh-tb-loading {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--wood-warm);
+}
+
+/* ---------- Editor canvas ---------- */
+.gh-editor .ProseMirror {
+  min-height: 420px;
+  padding: 1.4rem 1.6rem;
+  font-size: 16px;
+  line-height: 1.75;
+  color: var(--text-primary);
+  outline: none;
+}
+
+.gh-editor .ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  color: var(--text-muted);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+.gh-editor .ProseMirror > * + * { margin-top: 0.75em; }
+
+.gh-editor .ProseMirror h1 { font-family: var(--font-display); font-size: 2rem; margin: 1.4rem 0 0.3rem; line-height: 1.15; color: var(--text-primary); }
+.gh-editor .ProseMirror h2 { font-family: var(--font-display); font-size: 1.5rem; margin: 1.2rem 0 0.3rem; line-height: 1.2; color: var(--text-primary); }
+.gh-editor .ProseMirror h3 { font-family: var(--font-display); font-size: 1.2rem; margin: 1rem 0 0.25rem; line-height: 1.25; color: var(--text-primary); }
+
+.gh-editor .ProseMirror ul, .gh-editor .ProseMirror ol { padding-left: 1.4rem; }
+.gh-editor .ProseMirror li { margin: 0.2rem 0; }
+
+.gh-editor .ProseMirror blockquote {
+  border-left: 3px solid var(--wood-warm);
+  padding: 0.4rem 0.95rem;
+  margin: 0.6rem 0;
+  background: var(--wood-cream, #FBF6EC);
+  color: var(--text-secondary);
+  font-style: italic;
+  border-radius: 0 8px 8px 0;
+}
+
+.gh-editor .ProseMirror code {
+  background: var(--wood-cream, #FBF6EC);
+  padding: 1px 7px;
+  border-radius: 4px;
+  font-family: 'DM Mono', 'Courier New', monospace;
+  font-size: 0.9em;
+}
+
+.gh-editor .ProseMirror pre {
+  background: #2b2118;
+  color: #f5e9d3;
+  padding: 0.9rem 1rem;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-family: 'DM Mono', 'Courier New', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.gh-editor .ProseMirror pre code { background: transparent; padding: 0; color: inherit; }
+
+.gh-editor .ProseMirror hr,
+.gh-hr {
+  border: 0;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--border) 20%, var(--border) 80%, transparent);
+  margin: 2rem 0;
+}
+
+.gh-editor .ProseMirror img,
+.gh-img {
+  max-width: 100%;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  display: block;
+  margin: 0.75rem auto;
+}
+
+.gh-editor .ProseMirror a,
+.gh-link {
+  color: var(--wood-warm);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* ---------- Callouts ---------- */
+.gh-callout {
+  display: block;
+  padding: 0.9rem 1.1rem;
+  border-radius: 12px;
+  border: 1px solid;
+  margin: 1rem 0;
+}
+.gh-callout > * + * { margin-top: 0.4rem; }
+.gh-callout p { margin: 0; }
+
+.gh-callout-info    { background: #E6F1FB; border-color: #BFDCEF; color: #1E4976; }
+.gh-callout-warning { background: #FFF3DC; border-color: #F0D99F; color: #7A5118; }
+.gh-callout-tip     { background: #EAF5E1; border-color: #C7DDB5; color: #3B6E28; }
+.gh-callout-note    { background: var(--wood-cream, #FBF6EC); border-color: var(--border); color: var(--text-secondary); }
+
+/* ---------- Bubble menu (text selection) ---------- */
+.gh-bubble {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  background: #2b2118;
+  border-radius: 999px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.24);
+}
+.gh-bubble-btn {
+  background: transparent;
+  border: none;
+  color: #f5e6c8;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background 120ms;
+}
+.gh-bubble-btn:hover { background: rgba(255, 255, 255, 0.08); color: #fff; }
+.gh-bubble-btn.active { background: var(--wood-warm); color: #fff; }
+
+/* ---------- Slash menu ---------- */
+.gh-slash {
+  z-index: 10;
+  min-width: 260px;
+  max-height: 320px;
+  overflow-y: auto;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.14);
+  padding: 4px;
+}
+.gh-slash-head {
+  padding: 6px 10px 4px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.gh-slash-item {
+  display: block;
+  width: 100%;
+  padding: 7px 10px;
+  background: transparent;
+  border: 0;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 7px;
+  font: inherit;
+}
+.gh-slash-item:hover { background: var(--wood-cream, #FBF6EC); }
+.gh-slash-label { font-weight: 600; font-size: 13.5px; color: var(--text-primary); }
+.gh-slash-desc  { font-size: 11.5px; color: var(--text-muted); margin-top: 1px; }
+
+.gh-editor-uploading {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  background: rgba(0, 0, 0, 0.75);
+  color: #fff;
+  font-size: 12px;
+  padding: 6px 12px;
+  border-radius: 999px;
+}
+
+/* =========================================================
+   Article reader — used on the public News/Event page to
+   render the HTML saved by the editor.
+   ========================================================= */
+
+.gh-article {
+  font-size: 16.5px;
+  line-height: 1.8;
+  color: var(--text-primary);
+}
+.gh-article > * + * { margin-top: 0.9em; }
+.gh-article h1 { font-family: var(--font-display); font-size: 2rem; margin: 1.8rem 0 0.4rem; line-height: 1.15; }
+.gh-article h2 { font-family: var(--font-display); font-size: 1.55rem; margin: 1.6rem 0 0.4rem; line-height: 1.2; }
+.gh-article h3 { font-family: var(--font-display); font-size: 1.2rem; margin: 1.3rem 0 0.35rem; line-height: 1.25; }
+.gh-article p { margin: 0 0 0.9em; }
+.gh-article ul, .gh-article ol { padding-left: 1.5rem; margin: 0.4rem 0 0.95rem; }
+.gh-article li { margin-bottom: 0.35rem; }
+.gh-article blockquote {
+  border-left: 3px solid var(--wood-warm);
+  background: var(--wood-cream, #FBF6EC);
+  color: var(--text-secondary);
+  font-style: italic;
+  border-radius: 0 8px 8px 0;
+  padding: 0.55rem 1rem;
+  margin: 1rem 0;
+}
+.gh-article a { color: var(--wood-warm); text-decoration: underline; text-underline-offset: 2px; }
+.gh-article img {
+  max-width: 100%;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  margin: 1rem auto;
+  display: block;
+}
+.gh-article code {
+  background: var(--wood-cream, #FBF6EC);
+  padding: 1px 7px;
+  border-radius: 4px;
+  font-family: 'DM Mono', 'Courier New', monospace;
+  font-size: 0.9em;
+}
+.gh-article pre {
+  background: #2b2118;
+  color: #f5e9d3;
+  padding: 0.9rem 1rem;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-family: 'DM Mono', 'Courier New', monospace;
+  font-size: 13.5px;
+  line-height: 1.6;
+}
+.gh-article pre code { background: transparent; padding: 0; color: inherit; }
+.gh-article hr {
+  border: 0;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--border) 20%, var(--border) 80%, transparent);
+  margin: 2rem 0;
+}
