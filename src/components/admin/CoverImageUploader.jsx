@@ -120,7 +120,7 @@ export default function CoverImageUploader({ value, onChange, folder = 'news' })
                 inset: 0,
                 width: '100%',
                 height: '100%',
-                objectFit: 'cover',
+                objectFit: 'contain',
                 display: 'block',
               }}
               onError={(e) => { e.currentTarget.style.display = 'none'; }}
