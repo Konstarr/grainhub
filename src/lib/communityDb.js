@@ -217,10 +217,8 @@ export async function deleteCommunityMessage(messageId) {
 
 /**
  * Subscribe to live inserts in a community chat via Supabase realtime.
- * Returns the channel so the caller can remove it on unmount.
- *
- *   const ch = subscribeCommunityMessages(id, (newMsg) => ...);
- *   return () => supabase.removeChannel(ch);
+ * (Retained even though communities now use a POSTS model — future
+ * DM / chat surfaces can reuse this.)
  */
 export function subscribeCommunityMessages(communityId, onInsert) {
   if (!communityId) return null;
@@ -237,6 +235,156 @@ export function subscribeCommunityMessages(communityId, onInsert) {
       (payload) => {
         if (onInsert) onInsert(payload.new);
       }
+    )
+    .subscribe();
+  return channel;
+}
+
+/* ══════════════════ Posts (Facebook-style feed) ══════════════════ */
+
+/**
+ * Load a community's feed of posts. If a signed-in user id is passed,
+ * we also fetch which posts they've already liked so the UI can render
+ * an accurate "liked" state without another request per post.
+ */
+export async function fetchCommunityPosts(communityId, { limit = 50, myUserId = null } = {}) {
+  if (!communityId) return { data: [], error: null };
+  const { data: posts, error } = await supabase
+    .from('community_posts')
+    .select(
+      'id, community_id, author_id, body, image_url, like_count, comment_count, created_at, deleted_at,' +
+      'author:author_id(id, username, full_name, avatar_url, trade)'
+    )
+    .eq('community_id', communityId)
+    .is('deleted_at', null)
+    .order('created_at', { ascending: false })
+    .limit(limit);
+  if (error) return { data: [], error };
+
+  // Which of these posts have I already liked?
+  let mineSet = new Set();
+  if (myUserId && posts && posts.length > 0) {
+    const ids = posts.map((p) => p.id);
+    const { data: mine } = await supabase
+      .from('community_post_likes')
+      .select('post_id')
+      .eq('profile_id', myUserId)
+      .in('post_id', ids);
+    mineSet = new Set((mine || []).map((r) => r.post_id));
+  }
+  const decorated = (posts || []).map((p) => ({ ...p, iLiked: mineSet.has(p.id) }));
+  return { data: decorated, error: null };
+}
+
+export async function createCommunityPost(communityId, { body, imageUrl = null }) {
+  if (!communityId || !body?.trim()) {
+    return { data: null, error: new Error('Empty post') };
+  }
+  const { data: session } = await supabase.auth.getSession();
+  const uid = session?.session?.user?.id;
+  if (!uid) return { data: null, error: new Error('Sign in to post.') };
+
+  const { data, error } = await supabase
+    .from('community_posts')
+    .insert({
+      community_id: communityId,
+      author_id: uid,
+      body: body.trim().slice(0, 8000),
+      image_url: imageUrl || null,
+    })
+    .select(
+      'id, community_id, author_id, body, image_url, like_count, comment_count, created_at, deleted_at,' +
+      'author:author_id(id, username, full_name, avatar_url, trade)'
+    )
+    .maybeSingle();
+  return { data, error };
+}
+
+export async function deleteCommunityPost(postId) {
+  if (!postId) return { data: null, error: new Error('Missing post id') };
+  const { error } = await supabase
+    .from('community_posts')
+    .update({ deleted_at: new Date().toISOString() })
+    .eq('id', postId);
+  return { data: null, error };
+}
+
+/** Toggle like: if a row exists, delete it; otherwise insert. The
+ *  count triggers take care of bumping community_posts.like_count. */
+export async function togglePostLike({ postId, communityId, iLiked }) {
+  const { data: session } = await supabase.auth.getSession();
+  const uid = session?.session?.user?.id;
+  if (!uid) return { data: null, error: new Error('Sign in to like.') };
+
+  if (iLiked) {
+    const { error } = await supabase
+      .from('community_post_likes')
+      .delete()
+      .eq('post_id', postId)
+      .eq('profile_id', uid);
+    return { data: { iLiked: false }, error };
+  }
+  const { error } = await supabase
+    .from('community_post_likes')
+    .insert({ post_id: postId, community_id: communityId, profile_id: uid });
+  return { data: { iLiked: true }, error };
+}
+
+export async function fetchPostComments(postId) {
+  if (!postId) return { data: [], error: null };
+  const { data, error } = await supabase
+    .from('community_post_comments')
+    .select('id, post_id, author_id, body, created_at, deleted_at, author:author_id(id, username, full_name, avatar_url)')
+    .eq('post_id', postId)
+    .is('deleted_at', null)
+    .order('created_at', { ascending: true });
+  return { data: data || [], error };
+}
+
+export async function createPostComment({ postId, communityId, body }) {
+  if (!postId || !body?.trim()) {
+    return { data: null, error: new Error('Empty comment') };
+  }
+  const { data: session } = await supabase.auth.getSession();
+  const uid = session?.session?.user?.id;
+  if (!uid) return { data: null, error: new Error('Sign in to comment.') };
+
+  const { data, error } = await supabase
+    .from('community_post_comments')
+    .insert({
+      post_id: postId,
+      community_id: communityId,
+      author_id: uid,
+      body: body.trim().slice(0, 4000),
+    })
+    .select('id, post_id, author_id, body, created_at, deleted_at, author:author_id(id, username, full_name, avatar_url)')
+    .maybeSingle();
+  return { data, error };
+}
+
+export async function deletePostComment(commentId) {
+  if (!commentId) return { data: null, error: new Error('Missing comment id') };
+  const { error } = await supabase
+    .from('community_post_comments')
+    .update({ deleted_at: new Date().toISOString() })
+    .eq('id', commentId);
+  return { data: null, error };
+}
+
+/** Live new-post stream for the community feed. */
+export function subscribeCommunityPosts(communityId, onInsert) {
+  if (!communityId) return null;
+  const channel = supabase
+    .channel('community-feed-' + communityId)
+    .on(
+      'postgres_changes',
+      {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'community_posts',
+        filter: 'community_id=eq.' + communityId,
+      },
+      (payload) => { if (onInsert) onInsert(payload.new); }
     )
     .subscribe();
   return channel;
