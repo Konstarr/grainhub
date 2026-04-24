@@ -19,6 +19,7 @@ import Signup from './pages/Signup.jsx';
 import Login from './pages/Login.jsx';
 import Sponsor from './pages/Sponsor.jsx';
 import Events from './pages/Events.jsx';
+import Profile from './pages/Profile.jsx';
 
 export default function App() {
   return (
@@ -106,6 +107,14 @@ export default function App() {
             element={
               <RequireAuth>
                 <SupplierProfile />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/profile/:handle"
+            element={
+              <RequireAuth>
+                <Profile />
               </RequireAuth>
             }
           />
