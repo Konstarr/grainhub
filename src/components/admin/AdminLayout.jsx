@@ -33,7 +33,7 @@ export const ADMIN_SECTIONS = [
 ];
 
 export default function AdminLayout({ title, subtitle, actions, children }) {
-  const { profile, role } = useAuth();
+  const { profile, role, isOwner } = useAuth();
 
   return (
     <div className="adm-shell">
@@ -45,6 +45,22 @@ export default function AdminLayout({ title, subtitle, actions, children }) {
             <div className="adm-brand-sub">GrainHub</div>
           </div>
         </div>
+
+        {/* Owner-only section. Rendered above all other groups so the
+            financial dashboard is the first thing a platform owner
+            sees when they open the admin panel. */}
+        {isOwner && (
+          <div>
+            <div className="adm-nav-group">Owner</div>
+            <NavLink
+              to="/admin/dashboard"
+              className={({ isActive }) => 'adm-nav-item ' + (isActive ? 'active' : '')}
+            >
+              <span className="adm-nav-icon"><IconChart /></span>
+              <span>Dashboard</span>
+            </NavLink>
+          </div>
+        )}
 
         {ADMIN_SECTIONS.map((section) => (
           <div key={section.group}>
@@ -111,3 +127,4 @@ function IconUsers()  { return (<svg {...svg}><path d="M17 21v-2a4 4 0 0 0-4-4H5
 function IconStar()   { return (<svg {...svg}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>); }
 function IconBriefcase() { return (<svg {...svg}><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>); }
 function IconLink() { return (<svg {...svg}><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>); }
+function IconChart() { return (<svg {...svg}><line x1="4" y1="20" x2="4" y2="10"/><line x1="10" y1="20" x2="10" y2="4"/><line x1="16" y1="20" x2="16" y2="14"/><line x1="22" y1="20" x2="2" y2="20"/></svg>); }
