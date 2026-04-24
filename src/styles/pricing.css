@@ -496,28 +496,39 @@
 @media (max-width: 900px) { .sponsor-grid { grid-template-columns: 1fr; } }
 
 .sponsor-card-new {
-  background: #0F0A05;
-  color: #F5EAD6;
+  background: var(--white);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
   border-radius: 16px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-  transition: transform 0.15s, box-shadow 0.15s;
+  box-shadow: 0 2px 8px rgba(43, 26, 14, 0.06);
+  transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+  position: relative;
+}
+.sponsor-card-new::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 80px;
+  background: linear-gradient(180deg, var(--wood-cream, #F5EAD6) 0%, rgba(245, 234, 214, 0) 100%);
+  pointer-events: none;
 }
 .sponsor-card-new:hover {
   transform: translateY(-3px);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 10px 24px rgba(43, 26, 14, 0.12);
+  border-color: var(--wood-light);
 }
 .sponsor-card-new.sponsor-highlight {
-  outline: 2px solid var(--wood-warm);
-  outline-offset: -2px;
+  border-color: var(--wood-warm);
+  border-width: 2px;
 }
 
 .sponsor-medal {
   margin: 1.5rem auto 0.5rem;
-  width: 82px;
-  height: 82px;
+  width: 88px;
+  height: 88px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -528,15 +539,16 @@
   letter-spacing: 1.5px;
   text-transform: uppercase;
   color: #3A2410;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
   position: relative;
+  z-index: 1;
 }
 .sponsor-medal::before {
   content: '';
   position: absolute;
   inset: 6px;
   border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, 0.25);
+  border: 2px solid rgba(255, 255, 255, 0.35);
   pointer-events: none;
 }
 .sponsor-medal-label {
@@ -551,20 +563,19 @@
   flex-direction: column;
   flex: 1;
   align-items: center;
+  position: relative;
+  z-index: 1;
 }
 .sponsor-card-body .sponsor-price {
   font-family: 'Montserrat', sans-serif;
   font-size: 30px;
   font-weight: 700;
-  color: #F5EAD6;
+  color: var(--text-primary);
   letter-spacing: -0.5px;
-}
-.sponsor-card-body .sponsor-price .tier-price-sub {
-  color: rgba(245, 234, 214, 0.6);
 }
 .sponsor-card-body .sponsor-tagline {
   font-size: 13px;
-  color: rgba(245, 234, 214, 0.75);
+  color: var(--text-secondary);
   margin: 6px 0 14px;
   line-height: 1.5;
 }
@@ -573,18 +584,6 @@
   width: 100%;
   margin-bottom: 1.1rem;
 }
-.sponsor-card-body .tier-features li {
-  color: rgba(245, 234, 214, 0.82);
-  font-size: 13px;
-}
-.sponsor-card-body .tier-features li::before { color: #C08050; }
-.sponsor-card-body .tier-cta {
-  width: 100%;
-  background: linear-gradient(135deg, var(--wood-warm), #8B4316);
-  border: none;
-  color: #fff;
-}
-.sponsor-card-body .tier-cta:hover { background: linear-gradient(135deg, #8B4316, #6B3F1F); }
 
 /* ── À LA CARTE — icon tile grid ──────────────────────── */
 .alacarte-grid {
