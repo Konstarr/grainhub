@@ -170,32 +170,32 @@ export default function SignupForm() {
               <div className="signup-form-header">
                 <div className="signup-free-badge">✓ Free to join</div>
                 <h2>How will you use GrainHub?</h2>
-                <p>Pick the account type that fits. You can't switch later &mdash; pick carefully.</p>
+                <p>Pick the type that fits best. You can always upgrade your plan later.</p>
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1.5rem' }}>
                 <AccountTypeCard
                   title="Individual"
-                  tag="For makers & pros"
-                  icon="👷"
+                  tag="Makers &amp; pros"
+                  iconKind="individual"
                   bullets={[
-                    'Post in forums, ask questions',
-                    'Buy / sell in the Marketplace',
+                    'Post in forums and ask questions',
+                    'Buy and sell in the marketplace',
                     'Apply to jobs, save listings',
-                    'Build your portfolio and rep',
+                    'Build a portfolio and reputation',
                   ]}
                   selected={accountType === 'individual'}
                   onClick={() => setAccountType('individual')}
                 />
                 <AccountTypeCard
                   title="Business"
-                  tag="For companies & brands"
-                  icon="🏢"
+                  tag="Companies &amp; brands"
+                  iconKind="business"
                   bullets={[
-                    'Everything in an Individual account',
+                    'Everything in Individual',
                     'List your company in Suppliers',
-                    'Post jobs + drive hiring',
-                    'Eligible for sponsorship + ads',
+                    'Post jobs and recruit at scale',
+                    'Run sponsorships and ads',
                   ]}
                   selected={accountType === 'business'}
                   onClick={() => setAccountType('business')}
@@ -756,50 +756,158 @@ export default function SignupForm() {
   );
 }
 
-/* Account type selector card used on the picker step. */
-function AccountTypeCard({ title, tag, icon, bullets, selected, onClick }) {
+/* Account type selector card used on the picker step.
+ * Refined version: roomy layout, proper SVG icons that match the wood
+ * palette, cleaner typography, a subtle brown ring instead of a heavy
+ * colored background when selected. */
+function AccountTypeCard({ title, tag, iconKind, bullets, selected, onClick }) {
   return (
     <button
       type="button"
       onClick={onClick}
+      aria-pressed={selected}
       style={{
+        position: 'relative',
         textAlign: 'left',
-        background: selected ? 'var(--wood-cream, #FBF6EC)' : 'var(--white)',
-        border: '2px solid ' + (selected ? 'var(--wood-warm, #8a5030)' : 'var(--border)'),
+        background: 'var(--white)',
+        border: '1.5px solid ' + (selected ? 'var(--wood-warm, #8a5030)' : 'var(--border)'),
         borderRadius: 14,
-        padding: '1.1rem 1.15rem',
+        padding: '1.5rem 1.35rem 1.4rem',
         cursor: 'pointer',
-        transition: 'border-color 120ms, background 120ms, transform 100ms',
+        transition: 'border-color 140ms ease, box-shadow 140ms ease, transform 120ms ease',
         fontFamily: 'inherit',
-        boxShadow: selected ? '0 4px 12px rgba(138, 80, 48, 0.12)' : 'none',
+        boxShadow: selected
+          ? '0 0 0 4px rgba(138, 80, 48, 0.1), 0 6px 18px rgba(138, 80, 48, 0.08)'
+          : '0 1px 3px rgba(43, 26, 14, 0.04)',
+        outline: 'none',
       }}
-      onMouseEnter={(e) => { if (!selected) e.currentTarget.style.borderColor = 'var(--wood-warm)'; }}
-      onMouseLeave={(e) => { if (!selected) e.currentTarget.style.borderColor = 'var(--border)'; }}
+      onMouseEnter={(e) => {
+        if (!selected) {
+          e.currentTarget.style.borderColor = 'var(--wood-light)';
+          e.currentTarget.style.transform = 'translateY(-2px)';
+          e.currentTarget.style.boxShadow = '0 6px 16px rgba(43, 26, 14, 0.08)';
+        }
+      }}
+      onMouseLeave={(e) => {
+        if (!selected) {
+          e.currentTarget.style.borderColor = 'var(--border)';
+          e.currentTarget.style.transform = 'translateY(0)';
+          e.currentTarget.style.boxShadow = '0 1px 3px rgba(43, 26, 14, 0.04)';
+        }
+      }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
-        <div style={{ fontSize: 22 }}>{icon}</div>
-        <div>
-          <div style={{ fontFamily: "'DM Serif Display', serif", fontSize: 18, color: 'var(--text-primary)', lineHeight: 1.1 }}>
-            {title}
-          </div>
-          <div style={{ fontSize: 11, color: 'var(--text-muted)', letterSpacing: '0.05em', textTransform: 'uppercase', fontWeight: 600, marginTop: 2 }}>
-            {tag}
-          </div>
-        </div>
-        {selected && (
-          <div style={{
-            marginLeft: 'auto',
-            width: 20, height: 20, borderRadius: '50%',
-            background: 'var(--wood-warm)', color: '#fff',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 12, fontWeight: 700,
-          }}>✓</div>
-        )}
+      {/* Selected check — pulls to top-right, subtle */}
+      {selected && (
+        <div style={{
+          position: 'absolute',
+          top: 14,
+          right: 14,
+          width: 22,
+          height: 22,
+          borderRadius: '50%',
+          background: 'var(--wood-warm)',
+          color: '#fff',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: 12,
+          fontWeight: 700,
+          boxShadow: '0 2px 6px rgba(138, 80, 48, 0.3)',
+        }}>✓</div>
+      )}
+
+      {/* Icon — custom SVG in a warm-tinted square */}
+      <div style={{
+        width: 44,
+        height: 44,
+        borderRadius: 10,
+        background: selected ? 'linear-gradient(135deg, #6B3F1F, #A0522D)' : 'var(--wood-cream, #F5EAD6)',
+        color: selected ? '#fff' : 'var(--wood-warm)',
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: '0.9rem',
+        transition: 'background 140ms ease, color 140ms ease',
+      }}>
+        {iconKind === 'individual' ? <IconIndividual /> : <IconBusiness />}
       </div>
-      <ul style={{ margin: '0.4rem 0 0', padding: '0 0 0 1rem', listStyle: 'disc', color: 'var(--text-secondary)', fontSize: 13, lineHeight: 1.55 }}>
-        {bullets.map((b, i) => <li key={i}>{b}</li>)}
+
+      <div style={{
+        fontFamily: 'Montserrat, sans-serif',
+        fontSize: 18,
+        fontWeight: 700,
+        color: 'var(--text-primary)',
+        letterSpacing: '-0.2px',
+        lineHeight: 1.2,
+      }}>
+        {title}
+      </div>
+      <div style={{
+        fontSize: 11,
+        color: 'var(--text-muted)',
+        letterSpacing: '1.2px',
+        textTransform: 'uppercase',
+        fontWeight: 600,
+        marginTop: 3,
+      }}>
+        {tag}
+      </div>
+
+      <ul style={{
+        margin: '1rem 0 0',
+        padding: 0,
+        listStyle: 'none',
+        display: 'grid',
+        gap: 6,
+      }}>
+        {bullets.map((b, i) => (
+          <li key={i} style={{
+            fontSize: 13,
+            color: 'var(--text-secondary)',
+            lineHeight: 1.5,
+            paddingLeft: 20,
+            position: 'relative',
+          }}>
+            <span style={{
+              position: 'absolute',
+              left: 0,
+              top: 3,
+              width: 14,
+              height: 14,
+              borderRadius: '50%',
+              background: 'rgba(138, 80, 48, 0.12)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'var(--wood-warm)',
+              fontSize: 9,
+              fontWeight: 800,
+            }}>✓</span>
+            {b}
+          </li>
+        ))}
       </ul>
     </button>
+  );
+}
+
+/* Clean inline SVG icons matching the wood palette (currentColor). */
+function IconIndividual() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <circle cx="12" cy="8" r="4" />
+      <path d="M4 21c0-4.418 3.582-8 8-8s8 3.582 8 8" />
+    </svg>
+  );
+}
+function IconBusiness() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="3" y="6" width="18" height="15" rx="1.5" />
+      <path d="M3 10h18" />
+      <path d="M8 6V4h8v2" />
+      <path d="M10 14h4M10 17h4" />
+    </svg>
   );
 }
 
