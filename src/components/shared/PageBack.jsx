@@ -1,17 +1,21 @@
 import { Link } from 'react-router-dom';
 
 /**
- * Shared "you are here / get back" bar that sits at the top of every detail
- * page. Left side: a pill-shaped Back button that goes to the parent list.
- * Right side: a compact breadcrumb trail (Home › Section › Current).
+ * Shared breadcrumb trail at the top of every detail page.
+ * We used to render a back pill AND breadcrumbs — that was duplicative
+ * since the breadcrumb's section link (e.g. "Forums") is itself a back
+ * link. Now it's crumbs only, centered to the page gutter, with proper
+ * spacing above/below.
  *
  * Props:
- *   backTo       – path the Back pill navigates to (e.g. "/wiki")
- *   backLabel    – text for the pill (e.g. "Back to Wiki")
  *   crumbs       – array of { label, to? } where the last crumb is the
  *                  current page (no `to`). The first crumb is typically
  *                  { label: 'Home', to: '/' }. Optional — if omitted, a
  *                  sensible two-crumb trail is built from backTo/backLabel.
+ *   backTo       – path used to auto-build the section crumb when `crumbs`
+ *                  is not supplied. Also the link target for "Home › X".
+ *   backLabel    – text used to derive the section crumb label when
+ *                  `crumbs` is not supplied (e.g. "Back to Forums" → "Forums").
  */
 export default function PageBack({ backTo, backLabel, crumbs }) {
   const trail =
@@ -23,27 +27,24 @@ export default function PageBack({ backTo, backLabel, crumbs }) {
         ];
 
   return (
-    <div className="page-back-bar">
-      <Link to={backTo} className="pb-back" aria-label={backLabel}>
-        <span className="pb-arrow" aria-hidden="true">←</span>
-        <span className="pb-back-text">{backLabel}</span>
-      </Link>
-
-      <nav className="pb-crumbs" aria-label="Breadcrumb">
+    <nav className="page-back-bar" aria-label="Breadcrumb">
+      <ol className="pb-crumbs">
         {trail.map((c, i) => {
           const last = i === trail.length - 1;
           return (
-            <span key={`${c.label}-${i}`} className="pb-crumb">
+            <li key={`${c.label}-${i}`} className="pb-crumb">
               {c.to && !last ? (
-                <Link to={c.to}>{c.label}</Link>
+                <Link to={c.to} className="pb-crumb-link">{c.label}</Link>
               ) : (
-                <span className={last ? 'pb-crumb-current' : undefined}>{c.label}</span>
+                <span className={last ? 'pb-crumb-current' : 'pb-crumb-text'}>{c.label}</span>
               )}
-              {!last && <span className="pb-sep" aria-hidden="true">›</span>}
-            </span>
+              {!last && (
+                <span className="pb-sep" aria-hidden="true">/</span>
+              )}
+            </li>
           );
         })}
-      </nav>
-    </div>
+      </ol>
+    </nav>
   );
 }
