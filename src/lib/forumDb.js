@@ -329,6 +329,67 @@ export async function fetchProfileBadges(profileId) {
   return { data: data || [], error: null };
 }
 
+/**
+ * Fetch the most recently-active forum threads along with:
+ *   - the profile of whoever posted last (for "last replied by" badge)
+ *   - a short snippet of that last post's body (for preview)
+ *
+ * Two round-trips (threads + latest posts) — can't do a per-group MAX embed in
+ * PostgREST from the client. The second query pulls *all* posts for the
+ * returned thread set and we take the first one per thread client-side.
+ */
+export async function fetchRecentThreadsWithLastPost(limit = 50) {
+  const { data: threads, error } = await supabase
+    .from('forum_threads')
+    .select(`*, last_author:last_reply_by(${AUTHOR_COLS_SAFE})`)
+    .order('last_reply_at', { ascending: false })
+    .limit(limit);
+
+  if (error || !threads || threads.length === 0) {
+    return { data: threads || [], error };
+  }
+
+  const threadIds = threads.map((t) => t.id);
+  // Pull enough posts that every thread likely has its latest captured.
+  // 400 covers typical index pages even for chatty threads.
+  const { data: posts } = await supabase
+    .from('forum_posts')
+    .select('thread_id, body, created_at, author_id')
+    .in('thread_id', threadIds)
+    .order('created_at', { ascending: false })
+    .limit(400);
+
+  const latestByThread = new Map();
+  (posts || []).forEach((p) => {
+    // Keep only the first (= most recent, since we ordered DESC) per thread.
+    if (!latestByThread.has(p.thread_id)) latestByThread.set(p.thread_id, p);
+  });
+
+  // Also need the display name of OP authors in case a thread has zero replies
+  // and last_reply_by falls back to the thread author. Pull those profiles too
+  // so we always have a "last author" to show.
+  const missingAuthorIds = threads
+    .filter((t) => !t.last_author)
+    .map((t) => t.author_id)
+    .filter(Boolean);
+  let authorLookup = new Map();
+  if (missingAuthorIds.length > 0) {
+    const { data: authors } = await supabase
+      .from('profiles')
+      .select(AUTHOR_COLS_SAFE)
+      .in('id', Array.from(new Set(missingAuthorIds)));
+    (authors || []).forEach((a) => authorLookup.set(a.id, a));
+  }
+
+  const enriched = threads.map((t) => {
+    const lastPost = latestByThread.get(t.id) || null;
+    const lastAuthor = t.last_author || authorLookup.get(t.author_id) || null;
+    return { ...t, last_post: lastPost, last_author: lastAuthor };
+  });
+
+  return { data: enriched, error: null };
+}
+
 export async function fetchRecentThreadsByAuthor(authorId, limit = 10) {
   let { data, error } = await supabase
     .from('forum_threads')

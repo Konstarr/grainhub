@@ -23,7 +23,6 @@ import {
   FORUM_GUIDELINES,
   THREAD_LEGEND,
 } from '../data/forumsData.js';
-import { useSupabaseList } from '../hooks/useSupabaseList.js';
 import { mapThreadRow } from '../lib/mappers.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import {
@@ -32,6 +31,7 @@ import {
   fetchTopReputation,
   fetchMySubscribedThreads,
   fetchMyPostThreads,
+  fetchRecentThreadsWithLastPost,
 } from '../lib/forumDb.js';
 
 const AV_PALETTE = ['av-a', 'av-b', 'av-c', 'av-d', 'av-e'];
@@ -90,7 +90,11 @@ function toActivityItem(row) {
     category: 'Discussion',
     categoryBg: cat.bg,
     categoryText: cat.text,
-    author: 'Community',
+    author: t.lastAuthor || 'Community',
+    lastAuthor: t.lastAuthor,
+    lastAuthorUsername: t.lastAuthorUsername,
+    lastAuthorAvatar: t.lastAuthorAvatar,
+    lastSnippet: t.lastSnippet,
     time: t.lastReplyAgo || 'recently',
     replies: t.replyCount,
     views: t.viewCount,
@@ -107,10 +111,15 @@ export default function Forums() {
   const view = searchParams.get('view') || '';
   const { user, isAuthed } = useAuth();
 
-  const { data: threadRows } = useSupabaseList('forum_threads', {
-    order: { column: 'last_reply_at', ascending: false },
-    limit: 50,
-  });
+  const [threadRows, setThreadRows] = useState([]);
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { data } = await fetchRecentThreadsWithLastPost(50);
+      if (!cancelled) setThreadRows(data || []);
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
   const [customRows, setCustomRows] = useState(null);
   const [customLoading, setCustomLoading] = useState(false);

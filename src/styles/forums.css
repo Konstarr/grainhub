@@ -543,12 +543,14 @@
   background: var(--white);
   border: 1px solid var(--border);
   border-radius: 10px;
-  padding: 0.9rem 1.25rem;
+  padding: 0.95rem 1.25rem;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 1rem;
   cursor: pointer;
   transition: border-color 0.15s, box-shadow 0.12s;
+  text-decoration: none;
+  color: inherit;
 }
 
 .activity-item:hover {
@@ -611,6 +613,63 @@
   font-weight: 600;
   padding: 2px 7px;
   border-radius: 4px;
+}
+
+.act-meta-lead {
+  color: var(--text-muted);
+  font-size: 11.5px;
+}
+.act-meta-author {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Snippet preview of the most recent post in each thread */
+.act-snippet {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 8px 10px;
+  background: #FAF6EE;
+  border-left: 3px solid var(--wood-light);
+  border-radius: 6px;
+}
+.act-snippet-avatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  object-fit: cover;
+}
+.act-snippet-avatar-fallback {
+  background: linear-gradient(135deg, #6B3F1F, #A0522D);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+}
+.act-snippet-text {
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  line-height: 1.45;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-style: italic;
+}
+.act-snippet-quote {
+  color: var(--wood-warm);
+  font-family: 'Montserrat', serif;
+  font-size: 16px;
+  font-weight: 700;
+  margin-right: 2px;
+  vertical-align: -2px;
 }
 
 .act-stats {

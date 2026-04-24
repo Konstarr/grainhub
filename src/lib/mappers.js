@@ -211,8 +211,24 @@ export function mapMarketplaceRow(row) {
   };
 }
 
+// Strip HTML / markdown / extra whitespace from a post body so we can show a
+// clean one-line preview in the activity list.
+function snippet(body, max = 180) {
+  if (!body) return '';
+  const text = String(body)
+    .replace(/<[^>]+>/g, ' ')            // drop HTML tags
+    .replace(/!\[[^\]]*]\([^)]+\)/g, '') // markdown images
+    .replace(/\[([^\]]+)]\([^)]+\)/g, '$1') // markdown links → label
+    .replace(/[#>*_`~]+/g, ' ')          // markdown punctuation
+    .replace(/\s+/g, ' ')
+    .trim();
+  return text.length > max ? text.slice(0, max).trimEnd() + '…' : text;
+}
+
 // FORUM THREADS
 export function mapThreadRow(row) {
+  const la = row.last_author || null;
+  const lastAuthorName = (la && (la.full_name || la.username)) || null;
   return {
     id: row.id,
     slug: row.slug,
@@ -225,5 +241,9 @@ export function mapThreadRow(row) {
     replyCount: row.reply_count || 0,
     lastReplyAt: row.last_reply_at,
     lastReplyAgo: daysAgo(row.last_reply_at),
+    lastAuthor: lastAuthorName,
+    lastAuthorUsername: la?.username || null,
+    lastAuthorAvatar: la?.avatar_url || null,
+    lastSnippet: snippet(row.last_post?.body || '', 180),
   };
 }
