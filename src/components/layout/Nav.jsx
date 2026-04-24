@@ -28,7 +28,7 @@ function initialsFromProfile(profile, user) {
 }
 
 export default function Nav() {
-  const { isAuthed, user, profile, signOut } = useAuth();
+  const { isAuthed, user, profile, signOut, isStaff, isAdmin } = useAuth();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
@@ -168,7 +168,72 @@ export default function Nav() {
                 <MenuItem onClick={() => { setMenuOpen(false); navigate('/forums?view=subscriptions'); }}>
                   My subscriptions
                 </MenuItem>
+
+                {isStaff && (
+                  <>
+                    <div style={{ borderTop: '1px solid var(--border)', margin: '4px 0' }} />
+                    <MenuItem onClick={() => { setMenuOpen(false); navigate(isAdmin ? '/admin/news' : '/admin'); }}>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                        <span style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          width: 18, height: 18,
+                          borderRadius: 4,
+                          background: 'linear-gradient(135deg, #c07a3c, #8a5030)',
+                          color: '#fff',
+                          fontSize: 10,
+                          fontWeight: 700,
+                        }}>A</span>
+                        Admin panel
+                      </span>
+                    </MenuItem>
+                  </>
+                )}
+
                 <div style={{ borderTop: '1px solid var(--border)', margin: '4px 0' }} />
+                <MenuItem onClick={handleSignOut}>
+                  Sign out
+                </MenuItem>
+              </div>
+            )}
+          </div>
+        ) : (
+          <>
+            <Link to="/login" className="nav-btn">Log In</Link>
+            <Link to="/signup" className="nav-btn primary">Join Free</Link>
+          </>
+        )}
+      </div>
+    </nav>
+  );
+}
+
+function MenuItem({ children, onClick }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      role="menuitem"
+      style={{
+        width: '100%',
+        textAlign: 'left',
+        background: 'transparent',
+        border: 'none',
+        padding: '0.55rem 0.75rem',
+        fontSize: 14,
+        color: 'inherit',
+        borderRadius: 6,
+        cursor: 'pointer',
+        fontFamily: 'inherit',
+      }}
+      onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--wood-cream, #f5ead6)'; }}
+      onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+    >
+      {children}
+    </button>
+  );
+}
                 <MenuItem onClick={handleSignOut}>
                   Sign out
                 </MenuItem>

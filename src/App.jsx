@@ -1,6 +1,7 @@
 import { Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext.jsx';
 import RequireAuth from './components/auth/RequireAuth.jsx';
+import RequireStaff from './components/auth/RequireStaff.jsx';
 import Layout from './components/layout/Layout.jsx';
 import Home from './pages/Home.jsx';
 import Forums from './pages/Forums.jsx';
@@ -21,11 +22,27 @@ import Login from './pages/Login.jsx';
 import Sponsor from './pages/Sponsor.jsx';
 import Events from './pages/Events.jsx';
 import Profile from './pages/Profile.jsx';
+import AdminNews from './pages/admin/AdminNews.jsx';
+import AdminNewsEdit from './pages/admin/AdminNewsEdit.jsx';
 
 export default function App() {
   return (
     <AuthProvider>
       <Routes>
+        {/* Admin routes — no site Layout (own sidebar shell) */}
+        <Route
+          path="/admin"
+          element={<RequireStaff level="admin"><AdminNews /></RequireStaff>}
+        />
+        <Route
+          path="/admin/news"
+          element={<RequireStaff level="admin"><AdminNews /></RequireStaff>}
+        />
+        <Route
+          path="/admin/news/:id"
+          element={<RequireStaff level="admin"><AdminNewsEdit /></RequireStaff>}
+        />
+
         <Route element={<Layout />}>
           <Route path="/" element={<Home />} />
           <Route path="/forums" element={<Forums />} />
@@ -41,91 +58,47 @@ export default function App() {
 
           <Route
             path="/forums/new"
-            element={
-              <RequireAuth>
-                <NewThread />
-              </RequireAuth>
-            }
+            element={<RequireAuth><NewThread /></RequireAuth>}
           />
           <Route
             path="/forums/category/:id"
-            element={
-              <RequireAuth>
-                <ForumCategory />
-              </RequireAuth>
-            }
+            element={<RequireAuth><ForumCategory /></RequireAuth>}
           />
           <Route
             path="/forums/thread/:slug"
-            element={
-              <RequireAuth>
-                <ForumThread />
-              </RequireAuth>
-            }
+            element={<RequireAuth><ForumThread /></RequireAuth>}
           />
           <Route
             path="/forums/thread"
-            element={
-              <RequireAuth>
-                <ForumThread />
-              </RequireAuth>
-            }
+            element={<RequireAuth><ForumThread /></RequireAuth>}
           />
           <Route
             path="/wiki/article/:slug"
-            element={
-              <RequireAuth>
-                <WikiArticle />
-              </RequireAuth>
-            }
+            element={<RequireAuth><WikiArticle /></RequireAuth>}
           />
           <Route
             path="/wiki/article"
-            element={
-              <RequireAuth>
-                <WikiArticle />
-              </RequireAuth>
-            }
+            element={<RequireAuth><WikiArticle /></RequireAuth>}
           />
           <Route
             path="/news/article"
-            element={
-              <RequireAuth>
-                <NewsArticle />
-              </RequireAuth>
-            }
+            element={<RequireAuth><NewsArticle /></RequireAuth>}
           />
           <Route
             path="/marketplace/listing/:slug"
-            element={
-              <RequireAuth>
-                <Listing />
-              </RequireAuth>
-            }
+            element={<RequireAuth><Listing /></RequireAuth>}
           />
           <Route
             path="/marketplace/listing"
-            element={
-              <RequireAuth>
-                <Listing />
-              </RequireAuth>
-            }
+            element={<RequireAuth><Listing /></RequireAuth>}
           />
           <Route
             path="/suppliers/profile"
-            element={
-              <RequireAuth>
-                <SupplierProfile />
-              </RequireAuth>
-            }
+            element={<RequireAuth><SupplierProfile /></RequireAuth>}
           />
           <Route
             path="/profile/:handle"
-            element={
-              <RequireAuth>
-                <Profile />
-              </RequireAuth>
-            }
+            element={<RequireAuth><Profile /></RequireAuth>}
           />
         </Route>
       </Routes>

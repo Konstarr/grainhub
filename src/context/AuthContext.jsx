@@ -114,14 +114,19 @@ export function AuthProvider({ children }) {
     setProfile(data);
   };
 
+  const role = profile?.role || 'member';
+
   const value = {
     session,
     user: session?.user ?? null,
     profile,
     loading,
     isAuthed: !!session?.user,
-    isModerator: profile?.role === 'moderator' || profile?.role === 'admin',
-    isAdmin: profile?.role === 'admin',
+    isModerator: ['moderator', 'admin', 'owner'].includes(role),
+    isAdmin: ['admin', 'owner'].includes(role),
+    isOwner: role === 'owner',
+    isStaff: ['moderator', 'admin', 'owner'].includes(role),
+    role,
     signUp,
     signIn,
     signOut,

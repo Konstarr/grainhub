@@ -1,0 +1,334 @@
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams, Link } from 'react-router-dom';
+import ReactMarkdown from 'react-markdown';
+import AdminLayout from '../../components/admin/AdminLayout.jsx';
+import { useAuth } from '../../context/AuthContext.jsx';
+import {
+  getNewsArticle,
+  createNewsArticle,
+  updateNewsArticle,
+  deleteNewsArticle,
+} from '../../lib/adminDb.js';
+
+const CATEGORIES = [
+  'Industry News',
+  'Product Release',
+  'Safety & Compliance',
+  'Business & Trends',
+  'Events',
+  'Community',
+];
+
+const TRADES = [
+  'Cabinetmaking',
+  'Millwork',
+  'Flooring',
+  'Finishing',
+  'CNC',
+  'General',
+];
+
+/**
+ * /admin/news/new  or  /admin/news/:id
+ *
+ * Single form for both create and edit. The route param distinguishes the
+ * two modes:
+ *   - params.id === 'new'  → create
+ *   - params.id === uuid   → fetch + edit
+ */
+export default function AdminNewsEdit() {
+  const { id } = useParams();
+  const isNew = !id || id === 'new';
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const [loading, setLoading] = useState(!isNew);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState(null);
+  const [okMsg, setOkMsg] = useState(null);
+  const [mode, setMode] = useState('write'); // 'write' | 'preview'
+
+  const [form, setForm] = useState({
+    title: '',
+    slug: '',
+    category: '',
+    trade: '',
+    excerpt: '',
+    body: '',
+    cover_image_url: '',
+    source_url: '',
+    is_published: false,
+    published_at: null,
+    created_at: null,
+  });
+
+  useEffect(() => {
+    if (isNew) return;
+    let cancelled = false;
+    (async () => {
+      setLoading(true);
+      const { data, error } = await getNewsArticle(id);
+      if (cancelled) return;
+      if (error || !data) {
+        setError(error?.message || 'Article not found');
+        setLoading(false);
+        return;
+      }
+      setForm({
+        title: data.title || '',
+        slug: data.slug || '',
+        category: data.category || '',
+        trade: data.trade || '',
+        excerpt: data.excerpt || '',
+        body: data.body || '',
+        cover_image_url: data.cover_image_url || '',
+        source_url: data.source_url || '',
+        is_published: !!data.is_published,
+        published_at: data.published_at,
+        created_at: data.created_at,
+      });
+      setLoading(false);
+    })();
+    return () => { cancelled = true; };
+  }, [id, isNew]);
+
+  const set = (k) => (v) => setForm((f) => ({ ...f, [k]: v }));
+
+  const handleSave = async (publishOverride) => {
+    setSaving(true);
+    setError(null);
+    setOkMsg(null);
+    const payload = {
+      authorId: user?.id,
+      title: form.title,
+      slug: form.slug,
+      category: form.category,
+      trade: form.trade,
+      excerpt: form.excerpt,
+      body: form.body,
+      coverImageUrl: form.cover_image_url,
+      sourceUrl: form.source_url,
+      isPublished: typeof publishOverride === 'boolean' ? publishOverride : form.is_published,
+    };
+    if (isNew) {
+      const { data, error } = await createNewsArticle(payload);
+      setSaving(false);
+      if (error) { setError(error.message || 'Could not create'); return; }
+      navigate('/admin/news/' + data.id);
+    } else {
+      const dbPatch = {
+        title: payload.title.trim(),
+        slug: payload.slug || undefined,
+        category: payload.category || null,
+        trade: payload.trade || null,
+        excerpt: payload.excerpt || null,
+        body: payload.body,
+        cover_image_url: payload.coverImageUrl || null,
+        source_url: payload.sourceUrl || null,
+        is_published: payload.isPublished,
+      };
+      Object.keys(dbPatch).forEach((k) => dbPatch[k] === undefined && delete dbPatch[k]);
+      const { data, error } = await updateNewsArticle(id, dbPatch);
+      setSaving(false);
+      if (error) { setError(error.message || 'Could not save'); return; }
+      if (data) setForm((f) => ({ ...f, ...data }));
+      setOkMsg(payload.isPublished ? 'Saved & published.' : 'Saved as draft.');
+      setTimeout(() => setOkMsg(null), 2500);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (isNew) return;
+    if (!confirm('Delete this article? This cannot be undone.')) return;
+    setSaving(true);
+    const { error } = await deleteNewsArticle(id);
+    setSaving(false);
+    if (error) { setError(error.message || 'Could not delete'); return; }
+    navigate('/admin/news');
+  };
+
+  if (loading) {
+    return (
+      <AdminLayout title="Loading…">
+        <div className="adm-card">Loading article…</div>
+      </AdminLayout>
+    );
+  }
+
+  return (
+    <AdminLayout
+      title={isNew ? 'New article' : (form.title || 'Edit article')}
+      subtitle={
+        isNew
+          ? 'Draft a new article. Markdown supported for the body.'
+          : (form.is_published ? 'Published' : 'Draft') + ' · ' +
+            (form.created_at ? new Date(form.created_at).toLocaleDateString() : '')
+      }
+      actions={
+        <>
+          <Link to="/admin/news" className="adm-btn">← All articles</Link>
+          {!isNew && form.slug && form.is_published && (
+            <Link to={'/news?slug=' + form.slug} className="adm-btn" target="_blank">
+              View public
+            </Link>
+          )}
+        </>
+      }
+    >
+      <div className="adm-card">
+        {error && <div className="adm-error" style={{ marginBottom: 12 }}>{error}</div>}
+        {okMsg && <div className="adm-ok" style={{ marginBottom: 12 }}>{okMsg}</div>}
+
+        <div className="adm-form">
+          <div className="adm-field">
+            <label className="adm-label">Title</label>
+            <input
+              type="text"
+              className="adm-input"
+              value={form.title}
+              onChange={(e) => set('title')(e.target.value)}
+              placeholder="What's the headline?"
+              maxLength={240}
+            />
+            <div className="adm-hint">{form.title.length}/240 · Shows in lists and as the H1 on the public page.</div>
+          </div>
+
+          <div className="adm-form-grid">
+            <div className="adm-field">
+              <label className="adm-label">Slug</label>
+              <input
+                type="text"
+                className="adm-input"
+                value={form.slug}
+                onChange={(e) => set('slug')(e.target.value.toLowerCase().replace(/[^a-z0-9\-]/g, '-').replace(/-+/g, '-'))}
+                placeholder="leave blank to auto-generate"
+              />
+              <div className="adm-hint">Used in /news/article/:slug</div>
+            </div>
+
+            <div className="adm-field">
+              <label className="adm-label">Category</label>
+              <select className="adm-select" value={form.category} onChange={(e) => set('category')(e.target.value)}>
+                <option value="">—</option>
+                {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+
+            <div className="adm-field">
+              <label className="adm-label">Trade</label>
+              <select className="adm-select" value={form.trade} onChange={(e) => set('trade')(e.target.value)}>
+                <option value="">—</option>
+                {TRADES.map((t) => <option key={t} value={t}>{t}</option>)}
+              </select>
+            </div>
+
+            <div className="adm-field">
+              <label className="adm-label">Cover image URL</label>
+              <input
+                type="text"
+                className="adm-input"
+                value={form.cover_image_url}
+                onChange={(e) => set('cover_image_url')(e.target.value)}
+                placeholder="https://…"
+              />
+            </div>
+
+            <div className="adm-field full">
+              <label className="adm-label">Source URL (if syndicated)</label>
+              <input
+                type="text"
+                className="adm-input"
+                value={form.source_url}
+                onChange={(e) => set('source_url')(e.target.value)}
+                placeholder="https://…"
+              />
+            </div>
+
+            <div className="adm-field full">
+              <label className="adm-label">Excerpt</label>
+              <input
+                type="text"
+                className="adm-input"
+                value={form.excerpt}
+                onChange={(e) => set('excerpt')(e.target.value)}
+                placeholder="One- or two-sentence summary shown in lists."
+                maxLength={320}
+              />
+              <div className="adm-hint">{form.excerpt.length}/320</div>
+            </div>
+          </div>
+
+          <div className="adm-field">
+            <div className="adm-tabs">
+              <button type="button" className={'adm-tab ' + (mode === 'write' ? 'active' : '')} onClick={() => setMode('write')}>Write</button>
+              <button type="button" className={'adm-tab ' + (mode === 'preview' ? 'active' : '')} onClick={() => setMode('preview')}>Preview</button>
+              <div style={{ marginLeft: 'auto', padding: '0.4rem 0.5rem', color: 'var(--text-muted)', fontSize: 11.5 }}>
+                Markdown · headings with #, links with [text](url), images with ![alt](url)
+              </div>
+            </div>
+
+            {mode === 'write' ? (
+              <textarea
+                className="adm-textarea"
+                value={form.body}
+                onChange={(e) => set('body')(e.target.value)}
+                placeholder="Start writing the article in markdown…"
+              />
+            ) : (
+              <div className="adm-preview">
+                {form.body.trim() ? (
+                  <ReactMarkdown>{form.body}</ReactMarkdown>
+                ) : (
+                  <div style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>
+                    Nothing to preview yet.
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          <div className="adm-switch">
+            <button
+              type="button"
+              className={'adm-switch-toggle ' + (form.is_published ? 'on' : '')}
+              onClick={() => set('is_published')(!form.is_published)}
+              aria-label="Published"
+              aria-pressed={form.is_published}
+            />
+            <div className="adm-switch-text">
+              <strong>{form.is_published ? 'Published' : 'Draft'}</strong>
+              <span>
+                {form.is_published
+                  ? 'Visible to everyone on /news.'
+                  : 'Only staff can see this until you publish.'}
+              </span>
+            </div>
+          </div>
+
+          <div className="adm-footer">
+            <div className="adm-timestamp">
+              {!isNew && form.published_at
+                ? 'Published ' + new Date(form.published_at).toLocaleString()
+                : (!isNew && form.created_at
+                  ? 'Created ' + new Date(form.created_at).toLocaleString()
+                  : '')}
+            </div>
+            <div style={{ display: 'flex', gap: 8 }}>
+              {!isNew && (
+                <button type="button" className="adm-btn danger" onClick={handleDelete} disabled={saving}>
+                  Delete
+                </button>
+              )}
+              <button type="button" className="adm-btn" onClick={() => handleSave(false)} disabled={saving || !form.title.trim() || !form.body.trim()}>
+                {saving ? 'Saving…' : 'Save draft'}
+              </button>
+              <button type="button" className="adm-btn primary" onClick={() => handleSave(true)} disabled={saving || !form.title.trim() || !form.body.trim()}>
+                {form.is_published ? (saving ? 'Saving…' : 'Save & keep published') : (saving ? 'Publishing…' : 'Publish')}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </AdminLayout>
+  );
+}
