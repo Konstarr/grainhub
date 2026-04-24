@@ -18,6 +18,7 @@ import {
   deletePostComment,
 } from '../lib/communityDb.js';
 import { CommunityIcon } from './Communities.jsx';
+import { safeImageUrl } from '../lib/urlSafety.js';
 import '../styles/communities.css';
 
 /**
@@ -163,8 +164,8 @@ export default function CommunityHome() {
       <div
         className="comm-banner comm-banner-soft"
         style={{
-          backgroundImage: community.banner_url
-            ? `url(${community.banner_url})`
+          backgroundImage: safeImageUrl(community.banner_url)
+            ? `url("${safeImageUrl(community.banner_url)}")`
             : 'linear-gradient(135deg, #2C1A0E 0%, #6B3F1F 50%, #A0522D 100%)',
         }}
       >

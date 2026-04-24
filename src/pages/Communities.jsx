@@ -7,6 +7,7 @@ import {
   joinCommunity,
   leaveCommunity,
 } from '../lib/communityDb.js';
+import { safeImageUrl } from '../lib/urlSafety.js';
 import '../styles/communities.css';
 
 /**
@@ -169,10 +170,11 @@ function CommunityCard({ c, isMember, busy, onJoin, onLeave }) {
 }
 
 export function CommunityIcon({ c, size = 44 }) {
-  if (c.icon_url) {
-    return <img src={c.icon_url} alt="" className="comm-icon-img" style={{ width: size, height: size }} />;
+  const safe = safeImageUrl(c?.icon_url);
+  if (safe) {
+    return <img src={safe} alt="" className="comm-icon-img" style={{ width: size, height: size }} />;
   }
-  const initials = (c.name || '??')
+  const initials = (c?.name || '??')
     .split(/\s+/).filter(Boolean).slice(0, 2)
     .map((w) => w[0]).join('').toUpperCase();
   return (

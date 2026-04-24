@@ -512,7 +512,11 @@ function BadgesGrid({ items, isMe }) {
   );
 }
 
-function Field({ label, value, onChange, placeholder, textarea, rows = 3, full }) {
+function Field({ label, value, onChange, placeholder, textarea, rows = 3, full, maxLength }) {
+  // Sensible per-field defaults so the underlying DB columns can't
+  // silently reject oversized input. Bio/textareas cap higher than
+  // single-line fields. Caller can override with the `maxLength` prop.
+  const cap = maxLength != null ? maxLength : (textarea ? 600 : 120);
   return (
     <div className={'pf-field' + (full ? ' full' : '')}>
       <label className="pf-field-label">{label}</label>
@@ -521,6 +525,7 @@ function Field({ label, value, onChange, placeholder, textarea, rows = 3, full }
           className="pf-field-textarea"
           rows={rows}
           value={value}
+          maxLength={cap}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
         />
@@ -529,6 +534,7 @@ function Field({ label, value, onChange, placeholder, textarea, rows = 3, full }
           type="text"
           className="pf-field-input"
           value={value}
+          maxLength={cap}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
         />
