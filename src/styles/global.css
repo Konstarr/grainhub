@@ -614,6 +614,296 @@ nav.site-nav {
   .pb-sep { margin: 0 0.5rem; }
 }
 
+/* ══════════════════════════════════════════════════════
+   HOMEPAGE — magazine-style sections
+   ══════════════════════════════════════════════════════ */
+
+/* Stats strip — full-bleed dark brown band right under the marquee */
+.stats-strip {
+  background: linear-gradient(180deg, #2C1A0E 0%, #3A2410 100%);
+  position: relative;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+.stats-strip::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent, transparent 80px,
+    rgba(255, 231, 181, 0.025) 80px, rgba(255, 231, 181, 0.025) 81px
+  );
+  pointer-events: none;
+}
+.stats-strip-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem 2.5rem;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2rem;
+  position: relative;
+  z-index: 1;
+}
+@media (max-width: 720px) {
+  .stats-strip-inner { grid-template-columns: repeat(2, 1fr); gap: 1.25rem; padding: 1.5rem 1.25rem; }
+}
+.stats-cell {
+  text-align: center;
+  color: #F5EAD6;
+}
+.stats-value {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 44px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -1px;
+  background: linear-gradient(135deg, #F5EAD6 0%, #D9A97A 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.stats-label {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2.2px;
+  text-transform: uppercase;
+  color: var(--wood-light, #D9A97A);
+  margin-top: 8px;
+}
+.stats-sub {
+  font-size: 11.5px;
+  color: rgba(245, 234, 214, 0.55);
+  margin-top: 3px;
+}
+
+/* Magazine-style section scaffolding */
+.home-section {
+  background: var(--white);
+  position: relative;
+}
+.home-section-cream { background: #FBF6EC; }
+.home-section-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 3rem 2.5rem;
+}
+@media (max-width: 720px) {
+  .home-section-inner { padding: 2.25rem 1.25rem; }
+}
+.home-section-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-bottom: 1.75rem;
+  flex-wrap: wrap;
+}
+.home-section-eyebrow {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2.8px;
+  text-transform: uppercase;
+  color: var(--wood-warm);
+  margin-bottom: 6px;
+}
+.home-section-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.8px;
+  color: var(--text-primary);
+  margin: 0;
+}
+.home-section-sub {
+  font-size: 15px;
+  color: var(--text-secondary);
+  margin: 10px 0 0;
+  max-width: 560px;
+  line-height: 1.55;
+}
+.home-section-cta {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  color: var(--wood-warm);
+  text-decoration: none;
+  padding: 10px 18px;
+  background: var(--white);
+  border: 1.5px solid var(--wood-warm);
+  border-radius: 8px;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.home-section-cta:hover {
+  background: var(--wood-warm);
+  color: #fff;
+  text-decoration: none;
+}
+
+/* Communities showcase grid — 3 cards across */
+.home-comm-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.25rem;
+}
+.home-comm-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+  position: relative;
+}
+.home-comm-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 24px rgba(43, 26, 14, 0.12);
+  border-color: var(--wood-warm);
+  text-decoration: none;
+}
+.home-comm-banner {
+  height: 80px;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+.home-comm-banner::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent, rgba(0,0,0,0.3));
+  pointer-events: none;
+}
+.home-comm-icon-wrap {
+  margin: -32px 0 0 1rem;
+  position: relative;
+  z-index: 1;
+}
+.home-comm-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 14px;
+  border: 3px solid var(--white);
+  background: var(--white);
+  object-fit: cover;
+  box-shadow: 0 2px 8px rgba(43, 26, 14, 0.15);
+}
+.home-comm-icon-fb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 0.5px;
+}
+.home-comm-body { padding: 12px 1rem 1.1rem; }
+.home-comm-name {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 3px;
+}
+.home-comm-meta {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+.home-comm-desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Trade tiles — 4-up grid of chunky gradient buttons */
+.home-trades-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+@media (max-width: 900px) { .home-trades-grid { grid-template-columns: repeat(2, 1fr); } }
+.home-trade-tile {
+  position: relative;
+  padding: 1.25rem 1.1rem 1.1rem;
+  border-radius: 14px;
+  color: #fff;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 140px;
+  overflow: hidden;
+  transition: transform 0.15s, box-shadow 0.15s;
+  box-shadow: 0 2px 8px rgba(43, 26, 14, 0.12);
+}
+.home-trade-tile::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 15% 30%, rgba(255,255,255,0.15), transparent 50%);
+  pointer-events: none;
+}
+.home-trade-tile:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 28px rgba(43, 26, 14, 0.18);
+  text-decoration: none;
+}
+.home-trade-icon {
+  font-size: 32px;
+  line-height: 1;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.25));
+}
+.home-trade-name {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+  margin-top: auto;
+  color: #fff;
+}
+.home-trade-arrow {
+  position: absolute;
+  top: 1.1rem;
+  right: 1.1rem;
+  font-size: 20px;
+  opacity: 0.6;
+  transition: transform 0.15s, opacity 0.15s;
+}
+.home-trade-tile:hover .home-trade-arrow {
+  transform: translateX(3px);
+  opacity: 1;
+}
+
+.home-empty-card {
+  padding: 2rem 1.5rem;
+  background: var(--white);
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+/* Content-feed section uses the existing main-wrap grid but sits
+   inside the cream section, so we tone down its own padding. */
+.home-section .home-content-wrap {
+  padding: 0;
+  max-width: none;
+}
+
 /* ── SPONSOR STRIP ── */
 .sponsor-strip {
   background: #ffffff;
