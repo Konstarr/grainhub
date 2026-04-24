@@ -200,3 +200,124 @@ export async function deleteEvent(id) {
     .eq('id', id);
   return { error };
 }
+
+// ------------------------------------------------------------
+// Users / profiles
+// ------------------------------------------------------------
+
+export async function listProfiles({ search = '', limit = 200 } = {}) {
+  let q = supabase
+    .from('profiles')
+    .select('id, username, full_name, avatar_url, role, sponsor_tier, is_suspended, is_verified, trade, location, created_at')
+    .order('created_at', { ascending: false })
+    .limit(limit);
+  if (search && search.trim()) {
+    const s = search.trim();
+    q = q.or(`username.ilike.%${s}%,full_name.ilike.%${s}%`);
+  }
+  const { data, error } = await q;
+  return { data: data || [], error };
+}
+
+export async function getProfile(id) {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', id)
+    .maybeSingle();
+  return { data, error };
+}
+
+export async function updateProfileAdmin(id, patch) {
+  if (!id) return { data: null, error: new Error('Missing id') };
+  const { data, error } = await supabase
+    .from('profiles')
+    .update(patch)
+    .eq('id', id)
+    .select('*')
+    .maybeSingle();
+  return { data, error };
+}
+
+// ------------------------------------------------------------
+// Sponsor media
+// ------------------------------------------------------------
+
+export async function listSponsorMedia({ slot = null, search = '', limit = 200 } = {}) {
+  let q = supabase
+    .from('sponsor_media')
+    .select('*')
+    .order('slot', { ascending: true })
+    .order('sort_order', { ascending: true })
+    .limit(limit);
+  if (slot) q = q.eq('slot', slot);
+  if (search && search.trim()) q = q.ilike('name', '%' + search.trim() + '%');
+  const { data, error } = await q;
+  return { data: data || [], error };
+}
+
+export async function getSponsorMedia(id) {
+  const { data, error } = await supabase
+    .from('sponsor_media')
+    .select('*')
+    .eq('id', id)
+    .maybeSingle();
+  return { data, error };
+}
+
+export async function createSponsorMedia(row) {
+  const payload = {
+    owner_id: row.owner_id || null,
+    name: row.name,
+    tier: row.tier || null,
+    slot: row.slot,
+    image_url: row.image_url,
+    image_width: row.image_width || null,
+    image_height: row.image_height || null,
+    click_url: row.click_url || null,
+    alt_text: row.alt_text || null,
+    is_approved: !!row.is_approved,
+    is_active: row.is_active !== false,
+    sort_order: row.sort_order || 0,
+    starts_at: row.starts_at || null,
+    ends_at: row.ends_at || null,
+  };
+  const { data, error } = await supabase
+    .from('sponsor_media')
+    .insert(payload)
+    .select('*')
+    .maybeSingle();
+  return { data, error };
+}
+
+export async function updateSponsorMedia(id, patch) {
+  const { data, error } = await supabase
+    .from('sponsor_media')
+    .update(patch)
+    .eq('id', id)
+    .select('*')
+    .maybeSingle();
+  return { data, error };
+}
+
+export async function deleteSponsorMedia(id) {
+  const { error } = await supabase
+    .from('sponsor_media')
+    .delete()
+    .eq('id', id);
+  return { error };
+}
+
+// ------------------------------------------------------------
+// Public: fetch approved, active sponsor media by slot
+// ------------------------------------------------------------
+
+export async function fetchPublicSponsorMedia(slot) {
+  if (!slot) return { data: [], error: null };
+  const { data, error } = await supabase
+    .from('sponsor_media')
+    .select('id, name, tier, image_url, image_width, image_height, click_url, alt_text, sort_order')
+    .eq('slot', slot)
+    .order('sort_order', { ascending: true });
+  return { data: data || [], error };
+}
