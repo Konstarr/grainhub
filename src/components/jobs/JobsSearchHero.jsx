@@ -7,8 +7,14 @@ export default function JobsSearchHero({
   onJobTypeChange,
 }) {
   return (
-    <div className="page-header" style={{ paddingTop: 0, paddingBottom: 0 }}>
-      <div className="header-inner" style={{ paddingTop: '1.5rem', paddingBottom: '1.5rem' }}>
+    <div
+      style={{
+        background: 'var(--wood-cream, #FBF6EC)',
+        borderBottom: '1px solid var(--border)',
+        padding: '1rem 2.5rem',
+      }}
+    >
+      <div style={{ maxWidth: 1280, margin: '0 auto' }}>
         <div className="search-hero">
           <div className="search-input-wrap">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">

@@ -4,7 +4,7 @@ import CountUp from './CountUp.jsx';
 
 export default function Hero() {
   return (
-    <section className="hero">
+    <section className="hero gh-hero">
       <div className="hero-inner">
         <div>
           <div className="hero-eyebrow">The Industry's Knowledge Hub</div>
