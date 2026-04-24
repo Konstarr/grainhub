@@ -348,11 +348,9 @@ nav.site-nav {
   overflow: hidden;
 }
 
-/* The inner wrapper becomes a vertical-flex column, so EVERY child of
-   the hero (eyebrow, title, subtitle, stats, etc.) is vertically
-   centered as a group — not just anchored to the top with the wrapper
-   centered around it. This is what actually made the text read as
-   "top-aligned" before. */
+/* The inner wrapper becomes a vertical-flex column, so the eyebrow +
+   title + subtitle stack is vertically centered as a group inside the
+   220px brown band. */
 .gh-hero > .header-inner,
 .gh-hero > .page-header-inner,
 .gh-hero > .hero-inner,
@@ -366,6 +364,40 @@ nav.site-nav {
   flex-direction: column !important;
   justify-content: center !important;
   align-items: flex-start;                     /* keep content left-aligned within the column */
+}
+
+/* Inside the locked-height hero we only want the title group to render.
+   Pages originally packed stats tiles, search forms, newsletter chips
+   etc. next to the title — that made the brown band feel cluttered AND
+   caused the squish/overlap the user reported (stats stacked under the
+   subtitle, search buttons falling out of the 220px box). Hide them so
+   every hero looks identical: eyebrow, title, subtitle. Full-bleed
+   toolbars (category tiles, trade pills, search bars) live OUTSIDE the
+   hero and remain visible. */
+.gh-hero .header-right,
+.gh-hero .header-stats,
+.gh-hero .search-hero,
+.gh-hero .newsletter-inline,
+.gh-hero .hero-right,
+.gh-hero .hero-stats,
+.gh-hero .hero-actions {
+  display: none !important;
+}
+
+/* Keep the title-column aligned predictably whether or not a sibling
+   exists. Some pages wrap title+stats in a .header-top row; collapse it
+   to a clean block so the title group flows naturally. */
+.gh-hero .header-top {
+  display: block !important;
+  margin: 0 !important;
+  width: 100%;
+}
+.gh-hero .header-left,
+.gh-hero .hero-left,
+.gh-hero .events-header-left {
+  display: block;
+  min-width: 0;
+  width: 100%;
 }
 
 /* Shrink heavy hero content + collapse vertical margins so everything
@@ -415,13 +447,17 @@ nav.site-nav {
 .gh-hero .stats-row        { margin-top: 0.75rem !important; }
 
 /* Home hero is the only one with CTA buttons + stat cards + headline —
-   let it breathe with a taller box, just on Home. */
+   let it breathe with a taller box, just on Home. Override the generic
+   "hide extras" rule so Home's actions + right column stay visible. */
 .hero.gh-hero {
   height: auto;
   min-height: 380px;
   max-height: none;
   padding: 2.5rem 2.5rem !important;
 }
+.hero.gh-hero .hero-actions,
+.hero.gh-hero .hero-right,
+.hero.gh-hero .hero-stats { display: flex !important; }
 /* Home headline gets full size back since it's iconic */
 .hero.gh-hero h1 {
   font-size: 3rem !important;
