@@ -28,6 +28,7 @@ import Messages from './pages/Messages.jsx';
 import MessageThread from './pages/MessageThread.jsx';
 import AdminNews from './pages/admin/AdminNews.jsx';
 import AdminNewsEdit from './pages/admin/AdminNewsEdit.jsx';
+import AdminNewsReports from './pages/admin/AdminNewsReports.jsx';
 import AdminEvents from './pages/admin/AdminEvents.jsx';
 import AdminEventsEdit from './pages/admin/AdminEventsEdit.jsx';
 import AdminJobs from './pages/admin/AdminJobs.jsx';
@@ -43,6 +44,7 @@ export default function App() {
       <Routes>
         <Route path="/admin" element={<RequireStaff level="admin"><AdminNews /></RequireStaff>} />
         <Route path="/admin/news" element={<RequireStaff level="admin"><AdminNews /></RequireStaff>} />
+        <Route path="/admin/news/reports" element={<RequireStaff level="admin"><AdminNewsReports /></RequireStaff>} />
         <Route path="/admin/news/:id" element={<RequireStaff level="admin"><AdminNewsEdit /></RequireStaff>} />
         <Route path="/admin/events" element={<RequireStaff level="admin"><AdminEvents /></RequireStaff>} />
         <Route path="/admin/events/:id" element={<RequireStaff level="admin"><AdminEventsEdit /></RequireStaff>} />

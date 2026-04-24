@@ -124,9 +124,14 @@ export default function AdminNews() {
       title="News articles"
       subtitle={loading ? 'Loading…' : `${stats.total} total · ${stats.published} published · ${stats.drafts} draft`}
       actions={
-        <Link to="/admin/news/new" className="adm-btn primary">
-          + New article
-        </Link>
+        <>
+          <Link to="/admin/news/reports" className="adm-btn">
+            📊 Reports
+          </Link>
+          <Link to="/admin/news/new" className="adm-btn primary">
+            + New article
+          </Link>
+        </>
       }
     >
       {/* ---------- Stats strip ---------- */}
