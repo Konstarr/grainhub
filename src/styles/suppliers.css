@@ -22,6 +22,215 @@
 .search-btn { background: var(--wood-warm); color: white; border: none; padding: 0 26px; height: 46px; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; font-family: 'Montserrat', sans-serif; transition: background 0.15s; white-space: nowrap; }
 .search-btn:hover { background: #8B4316; }
 
+/* ── SUPPLIER LIST (new dense row layout) ── */
+.supplier-list-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(43, 26, 14, 0.04);
+}
+.supplier-list-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.1rem 1.5rem;
+  border-bottom: 1px solid var(--border-light);
+  background: #FDFBF5;
+}
+.supplier-list-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 0.2px;
+}
+.supplier-list-count {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.4px;
+}
+
+.supplier-row {
+  display: grid;
+  grid-template-columns: 72px 1fr auto;
+  gap: 1.15rem;
+  align-items: flex-start;
+  padding: 1.1rem 1.5rem;
+  border-bottom: 1px solid var(--border-light);
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.15s ease;
+}
+.supplier-row:last-child { border-bottom: 0; }
+.supplier-row:hover { background: #FDFBF5; }
+
+.supplier-logo-img,
+.supplier-logo-fallback {
+  width: 64px;
+  height: 64px;
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+.supplier-logo-img {
+  object-fit: contain;
+  background: white;
+  border: 1px solid var(--border-light);
+  padding: 6px;
+}
+.supplier-logo-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #2C1A0E, #6B3F1F);
+  color: #fff;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.supplier-body { min-width: 0; }
+
+.supplier-name-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.3rem;
+}
+.supplier-name {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.1px;
+}
+.supplier-verified {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #2E7BC4;
+  background: rgba(46, 123, 196, 0.1);
+  padding: 2px 8px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.supplier-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 1rem;
+  margin-bottom: 0.4rem;
+}
+.supplier-meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+.supplier-meta-cat {
+  color: var(--wood-warm);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 11px;
+}
+
+.supplier-desc {
+  font-size: 13.5px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: 0.55rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.supplier-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: center;
+}
+.supplier-badge {
+  font-size: 10.5px;
+  font-weight: 600;
+  background: #EAF3DE;
+  color: #2D5016;
+  padding: 3px 9px;
+  border-radius: 4px;
+  letter-spacing: 0.2px;
+}
+.supplier-quickchip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: #F5F0E4;
+  padding: 3px 9px;
+  border-radius: 4px;
+  letter-spacing: 0.2px;
+}
+
+.supplier-aside {
+  text-align: right;
+  min-width: 110px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+.supplier-rating {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.supplier-star { color: #F4B740; }
+.supplier-reviews {
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+.supplier-cta {
+  margin-top: 0.65rem;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--wood-warm);
+  letter-spacing: 0.3px;
+}
+.supplier-row:hover .supplier-cta { color: #8B4316; }
+
+@media (max-width: 640px) {
+  .supplier-row {
+    grid-template-columns: 56px 1fr;
+  }
+  .supplier-logo-img,
+  .supplier-logo-fallback { width: 56px; height: 56px; }
+  .supplier-aside {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.75rem;
+    min-width: 0;
+  }
+  .supplier-cta { margin-top: 0; }
+}
+
 /* ── VIEW SWITCH (List / Map) ──
    A segmented pill control anchored to the top of the center column.
    An animated thumb slides between the two tabs, matching the brown

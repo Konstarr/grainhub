@@ -29,11 +29,17 @@ export default function Suppliers() {
     const m = mapSupplierRow(r);
     return {
       logo: m.logo,
+      logoUrl: m.logoUrl,
       name: m.name,
+      description: m.description || '',
       category: m.category || '',
       rating: m.rating || '',
       reviews: String(m.reviewCount || 0),
+      reviewCount: m.reviewCount || 0,
       location: m.address || '',
+      website: m.website || '',
+      phone: m.phone || '',
+      isVerified: m.isVerified,
       badges: m.badges || [],
       trade: m.trade,
     };
