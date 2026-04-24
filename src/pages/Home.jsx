@@ -1,5 +1,4 @@
 import SponsorStrip from '../components/layout/SponsorStrip.jsx';
-import SponsorMarquee from '../components/sponsors/SponsorMarquee.jsx';
 import Hero from '../components/home/Hero.jsx';
 import NewsSection from '../components/home/NewsSection.jsx';
 import ForumSection from '../components/home/ForumSection.jsx';
@@ -11,7 +10,6 @@ export default function Home() {
   return (
     <>
       <Hero />
-      <SponsorMarquee />
       <SponsorStrip />
 
       <div className="main-wrap">
