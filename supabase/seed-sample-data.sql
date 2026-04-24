@@ -31,29 +31,34 @@ on conflict (slug) do update set name = excluded.name, category = excluded.categ
 -- ------------------------------------------------------------
 -- FORUM THREADS (20 threads across categories)
 -- author_id left NULL — anonymous seed content
+-- IMPORTANT: reply_count is NOT seeded. It starts at 0 and is
+-- maintained by the bump_thread_on_post trigger as real posts
+-- are inserted (see seed-users-and-posts.sql). Previously we
+-- seeded fake counts (47, 62, 127) that never matched the actual
+-- forum_posts rows, so threads displayed inflated numbers.
 -- ------------------------------------------------------------
-insert into public.forum_threads (category_id, title, slug, is_pinned, is_locked, is_solved, view_count, reply_count, last_reply_at) values
-  ('cabinet-making', 'Frameless vs face-frame for a production shop — what''s your take in 2026?', 'frameless-vs-face-frame-2026', false, false, false, 3842, 47, now() - interval '2 hours'),
-  ('cabinet-making', 'Best approach for undermount drawer slides on 3/4 ply boxes', 'undermount-slides-3-4-ply-boxes', false, false, true, 1523, 18, now() - interval '1 day'),
-  ('architectural-millwork', 'AWI Custom grade vs Premium grade — actual cost delta on a 40k job', 'awi-custom-vs-premium-40k-job', true, false, false, 5127, 62, now() - interval '5 hours'),
-  ('architectural-millwork', 'Wainscoting panel layout math — getting the reveal right on a long wall', 'wainscoting-layout-reveal-long-wall', false, false, true, 978, 14, now() - interval '3 days'),
-  ('finishing-coatings', 'Switched from CV to waterborne — six months in, here''s what I learned', 'cv-to-waterborne-six-months-in', false, false, false, 4201, 73, now() - interval '8 hours'),
-  ('finishing-coatings', 'Fisheye on white pigmented CV — shop air or contaminated product?', 'fisheye-on-white-pigmented-cv', false, false, true, 2108, 29, now() - interval '2 days'),
-  ('wood-species', 'Sourcing rift-sawn white oak at scale — who''s your go-to in 2026?', 'rift-white-oak-sourcing-2026', false, false, false, 1876, 23, now() - interval '1 day'),
-  ('wood-species', 'Moisture content variance on imported Euro beech — acceptable range?', 'moisture-content-euro-beech-range', false, false, false, 734, 11, now() - interval '4 days'),
-  ('hardware', 'Blum Movento vs Grass Dynapro vs Salice Futura — honest comparison', 'blum-vs-grass-vs-salice-drawer-slides', true, false, false, 7234, 94, now() - interval '1 hour'),
-  ('hardware', 'Aventos HF failures on heavy MDF doors — weight spec confusion', 'aventos-hf-heavy-mdf-door-failures', false, false, true, 1345, 22, now() - interval '2 days'),
-  ('cnc-routers', 'Nesting software shootout — Alphacam, Cabinet Vision CAM, Mozaik, or Enroute?', 'nesting-software-shootout-2026', false, false, false, 3978, 56, now() - interval '6 hours'),
-  ('cnc-routers', 'Spoilboard flattening interval on a 5x10 Biesse Rover — how often?', 'spoilboard-flattening-biesse-rover', false, false, true, 1872, 31, now() - interval '3 days'),
-  ('edge-banders', 'Edgebander glue pot temp drift — troubleshooting an IDM 200', 'edgebander-glue-pot-drift-idm-200', false, false, false, 612, 8, now() - interval '5 days'),
-  ('software-tools', 'Cabinet Vision vs Microvellum for a 15-person shop — which scales better?', 'cabinet-vision-vs-microvellum-15-person', false, false, false, 4512, 71, now() - interval '4 hours'),
-  ('estimating', 'How do you price field measures and design time on residential kitchens?', 'pricing-field-measure-design-kitchens', true, false, false, 3201, 45, now() - interval '10 hours'),
-  ('hiring-workforce', 'Apprentice pay scales — what are you offering new hires in 2026?', 'apprentice-pay-2026', false, false, false, 2189, 37, now() - interval '1 day'),
-  ('standards-codes', 'CARB Phase 2 vs TSCA Title VI — what actually applies to residential millwork?', 'carb-vs-tsca-residential-millwork', false, false, true, 1456, 19, now() - interval '3 days'),
-  ('safety-dust', 'Dust collection sizing for a new 8000 sq ft shop — central vs zoned', 'dust-collection-new-8000-sq-ft-shop', false, false, false, 987, 16, now() - interval '2 days'),
-  ('show-tell', 'Just finished: 32-door quartersawn white oak kitchen with fluted inset panels', 'finished-32-door-qswo-kitchen', false, false, false, 5834, 81, now() - interval '3 hours'),
-  ('industry-news', 'Cabinetmakers Association is folding into AWI — official as of March', 'cma-folding-into-awi-march-2026', false, false, false, 8921, 127, now() - interval '30 minutes')
-on conflict (slug) do update set title = excluded.title, category_id = excluded.category_id, is_pinned = excluded.is_pinned, is_solved = excluded.is_solved, view_count = excluded.view_count, reply_count = excluded.reply_count, last_reply_at = excluded.last_reply_at;
+insert into public.forum_threads (category_id, title, slug, is_pinned, is_locked, is_solved, view_count, last_reply_at) values
+  ('cabinet-making', 'Frameless vs face-frame for a production shop — what''s your take in 2026?', 'frameless-vs-face-frame-2026', false, false, false, 3842, now() - interval '2 hours'),
+  ('cabinet-making', 'Best approach for undermount drawer slides on 3/4 ply boxes', 'undermount-slides-3-4-ply-boxes', false, false, true, 1523, now() - interval '1 day'),
+  ('architectural-millwork', 'AWI Custom grade vs Premium grade — actual cost delta on a 40k job', 'awi-custom-vs-premium-40k-job', true, false, false, 5127, now() - interval '5 hours'),
+  ('architectural-millwork', 'Wainscoting panel layout math — getting the reveal right on a long wall', 'wainscoting-layout-reveal-long-wall', false, false, true, 978, now() - interval '3 days'),
+  ('finishing-coatings', 'Switched from CV to waterborne — six months in, here''s what I learned', 'cv-to-waterborne-six-months-in', false, false, false, 4201, now() - interval '8 hours'),
+  ('finishing-coatings', 'Fisheye on white pigmented CV — shop air or contaminated product?', 'fisheye-on-white-pigmented-cv', false, false, true, 2108, now() - interval '2 days'),
+  ('wood-species', 'Sourcing rift-sawn white oak at scale — who''s your go-to in 2026?', 'rift-white-oak-sourcing-2026', false, false, false, 1876, now() - interval '1 day'),
+  ('wood-species', 'Moisture content variance on imported Euro beech — acceptable range?', 'moisture-content-euro-beech-range', false, false, false, 734, now() - interval '4 days'),
+  ('hardware', 'Blum Movento vs Grass Dynapro vs Salice Futura — honest comparison', 'blum-vs-grass-vs-salice-drawer-slides', true, false, false, 7234, now() - interval '1 hour'),
+  ('hardware', 'Aventos HF failures on heavy MDF doors — weight spec confusion', 'aventos-hf-heavy-mdf-door-failures', false, false, true, 1345, now() - interval '2 days'),
+  ('cnc-routers', 'Nesting software shootout — Alphacam, Cabinet Vision CAM, Mozaik, or Enroute?', 'nesting-software-shootout-2026', false, false, false, 3978, now() - interval '6 hours'),
+  ('cnc-routers', 'Spoilboard flattening interval on a 5x10 Biesse Rover — how often?', 'spoilboard-flattening-biesse-rover', false, false, true, 1872, now() - interval '3 days'),
+  ('edge-banders', 'Edgebander glue pot temp drift — troubleshooting an IDM 200', 'edgebander-glue-pot-drift-idm-200', false, false, false, 612, now() - interval '5 days'),
+  ('software-tools', 'Cabinet Vision vs Microvellum for a 15-person shop — which scales better?', 'cabinet-vision-vs-microvellum-15-person', false, false, false, 4512, now() - interval '4 hours'),
+  ('estimating', 'How do you price field measures and design time on residential kitchens?', 'pricing-field-measure-design-kitchens', true, false, false, 3201, now() - interval '10 hours'),
+  ('hiring-workforce', 'Apprentice pay scales — what are you offering new hires in 2026?', 'apprentice-pay-2026', false, false, false, 2189, now() - interval '1 day'),
+  ('standards-codes', 'CARB Phase 2 vs TSCA Title VI — what actually applies to residential millwork?', 'carb-vs-tsca-residential-millwork', false, false, true, 1456, now() - interval '3 days'),
+  ('safety-dust', 'Dust collection sizing for a new 8000 sq ft shop — central vs zoned', 'dust-collection-new-8000-sq-ft-shop', false, false, false, 987, now() - interval '2 days'),
+  ('show-tell', 'Just finished: 32-door quartersawn white oak kitchen with fluted inset panels', 'finished-32-door-qswo-kitchen', false, false, false, 5834, now() - interval '3 hours'),
+  ('industry-news', 'Cabinetmakers Association is folding into AWI — official as of March', 'cma-folding-into-awi-march-2026', false, false, false, 8921, now() - interval '30 minutes')
+on conflict (slug) do update set title = excluded.title, category_id = excluded.category_id, is_pinned = excluded.is_pinned, is_solved = excluded.is_solved, view_count = excluded.view_count, last_reply_at = excluded.last_reply_at;
 
 
 -- ------------------------------------------------------------
