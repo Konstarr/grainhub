@@ -92,7 +92,7 @@ export default function SponsorStrip() {
         ) : (
           <span className="sponsor-logo-badge">{(s.name || '?').charAt(0)}</span>
         )}
-        {s.name && <span className="sponsor-logo-name">{s.name}</span>}
+        {/* Business name intentionally omitted — marquee is logo-only. */}
       </>
     );
 
