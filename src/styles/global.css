@@ -498,26 +498,53 @@ nav.site-nav {
 .wiki-hero.gh-hero .search-suggestions { display: none; }
 .wiki-hero.gh-hero .hero-right         { display: none; }
 
-/* Wiki hero carries more content than the other index heroes (title +
-   subtitle + the big search bar), so unlock the fixed 220px height and
-   give it extra vertical padding. The other pages still cap at 220px;
-   this one grows to whatever its content needs. */
-.wiki-hero.gh-hero {
-  height: auto !important;
-  min-height: 280px !important;
-  max-height: none !important;
-  padding: 2.5rem 2.5rem !important;
-}
+/* Wiki hero matches the 220px locked height like every other hero now.
+   The search bar (originally inside this hero) has been moved to its
+   own strip rendered directly below the hero — so Wiki lines up with
+   Forums / News / Jobs / Marketplace / Suppliers / Events. */
 
-/* Center-align the whole hero and make the content column wider so the
-   wiki header reads as a search hub. Title size matches the rest of
-   the site (36px) for consistency — no more over-sized wiki title
-   fighting the subtitle + search bar for vertical space. */
+/* Center-align the wiki title group so the search-hub identity reads
+   clearly even without the search bar inline. */
 .wiki-hero.gh-hero .hero-inner   { align-items: center !important; }
 .wiki-hero.gh-hero .hero-top     { flex-direction: column; align-items: center; width: 100%; }
 .wiki-hero.gh-hero .hero-left    { width: 100%; max-width: 760px; text-align: center; align-items: center !important; }
-.wiki-hero.gh-hero .hero-title   { font-size: 36px !important; line-height: 1.15 !important; margin: 0 0 0.6rem !important; text-align: center; }
-.wiki-hero.gh-hero .hero-sub     { font-size: 14px !important; line-height: 1.55 !important; max-width: 620px; margin: 0 auto !important; text-align: center; }
+.wiki-hero.gh-hero .hero-title   { text-align: center; }
+.wiki-hero.gh-hero .hero-sub     { max-width: 620px; margin: 0 auto !important; text-align: center; }
+
+/* ── WIKI SEARCH STRIP ── sits directly under the 220px brown hero. */
+.wiki-search-strip {
+  background: var(--wood-paper, #FDFBF5);
+  border-bottom: 1px solid var(--border, #E8DFCB);
+  padding: 1.25rem 2.5rem;
+}
+.wiki-search-inner {
+  max-width: 760px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.55rem;
+}
+.wiki-search-strip .wiki-search {
+  width: 100%;
+  max-width: 680px;
+  height: 52px;
+  border-radius: 999px;
+  padding: 0 4px 0 16px;
+  background: #fff;
+  border: 1px solid var(--border, #E8DFCB);
+  box-shadow: 0 4px 14px rgba(43, 26, 14, 0.08);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.wiki-search-strip .ws-input { flex: 1; font-size: 15px; border: 0; outline: none; background: transparent; color: var(--text-primary); font-family: 'Montserrat', sans-serif; }
+.wiki-search-strip .ws-btn { border-radius: 999px; padding: 0 1.5rem; height: 44px; background: var(--wood-warm); color: #fff; border: 0; font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: 14px; cursor: pointer; }
+.wiki-search-strip .ws-btn:hover { background: #8B4316; }
+.wiki-search-strip .search-suggestions { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.35rem; font-size: 12.5px; color: var(--text-muted); }
+.wiki-search-strip .search-sug-label { font-weight: 600; color: var(--text-secondary); }
+.wiki-search-strip .search-sug { color: var(--wood-warm); cursor: pointer; }
+.wiki-search-strip .search-sug:hover { text-decoration: underline; }
 .wiki-hero.gh-hero .wiki-search  {
   margin: 0.85rem auto 0 !important;
   max-width: 620px;
