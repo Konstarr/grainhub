@@ -138,7 +138,7 @@ export default function Nav() {
               style={{
                 background: 'transparent',
                 border: '1px solid rgba(255,255,255,0.2)',
-                color: 'inherit',
+                color: 'var(--wood-cream, #F5EAD6)',
                 cursor: 'pointer',
               }}
             >
