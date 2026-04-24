@@ -8,7 +8,7 @@ import { supabase } from '../../../lib/supabase.js';
 export async function uploadInlineImage(file, folder = 'news') {
   if (!file) throw new Error('No file');
   if (!file.type.startsWith('image/')) throw new Error('Not an image');
-  if (file.size > 8 * 1024 * 1024) throw new Error('Image is too large (max 8 MB)');
+  if (file.size > 50 * 1024 * 1024) throw new Error('Image is too large (max 50 MB)');
 
   const ext = (file.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '');
   const safeBase = file.name

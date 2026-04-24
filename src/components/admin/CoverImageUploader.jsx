@@ -16,7 +16,7 @@ import { supabase } from '../../lib/supabase.js';
  * Supports typing / pasting a URL directly too, so you can keep using an
  * external image host if you prefer.
  */
-const MAX_BYTES = 6 * 1024 * 1024; // 6 MB
+const MAX_BYTES = 50 * 1024 * 1024; // 50 MB (Supabase default upload cap)
 
 export default function CoverImageUploader({ value, onChange, folder = 'news' }) {
   const inputRef = useRef(null);
@@ -42,7 +42,7 @@ export default function CoverImageUploader({ value, onChange, folder = 'news' })
       return;
     }
     if (file.size > MAX_BYTES) {
-      setError('Image is too large — max 6 MB.');
+      setError('Image is too large — max 50 MB.');
       return;
     }
     setBusy(true);
@@ -177,7 +177,7 @@ export default function CoverImageUploader({ value, onChange, folder = 'news' })
               {busy ? 'Uploading…' : 'Drop an image, or click to browse'}
             </div>
             <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4 }}>
-              JPG, PNG, WEBP or GIF · max 6 MB · stored in Supabase
+              JPG, PNG, WEBP or GIF · max 50 MB · stored in Supabase
             </div>
           </div>
         )}
