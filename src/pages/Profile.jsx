@@ -45,9 +45,17 @@ export default function Profile() {
     full_name: '', bio: '', trade: '', location: '', website: '', avatar_url: '',
   });
 
+  // isMe: the profile being viewed belongs to the signed-in user.
+  // Compare against BOTH the loaded AuthContext profile id and the raw
+  // session user id — the latter is always available, so the Edit
+  // button stays visible even if the profile query in AuthContext is
+  // still in flight or failed.
   const isMe = useMemo(
-    () => !!profile && !!mySelf && profile.id === mySelf.id,
-    [profile, mySelf]
+    () =>
+      !!profile &&
+      ((mySelf && profile.id === mySelf.id) ||
+        (user?.id && profile.id === user.id)),
+    [profile, mySelf, user]
   );
 
   useEffect(() => {
