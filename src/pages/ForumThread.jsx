@@ -5,6 +5,7 @@ import '../styles/forumThread.css';
 import PageBack from '../components/shared/PageBack.jsx';
 import ReportModal from '../components/shared/ReportModal.jsx';
 import RichReplyBox from '../components/forums/RichReplyBox.jsx';
+import { SponsorSidebar } from '../components/sponsors/AdSlot.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { FORUM_GROUPS } from '../data/forumsData.js';
 import {
@@ -422,6 +423,7 @@ export default function ForumThread() {
         </div>
 
         <aside className="sidebar">
+          <SponsorSidebar />
           <div className="rs-card">
             <div className="rs-header">About this category</div>
             <div className="rs-body">

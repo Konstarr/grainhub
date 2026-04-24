@@ -8,6 +8,7 @@ import WikiArticleGrid from '../components/wiki/WikiArticleGrid.jsx';
 import ContributeCTA from '../components/wiki/ContributeCTA.jsx';
 import { useSupabaseList } from '../hooks/useSupabaseList.js';
 import { mapWikiRow } from '../lib/mappers.js';
+import { SponsorLeaderboard } from '../components/sponsors/AdSlot.jsx';
 
 const WIKI_GRADIENTS = [
   'linear-gradient(135deg,#1A2E48,#2D4A78)',
@@ -93,6 +94,8 @@ export default function Wiki() {
         onSearchChange={setSearchQuery}
         onSearchSubmit={scrollToResults}
       />
+
+      <SponsorLeaderboard />
 
       <div className="wiki-grid">
         <WikiLeftNav

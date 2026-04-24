@@ -4,6 +4,7 @@ import NewsCategoryTabs from '../components/news/NewsCategoryTabs.jsx';
 import HeroStory from '../components/news/HeroStory.jsx';
 import NewsGrid from '../components/news/NewsGrid.jsx';
 import NewsSidebar from '../components/news/NewsSidebar.jsx';
+import { SponsorHero, SponsorLeaderboard } from '../components/sponsors/AdSlot.jsx';
 import { useSupabaseList } from '../hooks/useSupabaseList.js';
 import { mapNewsRow } from '../lib/mappers.js';
 
@@ -60,9 +61,12 @@ export default function News() {
       <NewsPageHeader />
       <NewsCategoryTabs />
 
+      <SponsorHero />
+
       <div className="main-wrap">
         <div>
           <HeroStory story={heroStory} />
+          <SponsorLeaderboard />
           <NewsGrid stories={gridStories} />
         </div>
         <NewsSidebar />

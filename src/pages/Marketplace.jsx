@@ -3,6 +3,7 @@ import { useMemo, useRef, useState } from 'react';
 import CategoryHighway from '../components/marketplace/CategoryHighway.jsx';
 import FilterSidebar from '../components/marketplace/FilterSidebar.jsx';
 import ListingsArea from '../components/marketplace/ListingsArea.jsx';
+import { SponsorLeaderboard } from '../components/sponsors/AdSlot.jsx';
 import { MARKETPLACE_HEADER } from '../data/marketplaceData.js';
 import { useSupabaseList } from '../hooks/useSupabaseList.js';
 import { mapMarketplaceRow } from '../lib/mappers.js';
@@ -268,6 +269,8 @@ export default function Marketplace() {
       </div>
 
       <CategoryHighway activeCategory={activeCategory} onCategorySelect={setActiveCategory} />
+
+      <SponsorLeaderboard />
 
       <div className="mk-wrap" ref={listingsRef}>
         <FilterSidebar

@@ -5,6 +5,7 @@ import '../styles/wikiArticle.css';
 import PageBack from '../components/shared/PageBack.jsx';
 import { supabase } from '../lib/supabase.js';
 import { mapWikiRow } from '../lib/mappers.js';
+import { SponsorSidebar } from '../components/sponsors/AdSlot.jsx';
 
 function formatDate(iso) {
   if (!iso) return '';
@@ -118,6 +119,8 @@ export default function WikiArticle() {
               <button className="contrib-btn">Edit this article</button>
             </div>
           </div>
+
+          <SponsorSidebar />
         </aside>
 
         <article className="article" id="top">

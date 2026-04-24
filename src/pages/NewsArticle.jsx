@@ -4,6 +4,7 @@ import ReactMarkdown from 'react-markdown';
 import '../styles/newsArticle.css';
 import '../styles/editor.css';
 import PageBack from '../components/shared/PageBack.jsx';
+import { SponsorSidebar } from '../components/sponsors/AdSlot.jsx';
 import { supabase } from '../lib/supabase.js';
 
 /** Content may be either HTML (new editor) or markdown (legacy). */
@@ -172,6 +173,7 @@ export default function NewsArticle() {
         </article>
 
         <aside className="right-col">
+          <SponsorSidebar />
           <div className="rs-card">
             <div className="rs-header">🔥 Related News</div>
             <div className="rs-body">
