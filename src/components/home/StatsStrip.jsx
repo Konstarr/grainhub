@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase.js';
+import CountUp from './CountUp.jsx';
 
 /**
  * A full-bleed stat band that sits directly under the sponsor
@@ -48,7 +49,11 @@ export default function StatsStrip() {
       <div className="stats-strip-inner">
         {items.map((it) => (
           <div key={it.label} className="stats-cell">
-            <div className="stats-value">{formatCount(it.value)}</div>
+            <div className="stats-value">
+              {/* CountUp animates from 0 → live value once the strip
+                  scrolls into view AND the data has loaded. */}
+              <CountUp value={it.value} duration={1600} />
+            </div>
             <div className="stats-label">{it.label}</div>
             <div className="stats-sub">{it.sub}</div>
           </div>
@@ -56,10 +61,4 @@ export default function StatsStrip() {
       </div>
     </section>
   );
-}
-
-function formatCount(n) {
-  if (n >= 1000000) return (n / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
-  if (n >= 1000) return (n / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
-  return Number(n || 0).toLocaleString();
 }
