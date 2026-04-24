@@ -365,10 +365,8 @@
   flex: 1;
 }
 
-/* ── SIDEBAR ── */
+/* ── SIDEBAR — scrolls with the page, not pinned ── */
 .right-col {
-  position: sticky;
-  top: 80px;
   display: flex;
   flex-direction: column;
   gap: 1.25rem;

@@ -8,14 +8,21 @@ export const NEWS_PAGE_HEADER = {
   subtitle: 'Market reports, product launches, industry events, regulatory updates, and trade news from across the millwork and cabinet industry.',
 };
 
+// Tab ids MUST match the `category` column values in the
+// news_articles table exactly (case-sensitive) — otherwise the
+// ?category filter on the News page returns an empty result set.
+// `all` is the special no-filter selection.
 export const NEWS_CATEGORY_TABS = [
-  { label: 'All Stories', count: '2,847', id: 'all' },
-  { label: 'Industry Reports', count: '156', id: 'reports' },
-  { label: 'Markets & Supply', count: '412', id: 'markets' },
-  { label: 'CNC & Technology', count: '284', id: 'technology' },
-  { label: 'Regulatory & Compliance', count: '128', id: 'regulatory' },
-  { label: 'People & Hiring', count: '93', id: 'people' },
-  { label: 'Events & Awards', count: '72', id: 'events' },
+  { label: 'All Stories', id: 'all' },
+  { label: 'Industry',    id: 'Industry' },
+  { label: 'Markets',     id: 'Markets' },
+  { label: 'Materials',   id: 'Materials' },
+  { label: 'Machinery',   id: 'Machinery' },
+  { label: 'Software',    id: 'Software' },
+  { label: 'Hardware',    id: 'Hardware' },
+  { label: 'Finishing',   id: 'Finishing' },
+  { label: 'Regulatory',  id: 'Regulatory' },
+  { label: 'Standards',   id: 'Standards' },
 ];
 
 export const HERO_STORY = {

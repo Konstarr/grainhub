@@ -138,8 +138,8 @@
 .sim-price { font-family: 'Montserrat', sans-serif; font-size: 17px; color: var(--wood-warm); }
 .sim-loc { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
 
-/* ── RIGHT: STICKY PANEL ── */
-.right-col { position: sticky; top: 80px; display: flex; flex-direction: column; gap: 1rem; }
+/* ── RIGHT PANEL — scrolls with page content ── */
+.right-col { display: flex; flex-direction: column; gap: 1rem; }
 
 /* PRICE CARD */
 .price-card { background: var(--white); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; box-shadow: 0 4px 20px rgba(44,26,14,0.08); }

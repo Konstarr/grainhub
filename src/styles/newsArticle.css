@@ -532,10 +532,8 @@ article {}
   color: var(--text-muted);
 }
 
-/* SIDEBAR */
+/* SIDEBAR — scrolls naturally with the page */
 .right-col {
-  position: sticky;
-  top: 80px;
   display: flex;
   flex-direction: column;
   gap: 1.25rem;

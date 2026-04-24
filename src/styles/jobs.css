@@ -706,10 +706,8 @@
   font-weight: 500;
 }
 
-/* RIGHT SIDEBAR */
+/* RIGHT SIDEBAR — non-sticky so it scrolls with the page content. */
 .right-col {
-  position: sticky;
-  top: 80px;
   display: flex;
   flex-direction: column;
   gap: 1.25rem;

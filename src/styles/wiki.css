@@ -465,10 +465,8 @@
   font-weight: 600;
 }
 
-/* ---------- Right sidebar ---------- */
+/* ---------- Right sidebar — scrolls with the page ---------- */
 .right-col {
-  position: sticky;
-  top: 1rem;
   display: flex;
   flex-direction: column;
   gap: 1.25rem;

@@ -724,10 +724,9 @@ a.hot-topic { text-decoration: none; }
 .tb-pinned { background: #EDE0C4; color: #8B5E08; }
 .tb-featured { background: #FFF3DC; color: #8B5E08; }
 
-/* SIDEBAR */
+/* SIDEBAR — scrolls naturally with the page so every card is reachable
+   as the user scrolls, rather than being pinned at the top. */
 .right-col {
-  position: sticky;
-  top: 80px;
   display: flex;
   flex-direction: column;
   gap: 1.25rem;

@@ -473,7 +473,7 @@
 .page-btn.active { background: var(--wood-warm); border-color: var(--wood-warm); color: white; font-weight: 500; }
 
 /* RIGHT SIDEBAR */
-.right-col { position: sticky; top: 80px; display: flex; flex-direction: column; gap: 1.25rem; }
+.right-col { display: flex; flex-direction: column; gap: 1.25rem; }
 .rs-card { background: var(--white); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
 .rs-header { background: var(--wood-dark); padding: 0.75rem 1.25rem; font-family: 'Montserrat', sans-serif; font-size: 15px; color: var(--wood-cream); }
 .rs-body { padding: 1rem 1.25rem; }
