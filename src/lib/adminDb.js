@@ -321,3 +321,69 @@ export async function fetchPublicSponsorMedia(slot) {
     .order('sort_order', { ascending: true });
   return { data: data || [], error };
 }
+
+export async function listSponsorMediaByOwner(ownerId) {
+  if (!ownerId) return { data: [], error: null };
+  const { data, error } = await supabase
+    .from('sponsor_media')
+    .select('*')
+    .eq('owner_id', ownerId)
+    .order('slot', { ascending: true })
+    .order('sort_order', { ascending: true });
+  return { data: data || [], error };
+}
+
+/**
+ * Tier → slot access map. A sponsor can upload assets only to slots
+ * their tier unlocks. Platinum gets everything; lower tiers get
+ * progressively fewer slots.
+ */
+export const TIER_SLOT_ACCESS = {
+  silver:   ['marquee'],
+  gold:     ['marquee', 'sidebar'],
+  platinum: ['marquee', 'sidebar', 'leaderboard', 'hero'],
+};
+
+export function slotsForTier(tier) {
+  return TIER_SLOT_ACCESS[tier] || [];
+}
+
+/**
+ * Full catalog of sponsors grouped by tier — for the admin overview.
+ * Returns a map { platinum: [...], gold: [...], silver: [...] } where
+ * each entry is a profile row augmented with its media count + a small
+ * thumbnail list.
+ */
+export async function fetchSponsorDashboard() {
+  const { data: profiles, error } = await supabase
+    .from('profiles')
+    .select('id, username, full_name, avatar_url, sponsor_tier, sponsor_company, sponsor_notes')
+    .not('sponsor_tier', 'is', null)
+    .order('sponsor_tier', { ascending: false })
+    .order('full_name',    { ascending: true });
+  if (error) return { data: { platinum: [], gold: [], silver: [] }, error };
+
+  // Fetch all media for these sponsors in one shot
+  const ids = (profiles || []).map((p) => p.id);
+  let mediaByOwner = new Map();
+  if (ids.length > 0) {
+    const { data: media } = await supabase
+      .from('sponsor_media')
+      .select('id, owner_id, slot, image_url, is_approved, is_active')
+      .in('owner_id', ids);
+    (media || []).forEach((m) => {
+      const arr = mediaByOwner.get(m.owner_id) || [];
+      arr.push(m);
+      mediaByOwner.set(m.owner_id, arr);
+    });
+  }
+
+  const grouped = { platinum: [], gold: [], silver: [] };
+  (profiles || []).forEach((p) => {
+    const media = mediaByOwner.get(p.id) || [];
+    const entry = { ...p, media, mediaCount: media.length };
+    if (grouped[p.sponsor_tier]) grouped[p.sponsor_tier].push(entry);
+  });
+
+  return { data: grouped, error: null };
+}

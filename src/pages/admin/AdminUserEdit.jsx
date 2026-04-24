@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import AdminLayout from '../../components/admin/AdminLayout.jsx';
 import CoverImageUploader from '../../components/admin/CoverImageUploader.jsx';
+import SponsorMediaEditor from '../../components/admin/SponsorMediaEditor.jsx';
 import { getProfile, updateProfileAdmin } from '../../lib/adminDb.js';
 import { useAuth } from '../../context/AuthContext.jsx';
 
@@ -251,12 +252,16 @@ export default function AdminUserEdit() {
               placeholder="Contract dates, contact, renewal reminders."
             />
           </div>
-          <div className="adm-field full">
-            <Link to="/admin/sponsors" className="adm-btn">
-              → Manage this sponsor&apos;s media
-            </Link>
-          </div>
         </div>
+
+        {form.sponsor_tier && (
+          <div style={{ marginTop: 18, paddingTop: 14, borderTop: '1px solid var(--border)' }}>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: 15, color: 'var(--text-primary)', marginBottom: 8 }}>
+              Ad placements &amp; media
+            </div>
+            <SponsorMediaEditor ownerId={form.id} tier={form.sponsor_tier} />
+          </div>
+        )}
       </div>
 
       {/* ------------- Save ------------- */}

@@ -1,305 +1,225 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import AdminLayout from '../../components/admin/AdminLayout.jsx';
-import CoverImageUploader from '../../components/admin/CoverImageUploader.jsx';
-import {
-  listSponsorMedia,
-  createSponsorMedia,
-  updateSponsorMedia,
-  deleteSponsorMedia,
-} from '../../lib/adminDb.js';
+import { fetchSponsorDashboard, slotsForTier } from '../../lib/adminDb.js';
 
 /**
- * Ad slots and the sizes we recommend for each.
- * These hints drive the "Size guidance" panel the admin sees when
- * uploading, so sponsor assets stay consistent across the site.
+ * /admin/sponsors — overview dashboard, grouped by tier.
+ *
+ * Every sponsor card links through to the user's profile edit page, where
+ * the sponsor section now owns all the media CRUD. Staff come here for a
+ * quick "who's active, who's missing creative" read.
  */
-const SLOTS = [
-  { key: 'marquee',     label: 'Homepage Marquee',    sizeHint: '240×80 · transparent PNG or SVG ideal',  desc: 'Horizontal scrolling logo strip on the homepage.' },
-  { key: 'leaderboard', label: 'Leaderboard Banner',  sizeHint: '970×90 or 728×90 · JPG/PNG',              desc: 'Top banner above index pages (Marketplace, News, Wiki).' },
-  { key: 'sidebar',     label: 'Sidebar Card',        sizeHint: '300×250 or 300×600 · JPG/PNG',            desc: 'Right-column ad on article/thread pages.' },
-  { key: 'hero',        label: 'Featured Hero',       sizeHint: '1200×400 · JPG/PNG',                      desc: 'Large featured sponsor block on homepage / News.' },
-  { key: 'other',       label: 'Other / Misc',        sizeHint: 'Any size',                                desc: 'Ad hoc placements — use sparingly.' },
+const TIERS = [
+  { key: 'platinum', label: 'Platinum', bg: 'linear-gradient(135deg, #F4E5A8, #D4A849)', accent: '#8A5B0C' },
+  { key: 'gold',     label: 'Gold',     bg: 'linear-gradient(135deg, #FDF3D2, #E4BC55)', accent: '#7A5416' },
+  { key: 'silver',   label: 'Silver',   bg: 'linear-gradient(135deg, #EDEDED, #BFBFBF)', accent: '#4E4E4E' },
 ];
 
-const TIERS = [
-  { key: '',         label: 'House ad (no tier)' },
-  { key: 'silver',   label: 'Silver' },
-  { key: 'gold',     label: 'Gold' },
-  { key: 'platinum', label: 'Platinum' },
-];
+const SLOT_LABEL = {
+  marquee:     'Marquee',
+  leaderboard: 'Leaderboard',
+  sidebar:     'Sidebar',
+  hero:        'Hero',
+  other:       'Other',
+};
 
 export default function AdminSponsors() {
-  const [rows, setRows] = useState([]);
+  const [data, setData] = useState({ platinum: [], gold: [], silver: [] });
   const [loading, setLoading] = useState(true);
-  const [editing, setEditing] = useState(null); // row being edited (or 'new')
   const [err, setErr] = useState(null);
 
-  const load = async () => {
-    setLoading(true);
-    const { data, error } = await listSponsorMedia({});
-    if (error) setErr(error.message || 'Failed to load');
-    setRows(data || []);
-    setLoading(false);
-  };
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      setLoading(true);
+      const { data, error } = await fetchSponsorDashboard();
+      if (cancelled) return;
+      if (error) setErr(error.message || 'Failed to load');
+      setData(data || { platinum: [], gold: [], silver: [] });
+      setLoading(false);
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
-  useEffect(() => { load(); }, []);
-
-  const handleSave = async (form) => {
-    if (form.id) {
-      const { error } = await updateSponsorMedia(form.id, stripId(form));
-      if (error) { alert('Save failed: ' + (error.message || 'unknown')); return; }
-    } else {
-      const { error } = await createSponsorMedia(form);
-      if (error) { alert('Create failed: ' + (error.message || 'unknown')); return; }
-    }
-    setEditing(null);
-    load();
-  };
-
-  const handleDelete = async (id) => {
-    if (!confirm('Delete this asset?')) return;
-    const { error } = await deleteSponsorMedia(id);
-    if (error) { alert('Delete failed: ' + (error.message || 'unknown')); return; }
-    load();
-  };
-
-  const handleToggleApproved = async (row) => {
-    const { error } = await updateSponsorMedia(row.id, { is_approved: !row.is_approved });
-    if (error) { alert(error.message || 'Failed'); return; }
-    load();
-  };
-  const handleToggleActive = async (row) => {
-    const { error } = await updateSponsorMedia(row.id, { is_active: !row.is_active });
-    if (error) { alert(error.message || 'Failed'); return; }
-    load();
-  };
-
-  const bySlot = {};
-  (rows || []).forEach((r) => {
-    bySlot[r.slot] = bySlot[r.slot] || [];
-    bySlot[r.slot].push(r);
-  });
+  const totals = (data.platinum.length || 0) + (data.gold.length || 0) + (data.silver.length || 0);
 
   return (
     <AdminLayout
-      title="Sponsor media"
-      subtitle={loading ? 'Loading…' : `${rows.length} assets`}
-      actions={
-        <button className="adm-btn primary" onClick={() => setEditing({
-          name: '', tier: '', slot: 'marquee', image_url: '', click_url: '', alt_text: '',
-          is_approved: false, is_active: true, sort_order: 0,
-        })}>+ New asset</button>
-      }
+      title="Sponsors"
+      subtitle={loading
+        ? 'Loading…'
+        : `${totals} active sponsor${totals === 1 ? '' : 's'} · ${data.platinum.length} Platinum · ${data.gold.length} Gold · ${data.silver.length} Silver`}
+      actions={<Link to="/admin/users" className="adm-btn">Promote a user →</Link>}
     >
       {err && <div className="adm-error" style={{ marginBottom: 12 }}>{err}</div>}
 
-      {SLOTS.map((slot) => (
-        <SlotSection
-          key={slot.key}
-          slot={slot}
-          assets={bySlot[slot.key] || []}
-          onEdit={setEditing}
-          onDelete={handleDelete}
-          onToggleApproved={handleToggleApproved}
-          onToggleActive={handleToggleActive}
-        />
-      ))}
+      <div
+        className="adm-card"
+        style={{ padding: '1rem 1.25rem', marginBottom: 14, background: 'var(--wood-cream, #FBF6EC)' }}
+      >
+        <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.55 }}>
+          <strong style={{ color: 'var(--text-primary)' }}>How this works.</strong>{' '}
+          A user becomes a sponsor the moment you assign them a tier on their profile. Their tier
+          automatically unlocks matching ad slots, and they can upload media directly inside their
+          user edit page. Nothing to double-manage here.
+          <div style={{ marginTop: 6, display: 'flex', gap: 14, flexWrap: 'wrap' }}>
+            <TierMap tier="silver"   slots={slotsForTier('silver')} />
+            <TierMap tier="gold"     slots={slotsForTier('gold')} />
+            <TierMap tier="platinum" slots={slotsForTier('platinum')} />
+          </div>
+        </div>
+      </div>
 
-      {editing && (
-        <EditModal
-          row={editing}
-          onCancel={() => setEditing(null)}
-          onSave={handleSave}
-        />
-      )}
+      {TIERS.map((tier) => {
+        const sponsors = data[tier.key] || [];
+        return (
+          <div key={tier.key} className="adm-card" style={{ marginBottom: 18 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14, flexWrap: 'wrap', gap: 10 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div style={{
+                  width: 28, height: 28, borderRadius: 6, background: tier.bg,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  color: tier.accent, fontWeight: 800, fontSize: 11,
+                  letterSpacing: '0.08em', textShadow: '0 1px 0 rgba(255,255,255,0.4)',
+                }}>
+                  {tier.label[0]}
+                </div>
+                <div>
+                  <div style={{ fontFamily: 'var(--font-display)', fontSize: 18, color: 'var(--text-primary)' }}>
+                    {tier.label} sponsors
+                  </div>
+                  <div style={{ fontSize: 11.5, color: 'var(--text-muted)', marginTop: 1 }}>
+                    Unlocks: {slotsForTier(tier.key).map((s) => SLOT_LABEL[s]).join(' · ') || 'no slots'}
+                  </div>
+                </div>
+              </div>
+              <span className="adm-pill pub">{sponsors.length}</span>
+            </div>
+
+            {sponsors.length === 0 ? (
+              <div className="adm-empty">No {tier.label.toLowerCase()} sponsors yet.</div>
+            ) : (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 12 }}>
+                {sponsors.map((s) => (
+                  <SponsorCard key={s.id} sponsor={s} accent={tier.accent} />
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      })}
     </AdminLayout>
   );
 }
 
-function SlotSection({ slot, assets, onEdit, onDelete, onToggleApproved, onToggleActive }) {
+function TierMap({ tier, slots }) {
   return (
-    <div className="adm-card" style={{ marginBottom: 18 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12, marginBottom: 10 }}>
-        <div>
-          <div style={{ fontFamily: 'var(--font-display)', fontSize: 17, color: 'var(--text-primary)' }}>
-            {slot.label}
-          </div>
-          <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>{slot.desc}</div>
-          <div style={{ fontSize: 11.5, color: 'var(--wood-warm)', marginTop: 4, fontWeight: 600 }}>
-            Recommended: {slot.sizeHint}
-          </div>
-        </div>
-        <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
-          {assets.length} asset{assets.length === 1 ? '' : 's'}
-        </div>
-      </div>
-
-      {assets.length === 0 ? (
-        <div className="adm-empty" style={{ padding: '1.25rem' }}>
-          Nothing here yet.
-        </div>
-      ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 12 }}>
-          {assets.map((a) => (
-            <div key={a.id} style={{
-              border: '1px solid var(--border)',
-              borderRadius: 10,
-              background: 'var(--white)',
-              overflow: 'hidden',
-            }}>
-              <div style={{
-                height: 110,
-                background: 'linear-gradient(135deg, #F1E4CC, #E6D5B3)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: 10,
-              }}>
-                {a.image_url
-                  ? <img src={a.image_url} alt={a.alt_text || a.name} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
-                  : <div style={{ color: 'var(--text-muted)', fontSize: 12 }}>No image</div>}
-              </div>
-              <div style={{ padding: '0.6rem 0.75rem' }}>
-                <div style={{ fontWeight: 600, fontSize: 13.5, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {a.name}
-                </div>
-                <div style={{ display: 'flex', gap: 5, marginTop: 4, flexWrap: 'wrap' }}>
-                  {a.tier && <span className="adm-pill pub" style={{ textTransform: 'capitalize' }}>{a.tier}</span>}
-                  <span className={'adm-pill ' + (a.is_approved ? 'pub' : 'draft')}>
-                    {a.is_approved ? 'Approved' : 'Pending'}
-                  </span>
-                  <span className={'adm-pill ' + (a.is_active ? 'pub' : 'draft')}>
-                    {a.is_active ? 'Active' : 'Paused'}
-                  </span>
-                </div>
-                <div style={{ display: 'flex', gap: 4, marginTop: 8, flexWrap: 'wrap' }}>
-                  <button className="adm-btn" style={{ padding: '3px 9px', fontSize: 12 }} onClick={() => onEdit(a)}>Edit</button>
-                  <button className="adm-btn" style={{ padding: '3px 9px', fontSize: 12 }} onClick={() => onToggleApproved(a)}>
-                    {a.is_approved ? 'Unapprove' : 'Approve'}
-                  </button>
-                  <button className="adm-btn" style={{ padding: '3px 9px', fontSize: 12 }} onClick={() => onToggleActive(a)}>
-                    {a.is_active ? 'Pause' : 'Resume'}
-                  </button>
-                  <button className="adm-btn danger" style={{ padding: '3px 9px', fontSize: 12 }} onClick={() => onDelete(a.id)}>Delete</button>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+    <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>
+      <strong style={{ textTransform: 'capitalize', color: 'var(--text-primary)', fontWeight: 600 }}>
+        {tier}:
+      </strong>{' '}
+      {slots.map((s) => SLOT_LABEL[s]).join(' · ') || '—'}
     </div>
   );
 }
 
-function EditModal({ row, onCancel, onSave }) {
-  const [form, setForm] = useState(row);
-  const set = (k) => (v) => setForm((f) => ({ ...f, [k]: v }));
-  const currentSlot = SLOTS.find((s) => s.key === form.slot);
+function SponsorCard({ sponsor, accent }) {
+  const initials = (sponsor.full_name || sponsor.username || '??')
+    .split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase();
+
+  // Per-slot coverage: which slots have at least one approved+active asset?
+  const bySlot = {};
+  (sponsor.media || []).forEach((m) => {
+    (bySlot[m.slot] = bySlot[m.slot] || []).push(m);
+  });
+
+  // Show up to 3 thumbnail previews
+  const thumbs = (sponsor.media || []).slice(0, 3);
 
   return (
-    <div
-      onClick={onCancel}
-      style={{
-        position: 'fixed', inset: 0, background: 'rgba(0, 0, 0, 0.45)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 16,
-      }}
+    <Link
+      to={'/admin/users/' + sponsor.id}
+      style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}
     >
-      <div
-        onClick={(e) => e.stopPropagation()}
-        style={{
-          background: 'var(--white)', borderRadius: 14, width: '100%', maxWidth: 640,
-          maxHeight: '90vh', overflowY: 'auto', border: '1px solid var(--border)', padding: '1.5rem',
-        }}
+      <div style={{
+        border: '1px solid var(--border)',
+        borderRadius: 12,
+        padding: '0.9rem 1rem',
+        background: 'var(--white)',
+        transition: 'transform 120ms, box-shadow 120ms, border-color 120ms',
+      }}
+        onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--wood-warm)'; e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '0 6px 18px rgba(90,66,38,0.08)'; }}
+        onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--border)';     e.currentTarget.style.transform = '';                    e.currentTarget.style.boxShadow = 'none'; }}
       >
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-          <h2 style={{ margin: 0, fontFamily: 'var(--font-display)', fontSize: 20 }}>
-            {form.id ? 'Edit asset' : 'New sponsor asset'}
-          </h2>
-          <button type="button" className="adm-btn" onClick={onCancel}>×</button>
+        <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+          <div style={{
+            width: 44, height: 44, borderRadius: '50%',
+            background: sponsor.avatar_url
+              ? 'url(' + sponsor.avatar_url + ') center/cover no-repeat'
+              : 'linear-gradient(135deg, #4A2A12, #A0642B)',
+            color: '#fff',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontWeight: 700, fontSize: 13, flexShrink: 0,
+          }}>
+            {!sponsor.avatar_url && initials}
+          </div>
+          <div style={{ minWidth: 0, flex: 1 }}>
+            <div style={{ fontWeight: 600, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {sponsor.sponsor_company || sponsor.full_name || sponsor.username}
+            </div>
+            <div style={{ fontSize: 12, color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              @{sponsor.username}
+            </div>
+          </div>
         </div>
 
-        <div className="adm-form">
-          <div className="adm-field">
-            <label className="adm-label">Name</label>
-            <input type="text" className="adm-input" value={form.name || ''} onChange={(e) => set('name')(e.target.value)} placeholder="e.g. Blum SERVO-DRIVE" />
-          </div>
-
-          <div className="adm-form-grid">
-            <div className="adm-field">
-              <label className="adm-label">Slot</label>
-              <select className="adm-select" value={form.slot} onChange={(e) => set('slot')(e.target.value)}>
-                {SLOTS.map((s) => <option key={s.key} value={s.key}>{s.label}</option>)}
-              </select>
-              {currentSlot && (
-                <div className="adm-hint">{currentSlot.sizeHint}</div>
-              )}
-            </div>
-            <div className="adm-field">
-              <label className="adm-label">Tier</label>
-              <select className="adm-select" value={form.tier || ''} onChange={(e) => set('tier')(e.target.value || null)}>
-                {TIERS.map((t) => <option key={t.key} value={t.key}>{t.label}</option>)}
-              </select>
-            </div>
-
-            <div className="adm-field">
-              <label className="adm-label">Click-through URL</label>
-              <input type="text" className="adm-input" value={form.click_url || ''} onChange={(e) => set('click_url')(e.target.value)} placeholder="https://…" />
-            </div>
-            <div className="adm-field">
-              <label className="adm-label">Alt text</label>
-              <input type="text" className="adm-input" value={form.alt_text || ''} onChange={(e) => set('alt_text')(e.target.value)} placeholder="Short description" />
-            </div>
-
-            <div className="adm-field">
-              <label className="adm-label">Sort order</label>
-              <input type="number" className="adm-input" value={form.sort_order || 0} onChange={(e) => set('sort_order')(Number(e.target.value) || 0)} />
-            </div>
-          </div>
-
-          <div className="adm-field">
-            <label className="adm-label">Image</label>
-            <CoverImageUploader
-              value={form.image_url || ''}
-              onChange={(url) => set('image_url')(url)}
-              folder="sponsors"
-            />
-          </div>
-
-          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-            <label style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13 }}>
-              <input type="checkbox" checked={!!form.is_approved} onChange={() => set('is_approved')(!form.is_approved)} />
-              Approved
-            </label>
-            <label style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13 }}>
-              <input type="checkbox" checked={!!form.is_active} onChange={() => set('is_active')(!form.is_active)} />
-              Active
-            </label>
-          </div>
-
-          <div className="adm-footer">
-            <div />
-            <div style={{ display: 'flex', gap: 8 }}>
-              <button className="adm-btn" onClick={onCancel}>Cancel</button>
-              <button
-                className="adm-btn primary"
-                onClick={() => onSave(form)}
-                disabled={!form.name || !form.image_url}
+        {thumbs.length > 0 && (
+          <div style={{ display: 'flex', gap: 6, marginTop: 10, height: 48 }}>
+            {thumbs.map((m) => (
+              <div
+                key={m.id}
+                style={{
+                  flex: 1,
+                  background: 'linear-gradient(135deg, #F1E4CC, #E6D5B3)',
+                  borderRadius: 6,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  padding: 3,
+                  overflow: 'hidden',
+                }}
               >
-                {form.id ? 'Save' : 'Create'}
-              </button>
-            </div>
+                <img src={m.image_url} alt="" style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
+              </div>
+            ))}
           </div>
+        )}
+
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginTop: 10, fontSize: 10.5 }}>
+          {slotsForTier(sponsor.sponsor_tier).map((slot) => {
+            const count = (bySlot[slot] || []).filter((m) => m.is_approved && m.is_active).length;
+            const missing = count === 0;
+            return (
+              <span
+                key={slot}
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 4,
+                  padding: '2px 8px', borderRadius: 999,
+                  border: '1px solid ' + (missing ? '#fecaca' : 'var(--border)'),
+                  background: missing ? '#fef2f2' : 'var(--wood-cream, #FBF6EC)',
+                  color: missing ? '#991b1b' : accent,
+                  fontWeight: 600,
+                }}
+              >
+                {missing ? '○' : '●'} {SLOT_LABEL[slot]} ({count})
+              </span>
+            );
+          })}
+        </div>
+
+        <div style={{ fontSize: 11, color: 'var(--wood-warm)', marginTop: 10, fontWeight: 600 }}>
+          Edit sponsor →
         </div>
       </div>
-    </div>
+    </Link>
   );
-}
-
-function stripId(obj) {
-  const clone = { ...obj };
-  delete clone.id;
-  delete clone.created_at;
-  delete clone.updated_at;
-  return clone;
 }
