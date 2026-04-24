@@ -1,0 +1,219 @@
+import { useRef, useState } from 'react';
+import { supabase } from '../../lib/supabase.js';
+
+/**
+ * CoverImageUploader
+ *
+ * Drag-drop + click-to-upload for a single image. Uploads to the public
+ * `media` bucket in Supabase Storage under `news/<timestamp>-<rand>-<name>`,
+ * then hands the resulting public URL back to the caller via `onChange`.
+ *
+ * Props:
+ *   value     – current public URL (string or '')
+ *   onChange  – (url: string) => void
+ *   folder    – storage prefix, default 'news'
+ *
+ * Supports typing / pasting a URL directly too, so you can keep using an
+ * external image host if you prefer.
+ */
+const MAX_BYTES = 6 * 1024 * 1024; // 6 MB
+
+export default function CoverImageUploader({ value, onChange, folder = 'news' }) {
+  const inputRef = useRef(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState(null);
+  const [dragOver, setDragOver] = useState(false);
+  const [urlInput, setUrlInput] = useState(value || '');
+
+  // Keep the local input in sync when parent updates the URL (e.g. after load).
+  if (urlInput !== value && !busy) {
+    // Only sync when the parent value is a fresh load — don't clobber typing.
+    if ((!urlInput && value) || (urlInput !== '' && value === '')) {
+      setUrlInput(value || '');
+    }
+  }
+
+  const handleFiles = async (files) => {
+    setError(null);
+    const file = files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      setError('Please pick an image file (jpg, png, webp, gif).');
+      return;
+    }
+    if (file.size > MAX_BYTES) {
+      setError('Image is too large — max 6 MB.');
+      return;
+    }
+    setBusy(true);
+    try {
+      const ext = (file.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '');
+      const safeBase = file.name
+        .replace(/\.[^/.]+$/, '')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+        .slice(0, 40) || 'cover';
+      const rand = Math.random().toString(36).slice(2, 8);
+      const key = `${folder}/${Date.now()}-${rand}-${safeBase}.${ext}`;
+
+      const { error: upErr } = await supabase.storage
+        .from('media')
+        .upload(key, file, { cacheControl: '3600', upsert: false, contentType: file.type });
+
+      if (upErr) throw upErr;
+
+      const { data: pub } = supabase.storage.from('media').getPublicUrl(key);
+      const url = pub?.publicUrl || '';
+      setUrlInput(url);
+      onChange(url);
+    } catch (e) {
+      setError(e.message || 'Upload failed');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const handleUrlBlur = () => {
+    if (urlInput !== (value || '')) onChange(urlInput.trim());
+  };
+
+  return (
+    <div>
+      <div
+        onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+        onDragLeave={() => setDragOver(false)}
+        onDrop={(e) => {
+          e.preventDefault();
+          setDragOver(false);
+          if (e.dataTransfer?.files?.length) handleFiles(e.dataTransfer.files);
+        }}
+        onClick={() => inputRef.current?.click()}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') inputRef.current?.click(); }}
+        style={{
+          position: 'relative',
+          border: '2px dashed ' + (dragOver ? 'var(--wood-warm)' : 'var(--border)'),
+          borderRadius: 12,
+          padding: value ? 0 : '1.5rem',
+          background: dragOver ? 'rgba(138, 80, 48, 0.06)' : 'var(--wood-cream, #FBF6EC)',
+          cursor: 'pointer',
+          textAlign: 'center',
+          transition: 'border-color 120ms, background 120ms',
+          overflow: 'hidden',
+          minHeight: value ? 180 : 140,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        {value ? (
+          <>
+            <img
+              src={value}
+              alt="Cover preview"
+              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+              onError={(e) => { e.currentTarget.style.display = 'none'; }}
+            />
+            <div
+              style={{
+                position: 'absolute',
+                top: 8, right: 8,
+                display: 'flex', gap: 6,
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                type="button"
+                onClick={() => inputRef.current?.click()}
+                disabled={busy}
+                style={{
+                  padding: '0.35rem 0.7rem',
+                  borderRadius: 999,
+                  border: 'none',
+                  background: 'rgba(0,0,0,0.7)',
+                  color: '#fff',
+                  fontSize: 11.5,
+                  cursor: 'pointer',
+                  fontWeight: 600,
+                }}
+              >
+                {busy ? 'Uploading…' : 'Replace'}
+              </button>
+              <button
+                type="button"
+                onClick={() => { setUrlInput(''); onChange(''); }}
+                style={{
+                  padding: '0.35rem 0.7rem',
+                  borderRadius: 999,
+                  border: 'none',
+                  background: 'rgba(0,0,0,0.7)',
+                  color: '#fff',
+                  fontSize: 11.5,
+                  cursor: 'pointer',
+                  fontWeight: 600,
+                }}
+              >
+                Remove
+              </button>
+            </div>
+          </>
+        ) : (
+          <div>
+            <div style={{ fontSize: 28, marginBottom: 6 }}>
+              {busy ? '⏳' : '🖼️'}
+            </div>
+            <div style={{ fontWeight: 600, color: 'var(--text-primary)', fontSize: 14 }}>
+              {busy ? 'Uploading…' : 'Drop an image, or click to browse'}
+            </div>
+            <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4 }}>
+              JPG, PNG, WEBP or GIF · max 6 MB · stored in Supabase
+            </div>
+          </div>
+        )}
+
+        <input
+          ref={inputRef}
+          type="file"
+          accept="image/*"
+          style={{ display: 'none' }}
+          onChange={(e) => {
+            if (e.target.files?.length) handleFiles(e.target.files);
+            e.target.value = '';
+          }}
+        />
+      </div>
+
+      {error && (
+        <div
+          style={{
+            marginTop: 6,
+            padding: '0.4rem 0.7rem',
+            background: '#fef2f2',
+            border: '1px solid #fecaca',
+            color: '#991b1b',
+            borderRadius: 6,
+            fontSize: 12.5,
+          }}
+        >
+          {error}
+        </div>
+      )}
+
+      <div style={{ marginTop: 10 }}>
+        <label style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: 3 }}>
+          Or paste an image URL
+        </label>
+        <input
+          type="text"
+          className="adm-input"
+          value={urlInput}
+          onChange={(e) => setUrlInput(e.target.value)}
+          onBlur={handleUrlBlur}
+          placeholder="https://…"
+        />
+      </div>
+    </div>
+  );
+}

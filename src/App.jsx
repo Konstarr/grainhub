@@ -29,19 +29,9 @@ export default function App() {
   return (
     <AuthProvider>
       <Routes>
-        {/* Admin routes — no site Layout (own sidebar shell) */}
-        <Route
-          path="/admin"
-          element={<RequireStaff level="admin"><AdminNews /></RequireStaff>}
-        />
-        <Route
-          path="/admin/news"
-          element={<RequireStaff level="admin"><AdminNews /></RequireStaff>}
-        />
-        <Route
-          path="/admin/news/:id"
-          element={<RequireStaff level="admin"><AdminNewsEdit /></RequireStaff>}
-        />
+        <Route path="/admin" element={<RequireStaff level="admin"><AdminNews /></RequireStaff>} />
+        <Route path="/admin/news" element={<RequireStaff level="admin"><AdminNews /></RequireStaff>} />
+        <Route path="/admin/news/:id" element={<RequireStaff level="admin"><AdminNewsEdit /></RequireStaff>} />
 
         <Route element={<Layout />}>
           <Route path="/" element={<Home />} />
@@ -56,50 +46,22 @@ export default function App() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
 
-          <Route
-            path="/forums/new"
-            element={<RequireAuth><NewThread /></RequireAuth>}
-          />
-          <Route
-            path="/forums/category/:id"
-            element={<RequireAuth><ForumCategory /></RequireAuth>}
-          />
-          <Route
-            path="/forums/thread/:slug"
-            element={<RequireAuth><ForumThread /></RequireAuth>}
-          />
-          <Route
-            path="/forums/thread"
-            element={<RequireAuth><ForumThread /></RequireAuth>}
-          />
-          <Route
-            path="/wiki/article/:slug"
-            element={<RequireAuth><WikiArticle /></RequireAuth>}
-          />
-          <Route
-            path="/wiki/article"
-            element={<RequireAuth><WikiArticle /></RequireAuth>}
-          />
-          <Route
-            path="/news/article"
-            element={<RequireAuth><NewsArticle /></RequireAuth>}
-          />
-          <Route
-            path="/marketplace/listing/:slug"
-            element={<RequireAuth><Listing /></RequireAuth>}
-          />
-          <Route
-            path="/marketplace/listing"
-            element={<RequireAuth><Listing /></RequireAuth>}
-          />
-          <Route
-            path="/suppliers/profile"
-            element={<RequireAuth><SupplierProfile /></RequireAuth>}
-          />
-          <Route
-            path="/profile/:handle"
-            element={<RequireAuth><Profile /></RequireAuth>}
-          />
+          <Route path="/forums/new" element={<RequireAuth><NewThread /></RequireAuth>} />
+          <Route path="/forums/category/:id" element={<RequireAuth><ForumCategory /></RequireAuth>} />
+          <Route path="/forums/thread/:slug" element={<RequireAuth><ForumThread /></RequireAuth>} />
+          <Route path="/forums/thread" element={<RequireAuth><ForumThread /></RequireAuth>} />
+
+          <Route path="/wiki/article/:slug" element={<RequireAuth><WikiArticle /></RequireAuth>} />
+          <Route path="/wiki/article" element={<RequireAuth><WikiArticle /></RequireAuth>} />
+
+          <Route path="/news/article/:slug" element={<RequireAuth><NewsArticle /></RequireAuth>} />
+          <Route path="/news/article" element={<RequireAuth><NewsArticle /></RequireAuth>} />
+
+          <Route path="/marketplace/listing/:slug" element={<RequireAuth><Listing /></RequireAuth>} />
+          <Route path="/marketplace/listing" element={<RequireAuth><Listing /></RequireAuth>} />
+
+          <Route path="/suppliers/profile" element={<RequireAuth><SupplierProfile /></RequireAuth>} />
+          <Route path="/profile/:handle" element={<RequireAuth><Profile /></RequireAuth>} />
         </Route>
       </Routes>
     </AuthProvider>

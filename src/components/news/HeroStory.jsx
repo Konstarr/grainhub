@@ -19,7 +19,7 @@ export default function HeroStory({ story }) {
     : (s.imgGradient || fallbackGradient);
 
   return (
-    <Link to="/news/article" className="hero-story">
+    <Link to={s.slug ? '/news/article/' + s.slug : '/news'} className="hero-story">
       <div className="hero-story-img" style={{ background: bg }}>
         {s.kicker && (
           <span className={'story-kicker ' + colorClasses[s.kicker.color]}>

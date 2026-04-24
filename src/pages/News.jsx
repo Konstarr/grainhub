@@ -31,6 +31,8 @@ function toUi(row) {
   const authorInitials = m.sourceUrl ? 'SY' : 'GH';
   return {
     id: m.id,
+    slug: m.slug,
+    coverImage: m.coverImage,
     kicker: { label: m.category || 'News', color: kickerColor },
     imgGradient: GRADIENTS[h % GRADIENTS.length],
     category: m.category || 'News',

@@ -18,7 +18,7 @@ function NewsCard({ story }) {
     : (story.imgGradient || fallback);
 
   return (
-    <Link to="/news/article" className="news-card">
+    <Link to={story.slug ? '/news/article/' + story.slug : '/news'} className="news-card">
       <div className="news-card-img" style={{ background: bg }}>
         {story.kicker && (
           <span className={'story-kicker ' + colorClasses[story.kicker.color]}>

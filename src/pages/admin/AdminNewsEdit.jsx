@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import AdminLayout from '../../components/admin/AdminLayout.jsx';
+import CoverImageUploader from '../../components/admin/CoverImageUploader.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
 import {
   getNewsArticle,
@@ -222,14 +223,12 @@ export default function AdminNewsEdit() {
               </select>
             </div>
 
-            <div className="adm-field">
-              <label className="adm-label">Cover image URL</label>
-              <input
-                type="text"
-                className="adm-input"
+            <div className="adm-field full">
+              <label className="adm-label">Cover image</label>
+              <CoverImageUploader
                 value={form.cover_image_url}
-                onChange={(e) => set('cover_image_url')(e.target.value)}
-                placeholder="https://…"
+                onChange={(url) => set('cover_image_url')(url)}
+                folder="news"
               />
             </div>
 
@@ -330,5 +329,7 @@ export default function AdminNewsEdit() {
         </div>
       </div>
     </AdminLayout>
+  );
+}
   );
 }
