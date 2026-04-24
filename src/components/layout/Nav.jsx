@@ -69,8 +69,11 @@ export default function Nav() {
     navigate('/', { replace: true });
   };
 
-  const handle = profile?.username || (user?.email ? user.email.split('@')[0] : '');
-  const profileHref = handle ? '/profile/' + handle : '/forums';
+  // Prefer the username in the URL. If it isn't set yet, link to the
+  // user's UUID — the Profile page accepts both. Avoids broken links
+  // like /profile/<email-prefix> when no username exists on the row.
+  const routeKey = profile?.username || user?.id || '';
+  const profileHref = routeKey ? '/profile/' + routeKey : '/forums';
 
   const avatarBg = profile?.avatar_url
     ? 'url(' + profile.avatar_url + ') center/cover no-repeat'

@@ -5,6 +5,7 @@ import ReportModal from '../components/shared/ReportModal.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import {
   fetchProfileByHandle,
+  fetchProfileById,
   fetchProfileBadges,
   fetchRecentThreadsByAuthor,
   updateOwnProfile,
@@ -54,7 +55,15 @@ export default function Profile() {
     setLoading(true);
     setNotFound(false);
     (async () => {
-      const { data } = await fetchProfileByHandle(handle);
+      // Handle can be a username OR a UUID (when a user hasn't set
+      // a username yet, Nav links to /profile/<auth.uid()>). Try by
+      // username first; if nothing comes back and the handle looks
+      // like a UUID, fall back to an id lookup.
+      let { data } = await fetchProfileByHandle(handle);
+      if (!data && handle && /^[0-9a-f-]{36}$/i.test(handle)) {
+        const byId = await fetchProfileById(handle);
+        data = byId.data;
+      }
       if (cancelled) return;
       if (!data) {
         setProfile(null);
