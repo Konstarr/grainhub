@@ -228,7 +228,95 @@ export const ROLE_PACKS = [
   },
 ];
 
-// ── 4) Sponsorship tiers (existing) ───────────────────────
+// ── 4) À la carte — one-off, no subscription ──────────────
+// For buyers who don't want to commit to a monthly plan. Priced to
+// make subscriptions look like a better deal when used often, but
+// stand-alone useful for launches, product announcements, or seasonal
+// pushes.
+export const A_LA_CARTE = [
+  {
+    id: 'email-blast',
+    name: 'Dedicated email blast',
+    icon: '📧',
+    price: 799,
+    unit: 'one-time',
+    tagline: 'Your message, your design, to the full subscriber list.',
+    description:
+      'One dedicated send to our full GrainHub newsletter audience — your copy, your CTA, your branding. 24-hour turnaround on proofs.',
+  },
+  {
+    id: 'newsletter-sponsor',
+    name: 'Newsletter sponsorship',
+    icon: '📰',
+    price: 399,
+    unit: 'per week',
+    tagline: 'Sponsor one issue of The Weekly Grain.',
+    description:
+      'Your logo, 2-line copy, and CTA at the top of that week\'s edition. Reaches every subscribed user on Tuesday morning.',
+  },
+  {
+    id: 'event-sponsor',
+    name: 'Event sponsor',
+    icon: '🎪',
+    price: 1499,
+    unit: 'per event',
+    tagline: 'Put your brand on a GrainHub-hosted webinar or summit.',
+    description:
+      'Logo on event page + slides, 30-second intro during the live session, post-event attendee list (with opt-in).',
+  },
+  {
+    id: 'featured-article',
+    name: 'Featured sponsored article',
+    icon: '📝',
+    price: 599,
+    unit: 'one-time',
+    tagline: 'Written by your team, distributed through our News channel.',
+    description:
+      'Clearly labeled as sponsored. Lives permanently in the News archive and gets pushed to the homepage feed for 7 days.',
+  },
+  {
+    id: 'forum-ama',
+    name: 'Sponsored forum AMA',
+    icon: '🎤',
+    price: 799,
+    unit: 'one-time',
+    tagline: 'Host a verified AMA in the community forum.',
+    description:
+      'Pinned for 48 hours. We moderate. Includes a pre-promo post, live window, and permanent archive link.',
+  },
+  {
+    id: 'homepage-takeover',
+    name: 'Homepage banner takeover',
+    icon: '🎯',
+    price: 1200,
+    unit: 'per week',
+    tagline: 'Full-width homepage hero for 7 days.',
+    description:
+      'Rotates with zero other banners during your week. Max 3 takeovers per quarter (site-wide) so exposure stays valuable.',
+  },
+  {
+    id: 'industry-report',
+    name: 'Industry report co-sponsor',
+    icon: '📊',
+    price: 2500,
+    unit: 'quarterly',
+    tagline: 'Co-sponsor our quarterly millwork industry report.',
+    description:
+      'Logo on the cover + dedicated page. Lead list from report downloads (with opt-in). Typically 1,500+ engaged readers per report.',
+  },
+  {
+    id: 'directory-boost',
+    name: 'Supplier directory boost',
+    icon: '📦',
+    price: 299,
+    unit: '30 days',
+    tagline: 'Jump to the top of your category for a month.',
+    description:
+      'One-off boost without committing to a monthly Supplier Pack. Great for product-launch windows.',
+  },
+];
+
+// ── 5) Sponsorship tiers (existing) ───────────────────────
 export const SPONSOR_TIERS = [
   {
     id: 'silver',
@@ -263,7 +351,7 @@ export const SPONSOR_TIERS = [
   },
 ];
 
-// ── 5) Lookups ────────────────────────────────────────────
+// ── 6) Lookups ────────────────────────────────────────────
 export function findIndividualTier(id) {
   return INDIVIDUAL_TIERS.find((t) => t.id === id) || INDIVIDUAL_TIERS[0];
 }
@@ -281,7 +369,7 @@ export function findSponsorTier(id) {
   return SPONSOR_TIERS.find((t) => t.id === id) || null;
 }
 
-// ── 6) Helpers ────────────────────────────────────────────
+// ── 7) Helpers ────────────────────────────────────────────
 export function formatPrice(monthly) {
   if (monthly === null || monthly === undefined) return 'Contact sales';
   if (monthly === 0) return 'Free';
