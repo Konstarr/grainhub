@@ -286,91 +286,63 @@ export default function Profile() {
         </div>
 
         {/* ---------- CONTENT ---------- */}
-        <div className="pf-grid">
-          <div>
-            {tab === 'overview' && (
-              <>
-                <div className="pf-card">
-                  <div className="pf-card-title">About</div>
-                  {profile.bio ? (
-                    <p className="pf-bio">{profile.bio}</p>
-                  ) : (
-                    <p className="pf-bio muted">
-                      {isMe
-                        ? "You haven't written a bio yet. Click Edit profile to introduce yourself."
-                        : (profile.full_name || profile.username) + " hasn't added a bio yet."}
-                    </p>
-                  )}
-                </div>
-
-                <div className="pf-card">
-                  <div className="pf-card-title">
-                    <span>Recent threads</span>
-                    {threads.length > 5 && (
-                      <button type="button" className="pf-card-link" onClick={() => setTab('threads')}>
-                        See all →
-                      </button>
-                    )}
-                  </div>
-                  <ThreadList items={threads.slice(0, 5)} emptyIsMe={isMe} profile={profile} />
-                </div>
-
-                <div className="pf-card">
-                  <div className="pf-card-title">
-                    <span>Featured badges</span>
-                    {badges.length > 6 && (
-                      <button type="button" className="pf-card-link" onClick={() => setTab('badges')}>
-                        See all →
-                      </button>
-                    )}
-                  </div>
-                  <BadgesGrid items={badges.slice(0, 6)} isMe={isMe} />
-                </div>
-              </>
+        {tab === 'overview' && (
+          <div className="pf-card">
+            <div className="pf-card-title">About</div>
+            {profile.bio ? (
+              <p className="pf-bio">{profile.bio}</p>
+            ) : (
+              <p className="pf-bio muted">
+                {isMe
+                  ? "You haven't written a bio yet. Click Edit profile to introduce yourself."
+                  : (profile.full_name || profile.username) + " hasn't added a bio yet."}
+              </p>
             )}
-
-            {tab === 'threads' && (
-              <div className="pf-card">
-                <div className="pf-card-title">All threads ({threads.length})</div>
-                <ThreadList items={threads} emptyIsMe={isMe} profile={profile} />
-              </div>
-            )}
-
-            {tab === 'badges' && (
-              <div className="pf-card">
-                <div className="pf-card-title">Badges ({badges.length})</div>
-                <BadgesGrid items={badges} isMe={isMe} />
+            {badges.length > 0 && (
+              <div className="pf-badge-strip">
+                {badges.slice(0, 6).map((b, i) => (
+                  <span key={i} className="pf-badge-chip" title={b.badge?.description || b.badge?.name}>
+                    <span className="pf-badge-chip-icon">{b.badge?.icon || '🏅'}</span>
+                    {b.badge?.name}
+                  </span>
+                ))}
+                {badges.length > 6 && (
+                  <button type="button" className="pf-card-link" onClick={() => setTab('badges')}>
+                    +{badges.length - 6} more →
+                  </button>
+                )}
               </div>
             )}
           </div>
+        )}
 
-          {/* Sidebar */}
-          <aside>
-            <div className="pf-card">
-              <div className="pf-card-title">Contribution</div>
-              <div>
-                <div className="pf-row"><span className="pf-row-label">Reputation</span><span className="pf-row-value">{(profile.reputation || 0).toLocaleString()}</span></div>
-                <div className="pf-row"><span className="pf-row-label">Threads started</span><span className="pf-row-value">{(profile.thread_count || 0).toLocaleString()}</span></div>
-                <div className="pf-row"><span className="pf-row-label">Replies posted</span><span className="pf-row-value">{(profile.post_count || 0).toLocaleString()}</span></div>
-                <div className="pf-row"><span className="pf-row-label">Badges</span><span className="pf-row-value">{badges.length}</span></div>
-                {joinedYear && (
-                  <div className="pf-row"><span className="pf-row-label">Member since</span><span className="pf-row-value">{joinedYear}</span></div>
-                )}
-              </div>
+        {tab === 'overview' && (
+          <div className="pf-card">
+            <div className="pf-card-title">
+              <span>Recent threads</span>
+              {threads.length > 5 && (
+                <button type="button" className="pf-card-link" onClick={() => setTab('threads')}>
+                  See all →
+                </button>
+              )}
             </div>
+            <ThreadList items={threads.slice(0, 5)} emptyIsMe={isMe} profile={profile} />
+          </div>
+        )}
 
-            {isMe && (
-              <div className="pf-card">
-                <div className="pf-card-title">Quick links</div>
-                <div style={{ display: 'grid', gap: 8 }}>
-                  <Link to="/forums?view=subscriptions" className="pf-btn" style={{ justifyContent: 'center' }}>My subscriptions</Link>
-                  <Link to="/forums?view=my-posts" className="pf-btn" style={{ justifyContent: 'center' }}>My posts</Link>
-                  <Link to="/forums/new" className="pf-btn primary" style={{ justifyContent: 'center' }}>Start a thread</Link>
-                </div>
-              </div>
-            )}
-          </aside>
-        </div>
+        {tab === 'threads' && (
+          <div className="pf-card">
+            <div className="pf-card-title">All threads ({threads.length})</div>
+            <ThreadList items={threads} emptyIsMe={isMe} profile={profile} />
+          </div>
+        )}
+
+        {tab === 'badges' && (
+          <div className="pf-card">
+            <div className="pf-card-title">Badges ({badges.length})</div>
+            <BadgesGrid items={badges} isMe={isMe} />
+          </div>
+        )}
       </div>
 
       <ReportModal

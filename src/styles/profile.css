@@ -5,22 +5,22 @@
 .profile-wrap {
   max-width: 1080px;
   margin: 0 auto;
-  padding: 0.25rem 1.25rem 4rem;
+  padding: 0.25rem 1.25rem 2rem;
 }
 
 /* ---------- Hero ---------- */
 .pf-hero {
   position: relative;
-  margin-top: 0.75rem;
+  margin-top: 0.5rem;
   border: 1px solid var(--border);
-  border-radius: 18px;
+  border-radius: 14px;
   overflow: hidden;
   background: var(--white);
   box-shadow: 0 2px 6px rgba(90, 66, 38, 0.06);
 }
 
 .pf-cover {
-  height: 160px;
+  height: 80px;
   background:
     radial-gradient(circle at 15% 30%, rgba(255, 231, 181, 0.55), transparent 55%),
     radial-gradient(circle at 80% 60%, rgba(181, 120, 62, 0.45), transparent 60%),
@@ -45,19 +45,19 @@
 }
 
 .pf-hero-body {
-  padding: 0 1.75rem 1.5rem;
+  padding: 0 1.25rem 1rem;
   position: relative;
 }
 
 /* Avatar overlapping cover */
 .pf-avatar-frame {
   position: absolute;
-  top: -58px;
-  left: 1.75rem;
-  width: 116px;
-  height: 116px;
+  top: -38px;
+  left: 1.25rem;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
-  padding: 4px;
+  padding: 3px;
   background: var(--white);
   box-shadow: 0 4px 12px rgba(50, 30, 10, 0.15);
 }
@@ -72,8 +72,8 @@
   align-items: center;
   justify-content: center;
   font-family: var(--font-display);
-  font-size: 42px;
-  letter-spacing: 1px;
+  font-size: 28px;
+  letter-spacing: 0.5px;
   overflow: hidden;
 }
 
@@ -196,28 +196,28 @@
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 1px;
-  margin-top: 1.25rem;
+  margin-top: 0.85rem;
   background: var(--border);
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: 10px;
   overflow: hidden;
 }
 
 .pf-stat {
   background: var(--white);
-  padding: 1rem 1.1rem;
+  padding: 0.6rem 0.85rem;
   text-align: left;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 0;
 }
 
 .pf-stat-value {
   font-family: var(--font-display);
-  font-size: 28px;
+  font-size: 20px;
   line-height: 1.1;
   color: var(--text-primary);
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .pf-stat.pf-stat-accent .pf-stat-value {
@@ -228,24 +228,20 @@
 }
 
 .pf-stat-label {
-  font-size: 11px;
+  font-size: 10px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--text-muted);
   font-weight: 600;
 }
 
-.pf-stat-sub {
-  font-size: 11px;
-  color: var(--text-muted);
-  margin-top: 1px;
-}
+.pf-stat-sub { display: none; }
 
 /* ---------- Tabs ---------- */
 .pf-tabs {
   display: flex;
   gap: 4px;
-  margin: 1.5rem 0 1rem;
+  margin: 1rem 0 0.75rem;
   border-bottom: 1px solid var(--border);
   padding: 0 2px;
   overflow-x: auto;
@@ -311,17 +307,17 @@
 .pf-card {
   background: var(--white);
   border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 1.25rem 1.4rem;
-  margin-bottom: 1.25rem;
+  border-radius: 10px;
+  padding: 0.9rem 1.1rem;
+  margin-bottom: 0.75rem;
 }
 
 .pf-card-title {
   font-family: var(--font-display);
-  font-size: 1.1rem;
+  font-size: 0.95rem;
   color: var(--text-primary);
-  margin: 0 0 0.9rem;
-  font-weight: 500;
+  margin: 0 0 0.6rem;
+  font-weight: 600;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -336,6 +332,29 @@
 }
 
 .pf-card-link:hover { text-decoration: underline; }
+
+/* Inline badge chips on the Overview card — replaces the whole
+   "Featured badges" card so we don't add another full-size block. */
+.pf-badge-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 0.85rem;
+  padding-top: 0.75rem;
+  border-top: 1px dashed var(--border);
+}
+.pf-badge-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--wood-cream, #F5EAD6);
+  color: var(--text-primary);
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 999px;
+}
+.pf-badge-chip-icon { font-size: 13px; line-height: 1; }
 
 .pf-bio {
   font-size: 14.5px;
@@ -541,8 +560,9 @@
 
 /* Mobile tweaks for hero */
 @media (max-width: 640px) {
-  .pf-avatar-frame { width: 92px; height: 92px; top: -46px; left: 1.25rem; }
-  .pf-hero-body { padding: 0 1.25rem 1.25rem; }
+  .pf-avatar-frame { width: 68px; height: 68px; top: -32px; left: 1rem; }
+  .pf-avatar { font-size: 24px; }
+  .pf-hero-body { padding: 0 1rem 0.85rem; }
   .pf-head { padding-top: 52px; padding-left: calc(92px + 0.75rem - 1.25rem); }
   .pf-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .pf-name { font-size: 26px; }
