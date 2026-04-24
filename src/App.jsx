@@ -22,6 +22,7 @@ import Signup from './pages/Signup.jsx';
 import Login from './pages/Login.jsx';
 import Sponsor from './pages/Sponsor.jsx';
 import Pricing from './pages/Pricing.jsx';
+import AuthCallback from './pages/AuthCallback.jsx';
 import Events from './pages/Events.jsx';
 import EventDetail from './pages/EventDetail.jsx';
 import Profile from './pages/Profile.jsx';
@@ -72,6 +73,7 @@ export default function App() {
           <Route path="/sponsor" element={<Sponsor />} />
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/login" element={<Login />} />
 
           <Route path="/forums/new" element={<RequireAuth><NewThread /></RequireAuth>} />

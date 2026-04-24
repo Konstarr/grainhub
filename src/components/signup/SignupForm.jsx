@@ -281,17 +281,11 @@ export default function SignupForm() {
                 <p>Takes about 60 seconds. You'll be in the forums immediately.</p>
               </div>
 
-              {/* OAUTH */}
-              <div className="signup-oauth-row">
-                <button type="button" className="signup-oauth-btn">
-                  <span className="signup-oauth-icon">🔵</span>
-                  Continue with Google
-                </button>
-                <button type="button" className="signup-oauth-btn">
-                  <span className="signup-oauth-icon">🍎</span>
-                  Continue with Apple
-                </button>
-              </div>
+              {/* OAUTH — Supabase handles the provider handshake; we
+                  just pass the account type through in queryParams so
+                  we can pick it up in the callback and patch the
+                  profile row with the right account_type + metadata. */}
+              <OAuthRow accountType={accountType} onError={setAuthError} />
 
               <div className="signup-divider">or sign up with email</div>
 
@@ -909,6 +903,140 @@ function IconBusiness() {
       <path d="M3 10h18" />
       <path d="M8 6V4h8v2" />
       <path d="M10 14h4M10 17h4" />
+    </svg>
+  );
+}
+
+/**
+ * OAuth sign-in row. Uses supabase.auth.signInWithOAuth() — Supabase
+ * handles the provider handshake entirely, so we just hand it a
+ * provider slug and a redirect URL. The chosen account_type is
+ * stashed in sessionStorage so the OAuth callback can patch the
+ * freshly-created profile with the right business/individual flag.
+ *
+ * Enabling a provider = 3 steps, all outside this file:
+ *   1) Register an OAuth app in the provider's developer portal
+ *      (Google Cloud Console / Entra / LinkedIn / Apple Dev Portal).
+ *   2) Paste the client ID + secret into Supabase Dashboard →
+ *      Authentication → Providers.
+ *   3) Set the Redirect URL in the provider to:
+ *      https://<your-supabase-project>.supabase.co/auth/v1/callback
+ *
+ * Buttons for providers that aren't configured yet will simply
+ * surface the provider's "unsupported_provider" error in the form
+ * error state — no code changes needed to toggle a provider on.
+ */
+function OAuthRow({ accountType, onError }) {
+  const [busy, setBusy] = useState(null);
+
+  const go = async (provider) => {
+    setBusy(provider);
+    onError && onError('');
+    try {
+      // Remember the persona so the callback page can write the
+      // right account_type onto the freshly-created profile row.
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('signup:accountType', accountType || 'individual');
+      }
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: window.location.origin + '/auth/callback',
+        },
+      });
+      if (error) {
+        setBusy(null);
+        onError && onError(error.message || 'Could not start sign-in.');
+      }
+      // On success, the browser has already redirected — no cleanup needed.
+    } catch (e) {
+      setBusy(null);
+      onError && onError(e?.message || 'Sign-in failed.');
+    }
+  };
+
+  const providers = [
+    { id: 'google',   name: 'Google',    logo: <LogoGoogle /> },
+    { id: 'azure',    name: 'Microsoft', logo: <LogoMicrosoft /> },
+    { id: 'linkedin_oidc', name: 'LinkedIn', logo: <LogoLinkedIn /> },
+    { id: 'apple',    name: 'Apple',     logo: <LogoApple /> },
+  ];
+
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: '1rem' }}>
+      {providers.map((p) => (
+        <button
+          key={p.id}
+          type="button"
+          className="signup-oauth-btn"
+          onClick={() => go(p.id)}
+          disabled={busy !== null}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 8,
+            padding: '10px 12px',
+            border: '1px solid var(--border)',
+            borderRadius: 8,
+            background: 'var(--white)',
+            fontFamily: 'Montserrat, sans-serif',
+            fontSize: 13,
+            fontWeight: 600,
+            color: 'var(--text-primary)',
+            cursor: busy ? 'wait' : 'pointer',
+            opacity: busy && busy !== p.id ? 0.55 : 1,
+            transition: 'border-color 0.12s, background 0.12s',
+          }}
+          onMouseEnter={(e) => { if (!busy) { e.currentTarget.style.borderColor = 'var(--wood-warm)'; e.currentTarget.style.background = '#FDFBF5'; } }}
+          onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.background = 'var(--white)'; }}
+        >
+          {busy === p.id ? (
+            <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Redirecting…</span>
+          ) : (
+            <>
+              <span style={{ display: 'inline-flex', width: 18, height: 18 }}>{p.logo}</span>
+              <span>{p.name}</span>
+            </>
+          )}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+/* ── Brand-accurate SVG logos (no external deps) ── */
+function LogoGoogle() {
+  return (
+    <svg viewBox="0 0 48 48" width="18" height="18" aria-hidden="true">
+      <path fill="#FFC107" d="M43.6 20.1H42V20H24v8h11.3c-1.6 4.6-6 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.6-.4-3.9z"/>
+      <path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 16 19 13 24 13c3.1 0 5.8 1.1 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/>
+      <path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2c-2 1.5-4.5 2.4-7.2 2.4-5.2 0-9.7-3.4-11.3-8l-6.5 5C9.6 39.6 16.3 44 24 44z"/>
+      <path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.2-2.2 4.1-4.1 5.6l6.2 5.2C41.2 36.1 44 30.6 44 24c0-1.3-.1-2.6-.4-3.9z"/>
+    </svg>
+  );
+}
+function LogoMicrosoft() {
+  return (
+    <svg viewBox="0 0 23 23" width="18" height="18" aria-hidden="true">
+      <rect width="10" height="10" x="1"  y="1"  fill="#F25022"/>
+      <rect width="10" height="10" x="12" y="1"  fill="#7FBA00"/>
+      <rect width="10" height="10" x="1"  y="12" fill="#00A4EF"/>
+      <rect width="10" height="10" x="12" y="12" fill="#FFB900"/>
+    </svg>
+  );
+}
+function LogoLinkedIn() {
+  return (
+    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+      <path fill="#0A66C2" d="M20.45 20.45h-3.56v-5.57c0-1.33-.03-3.04-1.86-3.04-1.86 0-2.14 1.45-2.14 2.95v5.66H9.33V9h3.42v1.56h.05c.48-.9 1.64-1.86 3.38-1.86 3.62 0 4.28 2.38 4.28 5.47v6.28zM5.34 7.43a2.07 2.07 0 1 1 0-4.14 2.07 2.07 0 0 1 0 4.14zM7.12 20.45H3.56V9h3.56v11.45zM22.23 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.22.79 24 1.77 24h20.46c.98 0 1.77-.78 1.77-1.73V1.73C24 .77 23.21 0 22.23 0z"/>
+    </svg>
+  );
+}
+function LogoApple() {
+  return (
+    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+      <path fill="currentColor" d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
     </svg>
   );
 }
