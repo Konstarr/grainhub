@@ -296,7 +296,8 @@ nav.site-nav {
 
 /* ── SPONSOR STRIP ── */
 .sponsor-strip {
-  background: var(--wood-cream);
+  background: #ffffff;
+  border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
   padding: 18px 2.5rem;
   display: flex;
