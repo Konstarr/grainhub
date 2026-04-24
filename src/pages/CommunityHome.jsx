@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import PageBack from '../components/shared/PageBack.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
@@ -7,25 +7,36 @@ import {
   fetchMyMembership,
   joinCommunity,
   leaveCommunity,
-  fetchCommunityThreads,
+  fetchCommunityMembers,
+  fetchCommunityMessages,
+  sendCommunityMessage,
+  subscribeCommunityMessages,
 } from '../lib/communityDb.js';
+import { supabase } from '../lib/supabase.js';
 import { CommunityIcon } from './Communities.jsx';
-import { mapThreadRow } from '../lib/mappers.js';
 import '../styles/communities.css';
 
 /**
- * /c/:slug — the community home page. Header with icon + banner,
- * member count, Join button, thread list, members sidebar.
+ * /c/:slug — community as a chat room.
+ *
+ * Layout:
+ *   - Top banner with name / icon / member count / Join button
+ *   - Center: messages stream + compose box at bottom
+ *   - Right: member roster grouped by role (Owner / Mods / Members)
+ *
+ * Realtime: subscribes to community_messages inserts via Supabase
+ * realtime so new messages stream in automatically.
  */
 export default function CommunityHome() {
   const { slug } = useParams();
-  const { isAuthed } = useAuth();
+  const { user, isAuthed } = useAuth();
   const [community, setCommunity] = useState(null);
-  const [threads, setThreads] = useState([]);
   const [membership, setMembership] = useState(null);
+  const [members, setMembers] = useState([]);
+  const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [busy, setBusy] = useState(false);
   const [notFound, setNotFound] = useState(false);
+  const [busy, setBusy] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -33,27 +44,67 @@ export default function CommunityHome() {
     const { data } = await fetchCommunityBySlug(slug);
     if (!data) { setNotFound(true); setLoading(false); return; }
     setCommunity(data);
-    const [m, t] = await Promise.all([
+    const [m, r, msgs] = await Promise.all([
       fetchMyMembership(data.id),
-      fetchCommunityThreads(data.id, { limit: 50 }),
+      fetchCommunityMembers(data.id),
+      fetchCommunityMessages(data.id, { limit: 100 }),
     ]);
     setMembership(m.data || null);
-    setThreads(t.data || []);
+    setMembers(r.data || []);
+    setMessages(msgs.data || []);
     setLoading(false);
   };
 
   useEffect(() => { load(); /* eslint-disable-next-line */ }, [slug]);
 
+  // Realtime subscription — live message inserts.
+  useEffect(() => {
+    if (!community?.id) return undefined;
+    const channel = subscribeCommunityMessages(community.id, async (row) => {
+      // The realtime payload doesn't include the embedded author —
+      // hydrate by looking up the profile in our local member list.
+      const authorFromMembers = members.find((m) => m.profile?.id === row.author_id)?.profile;
+      const hydrated = { ...row, author: authorFromMembers || null };
+      // If author wasn't in the local member list (e.g. a mod posted
+      // from another tab), fetch them.
+      if (!hydrated.author && row.author_id) {
+        const { data } = await supabase
+          .from('profiles')
+          .select('id, username, full_name, avatar_url')
+          .eq('id', row.author_id)
+          .maybeSingle();
+        hydrated.author = data || null;
+      }
+      setMessages((prev) => {
+        // Guard against dupes: the sender also optimistically added
+        // their own message, so skip if we already have this id.
+        if (prev.some((m) => m.id === hydrated.id)) return prev;
+        return [...prev, hydrated];
+      });
+    });
+    return () => { if (channel) supabase.removeChannel(channel); };
+    // eslint-disable-next-line
+  }, [community?.id]);
+
   const handleToggleJoin = async () => {
     if (!community) return;
     setBusy(true);
-    if (membership) {
-      await leaveCommunity(community.id);
-    } else {
-      await joinCommunity(community.id);
-    }
+    if (membership) await leaveCommunity(community.id);
+    else            await joinCommunity(community.id);
     setBusy(false);
     load();
+  };
+
+  const isMember = !!membership;
+  const isMod = membership?.role === 'mod' || membership?.role === 'owner';
+
+  const handleSend = async (body) => {
+    if (!community?.id || !body.trim()) return { ok: false };
+    const { data, error } = await sendCommunityMessage(community.id, body);
+    if (error) return { ok: false, error: error.message };
+    // Optimistic append — realtime will dedupe.
+    if (data) setMessages((prev) => [...prev, data]);
+    return { ok: true };
   };
 
   if (notFound) {
@@ -91,7 +142,6 @@ export default function CommunityHome() {
         ]}
       />
 
-      {/* ── Header banner ── */}
       <div
         className="comm-banner"
         style={{
@@ -101,15 +151,13 @@ export default function CommunityHome() {
         }}
       >
         <div className="comm-banner-inner">
-          <CommunityIcon c={community} size={88} />
+          <CommunityIcon c={community} size={72} />
           <div style={{ flex: 1, minWidth: 0 }}>
             <h1 className="comm-home-title">{community.name}</h1>
             <div className="comm-home-sub">
               <span>c/{community.slug}</span>
               <span className="dot">·</span>
               <span>{(community.member_count || 0).toLocaleString()} members</span>
-              <span className="dot">·</span>
-              <span>{(community.thread_count || 0).toLocaleString()} threads</span>
             </div>
           </div>
           <div className="comm-home-actions">
@@ -129,91 +177,234 @@ export default function CommunityHome() {
         </div>
       </div>
 
-      <div className="comm-home-wrap">
-        <div>
-          {/* Description card */}
-          {community.description && (
-            <div className="comm-home-card">
-              <div className="comm-home-card-title">About</div>
-              <div className="comm-home-card-body">{community.description}</div>
-            </div>
-          )}
+      {community.description && (
+        <div className="comm-chat-about">
+          <div className="comm-chat-about-inner">{community.description}</div>
+        </div>
+      )}
 
-          {/* Threads */}
-          <div className="comm-home-card">
-            <div className="comm-home-card-title" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span>Threads</span>
-              {membership && (
-                <Link to={`/forums/new?community=${community.slug}`} className="comm-btn primary" style={{ padding: '6px 14px', fontSize: 12.5 }}>
-                  + New thread
-                </Link>
+      <div className="comm-chat-wrap">
+        {/* Messages column */}
+        <div className="comm-chat-main">
+          {!isMember ? (
+            <div className="comm-gate">
+              <div className="comm-gate-title">Join to see the chat</div>
+              <div className="comm-gate-sub">
+                This community's conversation is visible to members only. Join to read and post.
+              </div>
+              {isAuthed ? (
+                <button type="button" className="comm-btn primary" onClick={handleToggleJoin} disabled={busy}>
+                  {busy ? 'Joining…' : 'Join community'}
+                </button>
+              ) : (
+                <Link to="/login" className="comm-btn primary">Sign in</Link>
               )}
             </div>
-            {threads.length === 0 ? (
-              <div className="comm-empty" style={{ margin: '0.5rem 0 0' }}>
-                No threads yet. {membership ? 'Be the first to post.' : 'Join to start one.'}
-              </div>
-            ) : (
-              <div className="comm-thread-list">
-                {threads.map((row) => {
-                  const t = mapThreadRow(row);
-                  return (
-                    <Link key={t.id} to={`/forums/thread/${t.slug}`} className="comm-thread-row">
-                      <div className="comm-thread-title">{t.title}</div>
-                      <div className="comm-thread-meta">
-                        <span>{t.replyCount} replies</span>
-                        <span>·</span>
-                        <span>{t.viewCount} views</span>
-                        <span>·</span>
-                        <span>{t.lastReplyAgo || 'recently'}</span>
-                      </div>
-                    </Link>
-                  );
-                })}
-              </div>
-            )}
-          </div>
+          ) : (
+            <ChatStream
+              messages={messages}
+              currentUserId={user?.id}
+              isMod={isMod}
+              onSend={handleSend}
+            />
+          )}
         </div>
 
-        {/* Right rail — community info */}
-        <aside className="comm-home-side">
-          <div className="comm-home-card">
-            <div className="comm-home-card-title">About this community</div>
-            <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.55 }}>
-              Created {new Date(community.created_at).toLocaleDateString(undefined, { month: 'long', year: 'numeric' })}
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 10 }}>
-              <Stat label="Members" value={community.member_count} />
-              <Stat label="Threads" value={community.thread_count} />
-            </div>
+        {/* Member roster */}
+        <aside className="comm-chat-side">
+          <div className="comm-chat-side-title">
+            Members <span className="comm-chat-side-count">{members.length}</span>
           </div>
-
-          {isAuthed && !membership && (
-            <div className="comm-home-card">
-              <div className="comm-home-card-title">Not a member yet?</div>
-              <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.55, marginBottom: 10 }}>
-                Join to post threads and show up in this community's member list.
-              </div>
-              <button type="button" className="comm-btn primary" onClick={handleToggleJoin} disabled={busy} style={{ width: '100%' }}>
-                {busy ? 'Joining…' : 'Join community'}
-              </button>
-            </div>
-          )}
+          <MemberRoster members={members} />
         </aside>
       </div>
     </>
   );
 }
 
-function Stat({ label, value }) {
+/* ══════════════════ Chat stream + compose ══════════════════ */
+function ChatStream({ messages, currentUserId, isMod, onSend }) {
+  const scrollerRef = useRef(null);
+  const [draft, setDraft] = useState('');
+  const [sending, setSending] = useState(false);
+  const [err, setErr] = useState(null);
+
+  // Auto-scroll to bottom when messages change — only if the user is
+  // already near the bottom, so reading older history isn't disturbed.
+  useEffect(() => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    const nearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 120;
+    if (nearBottom) el.scrollTop = el.scrollHeight;
+  }, [messages.length]);
+
+  // Grouped rendering: consecutive messages from the same author within
+  // 5 minutes collapse into one "block" so the avatar + name appears
+  // once per block.
+  const blocks = useMemo(() => {
+    const out = [];
+    messages.forEach((m) => {
+      const last = out[out.length - 1];
+      const sameAuthor = last && last.authorId === m.author_id;
+      const close = last && (new Date(m.created_at) - new Date(last.items[last.items.length - 1].created_at)) < 5 * 60 * 1000;
+      if (last && sameAuthor && close) {
+        last.items.push(m);
+      } else {
+        out.push({ authorId: m.author_id, author: m.author, items: [m] });
+      }
+    });
+    return out;
+  }, [messages]);
+
+  const submit = async (e) => {
+    e?.preventDefault();
+    if (!draft.trim() || sending) return;
+    setSending(true);
+    setErr(null);
+    const res = await onSend(draft);
+    setSending(false);
+    if (!res.ok) {
+      setErr(res.error || 'Message failed to send.');
+      return;
+    }
+    setDraft('');
+  };
+
   return (
-    <div style={{ padding: '8px 10px', background: '#FDFBF5', borderRadius: 8, border: '1px solid var(--border-light)' }}>
-      <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: 1.4, textTransform: 'uppercase', color: 'var(--text-muted)' }}>
-        {label}
+    <div className="comm-chat-col">
+      <div className="comm-chat-scroll" ref={scrollerRef}>
+        {messages.length === 0 ? (
+          <div className="comm-chat-empty">
+            No messages yet. Say hi 👋
+          </div>
+        ) : (
+          blocks.map((b, i) => (
+            <ChatBlock key={b.items[0].id + '_' + i} block={b} currentUserId={currentUserId} isMod={isMod} />
+          ))
+        )}
       </div>
-      <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 18, fontWeight: 700, color: 'var(--text-primary)', marginTop: 2 }}>
-        {Number(value || 0).toLocaleString()}
+
+      <form className="comm-chat-compose" onSubmit={submit}>
+        <textarea
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              submit();
+            }
+          }}
+          placeholder="Say something to the community…"
+          rows={1}
+          className="comm-chat-input"
+          maxLength={4000}
+        />
+        <button type="submit" className="comm-btn primary" disabled={!draft.trim() || sending}>
+          {sending ? 'Sending…' : 'Send'}
+        </button>
+      </form>
+      {err && <div className="comm-chat-err">{err}</div>}
+      <div className="comm-chat-hint">
+        <kbd>Enter</kbd> to send · <kbd>Shift+Enter</kbd> for a new line
       </div>
+    </div>
+  );
+}
+
+function ChatBlock({ block, currentUserId, isMod }) {
+  const isSelf = block.authorId === currentUserId;
+  const name = block.author?.full_name || block.author?.username || 'Someone';
+  const avatarUrl = block.author?.avatar_url;
+  const initials = (name || '??').split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase();
+  const firstTs = block.items[0].created_at;
+
+  return (
+    <div className={'comm-chat-block ' + (isSelf ? 'is-self' : '')}>
+      <div className="comm-chat-avatar">
+        {avatarUrl
+          ? <img src={avatarUrl} alt="" />
+          : <span>{initials}</span>}
+      </div>
+      <div className="comm-chat-body">
+        <div className="comm-chat-head">
+          <Link
+            to={block.author?.username ? '/profile/' + block.author.username : '/forums'}
+            className="comm-chat-name"
+          >
+            {name}
+          </Link>
+          <span className="comm-chat-ts" title={new Date(firstTs).toLocaleString()}>
+            {formatRelative(firstTs)}
+          </span>
+        </div>
+        {block.items.map((m) => (
+          <div key={m.id} className="comm-chat-msg">
+            {m.deleted_at ? (
+              <em style={{ color: 'var(--text-muted)' }}>Message deleted</em>
+            ) : (
+              m.body
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function formatRelative(iso) {
+  if (!iso) return '';
+  const ms = Date.now() - new Date(iso).getTime();
+  if (ms < 60 * 1000) return 'just now';
+  if (ms < 60 * 60 * 1000) return Math.floor(ms / 60000) + 'm';
+  if (ms < 24 * 60 * 60 * 1000) return Math.floor(ms / 3600000) + 'h';
+  if (ms < 7 * 24 * 60 * 60 * 1000) return Math.floor(ms / 86400000) + 'd';
+  return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+}
+
+/* ══════════════════ Member roster ══════════════════ */
+function MemberRoster({ members }) {
+  const owners = members.filter((m) => m.role === 'owner');
+  const mods   = members.filter((m) => m.role === 'mod');
+  const regs   = members.filter((m) => m.role === 'member');
+
+  if (members.length === 0) {
+    return <div className="comm-empty" style={{ padding: '1.25rem 1rem' }}>No members yet.</div>;
+  }
+
+  return (
+    <div className="comm-members">
+      {owners.length > 0 && <RosterGroup label="Owner" rows={owners} />}
+      {mods.length   > 0 && <RosterGroup label={'Moderators · ' + mods.length} rows={mods} />}
+      {regs.length   > 0 && <RosterGroup label={'Members · ' + regs.length} rows={regs} />}
+    </div>
+  );
+}
+
+function RosterGroup({ label, rows }) {
+  return (
+    <div className="comm-roster-group">
+      <div className="comm-roster-label">{label}</div>
+      {rows.map((m) => {
+        const p = m.profile;
+        if (!p) return null;
+        const name = p.full_name || p.username || 'Member';
+        const initials = name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase();
+        return (
+          <Link
+            key={p.id}
+            to={'/profile/' + (p.username || p.id)}
+            className="comm-roster-row"
+          >
+            <div className="comm-roster-avatar">
+              {p.avatar_url ? <img src={p.avatar_url} alt="" /> : <span>{initials}</span>}
+            </div>
+            <div className="comm-roster-text">
+              <div className="comm-roster-name">{name}</div>
+              {p.trade && <div className="comm-roster-trade">{p.trade}</div>}
+            </div>
+          </Link>
+        );
+      })}
     </div>
   );
 }

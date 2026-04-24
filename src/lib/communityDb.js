@@ -156,7 +156,7 @@ export async function fetchCommunityThreads(communityId, { limit = 50 } = {}) {
 }
 
 /** Who are the members (for the community members tab / roster). */
-export async function fetchCommunityMembers(communityId, { limit = 50 } = {}) {
+export async function fetchCommunityMembers(communityId, { limit = 200 } = {}) {
   if (!communityId) return { data: [], error: null };
   const { data, error } = await supabase
     .from('community_members')
@@ -166,3 +166,79 @@ export async function fetchCommunityMembers(communityId, { limit = 50 } = {}) {
     .limit(limit);
   return { data: data || [], error };
 }
+
+/* ══════════════════ Messages (community chat) ══════════════════ */
+
+/** Load the most recent N messages in the community, oldest first so
+ *  the chat reads naturally top-to-bottom. */
+export async function fetchCommunityMessages(communityId, { limit = 100 } = {}) {
+  if (!communityId) return { data: [], error: null };
+  const { data, error } = await supabase
+    .from('community_messages')
+    .select('id, community_id, author_id, body, created_at, deleted_at, author:author_id(id, username, full_name, avatar_url)')
+    .eq('community_id', communityId)
+    .order('created_at', { ascending: false })
+    .limit(limit);
+  if (error) return { data: [], error };
+  return { data: (data || []).reverse(), error: null };
+}
+
+/** Send a message. RLS enforces membership; the trigger would also
+ *  reject a non-member, so this is belt + suspenders. */
+export async function sendCommunityMessage(communityId, body) {
+  if (!communityId || !body || !body.trim()) {
+    return { data: null, error: new Error('Empty message') };
+  }
+  const { data: session } = await supabase.auth.getSession();
+  const uid = session?.session?.user?.id;
+  if (!uid) return { data: null, error: new Error('Sign in to send messages.') };
+
+  const { data, error } = await supabase
+    .from('community_messages')
+    .insert({
+      community_id: communityId,
+      author_id: uid,
+      body: body.trim().slice(0, 4000),
+    })
+    .select('id, community_id, author_id, body, created_at, deleted_at, author:author_id(id, username, full_name, avatar_url)')
+    .maybeSingle();
+  return { data, error };
+}
+
+/** Soft-delete (set deleted_at). Only author / mod / admin. */
+export async function deleteCommunityMessage(messageId) {
+  if (!messageId) return { data: null, error: new Error('Missing id') };
+  const { error } = await supabase
+    .from('community_messages')
+    .update({ deleted_at: new Date().toISOString() })
+    .eq('id', messageId);
+  return { data: null, error };
+}
+
+/**
+ * Subscribe to live inserts in a community chat via Supabase realtime.
+ * Returns the channel so the caller can remove it on unmount.
+ *
+ *   const ch = subscribeCommunityMessages(id, (newMsg) => ...);
+ *   return () => supabase.removeChannel(ch);
+ */
+export function subscribeCommunityMessages(communityId, onInsert) {
+  if (!communityId) return null;
+  const channel = supabase
+    .channel('community-chat-' + communityId)
+    .on(
+      'postgres_changes',
+      {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'community_messages',
+        filter: 'community_id=eq.' + communityId,
+      },
+      (payload) => {
+        if (onInsert) onInsert(payload.new);
+      }
+    )
+    .subscribe();
+  return channel;
+}
+

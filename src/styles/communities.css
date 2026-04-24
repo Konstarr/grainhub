@@ -370,6 +370,317 @@ textarea.comm-input { resize: vertical; min-height: 90px; }
   margin-top: 3px;
 }
 
+/* ══════════════════════════════════════════════════════
+   CHAT ROOM LAYOUT — replaces the old thread-listing mode
+   ══════════════════════════════════════════════════════ */
+
+.comm-chat-about {
+  background: #FDFBF5;
+  border-bottom: 1px solid var(--border-light);
+}
+.comm-chat-about-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0.85rem 2rem;
+  font-size: 13.5px;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+.comm-chat-wrap {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem 2rem 2rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 260px;
+  gap: 1.25rem;
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .comm-chat-wrap { grid-template-columns: 1fr; }
+  .comm-chat-side { order: -1; }
+}
+
+/* Center chat column is a card with the scroller inside */
+.comm-chat-main {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  height: calc(100vh - 340px);
+  min-height: 500px;
+  display: flex;
+  flex-direction: column;
+}
+
+.comm-chat-col {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.comm-chat-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.comm-chat-scroll::-webkit-scrollbar { width: 8px; }
+.comm-chat-scroll::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+.comm-chat-empty {
+  margin: auto;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+/* Chat blocks — avatar + name/ts + one or more message lines */
+.comm-chat-block {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr);
+  gap: 10px;
+  align-items: flex-start;
+}
+.comm-chat-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6B3F1F, #A0522D);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.comm-chat-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.comm-chat-body { min-width: 0; }
+.comm-chat-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+.comm-chat-name {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-decoration: none;
+}
+.comm-chat-name:hover {
+  color: var(--wood-warm);
+  text-decoration: none;
+}
+.comm-chat-ts {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.comm-chat-msg {
+  font-size: 14px;
+  color: var(--text-primary);
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+/* Compose box */
+.comm-chat-compose {
+  display: flex;
+  gap: 8px;
+  padding: 10px 12px;
+  border-top: 1px solid var(--border-light);
+  background: #FDFBF5;
+  flex-shrink: 0;
+}
+.comm-chat-input {
+  flex: 1;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--text-primary);
+  outline: none;
+  resize: none;
+  max-height: 160px;
+  line-height: 1.45;
+  transition: border-color 0.12s;
+}
+.comm-chat-input:focus { border-color: var(--wood-warm); }
+.comm-chat-compose .comm-btn {
+  align-self: flex-end;
+}
+
+.comm-chat-err {
+  padding: 8px 14px;
+  background: #fef2f2;
+  color: #991b1b;
+  border-top: 1px solid #fecaca;
+  font-size: 12.5px;
+}
+.comm-chat-hint {
+  padding: 6px 12px 10px;
+  font-size: 11px;
+  color: var(--text-muted);
+  background: #FDFBF5;
+}
+.comm-chat-hint kbd {
+  font-family: inherit;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 10.5px;
+  color: var(--text-secondary);
+}
+
+/* Gate when not a member */
+.comm-gate {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: auto;
+  padding: 2rem;
+  text-align: center;
+  max-width: 360px;
+}
+.comm-gate-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.comm-gate-sub {
+  font-size: 13.5px;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin-bottom: 12px;
+}
+
+/* ── Member roster (right sidebar) ── */
+.comm-chat-side {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.85rem 0;
+  max-height: calc(100vh - 340px);
+  min-height: 500px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.comm-chat-side-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+  padding: 0 1rem 0.75rem;
+  border-bottom: 1px solid var(--border-light);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.comm-chat-side-count {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--wood-cream, #F5EAD6);
+  padding: 1px 8px;
+  border-radius: 999px;
+}
+
+.comm-members {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.75rem 0.5rem;
+}
+.comm-members::-webkit-scrollbar { width: 6px; }
+.comm-members::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+.comm-roster-group { margin-bottom: 1rem; }
+.comm-roster-group:last-child { margin-bottom: 0; }
+.comm-roster-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 4px 0.6rem 6px;
+}
+
+.comm-roster-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0.6rem;
+  border-radius: 6px;
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.12s;
+}
+.comm-roster-row:hover {
+  background: var(--wood-cream, #F5EAD6);
+  text-decoration: none;
+}
+.comm-roster-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6B3F1F, #A0522D);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 10.5px;
+  font-weight: 700;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.comm-roster-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.comm-roster-text {
+  flex: 1;
+  min-width: 0;
+}
+.comm-roster-name {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.comm-roster-trade {
+  font-size: 10.5px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 1px;
+}
+
 /* ── Profile communities chip (used on Profile page) ── */
 .pf-communities {
   display: flex;
