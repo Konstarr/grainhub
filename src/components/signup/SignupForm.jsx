@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { supabase } from '../../lib/supabase.js';
@@ -153,10 +153,19 @@ export default function SignupForm() {
     e.preventDefault();
   };
 
-  // If already logged in, bounce home.
-  if (user && currentStep !== 3) {
-    navigate('/', { replace: true });
-  }
+  // If the user is ALREADY logged in when they land on /signup, bounce
+  // them home — they don't need to sign up again. Deps are [user] only
+  // so that clicking Continue (which changes currentStep) doesn't
+  // re-fire the redirect and kick them out of the flow they're mid-way
+  // through.
+  useEffect(() => {
+    // Only redirect when the session is populated AND we're not on the
+    // success screen (where the user is expected to be logged in).
+    if (user && currentStep !== 3) {
+      navigate('/', { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
   const strengthScore = getPasswordStrengthClass(password);
 
