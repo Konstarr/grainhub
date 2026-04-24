@@ -107,6 +107,64 @@ export default function AdminUserEdit() {
       {error && <div className="adm-error" style={{ marginBottom: 12 }}>{error}</div>}
       {okMsg && <div className="adm-ok" style={{ marginBottom: 12 }}>{okMsg}</div>}
 
+      {/* ------------- Account type (admin override) ------------- */}
+      <div className="adm-card">
+        <div className="adm-card-title" style={{ fontFamily: 'var(--font-display)', fontSize: 17, color: 'var(--text-primary)', marginBottom: 12 }}>
+          Account type
+        </div>
+        <div className="adm-form-grid">
+          <div className="adm-field">
+            <label className="adm-label">Type</label>
+            <select
+              className="adm-select"
+              value={form.account_type || 'individual'}
+              onChange={(e) => {
+                const next = e.target.value;
+                const prev = form.account_type || 'individual';
+                if (next !== prev) {
+                  const warn = next === 'individual'
+                    ? 'Converting this account back to an individual will clear its sponsor tier and hide its business fields. Continue?'
+                    : 'Promoting this account to a business will unlock sponsor + ad features. You can fill in business details below after saving. Continue?';
+                  if (!confirm(warn)) return;
+                }
+                setForm((f) => {
+                  const patch = { ...f, account_type: next };
+                  // Clear sponsor tier when dropping back to individual
+                  // (DB constraint would reject the save anyway).
+                  if (next === 'individual') patch.sponsor_tier = null;
+                  return patch;
+                });
+              }}
+            >
+              <option value="individual">Individual</option>
+              <option value="business">Business</option>
+            </select>
+            <div className="adm-hint">
+              Admin override. Normal users can&apos;t switch — this is here so you can promote a test
+              account to a business or fix mis-categorised signups. Don&apos;t forget to save.
+            </div>
+          </div>
+          <div className="adm-field">
+            <div style={{
+              padding: '0.7rem 0.9rem',
+              background: form.account_type === 'business' ? '#E6F1FB' : 'var(--wood-cream, #FBF6EC)',
+              border: '1px solid ' + (form.account_type === 'business' ? '#BFDCEF' : 'var(--border)'),
+              borderRadius: 10, fontSize: 12.5, lineHeight: 1.55,
+              color: form.account_type === 'business' ? '#185FA5' : 'var(--text-secondary)',
+            }}>
+              <strong style={{ textTransform: 'uppercase', letterSpacing: '0.06em', fontSize: 11 }}>
+                {form.account_type === 'business' ? 'Business account' : 'Individual account'}
+              </strong>
+              <div style={{ marginTop: 4 }}>
+                {form.account_type === 'business'
+                  ? 'Eligible for sponsorship + ads. Appears with a business chip anywhere on the site.'
+                  : 'Personal account — can post, buy and sell, but not run ads or hold a sponsor tier.'}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* ------------- Identity ------------- */}
       <div className="adm-card">
         <div className="adm-card-title" style={{ fontFamily: 'var(--font-display)', fontSize: 17, color: 'var(--text-primary)', marginBottom: 12 }}>
