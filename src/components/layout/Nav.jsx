@@ -168,11 +168,24 @@ export default function Nav() {
                 }}
               >
                 <div style={{ padding: '0.55rem 0.75rem', borderBottom: '1px solid var(--border)', marginBottom: 4 }}>
-                  <div style={{ fontWeight: 600, fontSize: 14 }}>
-                    {profile?.full_name || profile?.username || 'You'}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+                    <div style={{ fontWeight: 600, fontSize: 14, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {profile?.full_name || profile?.username || 'You'}
+                    </div>
+                    <AccountTypePill
+                      accountType={profile?.account_type}
+                      membershipTier={profile?.membership_tier}
+                    />
                   </div>
                   {profile?.username && (
-                    <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>@{profile.username}</div>
+                    <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>
+                      @{profile.username}
+                    </div>
+                  )}
+                  {profile?.account_type === 'business' && profile?.business_name && (
+                    <div style={{ fontSize: 11.5, color: 'var(--text-muted)', marginTop: 2, fontStyle: 'italic' }}>
+                      {profile.business_name}
+                    </div>
                   )}
                 </div>
 
@@ -270,5 +283,47 @@ function MenuItem({ children, onClick }) {
     >
       {children}
     </button>
+  );
+}
+
+/**
+ * Small color-coded pill that surfaces the account type + membership
+ * tier at the top of the user dropdown. Individual = brown, Business =
+ * blue. The tier ("Free", "Pro", "Enterprise" …) appears as the second
+ * half so the user knows exactly what they're on.
+ */
+function AccountTypePill({ accountType, membershipTier }) {
+  const isBusiness = accountType === 'business';
+  const tierLabel = (membershipTier || 'free');
+  const label = isBusiness ? 'Business' : 'Individual';
+
+  const palette = isBusiness
+    ? { bg: '#E6F1FB', fg: '#185FA5', border: '#BFDCEF' }
+    : { bg: '#F5EAD6', fg: '#6B3F1F', border: '#E0CDA7' };
+
+  return (
+    <span
+      title={`${label} account · ${tierLabel[0].toUpperCase() + tierLabel.slice(1)} tier`}
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 4,
+        padding: '2px 7px',
+        borderRadius: 999,
+        background: palette.bg,
+        color: palette.fg,
+        border: `1px solid ${palette.border}`,
+        fontSize: 9.5,
+        fontWeight: 700,
+        letterSpacing: 0.6,
+        textTransform: 'uppercase',
+        whiteSpace: 'nowrap',
+        flexShrink: 0,
+      }}
+    >
+      <span>{label}</span>
+      <span style={{ opacity: 0.5 }}>·</span>
+      <span>{tierLabel}</span>
+    </span>
   );
 }
