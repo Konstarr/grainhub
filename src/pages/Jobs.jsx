@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import '../styles/jobs.css';
 import JobsPageHeader from '../components/jobs/JobsPageHeader.jsx';
 import JobsSearchHero from '../components/jobs/JobsSearchHero.jsx';
@@ -10,26 +10,211 @@ import { JOBS_PAGE_HEADER, ROLE_PILLS, FILTER_OPTIONS, JOBS_TOOLBAR_DATA, POST_J
 import { useSupabaseList } from '../hooks/useSupabaseList.js';
 import { mapJobRow } from '../lib/mappers.js';
 
+/**
+ * Empty filter state — every checkbox off, every text field empty.
+ * FilterSidebar reads the array of "active" strings per section and
+ * toggles items in / out.
+ */
+const EMPTY_FILTERS = {
+  jobType:          [],   // e.g. ['Full-time', 'Part-time']
+  workLocation:     [],   // e.g. ['On-site', 'Remote']
+  experienceLevel:  [],
+  shopSpecialty:    [],
+  region:           [],
+  postedWithin:     [],
+  minSalary:        '',
+  maxSalary:        '',
+};
+
+/**
+ * Map a UI "Posted within" label to a cutoff timestamp. Anything older
+ * than the cutoff gets filtered out.
+ */
+function postedWithinCutoff(label) {
+  const now = Date.now();
+  const day = 24 * 60 * 60 * 1000;
+  switch (label) {
+    case 'Last 24 hours': return now - 1 * day;
+    case 'Last 7 days':   return now - 7 * day;
+    case 'Last 30 days':  return now - 30 * day;
+    case 'Any time':      return 0;
+    default:              return 0;
+  }
+}
+
+/** Cast $95K / $95,000 / 95 → 95000; handles hourly by returning bare number. */
+function parseSalaryInput(v) {
+  if (!v) return null;
+  const clean = String(v).replace(/[^\d.]/g, '');
+  if (!clean) return null;
+  const n = Number(clean);
+  if (!isFinite(n)) return null;
+  // If the user typed "50" assume 50k for annual ranges
+  return n < 1000 ? n * 1000 : n;
+}
+
 export default function Jobs() {
   const [activeRole, setActiveRole] = useState('All Roles');
+  const [keyword, setKeyword]       = useState('');
+  const [locationQ, setLocationQ]   = useState('');
+  const [heroJobType, setHeroJobType] = useState('All Job Types');
+  const [sort, setSort]             = useState('newest');
+  const [filters, setFilters]       = useState(EMPTY_FILTERS);
 
   const { data: rows } = useSupabaseList('jobs', {
     filter: (q) => q.eq('is_approved', true).eq('is_filled', false),
     order: { column: 'posted_at', ascending: false },
-    limit: 50,
+    limit: 200,
   });
 
-  const liveJobs = rows.map(mapJobRow);
+  // ---------- filter ----------
+  const filteredRows = useMemo(() => {
+    const kw = keyword.trim().toLowerCase();
+    const loc = locationQ.trim().toLowerCase();
+
+    // Normalize hero job-type ("Full-time") → row value ("full-time")
+    const heroTypeRaw = heroJobType === 'All Job Types' ? null : heroJobType.toLowerCase();
+
+    // Combine hero job type with sidebar job-type checkboxes
+    const jobTypeSet = new Set(filters.jobType.map((s) => s.toLowerCase()));
+    if (heroTypeRaw) jobTypeSet.add(heroTypeRaw);
+
+    const workLocSet = new Set(filters.workLocation.map((s) => s.toLowerCase()));
+    const regionSet  = new Set(filters.region.map((s) => s.toLowerCase()));
+    const specSet    = new Set(filters.shopSpecialty.map((s) => s.toLowerCase()));
+    const expSet     = new Set(filters.experienceLevel.map((s) => s.toLowerCase()));
+
+    const minSalary = parseSalaryInput(filters.minSalary);
+    const maxSalary = parseSalaryInput(filters.maxSalary);
+
+    // Posted within — pick the most restrictive selected window
+    const postedCutoffs = filters.postedWithin.map(postedWithinCutoff).filter(Boolean);
+    const postedCutoff  = postedCutoffs.length ? Math.max(...postedCutoffs) : 0;
+
+    // Role pill matches against job title (heuristic but effective)
+    const roleMatch = activeRole && activeRole !== 'All Roles'
+      ? activeRole.toLowerCase().split(/\s*\/\s*|\s+/).filter(Boolean)
+      : null;
+
+    return (rows || []).filter((r) => {
+      // keyword — title / company / description
+      if (kw) {
+        const hay = [r.title, r.company, r.description].filter(Boolean).join(' ').toLowerCase();
+        if (!hay.includes(kw)) return false;
+      }
+      // location
+      if (loc) {
+        const hay = [r.location, r.venue, r.city, r.state].filter(Boolean).join(' ').toLowerCase();
+        if (!hay.includes(loc)) return false;
+      }
+      // job type
+      if (jobTypeSet.size > 0) {
+        const et = (r.employment_type || '').toLowerCase();
+        if (!jobTypeSet.has(et)) return false;
+      }
+      // work location on-site / hybrid / remote
+      if (workLocSet.size > 0) {
+        const isRemote = !!r.is_remote || /remote/i.test(r.location || '');
+        const isHybrid = !!r.is_hybrid || /hybrid/i.test(r.location || '');
+        let ok = false;
+        if (workLocSet.has('remote')   && isRemote) ok = true;
+        if (workLocSet.has('hybrid')   && isHybrid) ok = true;
+        if (workLocSet.has('on-site')  && !isRemote && !isHybrid) ok = true;
+        if (!ok) return false;
+      }
+      // region — best-effort substring match
+      if (regionSet.size > 0) {
+        const hay = (r.location || '').toLowerCase();
+        // region labels end with "US"/"Canada"; pick distinguishing tokens
+        const regionTokens = Array.from(regionSet).map((reg) =>
+          reg.replace(/\s*us$/, '').trim()
+        );
+        if (!regionTokens.some((t) => hay.includes(t))) return false;
+      }
+      // shop specialty — try a description match
+      if (specSet.size > 0) {
+        const hay = (r.description || '').toLowerCase() + ' ' + (r.title || '').toLowerCase();
+        if (!Array.from(specSet).some((t) => hay.includes(t))) return false;
+      }
+      // experience — we can't reliably infer from the schema, so let through
+      if (expSet.size > 0) {
+        const hay = (r.title || '').toLowerCase() + ' ' + (r.description || '').toLowerCase();
+        // match any of the selected levels against title/description keywords
+        const hints = {
+          'entry level (0–2 yrs)': ['entry', 'apprentice', 'junior', 'assistant'],
+          'mid level (2–5 yrs)':   ['mid', 'specialist', 'operator'],
+          'senior (5+ yrs)':       ['senior', 'lead', 'master', 'supervisor', 'foreman'],
+          'lead / supervisor':     ['lead', 'supervisor', 'foreman', 'manager', 'director'],
+        };
+        const matched = Array.from(expSet).some((e) =>
+          (hints[e] || []).some((h) => hay.includes(h))
+        );
+        if (!matched) return false;
+      }
+      // salary
+      if (minSalary != null && r.salary_max != null && r.salary_max < minSalary) return false;
+      if (maxSalary != null && r.salary_min != null && r.salary_min > maxSalary) return false;
+      // posted within
+      if (postedCutoff && r.posted_at && new Date(r.posted_at).getTime() < postedCutoff) {
+        return false;
+      }
+      // role pill
+      if (roleMatch) {
+        const hay = (r.title || '').toLowerCase();
+        if (!roleMatch.some((word) => hay.includes(word))) return false;
+      }
+      return true;
+    });
+  }, [rows, keyword, locationQ, heroJobType, activeRole, filters]);
+
+  // ---------- sort ----------
+  const sortedRows = useMemo(() => {
+    const arr = [...filteredRows];
+    switch (sort) {
+      case 'salary-high':
+        arr.sort((a, b) => (b.salary_max || 0) - (a.salary_max || 0));
+        break;
+      case 'salary-low':
+        arr.sort((a, b) => (a.salary_min || 0) - (b.salary_min || 0));
+        break;
+      case 'newest':
+      case 'relevant':
+      default:
+        arr.sort((a, b) => new Date(b.posted_at || 0) - new Date(a.posted_at || 0));
+    }
+    return arr;
+  }, [filteredRows, sort]);
+
+  const liveJobs = sortedRows.map(mapJobRow);
 
   return (
     <>
       <JobsPageHeader data={JOBS_PAGE_HEADER} />
-      <JobsSearchHero />
+
+      <JobsSearchHero
+        keyword={keyword}
+        onKeywordChange={setKeyword}
+        location={locationQ}
+        onLocationChange={setLocationQ}
+        jobType={heroJobType}
+        onJobTypeChange={setHeroJobType}
+      />
+
       <RoleBar pills={ROLE_PILLS} activeRole={activeRole} setActiveRole={setActiveRole} />
 
       <div className="jobs-wrap">
-        <FilterSidebar filters={FILTER_OPTIONS} />
-        <JobsListing toolbarData={JOBS_TOOLBAR_DATA} jobs={liveJobs} />
+        <FilterSidebar
+          filters={FILTER_OPTIONS}
+          active={filters}
+          onChange={setFilters}
+          onClear={() => setFilters(EMPTY_FILTERS)}
+        />
+        <JobsListing
+          toolbarData={JOBS_TOOLBAR_DATA}
+          jobs={liveJobs}
+          sort={sort}
+          onSortChange={setSort}
+        />
         <JobsSidebar postJobCta={POST_JOB_CTA} talentCta={TALENT_CTA} />
       </div>
     </>

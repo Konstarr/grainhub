@@ -1,4 +1,11 @@
-export default function JobsSearchHero() {
+export default function JobsSearchHero({
+  keyword = '',
+  onKeywordChange,
+  location = '',
+  onLocationChange,
+  jobType = 'All Job Types',
+  onJobTypeChange,
+}) {
   return (
     <div className="page-header" style={{ paddingTop: 0, paddingBottom: 0 }}>
       <div className="header-inner" style={{ paddingTop: '1.5rem', paddingBottom: '1.5rem' }}>
@@ -8,7 +15,12 @@ export default function JobsSearchHero() {
               <circle cx="7" cy="7" r="5.5" stroke="#9A7B5C" strokeWidth="1.5" />
               <path d="M11 11 L14 14" stroke="#9A7B5C" strokeWidth="1.5" strokeLinecap="round" />
             </svg>
-            <input type="text" placeholder="Job title, skill, or keyword..." />
+            <input
+              type="text"
+              placeholder="Job title, skill, or keyword..."
+              value={keyword}
+              onChange={(e) => onKeywordChange && onKeywordChange(e.target.value)}
+            />
           </div>
           <div className="search-input-wrap" style={{ minWidth: '180px', flex: '0.5' }}>
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -20,9 +32,18 @@ export default function JobsSearchHero() {
               />
               <circle cx="8" cy="6" r="1.5" stroke="#9A7B5C" strokeWidth="1.3" fill="none" />
             </svg>
-            <input type="text" placeholder="City, state, or zip..." />
+            <input
+              type="text"
+              placeholder="City, state, or zip..."
+              value={location}
+              onChange={(e) => onLocationChange && onLocationChange(e.target.value)}
+            />
           </div>
-          <select className="search-select">
+          <select
+            className="search-select"
+            value={jobType}
+            onChange={(e) => onJobTypeChange && onJobTypeChange(e.target.value)}
+          >
             <option>All Job Types</option>
             <option>Full-time</option>
             <option>Part-time</option>
@@ -30,7 +51,13 @@ export default function JobsSearchHero() {
             <option>Temporary</option>
             <option>Apprenticeship</option>
           </select>
-          <button className="search-btn">Find Jobs →</button>
+          <button
+            type="button"
+            className="search-btn"
+            onClick={() => { /* no-op; inputs already filter live */ }}
+          >
+            Find Jobs →
+          </button>
         </div>
       </div>
     </div>
