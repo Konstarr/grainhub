@@ -294,46 +294,66 @@ nav.site-nav {
 
 .stat-label { font-size: 13px; color: #9A8070; }
 
-/* ── UNIFIED PAGE HEROES ──
-   Every "top brown band" on index pages shares the same look +
-   min-height so switching between Forums / Jobs / News / Wiki /
-   Marketplace / Suppliers / Events doesn't make the header jump.
-   Individual page stylesheets used to set their own padding; this
-   rule is authoritative and overrides them via specificity + later
-   declaration. */
-.page-header,
-.wiki-hero,
-.events-page-header {
+/* ── UNIFIED PAGE HEROES (.gh-hero) ──
+   One class governs the top brown band on every index page, giving
+   it a locked height regardless of content. Pages opt in by adding
+   `gh-hero` to their outermost hero component. The class composes
+   with each page's existing class (page-header, wiki-hero, etc.)
+   but overrides its height / padding / background. */
+.gh-hero {
   background: var(--wood-dark) !important;
   color: #F5EFE6;
-  padding: 3.5rem 2.5rem 3rem !important;
-  min-height: 260px;
+  padding: 2rem 2.5rem !important;
+  height: 220px;
+  min-height: 220px;
+  max-height: 220px;
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   position: relative;
   overflow: hidden;
 }
 
-/* The inner wrappers each page uses — make them fill the flex row. */
-.page-header > .header-inner,
-.page-header > .page-header-inner,
-.wiki-hero > .hero-inner,
-.events-page-header > .events-page-header-inner {
+.gh-hero > .header-inner,
+.gh-hero > .page-header-inner,
+.gh-hero > .hero-inner,
+.gh-hero > .events-page-header-inner {
   flex: 1;
   max-width: 1280px;
   margin: 0 auto;
   width: 100%;
+  padding: 0 !important;
 }
 
-/* Re-tint wiki-hero text: its old styles were designed for a cream bg */
-.wiki-hero .hero-eyebrow { color: #FFD7AC; }
-.wiki-hero .hero-title   { color: #F5EFE6; }
-.wiki-hero .hero-title em { color: #FFD7AC; }
-.wiki-hero .hero-sub     { color: rgba(245, 239, 230, 0.78); }
-.wiki-hero .search-sug,
-.wiki-hero .search-sug-label { color: rgba(245, 239, 230, 0.78); }
-.wiki-hero .hs-num       { color: #F5EFE6; }
-.wiki-hero .hs-label     { color: rgba(245, 239, 230, 0.7); }
+/* Shrink heavy hero content so it actually fits in 220px. */
+.gh-hero h1,
+.gh-hero .hero-title,
+.gh-hero .events-title,
+.gh-hero .page-title { font-size: 2rem !important; line-height: 1.1 !important; margin: 0 0 0.4rem !important; }
+.gh-hero .hero-sub,
+.gh-hero .events-subtitle,
+.gh-hero .page-subtitle { font-size: 0.95rem !important; margin: 0 !important; }
+
+/* Wiki hero overrides — its light-on-cream design doesn't work on
+   dark. Re-tint text + re-skin the stat cards so they read. */
+.wiki-hero.gh-hero .hero-eyebrow { color: #FFD7AC; }
+.wiki-hero.gh-hero .hero-title   { color: #F5EFE6; }
+.wiki-hero.gh-hero .hero-title em { color: #FFD7AC; }
+.wiki-hero.gh-hero .hero-sub     { color: rgba(245, 239, 230, 0.78); }
+.wiki-hero.gh-hero .search-sug,
+.wiki-hero.gh-hero .search-sug-label { color: rgba(245, 239, 230, 0.8); }
+.wiki-hero.gh-hero .hero-stat {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+.wiki-hero.gh-hero .hs-num   { color: #FFD7AC; }
+.wiki-hero.gh-hero .hs-label { color: rgba(245, 239, 230, 0.75); }
+
+/* Hide the popular-search strip + right-side stat grid inside the
+   tight 220px hero — they were designed for the roomier original. */
+.wiki-hero.gh-hero .search-suggestions { display: none; }
+.wiki-hero.gh-hero .hero-right         { display: none; }
+.wiki-hero.gh-hero .hero-top           { flex-direction: column; align-items: flex-start; }
 
 /* ── SPONSOR STRIP ── */
 .sponsor-strip {

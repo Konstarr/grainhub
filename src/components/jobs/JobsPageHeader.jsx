@@ -2,7 +2,7 @@ export default function JobsPageHeader({ data }) {
   const titleLines = data.title.split('\n');
 
   return (
-    <div className="page-header">
+    <div className="page-header gh-hero">
       <div className="header-inner">
         <div className="header-top">
           <div>

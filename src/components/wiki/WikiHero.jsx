@@ -4,7 +4,7 @@ export default function WikiHero({ searchQuery = '', onSearchChange, onSearchSub
   const submit = () => { if (onSearchSubmit) onSearchSubmit(); };
 
   return (
-    <div className="wiki-hero">
+    <div className="wiki-hero gh-hero">
       <div className="hero-inner">
         <div className="hero-top">
           <div className="hero-left">

@@ -2,7 +2,7 @@ import { NEWS_PAGE_HEADER, NEWSLETTER_SUBSCRIBE } from '../../data/newsData.js';
 
 export default function NewsPageHeader() {
   return (
-    <div className="page-header">
+    <div className="page-header gh-hero">
       <div className="page-header-inner">
         <div className="page-header-left">
           <div className="page-eyebrow">{NEWS_PAGE_HEADER.eyebrow}</div>

@@ -1,6 +1,6 @@
 export default function PageHeader({ data }) {
   return (
-    <div className="page-header">
+    <div className="page-header gh-hero">
       <div className="header-inner">
         <div className="header-left">
           <div className="page-eyebrow">{data.eyebrow}</div>

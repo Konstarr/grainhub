@@ -206,7 +206,7 @@ export default function Marketplace() {
 
   return (
     <>
-      <div className="page-header">
+      <div className="page-header gh-hero">
         <div className="header-inner">
           <div className="header-top">
             <div>
