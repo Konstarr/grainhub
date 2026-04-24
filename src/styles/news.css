@@ -534,4 +534,5 @@
   border-radius: 7px;
   font-size: 13px;
   font-weight: 700;
-  curs
+  cursor: pointer;
+}

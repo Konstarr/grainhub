@@ -913,4 +913,7 @@ footer {
   font-size: 12px;
   color: #5A4838;
   flex-wrap: wrap;
-  ga
+  gap: 0.5rem;
+}
+
+.footer-bottom a { color: #7A6858; }
