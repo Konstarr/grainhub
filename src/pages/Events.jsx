@@ -1,3 +1,4 @@
+import { useSearchParams } from 'react-router-dom';
 import '../styles/events.css';
 import EventsPageHeader from '../components/events/EventsPageHeader.jsx';
 import EventsFilterTabs from '../components/events/EventsFilterTabs.jsx';
@@ -13,10 +14,20 @@ import { useSupabaseList } from '../hooks/useSupabaseList.js';
 import { mapEventRow } from '../lib/mappers.js';
 
 export default function Events() {
+  const [searchParams] = useSearchParams();
+  const activeType = searchParams.get('type') || '';
+
   const { data: rows } = useSupabaseList('events', {
-    filter: (q) => q.eq('is_approved', true).gte('start_date', new Date(Date.now() - 30 * 86400000).toISOString()),
+    filter: (q) => {
+      let out = q
+        .eq('is_approved', true)
+        .gte('start_date', new Date(Date.now() - 30 * 86400000).toISOString());
+      if (activeType) out = out.eq('event_type', activeType);
+      return out;
+    },
     order: { column: 'start_date', ascending: true },
     limit: 40,
+    deps: [activeType],
   });
 
   const liveEvents = rows.map(mapEventRow);

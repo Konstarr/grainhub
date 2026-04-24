@@ -13,10 +13,14 @@ import { supabase } from '../lib/supabase.js';
  *   });
  */
 export function useSupabaseList(table, opts = {}) {
-  const { select = '*', filter, order, limit } = opts;
+  const { select = '*', filter, order, limit, deps = [] } = opts;
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // `deps` lets callers re-run the query when URL params / filter values
+  // change without having to memoize the whole `filter` function.
+  const depsKey = JSON.stringify(deps);
 
   useEffect(() => {
     let cancelled = false;
@@ -50,7 +54,7 @@ export function useSupabaseList(table, opts = {}) {
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [table, select, JSON.stringify(order), limit]);
+  }, [table, select, JSON.stringify(order), limit, depsKey]);
 
   return { data, loading, error };
 }

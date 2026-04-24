@@ -1,3 +1,4 @@
+import { useSearchParams } from 'react-router-dom';
 import '../styles/news.css';
 import NewsPageHeader from '../components/news/NewsPageHeader.jsx';
 import NewsCategoryTabs from '../components/news/NewsCategoryTabs.jsx';
@@ -45,10 +46,18 @@ function toUi(row) {
 }
 
 export default function News() {
+  const [searchParams] = useSearchParams();
+  const activeCategory = searchParams.get('category') || '';
+
   const { data: rows } = useSupabaseList('news_articles', {
-    filter: (q) => q.eq('is_published', true),
+    filter: (q) => {
+      let out = q.eq('is_published', true);
+      if (activeCategory) out = out.eq('category', activeCategory);
+      return out;
+    },
     order: { column: 'published_at', ascending: false },
     limit: 40,
+    deps: [activeCategory],
   });
 
   const ui = rows.map(toUi);
