@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { supabase } from '../../lib/supabase.js';
 
 const MIN_CHIPS_PER_GROUP = 10;
-const SECONDS_PER_CHIP = 3.2;
+const SECONDS_PER_CHIP = 4.0; // was 3.2 — 25% slower scroll
 
 /**
  * Normalize a user-entered click URL so the browser treats it as an
