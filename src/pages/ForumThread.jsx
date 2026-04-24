@@ -5,6 +5,7 @@ import '../styles/forumThread.css';
 import PageBack from '../components/shared/PageBack.jsx';
 import ReportModal from '../components/shared/ReportModal.jsx';
 import RichReplyBox from '../components/forums/RichReplyBox.jsx';
+import { recordForumRecent } from '../components/forums/ForumsLeftSidebar.jsx';
 import { SponsorSidebar } from '../components/sponsors/AdSlot.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { FORUM_GROUPS } from '../data/forumsData.js';
@@ -210,6 +211,8 @@ export default function ForumThread() {
       if (!t) { setThread(null); setLoading(false); return; }
       setThread(t);
       incrementThreadViews(t.id).catch(() => null);
+      // Track in the left-sidebar "Recent" list.
+      recordForumRecent({ slug: t.slug, title: t.title });
 
       const { data: p } = await fetchThreadPosts(t.id);
       if (cancelled) return;

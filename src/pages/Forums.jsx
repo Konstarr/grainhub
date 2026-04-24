@@ -13,6 +13,7 @@ import TopContributors from '../components/forums/TopContributors.jsx';
 import ForumGuidelines from '../components/forums/ForumGuidelines.jsx';
 import ThreadLegend from '../components/forums/ThreadLegend.jsx';
 import SponsorCard from '../components/forums/SponsorCard.jsx';
+import ForumsLeftSidebar from '../components/forums/ForumsLeftSidebar.jsx';
 import TradeFilterBanner from '../components/layout/TradeFilterBanner.jsx';
 import { matchesTrade } from '../lib/trades.js';
 import {
@@ -258,7 +259,8 @@ export default function Forums() {
       <PageHeader data={FORUMS_PAGE_HEADER} />
       <ToolbarSection />
 
-      <div className="main-wrap">
+      <div className="main-wrap main-wrap-3col">
+        <ForumsLeftSidebar />
         <div>
           <TradeFilterBanner />
 
