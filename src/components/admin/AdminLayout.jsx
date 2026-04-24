@@ -24,9 +24,10 @@ export const ADMIN_SECTIONS = [
   {
     group: 'Community',
     items: [
-      { to: '/admin/forums',   label: 'Forum mod.', icon: <IconShield />,  enabled: false },
-      { to: '/admin/reports',  label: 'Reports',    icon: <IconFlag />,    enabled: false },
-      { to: '/admin/users',    label: 'Users',      icon: <IconUsers />,   enabled: true  },
+      { to: '/admin/forums',      label: 'Forum mod.',  icon: <IconShield />,  enabled: false },
+      { to: '/admin/reports',     label: 'Reports',     icon: <IconFlag />,    enabled: false },
+      { to: '/admin/users',       label: 'Users',       icon: <IconUsers />,   enabled: true  },
+      { to: '/admin/connections', label: 'Connections', icon: <IconLink />,    enabled: true  },
     ],
   },
 ];
@@ -109,3 +110,4 @@ function IconFlag()   { return (<svg {...svg}><path d="M4 15s1-1 4-1 5 2 8 2 4-1
 function IconUsers()  { return (<svg {...svg}><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>); }
 function IconStar()   { return (<svg {...svg}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>); }
 function IconBriefcase() { return (<svg {...svg}><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>); }
+function IconLink() { return (<svg {...svg}><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>); }

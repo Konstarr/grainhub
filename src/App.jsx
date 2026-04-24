@@ -35,6 +35,7 @@ import AdminJobsEdit from './pages/admin/AdminJobsEdit.jsx';
 import AdminUsers from './pages/admin/AdminUsers.jsx';
 import AdminUserEdit from './pages/admin/AdminUserEdit.jsx';
 import AdminSponsors from './pages/admin/AdminSponsors.jsx';
+import AdminConnections from './pages/admin/AdminConnections.jsx';
 
 export default function App() {
   return (
@@ -50,6 +51,7 @@ export default function App() {
         <Route path="/admin/users" element={<RequireStaff level="admin"><AdminUsers /></RequireStaff>} />
         <Route path="/admin/users/:id" element={<RequireStaff level="admin"><AdminUserEdit /></RequireStaff>} />
         <Route path="/admin/sponsors" element={<RequireStaff level="admin"><AdminSponsors /></RequireStaff>} />
+        <Route path="/admin/connections" element={<RequireStaff level="admin"><AdminConnections /></RequireStaff>} />
 
         <Route element={<Layout />}>
           <Route path="/" element={<Home />} />

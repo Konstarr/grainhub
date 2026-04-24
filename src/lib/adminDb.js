@@ -306,6 +306,77 @@ export async function getProfile(id) {
   return { data, error };
 }
 
+// ------------------------------------------------------------
+// Connections (admin)
+// ------------------------------------------------------------
+
+export async function listConnectionsAdmin({ search = '', status = '', limit = 300 } = {}) {
+  let q = supabase
+    .from('connections')
+    .select(`
+      id, status, created_at, responded_at, declined_at,
+      requester:requester_id ( id, username, full_name, avatar_url, business_name, account_type ),
+      addressee:addressee_id ( id, username, full_name, avatar_url, business_name, account_type )
+    `)
+    .order('created_at', { ascending: false })
+    .limit(limit);
+  if (status === 'pending' || status === 'accepted' || status === 'declined') {
+    q = q.eq('status', status);
+  }
+  const { data, error } = await q;
+  let rows = data || [];
+  if (search && search.trim()) {
+    const s = search.trim().toLowerCase();
+    rows = rows.filter((r) => {
+      const bag = [
+        r.requester?.username, r.requester?.full_name, r.requester?.business_name,
+        r.addressee?.username, r.addressee?.full_name, r.addressee?.business_name,
+      ].filter(Boolean).map((v) => v.toLowerCase()).join(' ');
+      return bag.includes(s);
+    });
+  }
+  return { data: rows, error };
+}
+
+/**
+ * Admin override — force an edge into any state. Creates the edge if it
+ * doesn't exist yet. Uses the server-side SECURITY DEFINER function so
+ * the DB does the is_admin() check.
+ */
+export async function adminForceConnect(a, b, status = 'accepted') {
+  const { data, error } = await supabase.rpc('admin_force_connect', {
+    a, b, new_status: status,
+  });
+  return { data, error };
+}
+
+export async function adminUpdateConnection(id, patch) {
+  const { data, error } = await supabase
+    .from('connections')
+    .update(patch)
+    .eq('id', id)
+    .select('*')
+    .maybeSingle();
+  return { data, error };
+}
+
+export async function adminDeleteConnection(id) {
+  const { error } = await supabase.from('connections').delete().eq('id', id);
+  return { error };
+}
+
+/** Search profiles by name / username — for the admin "create connection" picker. */
+export async function searchProfiles(query, { limit = 12 } = {}) {
+  const q = (query || '').trim();
+  if (!q) return { data: [], error: null };
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('id, username, full_name, avatar_url, business_name, account_type')
+    .or(`username.ilike.%${q}%,full_name.ilike.%${q}%,business_name.ilike.%${q}%`)
+    .limit(limit);
+  return { data: data || [], error };
+}
+
 export async function updateProfileAdmin(id, patch) {
   if (!id) return { data: null, error: new Error('Missing id') };
   const { data, error } = await supabase
