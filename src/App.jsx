@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext.jsx';
 import RequireAuth from './components/auth/RequireAuth.jsx';
@@ -31,36 +32,63 @@ import EventDetail from './pages/EventDetail.jsx';
 import Profile from './pages/Profile.jsx';
 import Messages from './pages/Messages.jsx';
 import MessageThread from './pages/MessageThread.jsx';
-import AdminNews from './pages/admin/AdminNews.jsx';
-import AdminNewsEdit from './pages/admin/AdminNewsEdit.jsx';
-import AdminNewsReports from './pages/admin/AdminNewsReports.jsx';
-import AdminOwnerDashboard from './pages/admin/AdminOwnerDashboard.jsx';
-import AdminEvents from './pages/admin/AdminEvents.jsx';
-import AdminEventsEdit from './pages/admin/AdminEventsEdit.jsx';
-import AdminJobs from './pages/admin/AdminJobs.jsx';
-import AdminJobsEdit from './pages/admin/AdminJobsEdit.jsx';
-import AdminUsers from './pages/admin/AdminUsers.jsx';
-import AdminUserEdit from './pages/admin/AdminUserEdit.jsx';
-import AdminSponsors from './pages/admin/AdminSponsors.jsx';
-import AdminConnections from './pages/admin/AdminConnections.jsx';
+// Admin pages — lazy-loaded so the TipTap editor (~210KB) and the
+// other admin-only widgets stay out of the main bundle for the 99% of
+// visitors who never see the admin panel.
+const AdminNews             = lazy(() => import('./pages/admin/AdminNews.jsx'));
+const AdminNewsEdit         = lazy(() => import('./pages/admin/AdminNewsEdit.jsx'));
+const AdminNewsReports      = lazy(() => import('./pages/admin/AdminNewsReports.jsx'));
+const AdminOwnerDashboard   = lazy(() => import('./pages/admin/AdminOwnerDashboard.jsx'));
+const AdminEvents           = lazy(() => import('./pages/admin/AdminEvents.jsx'));
+const AdminEventsEdit       = lazy(() => import('./pages/admin/AdminEventsEdit.jsx'));
+const AdminJobs             = lazy(() => import('./pages/admin/AdminJobs.jsx'));
+const AdminJobsEdit         = lazy(() => import('./pages/admin/AdminJobsEdit.jsx'));
+const AdminUsers            = lazy(() => import('./pages/admin/AdminUsers.jsx'));
+const AdminUserEdit         = lazy(() => import('./pages/admin/AdminUserEdit.jsx'));
+const AdminSponsors         = lazy(() => import('./pages/admin/AdminSponsors.jsx'));
+const AdminConnections      = lazy(() => import('./pages/admin/AdminConnections.jsx'));
+
+const AdminFallback = (
+  <div style={{
+    minHeight: '60vh',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: 'var(--text-muted)',
+    fontFamily: 'Montserrat, sans-serif',
+    fontSize: 14,
+  }}>
+    Loading admin…
+  </div>
+);
+
+// Helper: every admin route shares the same Suspense boundary so the
+// chunk loads once and re-uses across nav.
+const adminRoute = (level, Component) => (
+  <RequireStaff level={level}>
+    <Suspense fallback={AdminFallback}>
+      <Component />
+    </Suspense>
+  </RequireStaff>
+);
 
 export default function App() {
   return (
     <AuthProvider>
       <Routes>
-        <Route path="/admin" element={<RequireStaff level="admin"><AdminNews /></RequireStaff>} />
-        <Route path="/admin/dashboard" element={<RequireStaff level="owner"><AdminOwnerDashboard /></RequireStaff>} />
-        <Route path="/admin/news" element={<RequireStaff level="admin"><AdminNews /></RequireStaff>} />
-        <Route path="/admin/news/reports" element={<RequireStaff level="admin"><AdminNewsReports /></RequireStaff>} />
-        <Route path="/admin/news/:id" element={<RequireStaff level="admin"><AdminNewsEdit /></RequireStaff>} />
-        <Route path="/admin/events" element={<RequireStaff level="admin"><AdminEvents /></RequireStaff>} />
-        <Route path="/admin/events/:id" element={<RequireStaff level="admin"><AdminEventsEdit /></RequireStaff>} />
-        <Route path="/admin/jobs" element={<RequireStaff level="mod"><AdminJobs /></RequireStaff>} />
-        <Route path="/admin/jobs/:id" element={<RequireStaff level="mod"><AdminJobsEdit /></RequireStaff>} />
-        <Route path="/admin/users" element={<RequireStaff level="admin"><AdminUsers /></RequireStaff>} />
-        <Route path="/admin/users/:id" element={<RequireStaff level="admin"><AdminUserEdit /></RequireStaff>} />
-        <Route path="/admin/sponsors" element={<RequireStaff level="admin"><AdminSponsors /></RequireStaff>} />
-        <Route path="/admin/connections" element={<RequireStaff level="admin"><AdminConnections /></RequireStaff>} />
+        <Route path="/admin"                  element={adminRoute('admin', AdminNews)} />
+        <Route path="/admin/dashboard"        element={adminRoute('owner', AdminOwnerDashboard)} />
+        <Route path="/admin/news"             element={adminRoute('admin', AdminNews)} />
+        <Route path="/admin/news/reports"     element={adminRoute('admin', AdminNewsReports)} />
+        <Route path="/admin/news/:id"         element={adminRoute('admin', AdminNewsEdit)} />
+        <Route path="/admin/events"           element={adminRoute('admin', AdminEvents)} />
+        <Route path="/admin/events/:id"       element={adminRoute('admin', AdminEventsEdit)} />
+        <Route path="/admin/jobs"             element={adminRoute('mod',   AdminJobs)} />
+        <Route path="/admin/jobs/:id"         element={adminRoute('mod',   AdminJobsEdit)} />
+        <Route path="/admin/users"            element={adminRoute('admin', AdminUsers)} />
+        <Route path="/admin/users/:id"        element={adminRoute('admin', AdminUserEdit)} />
+        <Route path="/admin/sponsors"         element={adminRoute('admin', AdminSponsors)} />
+        <Route path="/admin/connections"      element={adminRoute('admin', AdminConnections)} />
 
         <Route element={<Layout />}>
           <Route path="/" element={<Home />} />

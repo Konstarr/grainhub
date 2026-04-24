@@ -1,9 +1,12 @@
 import '../styles/suppliers.css';
-import { useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import SupplierTable from '../components/suppliers/SupplierTable.jsx';
-import SuppliersMap from '../components/suppliers/SuppliersMap.jsx';
 import { SUPPLIERS_HEADER, SUPPLIER_CATEGORIES } from '../data/suppliersData.js';
+
+// Leaflet + react-leaflet weigh ~180KB minified — none of which is
+// needed unless the user actually flips to map view. Lazy-load.
+const SuppliersMap = lazy(() => import('../components/suppliers/SuppliersMap.jsx'));
 import { useSupabaseList } from '../hooks/useSupabaseList.js';
 import { mapSupplierRow } from '../lib/mappers.js';
 import { SponsorSidebar } from '../components/sponsors/AdSlot.jsx';
@@ -154,10 +157,25 @@ export default function Suppliers() {
           {view === 'list' ? (
             <SupplierTable activeCategory={activeCategory} suppliers={liveSuppliers} />
           ) : (
-            <SuppliersMap
-              activeCategory={activeCategory}
-              onCategoryChange={setActiveCategory}
-            />
+            <Suspense fallback={
+              <div style={{
+                height: 540,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'var(--text-muted)',
+                background: '#FAF6EE',
+                border: '1px solid var(--border)',
+                borderRadius: 12,
+              }}>
+                Loading map…
+              </div>
+            }>
+              <SuppliersMap
+                activeCategory={activeCategory}
+                onCategoryChange={setActiveCategory}
+              />
+            </Suspense>
           )}
         </div>
         <aside className="right-col">

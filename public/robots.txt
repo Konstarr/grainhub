@@ -1,0 +1,15 @@
+# GrainHub — robots.txt
+User-agent: *
+Allow: /
+
+# Don't index admin tooling, auth callbacks, or per-user dashboards.
+Disallow: /admin/
+Disallow: /admin
+Disallow: /auth/
+Disallow: /messages
+Disallow: /messages/
+Disallow: /signup
+Disallow: /login
+
+# Help search engines find the sitemap quickly.
+Sitemap: https://grainhub-brown.vercel.app/sitemap.xml

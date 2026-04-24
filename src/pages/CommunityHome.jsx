@@ -19,6 +19,7 @@ import {
 } from '../lib/communityDb.js';
 import { CommunityIcon } from './Communities.jsx';
 import { safeImageUrl } from '../lib/urlSafety.js';
+import useDocumentTitle from '../lib/useDocumentTitle.js';
 import '../styles/communities.css';
 
 /**
@@ -82,6 +83,7 @@ export default function CommunityHome() {
   };
 
   useEffect(() => { load(); /* eslint-disable-next-line */ }, [slug, user?.id]);
+  useDocumentTitle(community?.name);
 
   const handleToggleJoin = async () => {
     if (!community) return;

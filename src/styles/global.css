@@ -498,17 +498,19 @@ nav.site-nav {
 }
 
 /* ── Image-backed hero variant ────────────────────────── */
-/* The photo layer sits behind everything at z-index 0; a warm brown
-   scrim on top at z-index 1 pulls the workshop photo toward the site
-   palette while keeping enough contrast for the copy at z-index 2. */
-.hero-image .hero-image-layer {
+/* The hero photo is now a real <img> (.hero-image-bg) so the browser
+   can apply fetchpriority="high" and decode it on the LCP path. The
+   warm brown scrim layers over it at z-index 1; copy sits at z-index 2. */
+.hero-image .hero-image-bg {
   position: absolute;
   inset: 0;
   z-index: 0;
-  background-image: url('https://ozjtreaqyxlgsmopvwif.supabase.co/storage/v1/object/public/media/homepage/museums-victoria-U01ptiZV3Uo-unsplash.jpg');
-  background-size: cover;
-  background-position: center;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
   filter: saturate(0.85) contrast(1.05);
+  pointer-events: none;
 }
 .hero-image .hero-image-scrim {
   position: absolute;
