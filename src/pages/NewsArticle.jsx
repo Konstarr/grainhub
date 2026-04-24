@@ -37,6 +37,31 @@ export default function NewsArticle() {
       if (cancelled) return;
       if (error) { setErr(error); setLoading(false); return; }
       setArticle(data);
+
+      // Bump view_count on every page load. The Trending This Week
+      // card (and this page's own counter) reads view_count so real
+      // readership drives ranking. Errors are logged so missing
+      // migrations / RPC misconfigurations are visible during dev.
+      if (data) {
+        try {
+          const { error: bumpErr } = await supabase.rpc('increment_news_view', {
+            article_slug: data.slug,
+          });
+          if (bumpErr) {
+            // Most common: migration-news-view-counter.sql hasn't been
+            // run, so the function or view_count column doesn't exist.
+            // eslint-disable-next-line no-console
+            console.warn('[news] increment_news_view failed:', bumpErr.message || bumpErr);
+          } else if (!cancelled) {
+            // Optimistically reflect the bump in the rendered article
+            // so a refresh shows the new count right away.
+            setArticle((prev) => (prev ? { ...prev, view_count: (prev.view_count || 0) + 1 } : prev));
+          }
+        } catch (e) {
+          // eslint-disable-next-line no-console
+          console.warn('[news] increment_news_view threw:', e?.message || e);
+        }
+      }
       if (data) {
         const { data: rel } = await supabase
           .from('news_articles')

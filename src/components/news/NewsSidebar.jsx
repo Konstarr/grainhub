@@ -42,42 +42,57 @@ function trendingScore(article) {
 
 function TrendingCard() {
   const [items, setItems] = useState([]);
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      // Pull the last 14 days of published articles (cap at 50 to keep
-      // it cheap), then score + sort client-side.
-      const sinceIso = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString();
-      const { data } = await supabase
+
+  // Refetches the trending pool. Called on mount AND whenever the tab
+  // regains focus / the page becomes visible — so coming back from an
+  // article you just read picks up the new view count without a hard
+  // refresh.
+  const refetch = async () => {
+    // Pull the last 14 days of published articles (cap at 50 to keep
+    // it cheap), then score + sort client-side.
+    const sinceIso = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString();
+    const { data } = await supabase
+      .from('news_articles')
+      .select('slug, title, view_count, category, published_at')
+      .eq('is_published', true)
+      .gte('published_at', sinceIso)
+      .order('published_at', { ascending: false })
+      .limit(50);
+
+    // If the 14-day window is empty (e.g. demo with older seed data),
+    // fall back to the 50 most-recent published articles so the card
+    // still populates instead of going blank.
+    let pool = data || [];
+    if (pool.length === 0) {
+      const fb = await supabase
         .from('news_articles')
         .select('slug, title, view_count, category, published_at')
         .eq('is_published', true)
-        .gte('published_at', sinceIso)
         .order('published_at', { ascending: false })
         .limit(50);
+      pool = fb.data || [];
+    }
 
-      // If the 14-day window is empty (e.g. demo with older seed data),
-      // fall back to the 50 most-recent published articles so the card
-      // still populates instead of going blank.
-      let pool = data || [];
-      if (pool.length === 0) {
-        const fb = await supabase
-          .from('news_articles')
-          .select('slug, title, view_count, category, published_at')
-          .eq('is_published', true)
-          .order('published_at', { ascending: false })
-          .limit(50);
-        pool = fb.data || [];
-      }
+    const scored = pool
+      .map((a) => ({ ...a, _score: trendingScore(a) }))
+      .sort((a, b) => b._score - a._score)
+      .slice(0, 5);
 
-      const scored = pool
-        .map((a) => ({ ...a, _score: trendingScore(a) }))
-        .sort((a, b) => b._score - a._score)
-        .slice(0, 5);
+    setItems(scored);
+  };
 
-      if (!cancelled) setItems(scored);
-    })();
-    return () => { cancelled = true; };
+  useEffect(() => {
+    refetch();
+    // Refetch when the tab regains focus so coming back from an
+    // article you just viewed picks up its bumped view_count.
+    const onFocus = () => refetch();
+    window.addEventListener('focus', onFocus);
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) refetch();
+    });
+    return () => {
+      window.removeEventListener('focus', onFocus);
+    };
   }, []);
 
   if (items.length === 0) return null;
