@@ -377,8 +377,8 @@ nav.site-nav {
 .gh-hero .header-inner > *,
 .gh-hero .page-header-inner > * { /* default reset */ }
 
-/* Wiki hero overrides — its light-on-cream design doesn't work on
-   dark. Re-tint text + re-skin the stat cards so they read. */
+/* Wiki hero — the search-driven landing page. Re-tint for the dark
+   bg + recenter content so the title + search bar dominate. */
 .wiki-hero.gh-hero .hero-eyebrow { color: #FFD7AC; }
 .wiki-hero.gh-hero .hero-title   { color: #F5EFE6; }
 .wiki-hero.gh-hero .hero-title em { color: #FFD7AC; }
@@ -392,11 +392,30 @@ nav.site-nav {
 .wiki-hero.gh-hero .hs-num   { color: #FFD7AC; }
 .wiki-hero.gh-hero .hs-label { color: rgba(245, 239, 230, 0.75); }
 
-/* Hide the popular-search strip + right-side stat grid inside the
-   tight 220px hero — they were designed for the roomier original. */
+/* Drop the right-side stat grid + popular-search tail — they were
+   designed for the old roomier layout and add chrome we don't want. */
 .wiki-hero.gh-hero .search-suggestions { display: none; }
 .wiki-hero.gh-hero .hero-right         { display: none; }
-.wiki-hero.gh-hero .hero-top           { flex-direction: column; align-items: flex-start; }
+
+/* Center-align the whole hero and make the content column wider + the
+   type heavier, so the wiki header actually feels like a search hub. */
+.wiki-hero.gh-hero .hero-inner   { align-items: center !important; }
+.wiki-hero.gh-hero .hero-top     { flex-direction: column; align-items: center; width: 100%; }
+.wiki-hero.gh-hero .hero-left    { width: 100%; max-width: 760px; text-align: center; }
+.wiki-hero.gh-hero .hero-title   { font-size: 2.5rem !important; line-height: 1.08 !important; margin: 0 0 0.5rem !important; }
+.wiki-hero.gh-hero .hero-sub     { font-size: 0.95rem !important; max-width: 620px; margin: 0 auto !important; }
+.wiki-hero.gh-hero .wiki-search  {
+  margin: 0.85rem auto 0 !important;
+  max-width: 620px;
+  width: 100%;
+  height: 52px;
+  border-radius: 999px;
+  padding: 0 4px 0 16px;
+  background: #fff;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.18);
+}
+.wiki-hero.gh-hero .ws-input { font-size: 1rem; }
+.wiki-hero.gh-hero .ws-btn   { border-radius: 999px; padding: 0 1.25rem; height: 44px; }
 
 /* ── SPONSOR STRIP ── */
 .sponsor-strip {
