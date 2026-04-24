@@ -21,9 +21,12 @@ import Signup from './pages/Signup.jsx';
 import Login from './pages/Login.jsx';
 import Sponsor from './pages/Sponsor.jsx';
 import Events from './pages/Events.jsx';
+import EventDetail from './pages/EventDetail.jsx';
 import Profile from './pages/Profile.jsx';
 import AdminNews from './pages/admin/AdminNews.jsx';
 import AdminNewsEdit from './pages/admin/AdminNewsEdit.jsx';
+import AdminEvents from './pages/admin/AdminEvents.jsx';
+import AdminEventsEdit from './pages/admin/AdminEventsEdit.jsx';
 
 export default function App() {
   return (
@@ -32,6 +35,8 @@ export default function App() {
         <Route path="/admin" element={<RequireStaff level="admin"><AdminNews /></RequireStaff>} />
         <Route path="/admin/news" element={<RequireStaff level="admin"><AdminNews /></RequireStaff>} />
         <Route path="/admin/news/:id" element={<RequireStaff level="admin"><AdminNewsEdit /></RequireStaff>} />
+        <Route path="/admin/events" element={<RequireStaff level="admin"><AdminEvents /></RequireStaff>} />
+        <Route path="/admin/events/:id" element={<RequireStaff level="admin"><AdminEventsEdit /></RequireStaff>} />
 
         <Route element={<Layout />}>
           <Route path="/" element={<Home />} />
@@ -42,6 +47,7 @@ export default function App() {
           <Route path="/marketplace" element={<Marketplace />} />
           <Route path="/suppliers" element={<Suppliers />} />
           <Route path="/events" element={<Events />} />
+          <Route path="/events/:slug" element={<RequireAuth><EventDetail /></RequireAuth>} />
           <Route path="/sponsor" element={<Sponsor />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />

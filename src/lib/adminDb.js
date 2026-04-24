@@ -108,3 +108,95 @@ export async function deleteNewsArticle(id) {
     .eq('id', id);
   return { error };
 }
+
+// ------------------------------------------------------------
+// Events
+// ------------------------------------------------------------
+
+export async function listEvents({ search = '', limit = 200 } = {}) {
+  let q = supabase
+    .from('events')
+    .select('id, title, slug, event_type, start_date, end_date, location, venue_name, is_online, is_approved, cover_image_url, created_at, author_id, registration_url, trade')
+    .order('start_date', { ascending: true })
+    .limit(limit);
+  if (search && search.trim()) {
+    q = q.ilike('title', '%' + search.trim() + '%');
+  }
+  const { data, error } = await q;
+  return { data: data || [], error };
+}
+
+export async function getEvent(id) {
+  const { data, error } = await supabase
+    .from('events')
+    .select('*')
+    .eq('id', id)
+    .maybeSingle();
+  return { data, error };
+}
+
+export async function createEvent({
+  authorId,
+  title,
+  slug,
+  description,
+  eventType,
+  startDate,
+  endDate,
+  location,
+  venueName,
+  isOnline,
+  registrationUrl,
+  coverImageUrl,
+  trade,
+  isApproved,
+}) {
+  if (!title || !description || !startDate) {
+    return { data: null, error: new Error('Title, description, and start date are required') };
+  }
+  const row = {
+    author_id: authorId || null,
+    title: title.trim(),
+    slug: (slug && slug.trim()) || slugify(title),
+    description,
+    event_type: eventType || null,
+    start_date: new Date(startDate).toISOString(),
+    end_date: endDate ? new Date(endDate).toISOString() : null,
+    location: location || null,
+    venue_name: venueName || null,
+    is_online: !!isOnline,
+    registration_url: registrationUrl || null,
+    cover_image_url: coverImageUrl || null,
+    trade: trade || null,
+    is_approved: !!isApproved,
+  };
+  const { data, error } = await supabase
+    .from('events')
+    .insert(row)
+    .select('*')
+    .maybeSingle();
+  return { data, error };
+}
+
+export async function updateEvent(id, patch) {
+  if (!id) return { data: null, error: new Error('Missing id') };
+  const p = { ...patch };
+  if (p.start_date) p.start_date = new Date(p.start_date).toISOString();
+  if (p.end_date) p.end_date = new Date(p.end_date).toISOString();
+  const { data, error } = await supabase
+    .from('events')
+    .update(p)
+    .eq('id', id)
+    .select('*')
+    .maybeSingle();
+  return { data, error };
+}
+
+export async function deleteEvent(id) {
+  if (!id) return { error: new Error('Missing id') };
+  const { error } = await supabase
+    .from('events')
+    .delete()
+    .eq('id', id);
+  return { error };
+}

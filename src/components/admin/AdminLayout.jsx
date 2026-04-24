@@ -15,7 +15,7 @@ export const ADMIN_SECTIONS = [
     group: 'Content',
     items: [
       { to: '/admin/news',     label: 'News',      icon: <IconNews />,     enabled: true  },
-      { to: '/admin/events',   label: 'Events',    icon: <IconCal />,      enabled: false },
+      { to: '/admin/events',   label: 'Events',    icon: <IconCal />,      enabled: true  },
       { to: '/admin/listings', label: 'Listings',  icon: <IconTag />,      enabled: false },
     ],
   },
