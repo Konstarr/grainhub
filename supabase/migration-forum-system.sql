@@ -105,14 +105,24 @@ on conflict (id) do update set
 -- ------------------------------------------------------------
 
 -- Award badge helper
+-- SECURITY DEFINER so triggers firing in a regular user's context can still
+-- insert rows into profile_badges (which is locked down by RLS).
 create or replace function public.award_badge(p_profile uuid, p_badge text)
-returns void language plpgsql as $$
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
 begin
   insert into public.profile_badges (profile_id, badge_id)
   values (p_profile, p_badge)
   on conflict do nothing;
 end;
 $$;
+
+-- Make sure the function is owned by a role that can bypass RLS on
+-- profile_badges. postgres owns the table, so we align ownership.
+alter function public.award_badge(uuid, text) owner to postgres;
 
 -- Thread upvote -> bump thread count + author rep (+5)
 create or replace function public.on_thread_upvote()
