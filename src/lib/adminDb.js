@@ -298,12 +298,29 @@ export async function listProfiles({ search = '', accountType = null, limit = 20
 }
 
 export async function getProfile(id) {
-  const { data, error } = await supabase
+  // admin_get_profile is a SECURITY DEFINER function (see
+  // migration-hardening.sql) that returns the full profile row —
+  // including columns outside the public-safe grant. Required for
+  // AdminUserEdit which shows preferences, business fields, sponsor
+  // notes, etc. Falls back to the safe public SELECT so the page
+  // still renders something if the function hasn't been migrated yet.
+  const { data, error } = await supabase.rpc('admin_get_profile', { target: id });
+  if (!error && Array.isArray(data) && data.length > 0) {
+    return { data: data[0], error: null };
+  }
+  const fb = await supabase
     .from('profiles')
-    .select('*')
+    .select(
+      'id, username, full_name, bio, avatar_url, trade, location, website,' +
+      'role, reputation, thread_count, post_count, joined_at, created_at,' +
+      'is_verified, is_suspended,' +
+      'account_type, business_name, business_website, business_verified,' +
+      'sponsor_tier, sponsor_company,' +
+      'profile_public, show_on_leaderboard, email_visible'
+    )
     .eq('id', id)
     .maybeSingle();
-  return { data, error };
+  return { data: fb.data, error: fb.error || error };
 }
 
 // ------------------------------------------------------------
@@ -504,9 +521,13 @@ export function slotsForTier(tier) {
  * thumbnail list.
  */
 export async function fetchSponsorDashboard() {
+  // Only pull columns inside the public-safe grant from
+  // migration-hardening.sql. sponsor_notes is intentionally private
+  // (sits outside the grant) and isn't rendered on the dashboard —
+  // it's edited inside AdminUserEdit which uses admin_get_profile().
   const { data: profiles, error } = await supabase
     .from('profiles')
-    .select('id, username, full_name, avatar_url, sponsor_tier, sponsor_company, sponsor_notes')
+    .select('id, username, full_name, avatar_url, sponsor_tier, sponsor_company')
     .not('sponsor_tier', 'is', null)
     .order('sponsor_tier', { ascending: false })
     .order('full_name',    { ascending: true });
