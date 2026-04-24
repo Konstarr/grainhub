@@ -303,17 +303,22 @@ nav.site-nav {
 .gh-hero {
   background: var(--wood-dark) !important;
   color: #F5EFE6;
-  padding: 2rem 2.5rem !important;
+  padding: 0 2.5rem !important;                /* NO vertical padding — the inner column does the centering */
   height: 220px;
   min-height: 220px;
   max-height: 220px;
   box-sizing: border-box;
   display: flex;
-  align-items: center;
+  align-items: stretch;                        /* let inner wrapper fill full height */
   position: relative;
   overflow: hidden;
 }
 
+/* The inner wrapper becomes a vertical-flex column, so EVERY child of
+   the hero (eyebrow, title, subtitle, stats, etc.) is vertically
+   centered as a group — not just anchored to the top with the wrapper
+   centered around it. This is what actually made the text read as
+   "top-aligned" before. */
 .gh-hero > .header-inner,
 .gh-hero > .page-header-inner,
 .gh-hero > .hero-inner,
@@ -323,16 +328,32 @@ nav.site-nav {
   margin: 0 auto;
   width: 100%;
   padding: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: flex-start;                     /* keep content left-aligned within the column */
 }
 
-/* Shrink heavy hero content so it actually fits in 220px. */
+/* Shrink heavy hero content + collapse vertical margins so everything
+   actually fits + vertically centers inside the 220px box. */
 .gh-hero h1,
 .gh-hero .hero-title,
 .gh-hero .events-title,
-.gh-hero .page-title { font-size: 2rem !important; line-height: 1.1 !important; margin: 0 0 0.4rem !important; }
+.gh-hero .page-title       { font-size: 1.9rem !important; line-height: 1.1 !important; margin: 0 0 0.3rem !important; }
 .gh-hero .hero-sub,
 .gh-hero .events-subtitle,
-.gh-hero .page-subtitle { font-size: 0.95rem !important; margin: 0 !important; }
+.gh-hero .page-subtitle,
+.gh-hero p                 { font-size: 0.95rem !important; line-height: 1.45 !important; margin: 0 !important; max-width: 48rem; }
+.gh-hero .hero-eyebrow,
+.gh-hero .events-eyebrow,
+.gh-hero .page-eyebrow     { margin: 0 0 0.4rem !important; }
+.gh-hero .stats-row        { margin-top: 0.75rem !important; }
+.gh-hero .header-top,
+.gh-hero .header-left,
+.gh-hero .hero-left,
+.gh-hero .events-page-header-inner > *,
+.gh-hero .header-inner > *,
+.gh-hero .page-header-inner > * { /* default reset */ }
 
 /* Wiki hero overrides — its light-on-cream design doesn't work on
    dark. Re-tint text + re-skin the stat cards so they read. */
