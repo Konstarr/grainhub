@@ -9,7 +9,7 @@ export default function RecentActivity({ items }) {
       </div>
       <div className="activity-list">
         {items.map((item) => (
-          <Link key={item.id} to="/forums/thread" className={`activity-item ${item.isUnread ? 'unread' : ''}`}>
+          <Link key={item.id} to={item.slug ? `/forums/thread/${item.slug}` : '/forums/thread'} className={`activity-item ${item.isUnread ? 'unread' : ''}`}>
             <div className={`act-avatar ${item.avatarColor}`}>{item.avatar}</div>
             <div className="act-body">
               <div className="act-title">{item.title}</div>

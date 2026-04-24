@@ -45,7 +45,7 @@ export default function ForumGroup({ group }) {
       </div>
       <div className="forum-categories">
         {group.categories.map((cat) => (
-          <Link key={cat.id} to="/forums/thread" className={`forum-cat ${cat.isNew ? 'has-new' : ''}`}>
+          <Link key={cat.id} to={`/forums/category/${cat.id}`} className={`forum-cat ${cat.isNew ? 'has-new' : ''}`}>
             <div className="cat-icon-cell">
               <div className="cat-icon" style={{ background: getCategoryIconGradient(cat.iconColor) }}>
                 {cat.icon}

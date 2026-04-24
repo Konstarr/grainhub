@@ -35,7 +35,7 @@ export default function ForumSection() {
       ) : (
         <div className="forum-posts">
           {posts.map((post) => (
-            <Link key={post.id} to="/forums/thread" className="forum-post">
+            <Link key={post.id} to={post.slug ? `/forums/thread/${post.slug}` : '/forums/thread'} className="forum-post">
               <div className={`forum-avatar ${post.avatarColor}`}>{post.avatar}</div>
               <div className="forum-post-body">
                 <div className="forum-post-title">{post.title}</div>

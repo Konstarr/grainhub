@@ -4,6 +4,7 @@ import RequireAuth from './components/auth/RequireAuth.jsx';
 import Layout from './components/layout/Layout.jsx';
 import Home from './pages/Home.jsx';
 import Forums from './pages/Forums.jsx';
+import ForumCategory from './pages/ForumCategory.jsx';
 import ForumThread from './pages/ForumThread.jsx';
 import Jobs from './pages/Jobs.jsx';
 import Wiki from './pages/Wiki.jsx';
@@ -36,6 +37,22 @@ export default function App() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
 
+          <Route
+            path="/forums/category/:id"
+            element={
+              <RequireAuth>
+                <ForumCategory />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/forums/thread/:slug"
+            element={
+              <RequireAuth>
+                <ForumThread />
+              </RequireAuth>
+            }
+          />
           <Route
             path="/forums/thread"
             element={

@@ -54,6 +54,7 @@ function toActivityItem(row) {
   const initials = (t.title || '??').split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase() || 'GH';
   return {
     id: t.id,
+    slug: t.slug,
     avatar: initials,
     avatarColor,
     title: t.title,
