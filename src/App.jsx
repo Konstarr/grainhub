@@ -27,6 +27,8 @@ import Communities from './pages/Communities.jsx';
 import CommunityNew from './pages/CommunityNew.jsx';
 import CommunityHome from './pages/CommunityHome.jsx';
 import AuthCallback from './pages/AuthCallback.jsx';
+import Cart from './pages/Cart.jsx';
+import AccountSubscription from './pages/AccountSubscription.jsx';
 import Events from './pages/Events.jsx';
 import EventDetail from './pages/EventDetail.jsx';
 import Profile from './pages/Profile.jsx';
@@ -106,6 +108,8 @@ export default function App() {
           <Route path="/c/:slug" element={<CommunityHome />} />
           <Route path="/sponsor" element={<Sponsor />} />
           <Route path="/pricing" element={<Pricing />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/account/subscription" element={<RequireAuth><AccountSubscription /></RequireAuth>} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/login" element={<Login />} />

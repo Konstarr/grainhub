@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import '../styles/pricing.css';
 import {
   INDIVIDUAL_TIERS,
@@ -9,6 +9,7 @@ import {
   A_LA_CARTE,
   formatPrice,
 } from '../lib/pricing.js';
+import { useCart } from '../context/CartContext.jsx';
 
 /**
  * /pricing — public pricing page.
@@ -20,11 +21,16 @@ import {
  *   Role packs    → big hero cards with icons + pill tier selector
  *   À la carte    → grid of icon tiles with one price each
  *   Sponsorships  → metallic medallion-style cards (silver/gold/platinum)
+ *
+ * All CTAs add to the cart instead of routing to /signup. The cart
+ * keeps the user's selections so they can review everything before
+ * confirming. Apply happens via apply_my_subscription RPC at /cart.
  */
 export default function Pricing() {
   const [searchParams] = useSearchParams();
   const initial = searchParams.get('persona') === 'business' ? 'business' : 'individual';
   const [persona, setPersona] = useState(initial);
+  const cart = useCart();
 
   return (
     <>
@@ -38,6 +44,13 @@ export default function Pricing() {
                 Flat monthly pricing. No per-listing fees, no per-application charges.
               </p>
             </div>
+            {cart.count > 0 && (
+              <div className="header-right">
+                <Link to="/cart" className="pricing-cart-btn">
+                  Cart ({cart.count}) →
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -93,12 +106,7 @@ function IndividualSection() {
       </div>
       <div className="pricing-grid">
         {INDIVIDUAL_TIERS.map((t) => (
-          <TierCard
-            key={t.id}
-            tier={t}
-            ctaLabel={t.priceMonthly === 0 ? 'Sign up free' : 'Choose ' + t.name}
-            ctaTo="/signup"
-          />
+          <TierCard key={t.id} tier={t} />
         ))}
       </div>
     </section>
@@ -175,8 +183,48 @@ function BusinessSection() {
 
 /* ══════════════════ Sub-components ══════════════════════ */
 
+/**
+ * Reusable pill that flips between "Add to cart" and "Added ✓" plus a
+ * "Review cart" jump. Used by every CTA on the page so the visual
+ * language is consistent.
+ */
+function CartCta({ added, onAdd, contactSales = false, addLabel = 'Add to cart' }) {
+  const navigate = useNavigate();
+  if (contactSales) {
+    return <a href="mailto:sales@grainhub.io" className="tier-cta">Contact sales</a>;
+  }
+  if (added) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <button type="button" className="tier-cta tier-cta-added" disabled>
+          Added ✓
+        </button>
+        <button
+          type="button"
+          className="tier-cta-secondary"
+          onClick={() => navigate('/cart')}
+        >
+          Review cart →
+        </button>
+      </div>
+    );
+  }
+  return (
+    <button type="button" className="tier-cta" onClick={onAdd}>
+      {addLabel}
+    </button>
+  );
+}
+
 /** Generic tier card — used by individuals only now. */
-function TierCard({ tier, ctaLabel, ctaTo }) {
+function TierCard({ tier }) {
+  const cart = useCart();
+  const added = cart.has((i) => i.type === 'membership' && i.id === tier.id);
+
+  const handleAdd = () => {
+    cart.addItem({ type: 'membership', id: tier.id });
+  };
+
   return (
     <div className={'tier-card ' + (tier.highlight ? 'tier-highlight' : '')}>
       {tier.highlight && <div className="tier-ribbon">Most popular</div>}
@@ -189,11 +237,11 @@ function TierCard({ tier, ctaLabel, ctaTo }) {
       <ul className="tier-features">
         {tier.features.map((f, i) => <li key={i}>{f}</li>)}
       </ul>
-      {ctaTo?.startsWith('mailto:') ? (
-        <a href={ctaTo} className="tier-cta">{ctaLabel}</a>
-      ) : (
-        <Link to={ctaTo || '/signup'} className="tier-cta">{ctaLabel}</Link>
-      )}
+      <CartCta
+        added={added}
+        onAdd={handleAdd}
+        addLabel={tier.priceMonthly === 0 ? 'Select Free' : 'Add ' + tier.name}
+      />
     </div>
   );
 }
@@ -201,35 +249,45 @@ function TierCard({ tier, ctaLabel, ctaTo }) {
 /** Compact horizontal strip for the four business-membership levels.
  *  Much tighter than big cards — reads as a choose-your-baseline row. */
 function MembershipStrip({ tiers }) {
+  const cart = useCart();
   return (
     <div className="mb-strip">
-      {tiers.map((t, idx) => (
-        <div
-          key={t.id}
-          className={'mb-strip-col ' + (t.highlight ? 'mb-highlight' : '')}
-        >
-          {t.highlight && <span className="mb-badge">Most popular</span>}
-          <div className="mb-step">Step {idx + 1}</div>
-          <div className="mb-name">{t.name}</div>
-          <div className="mb-price">
-            {formatPrice(t.priceMonthly)}
-            {t.priceMonthly > 0 && <span className="tier-price-sub">/mo</span>}
-          </div>
-          <div className="mb-tagline">{t.tagline}</div>
-          <ul className="mb-feats">
-            {t.features.slice(0, 4).map((f, i) => <li key={i}>{f}</li>)}
-            {t.features.length > 4 && (
-              <li className="mb-more">+ {t.features.length - 4} more</li>
-            )}
-          </ul>
-          <Link
-            to={t.priceMonthly === null ? '/signup?persona=business' : '/signup?persona=business'}
-            className="mb-cta"
+      {tiers.map((t, idx) => {
+        const added = cart.has((i) => i.type === 'membership' && i.id === t.id);
+        const handleAdd = () => cart.addItem({ type: 'membership', id: t.id });
+        return (
+          <div
+            key={t.id}
+            className={'mb-strip-col ' + (t.highlight ? 'mb-highlight' : '')}
           >
-            {t.priceMonthly === null ? 'Contact sales' : t.priceMonthly === 0 ? 'Start free' : 'Choose'}
-          </Link>
-        </div>
-      ))}
+            {t.highlight && <span className="mb-badge">Most popular</span>}
+            <div className="mb-step">Step {idx + 1}</div>
+            <div className="mb-name">{t.name}</div>
+            <div className="mb-price">
+              {formatPrice(t.priceMonthly)}
+              {t.priceMonthly > 0 && <span className="tier-price-sub">/mo</span>}
+            </div>
+            <div className="mb-tagline">{t.tagline}</div>
+            <ul className="mb-feats">
+              {t.features.slice(0, 4).map((f, i) => <li key={i}>{f}</li>)}
+              {t.features.length > 4 && (
+                <li className="mb-more">+ {t.features.length - 4} more</li>
+              )}
+            </ul>
+            {t.priceMonthly === null ? (
+              <a href="mailto:sales@grainhub.io" className="mb-cta">Contact sales</a>
+            ) : added ? (
+              <button type="button" className="mb-cta mb-cta-added" disabled>
+                Added ✓
+              </button>
+            ) : (
+              <button type="button" className="mb-cta" onClick={handleAdd}>
+                {t.priceMonthly === 0 ? 'Select Free' : 'Add ' + t.name}
+              </button>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -242,6 +300,7 @@ const PACK_VISUALS = {
 };
 
 function PackCard({ pack }) {
+  const cart = useCart();
   const [tierId, setTierId] = useState(pack.tiers.find((t) => t.highlight)?.id || pack.tiers[0].id);
   const active = pack.tiers.find((t) => t.id === tierId) || pack.tiers[0];
   const visual = PACK_VISUALS[pack.id] || { icon: '✨', gradient: 'linear-gradient(135deg, #3A1A08, #6B3820)' };
@@ -250,6 +309,17 @@ function PackCard({ pack }) {
     active.cap === Infinity
       ? 'Unlimited ' + pack.unitPlural
       : active.cap + ' ' + (active.cap === 1 ? pack.unit : pack.unitPlural);
+
+  const added = cart.has(
+    (i) => i.type === 'pack' && i.id === pack.id && i.tierId === tierId,
+  );
+  const otherTierAdded = cart.has(
+    (i) => i.type === 'pack' && i.id === pack.id && i.tierId !== tierId,
+  );
+
+  const handleAdd = () => {
+    cart.addItem({ type: 'pack', id: pack.id, tierId });
+  };
 
   return (
     <div className="pack-hero">
@@ -288,9 +358,12 @@ function PackCard({ pack }) {
           {(active.extras || []).map((f, i) => <li key={'e' + i}>{f}</li>)}
         </ul>
 
-        <Link to="/signup?persona=business" className="tier-cta">
-          {active.priceMonthly === null ? 'Contact sales' : 'Add ' + active.name + ' tier'}
-        </Link>
+        <CartCta
+          added={added}
+          onAdd={handleAdd}
+          contactSales={active.priceMonthly === null}
+          addLabel={(otherTierAdded ? 'Switch to ' : 'Add ') + active.name + ' tier'}
+        />
       </div>
     </div>
   );
@@ -304,11 +377,17 @@ const SPONSOR_VISUALS = {
 };
 
 function SponsorMedallion({ tier }) {
+  const cart = useCart();
   const v = SPONSOR_VISUALS[tier.id] || SPONSOR_VISUALS.silver;
+  const added = cart.has((i) => i.type === 'sponsor' && i.id === tier.id);
+  const otherAdded = cart.has((i) => i.type === 'sponsor' && i.id !== tier.id);
+  const handleAdd = () => cart.addItem({ type: 'sponsor', id: tier.id });
+  const label = tier.name.replace(' Sponsor', '');
+
   return (
     <div className={'sponsor-card-new ' + (tier.highlight ? 'sponsor-highlight' : '')}>
       <div className="sponsor-medal" style={{ background: v.gradient, boxShadow: `0 4px 14px ${v.ring}55, inset 0 1px 0 rgba(255,255,255,0.4)` }}>
-        <span className="sponsor-medal-label">{tier.name.replace(' Sponsor', '')}</span>
+        <span className="sponsor-medal-label">{label}</span>
       </div>
       <div className="sponsor-card-body">
         <div className="sponsor-price">
@@ -319,7 +398,11 @@ function SponsorMedallion({ tier }) {
         <ul className="tier-features">
           {tier.features.map((f, i) => <li key={i}>{f}</li>)}
         </ul>
-        <Link to="/sponsor" className="tier-cta">Become {tier.name.replace(' Sponsor', '')}</Link>
+        <CartCta
+          added={added}
+          onAdd={handleAdd}
+          addLabel={(otherAdded ? 'Switch to ' : 'Become ') + label}
+        />
       </div>
     </div>
   );
@@ -327,6 +410,11 @@ function SponsorMedallion({ tier }) {
 
 /** Icon tile for à la carte items. */
 function ALaCarteTile({ item }) {
+  const cart = useCart();
+  const added = cart.has((i) => i.type === 'alacarte' && i.id === item.id);
+  const navigate = useNavigate();
+  const handleAdd = () => cart.addItem({ type: 'alacarte', id: item.id });
+
   return (
     <div className="alacarte-tile">
       <div className="alacarte-icon">{item.icon}</div>
@@ -337,9 +425,19 @@ function ALaCarteTile({ item }) {
       </div>
       <div className="alacarte-tagline">{item.tagline}</div>
       <div className="alacarte-desc">{item.description}</div>
-      <Link to="/signup?persona=business" className="alacarte-cta">
-        Book this →
-      </Link>
+      {added ? (
+        <button
+          type="button"
+          className="alacarte-cta"
+          onClick={() => navigate('/cart')}
+        >
+          Added ✓ · Review cart
+        </button>
+      ) : (
+        <button type="button" className="alacarte-cta" onClick={handleAdd}>
+          Add to cart →
+        </button>
+      )}
     </div>
   );
 }

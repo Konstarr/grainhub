@@ -203,6 +203,79 @@
   color: #fff;
 }
 
+/* CTA buttons rendered as <button> need to look identical to the
+   <Link>-based ones. Wipe browser defaults so width/family/cursor
+   match the original anchor styling exactly. */
+button.tier-cta,
+button.mb-cta {
+  width: 100%;
+  border: none;
+  cursor: pointer;
+  font-family: 'Montserrat', sans-serif;
+}
+button.alacarte-cta {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  font-family: inherit;
+  text-align: left;
+}
+button.tier-cta:disabled,
+button.mb-cta:disabled,
+button.alacarte-cta:disabled {
+  cursor: default;
+}
+
+/* "Added ✓" — green confirmation state */
+.tier-cta-added,
+.mb-cta-added {
+  background: #2D5016 !important;
+  color: #fff !important;
+  border-color: #2D5016 !important;
+}
+
+.tier-cta-secondary {
+  display: inline-block;
+  width: 100%;
+  text-align: center;
+  padding: 0.55rem 1rem;
+  background: transparent;
+  color: var(--wood-warm);
+  border: 1px solid var(--wood-warm);
+  border-radius: 8px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.tier-cta-secondary:hover {
+  background: var(--wood-warm);
+  color: #fff;
+}
+
+/* Cart pill in pricing hero */
+.pricing-cart-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.55rem 1rem;
+  background: var(--wood-warm);
+  color: #fff;
+  border-radius: 999px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+.pricing-cart-btn:hover {
+  background: #8B4316;
+  color: #fff;
+  text-decoration: none;
+}
+
 /* ── Pack card (with tier pill selector) ─────────────── */
 .pack-card {
   position: relative;
