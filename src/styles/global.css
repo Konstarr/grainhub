@@ -993,36 +993,5 @@ nav.site-nav {
   height: 50px;
   background: var(--wood-cream);
   border: 1px solid var(--border);
-  border-radius: 7px;
   flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 22px;
 }
-
-.machine-title { font-size: 13px; font-weight: 500; color: var(--text-primary); line-height: 1.3; margin-bottom: 2px; }
-.machine-price { font-size: 13px; font-weight: 600; color: var(--wood-warm); }
-.machine-loc { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
-
-/* SPONSOR AD */
-.sponsor-ad {
-  border-radius: 12px;
-  padding: 1.4rem;
-  color: white;
-  background: linear-gradient(140deg, #2D3A50, #1A2540);
-}
-
-.sp-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(255,255,255,0.4); margin-bottom: 6px; }
-.sp-title { font-family: 'Montserrat', sans-serif; font-size: 17px; margin-bottom: 5px; }
-.sp-sub { font-size: 13px; color: rgba(255,255,255,0.65); margin-bottom: 12px; line-height: 1.6; }
-.sp-btn {
-  background: #4A7FE0;
-  color: white;
-  border: none;
-  padding: 9px 16px;
-  border-radius: 7px;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
- 
