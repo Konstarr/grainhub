@@ -31,7 +31,7 @@ async function fetchReputations(profileIds) {
 export async function fetchThreadBySlug(slug) {
   const { data, error } = await supabase
     .from('forum_threads')
-    .select(`*, author:profiles(${AUTHOR_COLS_SAFE})`)
+    .select(`*, author:author_id(${AUTHOR_COLS_SAFE})`)
     .eq('slug', slug)
     .maybeSingle();
   if (error || !data) return { data, error };
@@ -64,7 +64,7 @@ export async function incrementThreadViews(threadId) {
 export async function fetchThreadPosts(threadId) {
   const { data, error } = await supabase
     .from('forum_posts')
-    .select(`*, author:profiles(${AUTHOR_COLS_SAFE})`)
+    .select(`*, author:author_id(${AUTHOR_COLS_SAFE})`)
     .eq('thread_id', threadId)
     .eq('is_deleted', false)
     .order('created_at', { ascending: true });
@@ -86,7 +86,7 @@ export async function createPost({ threadId, authorId, body, quotedPostId = null
       body,
       quoted_post_id: quotedPostId,
     })
-    .select(`*, author:profiles(${AUTHOR_COLS_SAFE})`)
+    .select(`*, author:author_id(${AUTHOR_COLS_SAFE})`)
     .maybeSingle();
   if (!error && data?.author?.id) {
     const reps = await fetchReputations([data.author.id]);
