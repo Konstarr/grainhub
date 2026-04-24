@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useSearchParams } from 'react-router-dom';
 import PageBack from '../components/shared/PageBack.jsx';
 import ReportModal from '../components/shared/ReportModal.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
@@ -22,6 +22,7 @@ import {
  */
 export default function Profile() {
   const { handle } = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { user, profile: mySelf, refreshProfile } = useAuth();
   const [profile, setProfile] = useState(null);
   const [badges, setBadges] = useState([]);
@@ -75,6 +76,18 @@ export default function Profile() {
     return () => { cancelled = true; };
   }, [handle]);
 
+  // Auto-open edit mode when Nav sends user here via ?edit=1,
+  // but only if they're viewing their own profile. Strip the param
+  // from the URL once consumed so refresh doesn't re-trigger it.
+  useEffect(() => {
+    if (searchParams.get('edit') === '1' && isMe && !editing) {
+      setEditing(true);
+      const next = new URLSearchParams(searchParams);
+      next.delete('edit');
+      setSearchParams(next, { replace: true });
+    }
+  }, [searchParams, isMe, editing, setSearchParams]);
+
   const initials = (profile?.full_name || profile?.username || '??')
     .split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase();
 
@@ -92,7 +105,6 @@ export default function Profile() {
       setEditBusy(false);
       return;
     }
-    // Re-fetch the summary view so reputation/badge_count stay accurate.
     const { data: fresh } = await fetchProfileByHandle(profile.username);
     if (fresh) setProfile(fresh);
     if (refreshProfile) refreshProfile();
@@ -119,7 +131,7 @@ export default function Profile() {
               Member not found
             </h2>
             <p style={{ color: 'var(--text-muted)' }}>
-              We couldn&apos;t find a profile with handle &quot;{handle}&quot;.
+              We could not find a profile with handle "{handle}".
             </p>
           </div>
         </div>
@@ -156,12 +168,12 @@ export default function Profile() {
                 </div>
 
                 <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginTop: 6, color: 'var(--text-muted)', fontSize: 14 }}>
-                  {profile.trade && <span>🪵 {profile.trade}</span>}
-                  {profile.location && <span>📍 {profile.location}</span>}
-                  {joinedStr && <span>📅 Joined {joinedStr}</span>}
+                  {profile.trade && <span>{profile.trade}</span>}
+                  {profile.location && <span>{profile.location}</span>}
+                  {joinedStr && <span>Joined {joinedStr}</span>}
                   {profile.website && (
                     <a href={profile.website} target="_blank" rel="noreferrer" style={{ color: 'var(--wood-warm)' }}>
-                      🔗 {profile.website.replace(/^https?:\/\//, '').replace(/\/$/, '')}
+                      {profile.website.replace(/^https?:\/\//, '').replace(/\/$/, '')}
                     </a>
                   )}
                 </div>
@@ -216,7 +228,7 @@ export default function Profile() {
                     Cancel
                   </button>
                   <button type="submit" style={pillBtn('solid')} disabled={editBusy}>
-                    {editBusy ? 'Saving…' : 'Save changes'}
+                    {editBusy ? 'Saving...' : 'Save changes'}
                   </button>
                 </div>
               </form>
@@ -236,7 +248,7 @@ export default function Profile() {
                   const b = row.badge || {};
                   return (
                     <div key={b.id || Math.random()} style={badgeCardStyle(b.tier)}>
-                      <div style={{ fontSize: 28, lineHeight: 1 }}>{b.icon || '🏆'}</div>
+                      <div style={{ fontSize: 28, lineHeight: 1 }}>{b.icon || 'B'}</div>
                       <div>
                         <div style={{ fontWeight: 600, fontSize: 14 }}>{b.name}</div>
                         <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>{b.description}</div>
@@ -253,7 +265,7 @@ export default function Profile() {
             <h2 style={sectionTitleStyle}>Recent threads</h2>
             {threads.length === 0 ? (
               <div style={{ color: 'var(--text-muted)', fontSize: 14 }}>
-                {isMe ? "You haven't started any threads yet." : `${profile.full_name || profile.username} hasn't started any threads yet.`}
+                {isMe ? "You haven't started any threads yet." : (profile.full_name || profile.username) + " hasn't started any threads yet."}
               </div>
             ) : (
               <div style={{ display: 'grid', gap: 8 }}>
@@ -272,9 +284,9 @@ export default function Profile() {
                       </div>
                     </div>
                     <div style={{ display: 'flex', gap: 14, fontSize: 12, color: 'var(--text-muted)' }}>
-                      <span>▲ {t.upvote_count || 0}</span>
-                      <span>💬 {t.reply_count || 0}</span>
-                      <span>👁 {t.view_count || 0}</span>
+                      <span>^ {t.upvote_count || 0}</span>
+                      <span>{t.reply_count || 0} replies</span>
+                      <span>{t.view_count || 0} views</span>
                     </div>
                   </Link>
                 ))}
@@ -283,7 +295,7 @@ export default function Profile() {
           </div>
         </div>
 
-        {/* Right column — quick meta */}
+        {/* Right column quick meta */}
         <aside className="right-col">
           <div style={cardStyle}>
             <h2 style={sectionTitleStyle}>About</h2>
@@ -402,7 +414,7 @@ function avatarStyle(url) {
     width: 96,
     height: 96,
     borderRadius: '50%',
-    background: url ? `url(${url}) center/cover no-repeat` : 'linear-gradient(135deg,#4A2A12,#8A5030)',
+    background: url ? 'url(' + url + ') center/cover no-repeat' : 'linear-gradient(135deg,#4A2A12,#8A5030)',
     color: '#fff',
     display: 'flex',
     alignItems: 'center',

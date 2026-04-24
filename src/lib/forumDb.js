@@ -1,30 +1,49 @@
 /**
- * Forum DB helpers: posts, upvotes, replies/quotes, reports, profile lookups.
+ * Forum DB helpers: posts, upvotes, replies/quotes, reports, profile lookups,
+ * subscriptions, and live counters.
  *
  * Every mutation returns { data, error } in the same shape so the UI can
  * handle failures uniformly.
  */
 import { supabase } from './supabase.js';
 
+// Columns guaranteed to exist in the base schema (pre-migration safe).
+// Reputation is enriched via fetchReputations() after the main fetch.
+const AUTHOR_COLS_SAFE = 'id, username, full_name, avatar_url, trade';
+
+async function fetchReputations(profileIds) {
+  const ids = Array.from(new Set(profileIds.filter(Boolean)));
+  if (ids.length === 0) return new Map();
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('id, reputation')
+    .in('id', ids);
+  if (error || !data) return new Map();
+  const map = new Map();
+  data.forEach((r) => { map.set(r.id, r.reputation || 0); });
+  return map;
+}
+
 // ------------------------------------------------------------
 // THREADS
 // ------------------------------------------------------------
 
-/** Fetch a single thread by slug, with author profile joined. */
 export async function fetchThreadBySlug(slug) {
   const { data, error } = await supabase
     .from('forum_threads')
-    .select('*, author:profiles(id, username, full_name, avatar_url, reputation, trade)')
+    .select(`*, author:profiles(${AUTHOR_COLS_SAFE})`)
     .eq('slug', slug)
     .maybeSingle();
-  return { data, error };
+  if (error || !data) return { data, error };
+  if (data.author?.id) {
+    const reps = await fetchReputations([data.author.id]);
+    data.author.reputation = reps.get(data.author.id) || 0;
+  }
+  return { data, error: null };
 }
 
-/** Increment view count (best-effort; ignore errors). */
 export async function incrementThreadViews(threadId) {
   if (!threadId) return;
-  await supabase.rpc('noop', {}).catch(() => null);
-  // Do a simple update; no optimistic locking needed for a counter.
   const { data: cur } = await supabase
     .from('forum_threads')
     .select('view_count')
@@ -39,21 +58,22 @@ export async function incrementThreadViews(threadId) {
 }
 
 // ------------------------------------------------------------
-// POSTS (replies within a thread)
+// POSTS
 // ------------------------------------------------------------
 
-/** Fetch all posts in a thread, oldest first, with author. */
 export async function fetchThreadPosts(threadId) {
   const { data, error } = await supabase
     .from('forum_posts')
-    .select('*, author:profiles(id, username, full_name, avatar_url, reputation, trade)')
+    .select(`*, author:profiles(${AUTHOR_COLS_SAFE})`)
     .eq('thread_id', threadId)
     .eq('is_deleted', false)
     .order('created_at', { ascending: true });
-  return { data: data || [], error };
+  if (error || !data) return { data: [], error };
+  const reps = await fetchReputations(data.map((p) => p.author?.id).filter(Boolean));
+  data.forEach((p) => { if (p.author) p.author.reputation = reps.get(p.author.id) || 0; });
+  return { data, error: null };
 }
 
-/** Create a reply in a thread. quotedPostId is optional. */
 export async function createPost({ threadId, authorId, body, quotedPostId = null }) {
   if (!threadId || !authorId || !body) {
     return { data: null, error: new Error('Missing threadId, authorId, or body') };
@@ -66,12 +86,15 @@ export async function createPost({ threadId, authorId, body, quotedPostId = null
       body,
       quoted_post_id: quotedPostId,
     })
-    .select('*, author:profiles(id, username, full_name, avatar_url, reputation, trade)')
+    .select(`*, author:profiles(${AUTHOR_COLS_SAFE})`)
     .maybeSingle();
+  if (!error && data?.author?.id) {
+    const reps = await fetchReputations([data.author.id]);
+    data.author.reputation = reps.get(data.author.id) || 0;
+  }
   return { data, error };
 }
 
-/** Edit a post (author only; RLS enforces). */
 export async function updatePost(postId, body) {
   const { data, error } = await supabase
     .from('forum_posts')
@@ -82,7 +105,6 @@ export async function updatePost(postId, body) {
   return { data, error };
 }
 
-/** Soft delete a post. */
 export async function deletePost(postId) {
   const { data, error } = await supabase
     .from('forum_posts')
@@ -95,7 +117,6 @@ export async function deletePost(postId) {
 // UPVOTES
 // ------------------------------------------------------------
 
-/** Has the given user upvoted this thread? Returns boolean. */
 export async function hasUpvotedThread(threadId, userId) {
   if (!threadId || !userId) return false;
   const { data } = await supabase
@@ -104,39 +125,37 @@ export async function hasUpvotedThread(threadId, userId) {
     .eq('thread_id', threadId)
     .eq('voter_id', userId)
     .maybeSingle();
-  return Boolean(data);
+  return !!data;
 }
 
-/** Fetch the set of post IDs this user has upvoted within the given list. */
 export async function fetchUserPostUpvotes(postIds, userId) {
   if (!userId || !postIds || postIds.length === 0) return new Set();
   const { data } = await supabase
     .from('post_upvotes')
     .select('post_id')
-    .eq('voter_id', userId)
-    .in('post_id', postIds);
+    .in('post_id', postIds)
+    .eq('voter_id', userId);
   return new Set((data || []).map((r) => r.post_id));
 }
 
-/** Toggle a thread upvote. Returns new state { upvoted: boolean }. */
 export async function toggleThreadUpvote(threadId, userId) {
   if (!threadId || !userId) return { upvoted: false, error: new Error('Not signed in') };
-  const existing = await hasUpvotedThread(threadId, userId);
-  if (existing) {
+  const already = await hasUpvotedThread(threadId, userId);
+  if (already) {
     const { error } = await supabase
       .from('thread_upvotes')
       .delete()
       .eq('thread_id', threadId)
       .eq('voter_id', userId);
     return { upvoted: false, error };
+  } else {
+    const { error } = await supabase
+      .from('thread_upvotes')
+      .insert({ thread_id: threadId, voter_id: userId });
+    return { upvoted: !error, error };
   }
-  const { error } = await supabase
-    .from('thread_upvotes')
-    .insert({ thread_id: threadId, voter_id: userId });
-  return { upvoted: true, error };
 }
 
-/** Toggle a post upvote. */
 export async function togglePostUpvote(postId, userId) {
   if (!postId || !userId) return { upvoted: false, error: new Error('Not signed in') };
   const { data: existing } = await supabase
@@ -152,11 +171,12 @@ export async function togglePostUpvote(postId, userId) {
       .eq('post_id', postId)
       .eq('voter_id', userId);
     return { upvoted: false, error };
+  } else {
+    const { error } = await supabase
+      .from('post_upvotes')
+      .insert({ post_id: postId, voter_id: userId });
+    return { upvoted: !error, error };
   }
-  const { error } = await supabase
-    .from('post_upvotes')
-    .insert({ post_id: postId, voter_id: userId });
-  return { upvoted: true, error };
 }
 
 // ------------------------------------------------------------
@@ -181,24 +201,54 @@ export async function submitReport({ reporterId, targetType, targetId, reason, d
 // PROFILES
 // ------------------------------------------------------------
 
-export async function fetchProfileByHandle(handle) {
-  if (!handle) return { data: null, error: new Error('No handle') };
-  const { data, error } = await supabase
+async function fetchProfileRaw(filterCol, filterVal) {
+  const { data: summary } = await supabase
     .from('profile_summary')
     .select('*')
-    .eq('username', handle)
+    .eq(filterCol, filterVal)
     .maybeSingle();
-  return { data, error };
+  if (summary) return summary;
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq(filterCol, filterVal)
+    .maybeSingle();
+  if (!profile) return profile;
+
+  const [threadsR, postsR, badgesR] = await Promise.all([
+    supabase.from('forum_threads').select('id', { count: 'exact', head: true }).eq('author_id', profile.id),
+    supabase.from('forum_posts').select('id', { count: 'exact', head: true }).eq('author_id', profile.id),
+    supabase.from('profile_badges').select('badge_id', { count: 'exact', head: true }).eq('profile_id', profile.id).then((r) => r, () => ({ count: 0 })),
+  ]);
+  return {
+    ...profile,
+    reputation: profile.reputation || 0,
+    thread_count: threadsR.count || 0,
+    post_count: postsR.count || 0,
+    badge_count: badgesR.count || 0,
+    joined_at: profile.joined_at || profile.created_at,
+  };
+}
+
+export async function fetchProfileByHandle(handle) {
+  if (!handle) return { data: null, error: new Error('No handle') };
+  try {
+    const data = await fetchProfileRaw('username', handle);
+    return { data: data || null, error: null };
+  } catch (e) {
+    return { data: null, error: e };
+  }
 }
 
 export async function fetchProfileById(id) {
   if (!id) return { data: null, error: new Error('No id') };
-  const { data, error } = await supabase
-    .from('profile_summary')
-    .select('*')
-    .eq('id', id)
-    .maybeSingle();
-  return { data, error };
+  try {
+    const data = await fetchProfileRaw('id', id);
+    return { data: data || null, error: null };
+  } catch (e) {
+    return { data: null, error: e };
+  }
 }
 
 export async function fetchProfileBadges(profileId) {
@@ -208,23 +258,33 @@ export async function fetchProfileBadges(profileId) {
     .select('awarded_at, badge:badges(id, name, description, icon, tier, display_order)')
     .eq('profile_id', profileId)
     .order('awarded_at', { ascending: false });
-  return { data: data || [], error };
+  if (error) return { data: [], error: null };
+  return { data: data || [], error: null };
 }
 
 export async function fetchRecentThreadsByAuthor(authorId, limit = 10) {
-  const { data, error } = await supabase
+  let { data, error } = await supabase
     .from('forum_threads')
     .select('id, slug, title, upvote_count, reply_count, view_count, last_reply_at')
     .eq('author_id', authorId)
     .order('last_reply_at', { ascending: false })
     .limit(limit);
+  if (error) {
+    const fb = await supabase
+      .from('forum_threads')
+      .select('id, slug, title, reply_count, view_count, last_reply_at')
+      .eq('author_id', authorId)
+      .order('last_reply_at', { ascending: false })
+      .limit(limit);
+    data = (fb.data || []).map((r) => ({ ...r, upvote_count: 0 }));
+    error = null;
+  }
   return { data: data || [], error };
 }
 
 export async function updateOwnProfile(userId, patch) {
   if (!userId) return { data: null, error: new Error('Not signed in') };
   const clean = { ...patch };
-  // Only allow these fields to be updated from the UI
   const allowed = ['username', 'full_name', 'bio', 'avatar_url', 'trade', 'location', 'website'];
   Object.keys(clean).forEach((k) => { if (!allowed.includes(k)) delete clean[k]; });
   const { data, error } = await supabase
@@ -246,5 +306,150 @@ export async function fetchTopReputation(limit = 10) {
     .select('id, username, full_name, avatar_url, reputation, trade, badge_count')
     .order('reputation', { ascending: false })
     .limit(limit);
+  if (error) {
+    const fb = await supabase
+      .from('profiles')
+      .select('id, username, full_name, avatar_url, trade')
+      .limit(limit);
+    return { data: (fb.data || []).map((p) => ({ ...p, reputation: 0, badge_count: 0 })), error: null };
+  }
   return { data: data || [], error };
+}
+
+// ------------------------------------------------------------
+// SUBSCRIPTIONS
+// ------------------------------------------------------------
+
+export async function fetchMySubscribedThreadIds(userId) {
+  if (!userId) return new Set();
+  const { data, error } = await supabase
+    .from('thread_subscriptions')
+    .select('thread_id')
+    .eq('user_id', userId);
+  if (error || !data) return new Set();
+  return new Set(data.map((r) => r.thread_id));
+}
+
+export async function fetchMySubscribedThreads(userId, limit = 50) {
+  if (!userId) return { data: [], error: null };
+  const { data: subs, error: subErr } = await supabase
+    .from('thread_subscriptions')
+    .select('thread_id')
+    .eq('user_id', userId);
+  if (subErr || !subs || subs.length === 0) return { data: [], error: null };
+  const ids = subs.map((r) => r.thread_id);
+  const { data, error } = await supabase
+    .from('forum_threads')
+    .select('*')
+    .in('id', ids)
+    .order('last_reply_at', { ascending: false })
+    .limit(limit);
+  return { data: data || [], error };
+}
+
+export async function isSubscribed(threadId, userId) {
+  if (!threadId || !userId) return false;
+  const { data } = await supabase
+    .from('thread_subscriptions')
+    .select('thread_id')
+    .eq('thread_id', threadId)
+    .eq('user_id', userId)
+    .maybeSingle();
+  return !!data;
+}
+
+export async function toggleSubscription(threadId, userId) {
+  if (!threadId || !userId) return { subscribed: false, error: new Error('Not signed in') };
+  const already = await isSubscribed(threadId, userId);
+  if (already) {
+    const { error } = await supabase
+      .from('thread_subscriptions')
+      .delete()
+      .eq('thread_id', threadId)
+      .eq('user_id', userId);
+    return { subscribed: false, error };
+  } else {
+    const { error } = await supabase
+      .from('thread_subscriptions')
+      .insert({ thread_id: threadId, user_id: userId });
+    return { subscribed: !error, error };
+  }
+}
+
+// ------------------------------------------------------------
+// MY POSTS
+// ------------------------------------------------------------
+
+export async function fetchMyPostThreads(userId, limit = 50) {
+  if (!userId) return { data: [], error: null };
+  const { data: authored } = await supabase
+    .from('forum_threads')
+    .select('*')
+    .eq('author_id', userId)
+    .order('last_reply_at', { ascending: false })
+    .limit(limit);
+  const { data: postedInIds } = await supabase
+    .from('forum_posts')
+    .select('thread_id')
+    .eq('author_id', userId)
+    .limit(500);
+  const ids = Array.from(new Set((postedInIds || []).map((r) => r.thread_id)));
+  let postedIn = [];
+  if (ids.length > 0) {
+    const { data } = await supabase
+      .from('forum_threads')
+      .select('*')
+      .in('id', ids)
+      .order('last_reply_at', { ascending: false })
+      .limit(limit);
+    postedIn = data || [];
+  }
+  const seen = new Set();
+  const merged = [];
+  [...(authored || []), ...postedIn].forEach((t) => {
+    if (seen.has(t.id)) return;
+    seen.add(t.id);
+    merged.push(t);
+  });
+  merged.sort((a, b) => new Date(b.last_reply_at || 0) - new Date(a.last_reply_at || 0));
+  return { data: merged.slice(0, limit), error: null };
+}
+
+// ------------------------------------------------------------
+// LIVE COUNTERS
+// ------------------------------------------------------------
+
+export async function fetchForumCounters() {
+  const [tr, pr, mr] = await Promise.all([
+    supabase.from('forum_threads').select('id', { count: 'exact', head: true }),
+    supabase.from('forum_posts').select('id', { count: 'exact', head: true }),
+    supabase.from('profiles').select('id', { count: 'exact', head: true }),
+  ]);
+  const since = new Date();
+  since.setHours(0, 0, 0, 0);
+  const { count: postsToday } = await supabase
+    .from('forum_posts')
+    .select('id', { count: 'exact', head: true })
+    .gte('created_at', since.toISOString());
+  return {
+    threadsTotal: tr.count || 0,
+    postsTotal: pr.count || 0,
+    membersTotal: mr.count || 0,
+    postsToday: postsToday || 0,
+  };
+}
+
+export async function fetchCategoryCounters() {
+  const { data: threads } = await supabase
+    .from('forum_threads')
+    .select('id, category_id, reply_count');
+  const byCat = new Map();
+  (threads || []).forEach((t) => {
+    if (!t.category_id) return;
+    const entry = byCat.get(t.category_id) || { threads: 0, posts: 0 };
+    entry.threads += 1;
+    entry.posts += (t.reply_count || 0) + 1;
+    byCat.set(t.category_id, entry);
+  });
+  return byCat;
 }

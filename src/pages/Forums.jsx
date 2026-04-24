@@ -1,3 +1,4 @@
+import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import '../styles/forums.css';
 import PageHeader from '../components/forums/PageHeader.jsx';
@@ -18,13 +19,19 @@ import {
   FORUM_GROUPS,
   ONLINE_MEMBERS,
   HOT_TOPICS,
-  FORUM_STATS,
-  TOP_CONTRIBUTORS,
   FORUM_GUIDELINES,
   THREAD_LEGEND,
 } from '../data/forumsData.js';
 import { useSupabaseList } from '../hooks/useSupabaseList.js';
 import { mapThreadRow } from '../lib/mappers.js';
+import { useAuth } from '../context/AuthContext.jsx';
+import {
+  fetchForumCounters,
+  fetchCategoryCounters,
+  fetchTopReputation,
+  fetchMySubscribedThreads,
+  fetchMyPostThreads,
+} from '../lib/forumDb.js';
 
 const AV_PALETTE = ['av-a', 'av-b', 'av-c', 'av-d', 'av-e'];
 const CAT_COLORS = [
@@ -35,9 +42,30 @@ const CAT_COLORS = [
   { bg: '#F0E7FA', text: '#5E2E8F' },
 ];
 
-function hashSlug(s = '') {
+const VIEW_TITLES = {
+  '':              'Recent Activity',
+  hot:             'Hot Today',
+  new:             'New Posts',
+  unanswered:      'Unanswered Threads',
+  solved:          'Solved Threads',
+  subscriptions:   'My Subscriptions',
+  'my-posts':      'My Posts',
+};
+
+const VIEW_EMPTIES = {
+  '':              'No forum threads yet.',
+  hot:             'No hot discussions in the last 24 hours.',
+  new:             'No new threads in the last 48 hours.',
+  unanswered:      'No unanswered threads right now.',
+  solved:          'No threads marked as solved yet.',
+  subscriptions:   "You aren't subscribed to any threads. Open a thread and click Subscribe to start tracking it.",
+  'my-posts':      "You haven't started or replied in any threads yet.",
+};
+
+function hashSlug(s) {
+  const str = s || '';
   let h = 0;
-  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
+  for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) | 0;
   return Math.abs(h);
 }
 
@@ -67,22 +95,126 @@ function toActivityItem(row) {
     views: t.viewCount,
     badges,
     isUnread: false,
+    _raw: row,
   };
 }
 
 export default function Forums() {
   const [searchParams] = useSearchParams();
   const trade = searchParams.get('trade') || '';
+  const view = searchParams.get('view') || '';
+  const { user, isAuthed } = useAuth();
 
   const { data: threadRows } = useSupabaseList('forum_threads', {
     order: { column: 'last_reply_at', ascending: false },
     limit: 50,
   });
-  const liveActivity = threadRows.map(toActivityItem);
+
+  const [customRows, setCustomRows] = useState(null);
+  const [customLoading, setCustomLoading] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function run() {
+      if (view === 'subscriptions' && isAuthed) {
+        setCustomLoading(true);
+        const res = await fetchMySubscribedThreads(user.id, 50);
+        if (!cancelled) setCustomRows(res.data || []);
+      } else if (view === 'my-posts' && isAuthed) {
+        setCustomLoading(true);
+        const res = await fetchMyPostThreads(user.id, 50);
+        if (!cancelled) setCustomRows(res.data || []);
+      } else {
+        setCustomRows(null);
+      }
+      if (!cancelled) setCustomLoading(false);
+    }
+    run();
+    return () => { cancelled = true; };
+  }, [view, isAuthed, user?.id]);
+
+  const sourceRows = customRows != null ? customRows : threadRows;
+  const liveActivity = useMemo(() => sourceRows.map(toActivityItem), [sourceRows]);
+
+  const viewFiltered = useMemo(() => {
+    if (!view || view === 'subscriptions' || view === 'my-posts') return liveActivity;
+    const now = Date.now();
+    const DAY = 24 * 60 * 60 * 1000;
+    return liveActivity.filter((item) => {
+      const raw = item._raw || {};
+      const last = raw.last_reply_at ? new Date(raw.last_reply_at).getTime() : 0;
+      if (view === 'hot') return (now - last) < DAY && (raw.reply_count || 0) >= 1;
+      if (view === 'new') return (now - last) < 2 * DAY;
+      if (view === 'unanswered') return (raw.reply_count || 0) === 0;
+      if (view === 'solved') return !!raw.is_solved;
+      return true;
+    });
+  }, [liveActivity, view]);
 
   const filteredActivity = trade
-    ? liveActivity.filter((item) => matchesTrade(item, trade))
-    : liveActivity;
+    ? viewFiltered.filter((item) => matchesTrade(item, trade))
+    : viewFiltered;
+
+  const [counters, setCounters] = useState(null);
+  const [topContribs, setTopContribs] = useState([]);
+  const [catCounts, setCatCounts] = useState(new Map());
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const c = await fetchForumCounters();
+      const topRes = await fetchTopReputation(5);
+      const cat = await fetchCategoryCounters();
+      if (cancelled) return;
+      setCounters(c);
+      setTopContribs(topRes.data || []);
+      setCatCounts(cat);
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  const liveStats = useMemo(() => {
+    if (!counters) return [];
+    return [
+      { label: 'Total posts',   value: counters.postsTotal.toLocaleString() },
+      { label: 'Total threads', value: counters.threadsTotal.toLocaleString() },
+      { label: 'Members',       value: counters.membersTotal.toLocaleString() },
+      { label: 'Posts today',   value: counters.postsToday.toLocaleString(), isHighlight: true },
+    ];
+  }, [counters]);
+
+  const liveContribs = useMemo(() => {
+    return topContribs.map((p, i) => ({
+      rank: i + 1,
+      name: p.full_name || p.username,
+      meta: (p.badge_count || 0) + ' badge' + ((p.badge_count || 0) === 1 ? '' : 's'),
+      points: (p.reputation || 0).toLocaleString() + ' rep',
+      initials: (p.full_name || p.username || '??').split(/\s+/).slice(0, 2).map((w) => w[0]).join('').toUpperCase(),
+      avatarColor: AV_PALETTE[i % AV_PALETTE.length],
+    }));
+  }, [topContribs]);
+
+  const viewTitle = VIEW_TITLES[view] || VIEW_TITLES[''];
+  const viewEmpty = VIEW_EMPTIES[view] || VIEW_EMPTIES[''];
+
+  const groupsWithLive = useMemo(() => {
+    return FORUM_GROUPS.map((g) => {
+      let groupPosts = 0;
+      const categories = g.categories.map((c) => {
+        const live = catCounts.get(c.id);
+        if (live) {
+          groupPosts += live.posts;
+          return { ...c, threads: live.threads, posts: live.posts };
+        }
+        return { ...c, threads: 0, posts: 0 };
+      });
+      return {
+        ...g,
+        forumCount: categories.length,
+        postCount: groupPosts,
+        categories,
+      };
+    });
+  }, [catCounts]);
 
   return (
     <>
@@ -96,24 +228,25 @@ export default function Forums() {
           <OnlineUsersStrip data={ONLINE_MEMBERS} />
           <HotTopicsStrip topics={HOT_TOPICS} />
 
-          <div className="forum-groups">
-            {FORUM_GROUPS.map((group) => (
-              <ForumGroup key={group.id} group={group} />
-            ))}
-          </div>
+          {!view && (
+            <div className="forum-groups">
+              {groupsWithLive.map((group) => (
+                <ForumGroup key={group.id} group={group} />
+              ))}
+            </div>
+          )}
 
           <div style={{ marginTop: '2rem' }}>
-            <h2 style={{
-              fontFamily: "'DM Serif Display', serif",
-              fontSize: '24px',
-              color: 'var(--text-primary)',
-              margin: '0 0 1rem 0',
-            }}>
-              Recent Activity
+            <h2 style={{ fontFamily: "'DM Serif Display', serif", fontSize: '24px', color: 'var(--text-primary)', margin: '0 0 1rem 0' }}>
+              {viewTitle}
             </h2>
-            {filteredActivity.length === 0 ? (
+            {customLoading ? (
+              <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)', border: '1px solid var(--border)', borderRadius: '12px', background: 'var(--white)' }}>
+                Loading...
+              </div>
+            ) : filteredActivity.length === 0 ? (
               <div style={{ padding: '3rem 2rem', textAlign: 'center', color: 'var(--text-muted)', border: '1px solid var(--border)', borderRadius: '12px', background: 'var(--white)' }}>
-                No forum threads yet.
+                {viewEmpty}
               </div>
             ) : (
               <RecentActivity items={filteredActivity} />
@@ -122,8 +255,8 @@ export default function Forums() {
         </div>
 
         <aside className="right-col">
-          <ForumStats stats={FORUM_STATS} />
-          <TopContributors contributors={TOP_CONTRIBUTORS} />
+          <ForumStats stats={liveStats} />
+          <TopContributors contributors={liveContribs} />
           <ForumGuidelines guidelines={FORUM_GUIDELINES} />
           <ThreadLegend items={THREAD_LEGEND} />
           <SponsorCard />

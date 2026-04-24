@@ -14,6 +14,8 @@ import {
   togglePostUpvote,
   createPost,
   incrementThreadViews,
+  isSubscribed,
+  toggleSubscription,
 } from '../lib/forumDb.js';
 
 function findCategoryMeta(id) {
@@ -61,7 +63,7 @@ function AuthorCard({ author }) {
   );
 }
 
-function PostCard({ post, index, isOp, isAccepted, hasUpvoted, onUpvote, onQuote, onReport, onGoToProfile }) {
+function PostCard({ post, index, isOp, isAccepted, hasUpvoted, onUpvote, onQuote, onReport }) {
   const quoted = post.quoted_post_id && post.__quoted
     ? { author: authorDisplay(post.__quoted.author), body: post.__quoted.body }
     : null;
@@ -77,7 +79,7 @@ function PostCard({ post, index, isOp, isAccepted, hasUpvoted, onUpvote, onQuote
             aria-label="Upvote"
             title={hasUpvoted ? 'Remove upvote' : 'Upvote'}
           >
-            ▲
+            \u25B2
           </button>
           <div className="vote-count">{post.upvote_count || 0}</div>
         </div>
@@ -88,7 +90,7 @@ function PostCard({ post, index, isOp, isAccepted, hasUpvoted, onUpvote, onQuote
           <div className="post-header">
             <span className="post-num">#{index + 1}</span>
             {isOp && <span className="post-op-badge">OP</span>}
-            {isAccepted && <span className="best-badge">✓ Accepted answer</span>}
+            {isAccepted && <span className="best-badge">\u2713 Accepted answer</span>}
             <span style={{ fontSize: '11px', color: 'var(--text-muted)', marginLeft: 'auto' }}>
               {timeAgo(post.created_at)}
             </span>
@@ -98,7 +100,7 @@ function PostCard({ post, index, isOp, isAccepted, hasUpvoted, onUpvote, onQuote
             <div className="post-quote">
               <div className="post-quote-author">{quoted.author.name} wrote:</div>
               <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
-                {(quoted.body || '').slice(0, 280)}{(quoted.body || '').length > 280 ? '…' : ''}
+                {(quoted.body || '').slice(0, 280)}{(quoted.body || '').length > 280 ? '\u2026' : ''}
               </div>
             </div>
           )}
@@ -110,10 +112,10 @@ function PostCard({ post, index, isOp, isAccepted, hasUpvoted, onUpvote, onQuote
           </div>
 
           <div className="post-footer">
-            <button type="button" className="post-action" onClick={onQuote}>“ Quote</button>
-            <button type="button" className="post-action" onClick={onUpvote}>{hasUpvoted ? '❤️' : '👍'} {hasUpvoted ? 'Liked' : 'Like'}</button>
+            <button type="button" className="post-action" onClick={onQuote}>\u201C Quote</button>
+            <button type="button" className="post-action" onClick={onUpvote}>{hasUpvoted ? 'Liked' : 'Like'}</button>
             <div className="post-footer-spacer" />
-            <span className="post-report" onClick={onReport}>⚑ Report</span>
+            <span className="post-report" onClick={onReport}>\u2691 Report</span>
           </div>
         </div>
       </div>
@@ -121,29 +123,38 @@ function PostCard({ post, index, isOp, isAccepted, hasUpvoted, onUpvote, onQuote
   );
 }
 
-function ThreadHeader({ thread, category, hasUpvoted, onUpvote, onReport, onReply }) {
+function ThreadHeader({ thread, category, hasUpvoted, onUpvote, onReport, onReply, subscribed, onToggleSubscribe, subscribeBusy }) {
   if (!thread) return null;
   return (
     <div className="thread-header">
       <div className="thread-tags">
         {category && <span className="tag tag-cat">{category.name}</span>}
-        {thread.is_pinned && <span className="tag tag-solved">📌 Pinned</span>}
-        {thread.is_solved && <span className="tag tag-solved">✓ Solved</span>}
-        {(thread.view_count || 0) > 1000 && <span className="tag tag-hot">🔥 Hot</span>}
+        {thread.is_pinned && <span className="tag tag-solved">Pinned</span>}
+        {thread.is_solved && <span className="tag tag-solved">\u2713 Solved</span>}
+        {(thread.view_count || 0) > 1000 && <span className="tag tag-hot">Hot</span>}
       </div>
       <h1 className="thread-title">{thread.title}</h1>
       <div className="thread-meta">
-        <div className="thread-meta-item">👁️ {thread.view_count || 0} views</div>
-        <div className="thread-meta-item">💬 {thread.reply_count || 0} replies</div>
-        <div className="thread-meta-item">👍 {thread.upvote_count || 0} upvotes</div>
-        <div className="thread-meta-item">⏱️ last reply {timeAgo(thread.last_reply_at)}</div>
+        <div className="thread-meta-item">{thread.view_count || 0} views</div>
+        <div className="thread-meta-item">{thread.reply_count || 0} replies</div>
+        <div className="thread-meta-item">{thread.upvote_count || 0} upvotes</div>
+        <div className="thread-meta-item">last reply {timeAgo(thread.last_reply_at)}</div>
       </div>
       <div className="thread-actions">
-        <button type="button" className="act-btn primary" onClick={onReply}>✉️ Reply</button>
+        <button type="button" className="act-btn primary" onClick={onReply}>Reply</button>
         <button type="button" className={'act-btn ' + (hasUpvoted ? 'primary' : '')} onClick={onUpvote}>
-          {hasUpvoted ? '❤️ Upvoted' : '👍 Upvote thread'}
+          {hasUpvoted ? 'Upvoted' : 'Upvote thread'}
         </button>
-        <button type="button" className="act-btn" onClick={onReport}>⚑ Report</button>
+        <button
+          type="button"
+          className={'act-btn ' + (subscribed ? 'primary' : '')}
+          onClick={onToggleSubscribe}
+          disabled={subscribeBusy}
+          title={subscribed ? 'Stop tracking this thread' : 'Get notified about new replies'}
+        >
+          {subscribed ? '\u{1F516} Subscribed' : '\u{1F516} Subscribe'}
+        </button>
+        <button type="button" className="act-btn" onClick={onReport}>\u2691 Report</button>
       </div>
     </div>
   );
@@ -174,15 +185,15 @@ function ReplyBox({ value, onChange, onSubmit, disabled, quoteSnippet, onCancelQ
           <div style={{ color: 'var(--text-secondary)' }}>
             <strong>Replying to {quoteSnippet.authorName}:</strong>
             <div style={{ fontStyle: 'italic', marginTop: 4, color: 'var(--text-muted)' }}>
-              "{(quoteSnippet.body || '').slice(0, 200)}{(quoteSnippet.body || '').length > 200 ? '…' : ''}"
+              "{(quoteSnippet.body || '').slice(0, 200)}{(quoteSnippet.body || '').length > 200 ? '\u2026' : ''}"
             </div>
           </div>
-          <button type="button" onClick={onCancelQuote} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', fontSize: '18px', lineHeight: 1 }}>×</button>
+          <button type="button" onClick={onCancelQuote} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', fontSize: '18px', lineHeight: 1 }}>x</button>
         </div>
       )}
       <textarea
         className="reply-textarea"
-        placeholder="Share your take… be specific, include measurements and photos when they help."
+        placeholder="Share your take\u2026 be specific, include measurements and photos when they help."
         value={value}
         onChange={(e) => onChange(e.target.value)}
         disabled={disabled}
@@ -191,7 +202,7 @@ function ReplyBox({ value, onChange, onSubmit, disabled, quoteSnippet, onCancelQ
         <div className="reply-footer-left">Be kind. Stay on topic. Link sources.</div>
         <div className="reply-footer-right">
           <button type="button" className="act-btn primary" onClick={onSubmit} disabled={disabled || busy || !value.trim()}>
-            {busy ? 'Posting…' : 'Post reply'}
+            {busy ? 'Posting\u2026' : 'Post reply'}
           </button>
         </div>
       </div>
@@ -217,7 +228,9 @@ export default function ForumThread() {
   const [reportOpen, setReportOpen] = useState(false);
   const [reportTarget, setReportTarget] = useState(null);
 
-  // Load thread + posts + user's upvote state
+  const [subscribed, setSubscribed] = useState(false);
+  const [subscribeBusy, setSubscribeBusy] = useState(false);
+
   useEffect(() => {
     if (!slug) return;
     let cancelled = false;
@@ -238,16 +251,35 @@ export default function ForumThread() {
         if (!cancelled) setThreadUpvoted(up);
         const postUpvotes = await fetchUserPostUpvotes(p.map((x) => x.id), user.id);
         if (!cancelled) setPostUpvotedSet(postUpvotes);
+        const sub = await isSubscribed(t.id, user.id);
+        if (!cancelled) setSubscribed(sub);
+      } else {
+        if (!cancelled) setSubscribed(false);
       }
       setLoading(false);
     })();
     return () => { cancelled = true; };
   }, [slug, user?.id]);
 
+  const handleToggleSubscribe = async () => {
+    if (!isAuthed) { navigate('/login'); return; }
+    if (!thread || subscribeBusy) return;
+    setSubscribeBusy(true);
+    const prev = subscribed;
+    setSubscribed(!prev);
+    const { subscribed: now, error } = await toggleSubscription(thread.id, user.id);
+    if (error) {
+      setSubscribed(prev);
+      alert('Could not update subscription: ' + (error.message || 'unknown error'));
+    } else {
+      setSubscribed(now);
+    }
+    setSubscribeBusy(false);
+  };
+
   const { category, group } = findCategoryMeta(thread?.category_id);
 
   const enrichedPosts = useMemo(() => {
-    // Attach quoted posts inline for render
     const byId = {};
     posts.forEach((p) => { byId[p.id] = p; });
     return posts.map((p) => (p.quoted_post_id ? { ...p, __quoted: byId[p.quoted_post_id] } : p));
@@ -256,12 +288,10 @@ export default function ForumThread() {
   const handleThreadUpvote = async () => {
     if (!isAuthed) { navigate('/login'); return; }
     if (!thread) return;
-    // optimistic
     setThreadUpvoted((v) => !v);
     setThread((t) => t ? { ...t, upvote_count: (t.upvote_count || 0) + (threadUpvoted ? -1 : 1) } : t);
     const { error } = await toggleThreadUpvote(thread.id, user.id);
     if (error) {
-      // revert on failure
       setThreadUpvoted((v) => !v);
       setThread((t) => t ? { ...t, upvote_count: (t.upvote_count || 0) + (threadUpvoted ? 1 : -1) } : t);
     }
@@ -270,7 +300,6 @@ export default function ForumThread() {
   const handlePostUpvote = async (postId) => {
     if (!isAuthed) { navigate('/login'); return; }
     const wasUpvoted = postUpvotedSet.has(postId);
-    // optimistic
     setPostUpvotedSet((s) => {
       const next = new Set(s);
       if (wasUpvoted) next.delete(postId); else next.add(postId);
@@ -351,10 +380,10 @@ export default function ForumThread() {
 
       <div className="ft-wrap">
         <div>
-          {loading && <div style={{ padding: '2rem', color: 'var(--text-muted)' }}>Loading thread…</div>}
+          {loading && <div style={{ padding: '2rem', color: 'var(--text-muted)' }}>Loading thread\u2026</div>}
           {!loading && !thread && (
             <div style={{ padding: '2rem', color: 'var(--text-muted)' }}>
-              Thread not found. <Link to="/forums">Back to Forums →</Link>
+              Thread not found. <Link to="/forums">Back to Forums \u2192</Link>
             </div>
           )}
           {thread && (
@@ -369,6 +398,9 @@ export default function ForumThread() {
                   const el = document.getElementById('reply-box');
                   if (el) el.scrollIntoView({ behavior: 'smooth' });
                 }}
+                subscribed={subscribed}
+                onToggleSubscribe={handleToggleSubscribe}
+                subscribeBusy={subscribeBusy}
               />
 
               <div className="posts">
@@ -432,9 +464,9 @@ export default function ForumThread() {
               <div className="rs-header">You</div>
               <div className="rs-body" style={{ fontSize: 13 }}>
                 <div style={{ fontWeight: 500 }}>{profile.full_name || profile.username}</div>
-                <div style={{ color: 'var(--text-muted)', fontSize: 12 }}>{profile.reputation || 0} rep · {profile.post_count || 0} posts</div>
+                <div style={{ color: 'var(--text-muted)', fontSize: 12 }}>{profile.reputation || 0} rep \u00B7 {profile.post_count || 0} posts</div>
                 <Link to={'/profile/' + profile.username} style={{ display: 'inline-block', marginTop: 8, color: 'var(--wood-warm)', fontSize: 12 }}>
-                  View your profile →
+                  View your profile \u2192
                 </Link>
               </div>
             </div>

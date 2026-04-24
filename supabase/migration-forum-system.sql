@@ -357,6 +357,31 @@ select
   (select count(*) from public.profile_badges pb where pb.profile_id = p.id) as badge_count
 from public.profiles p;
 
+-- ------------------------------------------------------------
+-- 10. Thread subscriptions (powers "My Subscriptions" filter)
+-- ------------------------------------------------------------
+create table if not exists public.thread_subscriptions (
+  thread_id  uuid not null references public.forum_threads(id) on delete cascade,
+  user_id    uuid not null references public.profiles(id)      on delete cascade,
+  created_at timestamptz not null default now(),
+  primary key (thread_id, user_id)
+);
+create index if not exists thread_subscriptions_user_idx on public.thread_subscriptions(user_id, created_at desc);
+
+alter table public.thread_subscriptions enable row level security;
+
+drop policy if exists thread_subs_select_own on public.thread_subscriptions;
+create policy thread_subs_select_own on public.thread_subscriptions
+  for select using (auth.uid() = user_id);
+
+drop policy if exists thread_subs_insert_own on public.thread_subscriptions;
+create policy thread_subs_insert_own on public.thread_subscriptions
+  for insert with check (auth.uid() = user_id);
+
+drop policy if exists thread_subs_delete_own on public.thread_subscriptions;
+create policy thread_subs_delete_own on public.thread_subscriptions
+  for delete using (auth.uid() = user_id);
+
 -- ============================================================
 -- DONE. Existing rows: backfill counters (one-time) if needed:
 --   update public.profiles p set post_count = (select count(*) from public.forum_posts where author_id = p.id),
