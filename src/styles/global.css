@@ -298,7 +298,7 @@ nav.site-nav {
 .sponsor-strip {
   background: var(--wood-cream);
   border-bottom: 1px solid var(--border);
-  padding: 12px 2.5rem;
+  padding: 18px 2.5rem;
   display: flex;
   align-items: center;
   gap: 2rem;
@@ -367,47 +367,60 @@ nav.site-nav {
   .sponsor-track { animation: none; }
 }
 
+/* Logos-only marquee — no chip, no border, no background. */
 .sponsor-logo {
-  background: white;
-  border: 1px solid var(--border);
-  border-radius: 7px;
-  padding: 7px 14px 7px 10px;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-secondary);
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  font-size: 0;                   /* swallow whitespace between inline children */
+  color: inherit;
   white-space: nowrap;
-  transition: border-color 0.15s, transform 0.15s;
+  transition: opacity 0.15s, transform 0.15s, filter 0.15s;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 0;
   flex-shrink: 0;
   text-decoration: none;
+  height: 60px;                   /* anchor every chip to the same height */
+  opacity: 0.82;
+  filter: grayscale(12%);
 }
 .sponsor-logo:hover {
-  border-color: var(--wood-warm);
+  opacity: 1;
+  filter: none;
   transform: translateY(-1px);
 }
 
+/* Fallback badge (only used when a sponsor has no logo uploaded yet). */
 .sponsor-logo-badge {
-  width: 26px;
-  height: 26px;
-  border-radius: 6px;
-  background: var(--wood-cream);
-  color: var(--wood-warm);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 11px;
+  background: transparent;
+  color: var(--wood-warm);
+  font-size: 13px;
   font-weight: 800;
   letter-spacing: 0.5px;
   flex-shrink: 0;
+  width: 60px;
+  height: 60px;
+  border-radius: 6px;
 }
 
+/* The actual image logo — big, proportional, no chrome. */
 .sponsor-logo-img {
+  width: auto;
+  height: 100%;                   /* fills the 60px strip height */
+  max-height: 60px;
+  max-width: 180px;
   object-fit: contain;
-  background: white;
-  padding: 3px;
+  background: transparent;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  display: block;
 }
 
 .sponsor-logo-name {
