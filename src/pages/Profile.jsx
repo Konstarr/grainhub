@@ -9,33 +9,34 @@ import {
   fetchRecentThreadsByAuthor,
   updateOwnProfile,
 } from '../lib/forumDb.js';
+import '../styles/profile.css';
 
 /**
  * /profile/:handle
  *
- * Public profile page: avatar, display name, bio, trade, location, website,
- * reputation, post count, thread count, joined date, badges, recent threads.
- *
- * If the logged-in user is viewing their own profile, an "Edit profile"
- * affordance reveals inline editing for bio / trade / location / website /
- * full_name / avatar_url. Username is not editable here.
+ * Public profile — hero banner + avatar, info chips, stats strip,
+ * tabbed content (Overview / Threads / Badges), inline edit for own profile.
  */
 export default function Profile() {
   const { handle } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
   const { user, profile: mySelf, refreshProfile } = useAuth();
+
   const [profile, setProfile] = useState(null);
   const [badges, setBadges] = useState([]);
   const [threads, setThreads] = useState([]);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
+  const [tab, setTab] = useState('overview'); // overview | threads | badges
 
   // Edit state
   const [editing, setEditing] = useState(false);
   const [editBusy, setEditBusy] = useState(false);
   const [editErr, setEditErr] = useState(null);
-  const [form, setForm] = useState({ full_name: '', bio: '', trade: '', location: '', website: '', avatar_url: '' });
+  const [form, setForm] = useState({
+    full_name: '', bio: '', trade: '', location: '', website: '', avatar_url: '',
+  });
 
   const isMe = useMemo(
     () => !!profile && !!mySelf && profile.id === mySelf.id,
@@ -66,7 +67,7 @@ export default function Profile() {
       });
       const [{ data: b }, { data: t }] = await Promise.all([
         fetchProfileBadges(data.id),
-        fetchRecentThreadsByAuthor(data.id, 10),
+        fetchRecentThreadsByAuthor(data.id, 25),
       ]);
       if (cancelled) return;
       setBadges(b || []);
@@ -76,9 +77,7 @@ export default function Profile() {
     return () => { cancelled = true; };
   }, [handle]);
 
-  // Auto-open edit mode when Nav sends user here via ?edit=1,
-  // but only if they're viewing their own profile. Strip the param
-  // from the URL once consumed so refresh doesn't re-trigger it.
+  // Auto-open edit when Nav sends here via ?edit=1
   useEffect(() => {
     if (searchParams.get('edit') === '1' && isMe && !editing) {
       setEditing(true);
@@ -92,14 +91,17 @@ export default function Profile() {
     .split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase();
 
   const joined = profile?.joined_at || profile?.created_at;
-  const joinedStr = joined ? new Date(joined).toLocaleDateString(undefined, { year: 'numeric', month: 'long' }) : '';
+  const joinedStr = joined
+    ? new Date(joined).toLocaleDateString(undefined, { year: 'numeric', month: 'long' })
+    : '';
+  const joinedYear = joined ? new Date(joined).getFullYear() : '';
 
   const handleSaveEdit = async (e) => {
     e.preventDefault();
     if (!user) return;
     setEditBusy(true);
     setEditErr(null);
-    const { data, error } = await updateOwnProfile(user.id, form);
+    const { error } = await updateOwnProfile(user.id, form);
     if (error) {
       setEditErr(error.message || 'Failed to save profile.');
       setEditBusy(false);
@@ -115,8 +117,14 @@ export default function Profile() {
   if (loading) {
     return (
       <>
-        <PageBack backTo="/forums" backLabel="Back to Forums" crumbs={[{ label: 'Home', to: '/' }, { label: 'Forums', to: '/forums' }, { label: 'Profile' }]} />
-        <div className="main-wrap"><div style={{ padding: '3rem 1rem', color: 'var(--text-muted)' }}>Loading profile...</div></div>
+        <PageBack
+          backTo="/forums"
+          backLabel="Back to Forums"
+          crumbs={[{ label: 'Home', to: '/' }, { label: 'Forums', to: '/forums' }, { label: 'Profile' }]}
+        />
+        <div className="profile-wrap">
+          <div style={{ padding: '3rem 1rem', color: 'var(--text-muted)' }}>Loading profile…</div>
+        </div>
       </>
     );
   }
@@ -124,20 +132,24 @@ export default function Profile() {
   if (notFound || !profile) {
     return (
       <>
-        <PageBack backTo="/forums" backLabel="Back to Forums" crumbs={[{ label: 'Home', to: '/' }, { label: 'Forums', to: '/forums' }, { label: 'Profile' }]} />
-        <div className="main-wrap">
-          <div style={{ padding: '3rem 1rem', textAlign: 'center' }}>
-            <h2 style={{ fontFamily: "'DM Serif Display', serif", color: 'var(--text-primary)', marginBottom: 8 }}>
-              Member not found
-            </h2>
-            <p style={{ color: 'var(--text-muted)' }}>
-              We could not find a profile with handle "{handle}".
-            </p>
+        <PageBack
+          backTo="/forums"
+          backLabel="Back to Forums"
+          crumbs={[{ label: 'Home', to: '/' }, { label: 'Forums', to: '/forums' }, { label: 'Profile' }]}
+        />
+        <div className="profile-wrap">
+          <div className="pf-empty" style={{ padding: '3.5rem 1rem' }}>
+            <div className="pf-empty-title">Member not found</div>
+            <div>We could not find a profile with handle &ldquo;{handle}&rdquo;.</div>
           </div>
         </div>
       </>
     );
   }
+
+  const websiteLabel = profile.website
+    ? profile.website.replace(/^https?:\/\//, '').replace(/\/$/, '')
+    : '';
 
   return (
     <>
@@ -151,172 +163,198 @@ export default function Profile() {
         ]}
       />
 
-      <div className="main-wrap">
-        <div>
-          {/* HEADER CARD */}
-          <div style={headerCardStyle}>
-            <div style={{ display: 'flex', gap: '1.25rem', alignItems: 'flex-start', flexWrap: 'wrap' }}>
-              <div style={avatarStyle(profile.avatar_url)}>
-                {!profile.avatar_url && initials}
-              </div>
-              <div style={{ flex: 1, minWidth: 220 }}>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, flexWrap: 'wrap' }}>
-                  <h1 style={{ fontFamily: "'DM Serif Display', serif", fontSize: 30, margin: 0, color: 'var(--text-primary)' }}>
-                    {profile.full_name || profile.username}
-                  </h1>
-                  <span style={{ color: 'var(--text-muted)', fontSize: 15 }}>@{profile.username}</span>
-                </div>
+      <div className="profile-wrap">
 
-                <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginTop: 6, color: 'var(--text-muted)', fontSize: 14 }}>
-                  {profile.trade && <span>{profile.trade}</span>}
-                  {profile.location && <span>{profile.location}</span>}
-                  {joinedStr && <span>Joined {joinedStr}</span>}
-                  {profile.website && (
-                    <a href={profile.website} target="_blank" rel="noreferrer" style={{ color: 'var(--wood-warm)' }}>
-                      {profile.website.replace(/^https?:\/\//, '').replace(/\/$/, '')}
-                    </a>
-                  )}
-                </div>
+        {/* ---------- HERO ---------- */}
+        <div className="pf-hero">
+          <div className="pf-cover" aria-hidden="true" />
 
-                {profile.bio && !editing && (
-                  <p style={{ marginTop: 12, color: 'var(--text-primary)', lineHeight: 1.55, whiteSpace: 'pre-wrap' }}>
-                    {profile.bio}
-                  </p>
-                )}
-
-                {!editing && (
-                  <div style={{ display: 'flex', gap: 8, marginTop: 14 }}>
-                    {isMe ? (
-                      <button type="button" style={pillBtn('solid')} onClick={() => setEditing(true)}>
-                        Edit profile
-                      </button>
-                    ) : (
-                      <button type="button" style={pillBtn('ghost')} onClick={() => setReportOpen(true)}>
-                        Report member
-                      </button>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              {/* STATS COLUMN */}
-              <div style={{ display: 'flex', gap: 18, marginLeft: 'auto' }}>
-                <Stat label="Reputation" value={profile.reputation || 0} highlight />
-                <Stat label="Posts" value={profile.post_count || 0} />
-                <Stat label="Threads" value={profile.thread_count || 0} />
+          <div className="pf-hero-body">
+            <div className="pf-avatar-frame">
+              <div className="pf-avatar">
+                {profile.avatar_url
+                  ? <img src={profile.avatar_url} alt="" />
+                  : initials}
               </div>
             </div>
 
-            {/* EDIT FORM */}
-            {editing && (
-              <form onSubmit={handleSaveEdit} style={{ marginTop: 20, borderTop: '1px solid var(--border)', paddingTop: 16 }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                  <Field label="Display name" value={form.full_name} onChange={(v) => setForm({ ...form, full_name: v })} />
-                  <Field label="Trade" value={form.trade} onChange={(v) => setForm({ ...form, trade: v })} placeholder="Cabinetmaker, Millwork Installer..." />
-                  <Field label="Location" value={form.location} onChange={(v) => setForm({ ...form, location: v })} placeholder="Portland, OR" />
-                  <Field label="Website" value={form.website} onChange={(v) => setForm({ ...form, website: v })} placeholder="https://..." />
-                  <Field label="Avatar URL" value={form.avatar_url} onChange={(v) => setForm({ ...form, avatar_url: v })} placeholder="https://..." full />
-                  <Field label="Bio" value={form.bio} onChange={(v) => setForm({ ...form, bio: v })} textarea rows={4} full />
+            <div className="pf-head">
+              <div className="pf-identity">
+                <div className="pf-displayname">
+                  <h1 className="pf-name">{profile.full_name || profile.username}</h1>
+                  <span className="pf-handle">@{profile.username}</span>
                 </div>
-                {editErr && (
-                  <div style={{ background: '#fef2f2', color: '#991b1b', border: '1px solid #fecaca', padding: '0.5rem 0.75rem', borderRadius: 8, fontSize: 13, marginTop: 12 }}>
-                    {editErr}
-                  </div>
+
+                <div className="pf-chips">
+                  {profile.trade && <span className="pf-chip"><IconTrade /> {profile.trade}</span>}
+                  {profile.location && <span className="pf-chip"><IconPin /> {profile.location}</span>}
+                  {joinedStr && <span className="pf-chip"><IconCal /> Joined {joinedStr}</span>}
+                  {profile.website && (
+                    <a
+                      href={profile.website}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="pf-chip pf-chip-link"
+                    >
+                      <IconLink /> {websiteLabel}
+                    </a>
+                  )}
+                </div>
+              </div>
+
+              <div className="pf-actions">
+                {isMe ? (
+                  <>
+                    <button type="button" className="pf-btn primary" onClick={() => setEditing((v) => !v)}>
+                      {editing ? 'Close' : 'Edit profile'}
+                    </button>
+                    <Link to="/forums/new" className="pf-btn">New thread</Link>
+                  </>
+                ) : (
+                  <>
+                    <button type="button" className="pf-btn" disabled title="Coming soon">
+                      Message
+                    </button>
+                    <button type="button" className="pf-btn ghost-danger" onClick={() => setReportOpen(true)}>
+                      Report
+                    </button>
+                  </>
                 )}
-                <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 14 }}>
-                  <button type="button" style={pillBtn('ghost')} onClick={() => setEditing(false)} disabled={editBusy}>
+              </div>
+            </div>
+
+            {/* Stats strip */}
+            <div className="pf-stats">
+              <StatCell label="Reputation" value={profile.reputation || 0} accent sub="community score" />
+              <StatCell label="Threads" value={profile.thread_count || 0} sub="started" />
+              <StatCell label="Replies" value={profile.post_count || 0} sub="posts" />
+              <StatCell label="Badges" value={badges.length} sub="earned" />
+            </div>
+
+            {/* Edit form */}
+            {editing && isMe && (
+              <form onSubmit={handleSaveEdit} className="pf-edit">
+                <div className="pf-edit-grid">
+                  <Field label="Display name" value={form.full_name} onChange={(v) => setForm({ ...form, full_name: v })} />
+                  <Field label="Trade" value={form.trade} onChange={(v) => setForm({ ...form, trade: v })} placeholder="Cabinetmaker, Millwork Installer…" />
+                  <Field label="Location" value={form.location} onChange={(v) => setForm({ ...form, location: v })} placeholder="Portland, OR" />
+                  <Field label="Website" value={form.website} onChange={(v) => setForm({ ...form, website: v })} placeholder="https://…" />
+                  <Field label="Avatar URL" full value={form.avatar_url} onChange={(v) => setForm({ ...form, avatar_url: v })} placeholder="https://…" />
+                  <Field label="Bio" full textarea rows={4} value={form.bio} onChange={(v) => setForm({ ...form, bio: v })} placeholder="Tell the community who you are and what you do…" />
+                </div>
+                {editErr && <div className="pf-error">{editErr}</div>}
+                <div className="pf-edit-actions">
+                  <button type="button" className="pf-btn" disabled={editBusy} onClick={() => setEditing(false)}>
                     Cancel
                   </button>
-                  <button type="submit" style={pillBtn('solid')} disabled={editBusy}>
-                    {editBusy ? 'Saving...' : 'Save changes'}
+                  <button type="submit" className="pf-btn primary" disabled={editBusy}>
+                    {editBusy ? 'Saving…' : 'Save changes'}
                   </button>
                 </div>
               </form>
             )}
           </div>
-
-          {/* BADGES */}
-          <div style={cardStyle}>
-            <h2 style={sectionTitleStyle}>Badges</h2>
-            {badges.length === 0 ? (
-              <div style={{ color: 'var(--text-muted)', fontSize: 14 }}>
-                No badges yet. Earn them by posting threads, helping others, and getting upvoted.
-              </div>
-            ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 12 }}>
-                {badges.map((row) => {
-                  const b = row.badge || {};
-                  return (
-                    <div key={b.id || Math.random()} style={badgeCardStyle(b.tier)}>
-                      <div style={{ fontSize: 28, lineHeight: 1 }}>{b.icon || 'B'}</div>
-                      <div>
-                        <div style={{ fontWeight: 600, fontSize: 14 }}>{b.name}</div>
-                        <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>{b.description}</div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-
-          {/* RECENT THREADS */}
-          <div style={cardStyle}>
-            <h2 style={sectionTitleStyle}>Recent threads</h2>
-            {threads.length === 0 ? (
-              <div style={{ color: 'var(--text-muted)', fontSize: 14 }}>
-                {isMe ? "You haven't started any threads yet." : (profile.full_name || profile.username) + " hasn't started any threads yet."}
-              </div>
-            ) : (
-              <div style={{ display: 'grid', gap: 8 }}>
-                {threads.map((t) => (
-                  <Link
-                    key={t.id}
-                    to={t.slug ? '/forums/thread/' + t.slug : '/forums'}
-                    style={threadRowStyle}
-                  >
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontWeight: 500, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {t.title}
-                      </div>
-                      <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>
-                        {t.last_reply_at ? new Date(t.last_reply_at).toLocaleDateString() : ''}
-                      </div>
-                    </div>
-                    <div style={{ display: 'flex', gap: 14, fontSize: 12, color: 'var(--text-muted)' }}>
-                      <span>^ {t.upvote_count || 0}</span>
-                      <span>{t.reply_count || 0} replies</span>
-                      <span>{t.view_count || 0} views</span>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            )}
-          </div>
         </div>
 
-        {/* Right column quick meta */}
-        <aside className="right-col">
-          <div style={cardStyle}>
-            <h2 style={sectionTitleStyle}>About</h2>
-            <div style={{ fontSize: 14, color: 'var(--text-primary)', lineHeight: 1.6 }}>
-              <div><strong>@{profile.username}</strong></div>
-              {profile.trade && <div style={{ color: 'var(--text-muted)' }}>{profile.trade}</div>}
-              {profile.location && <div style={{ color: 'var(--text-muted)' }}>{profile.location}</div>}
-              {joinedStr && <div style={{ color: 'var(--text-muted)', marginTop: 6 }}>Member since {joinedStr}</div>}
-            </div>
+        {/* ---------- TABS ---------- */}
+        <div className="pf-tabs">
+          <TabButton active={tab === 'overview'} onClick={() => setTab('overview')}>
+            Overview
+          </TabButton>
+          <TabButton active={tab === 'threads'} onClick={() => setTab('threads')}>
+            Threads <span className="pf-tab-count">{threads.length}</span>
+          </TabButton>
+          <TabButton active={tab === 'badges'} onClick={() => setTab('badges')}>
+            Badges <span className="pf-tab-count">{badges.length}</span>
+          </TabButton>
+        </div>
+
+        {/* ---------- CONTENT ---------- */}
+        <div className="pf-grid">
+          <div>
+            {tab === 'overview' && (
+              <>
+                <div className="pf-card">
+                  <div className="pf-card-title">About</div>
+                  {profile.bio ? (
+                    <p className="pf-bio">{profile.bio}</p>
+                  ) : (
+                    <p className="pf-bio muted">
+                      {isMe
+                        ? "You haven't written a bio yet. Click Edit profile to introduce yourself."
+                        : (profile.full_name || profile.username) + " hasn't added a bio yet."}
+                    </p>
+                  )}
+                </div>
+
+                <div className="pf-card">
+                  <div className="pf-card-title">
+                    <span>Recent threads</span>
+                    {threads.length > 5 && (
+                      <button type="button" className="pf-card-link" onClick={() => setTab('threads')}>
+                        See all →
+                      </button>
+                    )}
+                  </div>
+                  <ThreadList items={threads.slice(0, 5)} emptyIsMe={isMe} profile={profile} />
+                </div>
+
+                <div className="pf-card">
+                  <div className="pf-card-title">
+                    <span>Featured badges</span>
+                    {badges.length > 6 && (
+                      <button type="button" className="pf-card-link" onClick={() => setTab('badges')}>
+                        See all →
+                      </button>
+                    )}
+                  </div>
+                  <BadgesGrid items={badges.slice(0, 6)} isMe={isMe} />
+                </div>
+              </>
+            )}
+
+            {tab === 'threads' && (
+              <div className="pf-card">
+                <div className="pf-card-title">All threads ({threads.length})</div>
+                <ThreadList items={threads} emptyIsMe={isMe} profile={profile} />
+              </div>
+            )}
+
+            {tab === 'badges' && (
+              <div className="pf-card">
+                <div className="pf-card-title">Badges ({badges.length})</div>
+                <BadgesGrid items={badges} isMe={isMe} />
+              </div>
+            )}
           </div>
 
-          <div style={cardStyle}>
-            <h2 style={sectionTitleStyle}>Contribution</h2>
-            <div style={{ display: 'grid', gap: 8, fontSize: 14 }}>
-              <Row label="Reputation" value={profile.reputation || 0} />
-              <Row label="Posts" value={profile.post_count || 0} />
-              <Row label="Threads started" value={profile.thread_count || 0} />
-              <Row label="Badges earned" value={badges.length} />
+          {/* Sidebar */}
+          <aside>
+            <div className="pf-card">
+              <div className="pf-card-title">Contribution</div>
+              <div>
+                <div className="pf-row"><span className="pf-row-label">Reputation</span><span className="pf-row-value">{(profile.reputation || 0).toLocaleString()}</span></div>
+                <div className="pf-row"><span className="pf-row-label">Threads started</span><span className="pf-row-value">{(profile.thread_count || 0).toLocaleString()}</span></div>
+                <div className="pf-row"><span className="pf-row-label">Replies posted</span><span className="pf-row-value">{(profile.post_count || 0).toLocaleString()}</span></div>
+                <div className="pf-row"><span className="pf-row-label">Badges</span><span className="pf-row-value">{badges.length}</span></div>
+                {joinedYear && (
+                  <div className="pf-row"><span className="pf-row-label">Member since</span><span className="pf-row-value">{joinedYear}</span></div>
+                )}
+              </div>
             </div>
-          </div>
-        </aside>
+
+            {isMe && (
+              <div className="pf-card">
+                <div className="pf-card-title">Quick links</div>
+                <div style={{ display: 'grid', gap: 8 }}>
+                  <Link to="/forums?view=subscriptions" className="pf-btn" style={{ justifyContent: 'center' }}>My subscriptions</Link>
+                  <Link to="/forums?view=my-posts" className="pf-btn" style={{ justifyContent: 'center' }}>My posts</Link>
+                  <Link to="/forums/new" className="pf-btn primary" style={{ justifyContent: 'center' }}>Start a thread</Link>
+                </div>
+              </div>
+            )}
+          </aside>
+        </div>
       </div>
 
       <ReportModal
@@ -329,154 +367,130 @@ export default function Profile() {
   );
 }
 
-// ---------------- presentation helpers ----------------
+/* ================= Subcomponents ================= */
 
-function Stat({ label, value, highlight }) {
+function TabButton({ active, onClick, children }) {
   return (
-    <div style={{ textAlign: 'center', minWidth: 70 }}>
-      <div style={{
-        fontFamily: "'DM Serif Display', serif",
-        fontSize: 26,
-        color: highlight ? 'var(--wood-warm, #8A5030)' : 'var(--text-primary)',
-        lineHeight: 1,
-      }}>
-        {value.toLocaleString()}
-      </div>
-      <div style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginTop: 4 }}>
-        {label}
-      </div>
+    <button type="button" className={'pf-tab ' + (active ? 'active' : '')} onClick={onClick}>
+      {children}
+    </button>
+  );
+}
+
+function StatCell({ label, value, sub, accent }) {
+  return (
+    <div className={'pf-stat ' + (accent ? 'pf-stat-accent' : '')}>
+      <div className="pf-stat-value">{Number(value || 0).toLocaleString()}</div>
+      <div className="pf-stat-label">{label}</div>
+      {sub && <div className="pf-stat-sub">{sub}</div>}
     </div>
   );
 }
 
-function Row({ label, value }) {
+function ThreadList({ items, emptyIsMe, profile }) {
+  if (!items || items.length === 0) {
+    return (
+      <div className="pf-empty">
+        <div className="pf-empty-title">
+          {emptyIsMe ? "You haven't started any threads yet." : (profile?.full_name || profile?.username || 'This member') + " hasn't started any threads yet."}
+        </div>
+        {emptyIsMe && (
+          <div style={{ marginTop: 10 }}>
+            <Link to="/forums/new" className="pf-btn primary" style={{ display: 'inline-flex' }}>
+              Start your first thread
+            </Link>
+          </div>
+        )}
+      </div>
+    );
+  }
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-      <span style={{ color: 'var(--text-muted)' }}>{label}</span>
-      <span style={{ fontWeight: 600 }}>{Number(value || 0).toLocaleString()}</span>
+    <div>
+      {items.map((t) => (
+        <Link
+          key={t.id}
+          to={t.slug ? '/forums/thread/' + t.slug : '/forums'}
+          className="pf-thread"
+        >
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div className="pf-thread-title">{t.title}</div>
+            <div className="pf-thread-sub">
+              {t.last_reply_at ? 'Last reply ' + new Date(t.last_reply_at).toLocaleDateString() : 'recently'}
+            </div>
+          </div>
+          <div className="pf-thread-stats">
+            <span className="pf-thread-stat"><IconArrow /> {t.upvote_count || 0}</span>
+            <span className="pf-thread-stat"><IconReply /> {t.reply_count || 0}</span>
+            <span className="pf-thread-stat"><IconEye /> {t.view_count || 0}</span>
+          </div>
+        </Link>
+      ))}
+    </div>
+  );
+}
+
+function BadgesGrid({ items, isMe }) {
+  if (!items || items.length === 0) {
+    return (
+      <div className="pf-empty">
+        <div className="pf-empty-title">No badges yet</div>
+        <div>
+          {isMe
+            ? 'Earn badges by posting threads, helping others, and racking up upvotes.'
+            : 'Keep checking back — badges are earned over time.'}
+        </div>
+      </div>
+    );
+  }
+  return (
+    <div className="pf-badges">
+      {items.map((row) => {
+        const b = row.badge || {};
+        return (
+          <div key={b.id || Math.random()} className={'pf-badge tier-' + (b.tier || 'bronze')}>
+            <div className="pf-badge-icon">{b.icon || '🏅'}</div>
+            <div>
+              <div className="pf-badge-name">{b.name || 'Badge'}</div>
+              <div className="pf-badge-desc">{b.description || ''}</div>
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }
 
 function Field({ label, value, onChange, placeholder, textarea, rows = 3, full }) {
-  const common = {
-    width: '100%',
-    padding: '0.55rem 0.75rem',
-    borderRadius: 8,
-    border: '1px solid var(--border)',
-    fontFamily: 'inherit',
-    fontSize: 14,
-    background: 'var(--white, #fff)',
-  };
   return (
-    <div style={{ gridColumn: full ? '1 / -1' : 'auto' }}>
-      <label style={{ display: 'block', fontSize: 12, color: 'var(--text-muted)', marginBottom: 4, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-        {label}
-      </label>
+    <div className={'pf-field' + (full ? ' full' : '')}>
+      <label className="pf-field-label">{label}</label>
       {textarea ? (
-        <textarea rows={rows} value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} style={{ ...common, resize: 'vertical' }} />
+        <textarea
+          className="pf-field-textarea"
+          rows={rows}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+        />
       ) : (
-        <input type="text" value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} style={common} />
+        <input
+          type="text"
+          className="pf-field-input"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+        />
       )}
     </div>
   );
 }
 
-// ---------------- styles ----------------
-
-const headerCardStyle = {
-  background: 'var(--white, #fff)',
-  border: '1px solid var(--border)',
-  borderRadius: 12,
-  padding: '1.5rem',
-  marginBottom: 16,
-};
-
-const cardStyle = {
-  background: 'var(--white, #fff)',
-  border: '1px solid var(--border)',
-  borderRadius: 12,
-  padding: '1.25rem',
-  marginBottom: 16,
-};
-
-const sectionTitleStyle = {
-  fontFamily: "'DM Serif Display', serif",
-  fontSize: 20,
-  color: 'var(--text-primary)',
-  margin: '0 0 12px 0',
-  paddingBottom: 8,
-  borderBottom: '2px solid var(--border)',
-};
-
-function avatarStyle(url) {
-  const base = {
-    width: 96,
-    height: 96,
-    borderRadius: '50%',
-    background: url ? 'url(' + url + ') center/cover no-repeat' : 'linear-gradient(135deg,#4A2A12,#8A5030)',
-    color: '#fff',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontFamily: "'DM Serif Display', serif",
-    fontSize: 36,
-    flexShrink: 0,
-  };
-  return base;
-}
-
-function badgeCardStyle(tier) {
-  const tierBg = {
-    bronze: 'linear-gradient(135deg, #f7e4cc, #e5c097)',
-    silver: 'linear-gradient(135deg, #eaeaea, #c8c8c8)',
-    gold:   'linear-gradient(135deg, #fff1c2, #f0c64a)',
-  }[tier] || 'var(--wood-cream, #f5ead6)';
-  return {
-    display: 'flex',
-    gap: 10,
-    alignItems: 'center',
-    padding: '0.7rem 0.9rem',
-    borderRadius: 10,
-    background: tierBg,
-    border: '1px solid var(--border)',
-  };
-}
-
-const threadRowStyle = {
-  display: 'flex',
-  gap: 12,
-  alignItems: 'center',
-  padding: '0.7rem 0.85rem',
-  borderRadius: 10,
-  border: '1px solid var(--border)',
-  background: 'var(--wood-cream, #FBF6EC)',
-  textDecoration: 'none',
-};
-
-function pillBtn(variant) {
-  if (variant === 'solid') {
-    return {
-      background: 'var(--wood-warm, #8A5030)',
-      color: '#fff',
-      border: 'none',
-      borderRadius: 999,
-      padding: '0.55rem 1.1rem',
-      fontSize: 14,
-      fontWeight: 500,
-      cursor: 'pointer',
-      fontFamily: 'inherit',
-    };
-  }
-  return {
-    background: 'transparent',
-    color: 'var(--text-primary)',
-    border: '1px solid var(--border)',
-    borderRadius: 999,
-    padding: '0.55rem 1.1rem',
-    fontSize: 14,
-    fontWeight: 500,
-    cursor: 'pointer',
-    fontFamily: 'inherit',
-  };
-}
+/* ---------- Inline icons (no extra dep) ---------- */
+const svgProps = { width: 12, height: 12, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' };
+function IconTrade() { return (<svg {...svgProps}><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.8-3.8a6 6 0 0 1-7.9 7.9L6.1 20l-3.2-3.2 8.6-8.6A6 6 0 0 1 19.4 0l-4.7 4.7z"/></svg>); }
+function IconPin()   { return (<svg {...svgProps}><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>); }
+function IconCal()   { return (<svg {...svgProps}><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>); }
+function IconLink()  { return (<svg {...svgProps}><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>); }
+function IconArrow() { return (<svg {...svgProps}><polyline points="18 15 12 9 6 15"/></svg>); }
+function IconReply() { return (<svg {...svgProps}><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>); }
+function IconEye()   { return (<svg {...svgProps}><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>); }

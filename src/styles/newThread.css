@@ -1,0 +1,114 @@
+/* New Thread composer */
+
+.nt-wrap {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 1.25rem 1.25rem 4rem;
+}
+
+.nt-header {
+  margin: 1rem 0 1.5rem;
+}
+.nt-eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--wood-warm);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.nt-title {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin: 0 0 6px;
+  line-height: 1.15;
+}
+.nt-subtitle {
+  color: var(--text-secondary);
+  font-size: 14px;
+  margin: 0;
+}
+
+.nt-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 2px rgba(90, 66, 38, 0.04);
+}
+
+.nt-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 1.1rem;
+}
+
+.nt-label {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.nt-input,
+.nt-select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--wood-ivory, #fdfaf3);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 15px;
+  transition: border-color 120ms, box-shadow 120ms;
+}
+
+.nt-input:focus,
+.nt-select:focus {
+  outline: none;
+  border-color: var(--wood-warm);
+  box-shadow: 0 0 0 3px rgba(183, 132, 74, 0.15);
+  background: var(--white);
+}
+
+.nt-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.nt-error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+  padding: 0.7rem 0.9rem;
+  border-radius: 8px;
+  font-size: 13px;
+  margin: 0.5rem 0 1rem;
+}
+
+.nt-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.1rem;
+  padding-top: 1.1rem;
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.nt-tips {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.nt-tips strong { color: var(--text-secondary); font-weight: 600; }
+
+.nt-postingas {
+  margin-top: 0.9rem;
+  font-size: 12px;
+  color: var(--text-muted);
+  text-align: right;
+}

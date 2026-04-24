@@ -62,7 +62,7 @@ export default function ToolbarSection() {
           <button
             type="button"
             className="new-thread-btn"
-            onClick={() => navigate('/forums?view=my-posts')}
+            onClick={() => navigate('/forums/new')}
           >
             ✏ New Thread
           </button>

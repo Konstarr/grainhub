@@ -42,6 +42,73 @@ export async function fetchThreadBySlug(slug) {
   return { data, error: null };
 }
 
+/**
+ * Turn a title into a slug; append a 6-char random suffix so collisions are
+ * astronomically unlikely (the DB still enforces uniqueness).
+ */
+function slugify(title) {
+  const base = (title || '')
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 80) || 'thread';
+  const suffix = Math.random().toString(36).slice(2, 8);
+  return `${base}-${suffix}`;
+}
+
+/**
+ * Create a new thread + its opening post. Both inserts are done in sequence
+ * because Supabase JS doesn't support multi-table transactions from the
+ * client. The body insert is tried up to twice on slug collision.
+ */
+export async function createThread({ authorId, categoryId, title, body }) {
+  if (!authorId || !categoryId || !title || !body) {
+    return { data: null, error: new Error('Missing required fields') };
+  }
+  let threadRow = null;
+  let threadErr = null;
+  for (let i = 0; i < 3; i += 1) {
+    const slug = slugify(title);
+    const { data, error } = await supabase
+      .from('forum_threads')
+      .insert({
+        category_id: categoryId,
+        author_id: authorId,
+        title: title.trim(),
+        slug,
+        last_reply_at: new Date().toISOString(),
+        last_reply_by: authorId,
+      })
+      .select('*')
+      .maybeSingle();
+    if (!error && data) { threadRow = data; threadErr = null; break; }
+    threadErr = error;
+    // Retry only on unique-violation (slug collision); otherwise bail
+    if (!error || (error.code !== '23505' && !/slug/i.test(error.message || ''))) break;
+  }
+  if (!threadRow) return { data: null, error: threadErr };
+
+  const { data: post, error: postErr } = await supabase
+    .from('forum_posts')
+    .insert({
+      thread_id: threadRow.id,
+      author_id: authorId,
+      body: body.trim(),
+    })
+    .select('*')
+    .maybeSingle();
+
+  if (postErr) {
+    // Clean up the orphaned thread so a retry doesn't leave a dupe
+    await supabase.from('forum_threads').delete().eq('id', threadRow.id);
+    return { data: null, error: postErr };
+  }
+  return { data: { thread: threadRow, post }, error: null };
+}
+
 export async function incrementThreadViews(threadId) {
   if (!threadId) return;
   const { data: cur } = await supabase

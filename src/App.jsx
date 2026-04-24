@@ -6,6 +6,7 @@ import Home from './pages/Home.jsx';
 import Forums from './pages/Forums.jsx';
 import ForumCategory from './pages/ForumCategory.jsx';
 import ForumThread from './pages/ForumThread.jsx';
+import NewThread from './pages/NewThread.jsx';
 import Jobs from './pages/Jobs.jsx';
 import Wiki from './pages/Wiki.jsx';
 import WikiArticle from './pages/WikiArticle.jsx';
@@ -38,6 +39,14 @@ export default function App() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
 
+          <Route
+            path="/forums/new"
+            element={
+              <RequireAuth>
+                <NewThread />
+              </RequireAuth>
+            }
+          />
           <Route
             path="/forums/category/:id"
             element={

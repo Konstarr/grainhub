@@ -129,7 +129,14 @@ export default function ForumCategory() {
                 {categoryDesc}
               </p>
             )}
-            <div style={{ marginTop: '1rem', display: 'flex', gap: '1rem', alignItems: 'center' }}>
+            <div style={{ marginTop: '1rem', display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+              <Link
+                to={'/forums/new?category=' + encodeURIComponent(id)}
+                className="act-btn primary"
+                style={{ textDecoration: 'none' }}
+              >
+                ✏ Start a thread
+              </Link>
               <Link to="/forums" style={{ color: 'var(--wood-warm)', fontSize: '13px', fontWeight: '500' }}>
                 → All forums
               </Link>
@@ -145,7 +152,17 @@ export default function ForumCategory() {
             </div>
           ) : items.length === 0 ? (
             <div style={{ padding: '3rem 2rem', textAlign: 'center', color: 'var(--text-muted)', border: '1px solid var(--border)', borderRadius: '12px', background: 'var(--white)' }}>
-              No threads in this category yet. <Link to="/forums" style={{ color: 'var(--wood-warm)' }}>Back to Forums →</Link>
+              <div style={{ fontSize: 15, color: 'var(--text-primary)', marginBottom: 6, fontWeight: 500 }}>
+                No threads in this category yet.
+              </div>
+              <div style={{ marginBottom: 16 }}>Be the first to start the conversation.</div>
+              <Link
+                to={'/forums/new?category=' + encodeURIComponent(id)}
+                className="act-btn primary"
+                style={{ textDecoration: 'none' }}
+              >
+                ✏ Start the first thread
+              </Link>
             </div>
           ) : (
             <RecentActivity items={items} />
