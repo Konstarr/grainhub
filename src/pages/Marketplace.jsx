@@ -1,5 +1,5 @@
 import '../styles/marketplace.css';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import CategoryHighway from '../components/marketplace/CategoryHighway.jsx';
 import FilterSidebar from '../components/marketplace/FilterSidebar.jsx';
 import ListingsArea from '../components/marketplace/ListingsArea.jsx';
@@ -30,16 +30,37 @@ const EMOJI_BY_CAT = {
   'Tooling': '🔩',
 };
 
+const DEFAULT_FILTERS = {
+  conditions: ['New', 'Excellent', 'Good', 'Fair'],
+  priceMin: '',
+  priceMax: '',
+};
+
+const CATEGORY_PATTERN = {
+  'all': () => true,
+  'machinery': (c) => /machin|cnc|edgeband|moulder|saw|sander|dust|combin/i.test(c),
+  'lumber': (c) => /lumber/i.test(c),
+  'sheet': (c) => /sheet/i.test(c),
+  'hardware': (c) => /hardware/i.test(c),
+  'finishing': (c) => /finish|coat/i.test(c),
+  'tooling': (c) => /tool|bit/i.test(c),
+  'vehicles': (c) => /vehicle|trailer|truck/i.test(c),
+  'shop': (c) => /shop|office|fixture/i.test(c),
+  'surplus': (c) => /surplus|closeout/i.test(c),
+};
+
 function toListingCard(row) {
   const m = mapMarketplaceRow(row);
   return {
     id: m.id,
+    slug: m.slug,
     category: m.category || 'Misc',
     condition: COND_LABEL[m.condition] || 'Used',
     title: m.title,
     location: m.location || 'U.S.',
     shipping: 'Local pickup',
     price: m.price || 'Contact',
+    priceNumeric: m.priceNumeric,
     priceUnit: '',
     emoji: EMOJI_BY_CAT[m.category] || '📦',
     imgClass: 'mk-img-default',
@@ -47,19 +68,45 @@ function toListingCard(row) {
     specs: m.description ? m.description.slice(0, 80) + (m.description.length > 80 ? '…' : '') : '',
     isNew: false,
     images: m.images,
+    createdAt: row.created_at,
   };
 }
 
 export default function Marketplace() {
   const [activeCategory, setActiveCategory] = useState('all');
-  const [filters, setFilters] = useState({ conditions: ['New', 'Excellent', 'Good'] });
+  const [filters, setFilters] = useState(DEFAULT_FILTERS);
+  const [sortMode, setSortMode] = useState('newest');
+  const [viewMode, setViewMode] = useState('grid');
 
   const { data: rows } = useSupabaseList('marketplace_listings', {
     filter: (q) => q.eq('is_approved', true).eq('is_sold', false),
     order: { column: 'created_at', ascending: false },
-    limit: 12,
+    limit: 200,
   });
-  const recent = rows.map(toListingCard);
+
+  const allListings = useMemo(() => rows.map(toListingCard), [rows]);
+
+  const visible = useMemo(() => {
+    const catMatcher = CATEGORY_PATTERN[activeCategory] || (() => true);
+    const min = filters.priceMin === '' ? null : Number(filters.priceMin);
+    const max = filters.priceMax === '' ? null : Number(filters.priceMax);
+    const conds = filters.conditions || [];
+
+    let out = allListings.filter((l) => {
+      if (catMatcher(l.category) === false) return false;
+      if (conds.length > 0 && conds.includes(l.condition) === false) return false;
+      if (min !== null && !Number.isNaN(min) && (l.priceNumeric == null || l.priceNumeric < min)) return false;
+      if (max !== null && !Number.isNaN(max) && (l.priceNumeric == null || l.priceNumeric > max)) return false;
+      return true;
+    });
+
+    if (sortMode === 'price-asc') {
+      out = [...out].sort((a, b) => (a.priceNumeric ?? Infinity) - (b.priceNumeric ?? Infinity));
+    } else if (sortMode === 'price-desc') {
+      out = [...out].sort((a, b) => (b.priceNumeric ?? -Infinity) - (a.priceNumeric ?? -Infinity));
+    }
+    return out;
+  }, [allListings, activeCategory, filters, sortMode]);
 
   return (
     <>
@@ -117,8 +164,19 @@ export default function Marketplace() {
       <CategoryHighway activeCategory={activeCategory} onCategorySelect={setActiveCategory} />
 
       <div className="mk-wrap">
-        <FilterSidebar filters={filters} onFilterChange={setFilters} />
-        <ListingsArea recent={recent} />
+        <FilterSidebar
+          filters={filters}
+          onFilterChange={setFilters}
+          onClearAll={() => { setFilters(DEFAULT_FILTERS); setActiveCategory('all'); }}
+        />
+        <ListingsArea
+          listings={visible}
+          totalCount={allListings.length}
+          sortMode={sortMode}
+          onSortChange={setSortMode}
+          viewMode={viewMode}
+          onViewChange={setViewMode}
+        />
       </div>
     </>
   );
