@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import '../styles/forums.css';
 import PageHeader from '../components/forums/PageHeader.jsx';
 import ToolbarSection from '../components/forums/ToolbarSection.jsx';
+import { SponsorSidebar } from '../components/sponsors/AdSlot.jsx';
 import RecentActivity from '../components/forums/RecentActivity.jsx';
 import ForumGroup from '../components/forums/ForumGroup.jsx';
 import OnlineUsersStrip from '../components/forums/OnlineUsersStrip.jsx';
@@ -255,6 +256,7 @@ export default function Forums() {
         </div>
 
         <aside className="right-col">
+          <SponsorSidebar />
           <ForumStats stats={liveStats} />
           <TopContributors contributors={liveContribs} />
           <ForumGuidelines guidelines={FORUM_GUIDELINES} />

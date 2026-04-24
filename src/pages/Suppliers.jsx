@@ -5,6 +5,7 @@ import SuppliersMap from '../components/suppliers/SuppliersMap.jsx';
 import { SUPPLIERS_HEADER, SUPPLIER_CATEGORIES } from '../data/suppliersData.js';
 import { useSupabaseList } from '../hooks/useSupabaseList.js';
 import { mapSupplierRow } from '../lib/mappers.js';
+import { SponsorSidebar } from '../components/sponsors/AdSlot.jsx';
 
 export default function Suppliers() {
   const [activeCategory, setActiveCategory] = useState('');
@@ -114,7 +115,14 @@ export default function Suppliers() {
         </div>
       </div>
 
-      <SupplierTable activeCategory={activeCategory} suppliers={liveSuppliers} />
+      <div className="main-wrap">
+        <div>
+          <SupplierTable activeCategory={activeCategory} suppliers={liveSuppliers} />
+        </div>
+        <aside className="right-col">
+          <SponsorSidebar />
+        </aside>
+      </div>
     </>
   );
 }

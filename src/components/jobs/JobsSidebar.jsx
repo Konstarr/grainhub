@@ -1,8 +1,10 @@
 import { Link } from 'react-router-dom';
+import { SponsorSidebar } from '../sponsors/AdSlot.jsx';
 
 export default function JobsSidebar({ postJobCta, talentCta }) {
   return (
     <aside className="right-col">
+      <SponsorSidebar />
       <div className="post-job-card">
         <div className="pjc-eyebrow">{postJobCta.eyebrow}</div>
         <div className="pjc-title">{postJobCta.title}</div>
