@@ -18,9 +18,9 @@
 }
 .header-inner { max-width: 1380px; margin: 0 auto; position: relative; z-index: 1; }
 .header-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 2rem; flex-wrap: wrap; margin-bottom: 2.5rem; }
-.page-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: var(--wood-light); margin-bottom: 10px; }
-.page-title { font-family: 'Montserrat', sans-serif; font-size: 46px; color: var(--wood-cream); letter-spacing: -0.5px; line-height: 1.08; margin-bottom: 10px; }
-.page-subtitle { font-size: 15px; color: #9A8070; max-width: 540px; line-height: 1.7; }
+.page-eyebrow { font-family: 'Montserrat', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: var(--wood-light); margin-bottom: 10px; }
+.page-title { font-family: 'Montserrat', sans-serif; font-size: 36px; font-weight: 700; color: var(--wood-cream); letter-spacing: -0.5px; line-height: 1.1; margin-bottom: 10px; }
+.page-subtitle { font-family: 'Montserrat', sans-serif; font-size: 15px; font-weight: 400; color: rgba(245, 234, 214, 0.82); max-width: 540px; line-height: 1.65; }
 
 .header-stats { display: flex; gap: 2.5rem; flex-shrink: 0; padding-top: 0.5rem; }
 .hstat-num { font-family: 'Montserrat', sans-serif; font-size: 34px; color: var(--wood-light); line-height: 1; }

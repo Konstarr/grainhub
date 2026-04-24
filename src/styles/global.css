@@ -369,18 +369,49 @@ nav.site-nav {
 }
 
 /* Shrink heavy hero content + collapse vertical margins so everything
-   actually fits + vertically centers inside the 220px box. */
+   actually fits + vertically centers inside the 220px box.
+   --- UNIFIED TYPOGRAPHY ---
+   Every hero across every page now pulls from the SAME token set:
+   title size/weight/color/letter-spacing, eyebrow treatment, and
+   subtitle treatment are all locked here with !important so each
+   page's own CSS file (forums.css / news.css / marketplace.css /
+   suppliers.css / jobs.css / events.css) can't drift.  */
 .gh-hero h1,
 .gh-hero .hero-title,
 .gh-hero .events-title,
-.gh-hero .page-title       { font-size: 1.9rem !important; line-height: 1.1 !important; margin: 0 0 0.3rem !important; }
+.gh-hero .page-title {
+  font-family: 'Montserrat', 'Segoe UI', system-ui, sans-serif !important;
+  font-size: 36px !important;
+  font-weight: 700 !important;
+  line-height: 1.1 !important;
+  letter-spacing: -0.5px !important;
+  color: var(--wood-cream, #F5EAD6) !important;
+  margin: 0 0 10px !important;
+}
 .gh-hero .hero-sub,
 .gh-hero .events-subtitle,
 .gh-hero .page-subtitle,
-.gh-hero p                 { font-size: 0.95rem !important; line-height: 1.45 !important; margin: 0 !important; max-width: 48rem; }
+.gh-hero p {
+  font-family: 'Montserrat', 'Segoe UI', system-ui, sans-serif !important;
+  font-size: 15px !important;
+  font-weight: 400 !important;
+  line-height: 1.65 !important;
+  letter-spacing: 0 !important;
+  color: rgba(245, 234, 214, 0.82) !important;
+  margin: 0 !important;
+  max-width: 540px;
+}
 .gh-hero .hero-eyebrow,
 .gh-hero .events-eyebrow,
-.gh-hero .page-eyebrow     { margin: 0 0 0.4rem !important; }
+.gh-hero .page-eyebrow {
+  font-family: 'Montserrat', 'Segoe UI', system-ui, sans-serif !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  letter-spacing: 2.5px !important;
+  text-transform: uppercase !important;
+  color: var(--wood-light, #D9A97A) !important;
+  margin: 0 0 10px !important;
+}
 .gh-hero .stats-row        { margin-top: 0.75rem !important; }
 
 /* Home hero is the only one with CTA buttons + stat cards + headline —

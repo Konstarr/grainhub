@@ -13,25 +13,31 @@
   margin: 0 auto;
 }
 .events-eyebrow {
-  color: var(--accent-green, #8FBF7F);
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.18em;
+  font-family: 'Montserrat', sans-serif;
+  color: var(--wood-light);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2.5px;
   text-transform: uppercase;
-  margin-bottom: 0.75rem;
+  margin-bottom: 10px;
 }
 .events-title {
   font-family: 'Montserrat', sans-serif;
-  font-size: 2.8rem;
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--wood-cream);
+  letter-spacing: -0.5px;
   line-height: 1.1;
-  margin-bottom: 1rem;
+  margin-bottom: 10px;
   max-width: 48rem;
 }
 .events-subtitle {
-  font-size: 1.05rem;
-  line-height: 1.55;
-  color: rgba(245, 239, 230, 0.75);
-  max-width: 44rem;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  color: rgba(245, 234, 214, 0.82);
+  line-height: 1.65;
+  max-width: 540px;
 }
 
 /* ---------- Filter tabs ---------- */
