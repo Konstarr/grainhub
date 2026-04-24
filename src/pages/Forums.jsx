@@ -19,7 +19,6 @@ import {
   FORUMS_PAGE_HEADER,
   FORUM_GROUPS,
   ONLINE_MEMBERS,
-  HOT_TOPICS,
   FORUM_GUIDELINES,
   THREAD_LEGEND,
 } from '../data/forumsData.js';
@@ -147,6 +146,30 @@ export default function Forums() {
   const sourceRows = customRows != null ? customRows : threadRows;
   const liveActivity = useMemo(() => sourceRows.map(toActivityItem), [sourceRows]);
 
+  // Compute real "trending" threads from the live thread set.
+  // Ranking = recency-boosted activity: replies × views × recency-decay.
+  // Everything stale (> 14 days) drops out so the strip stays current.
+  const trendingTopics = useMemo(() => {
+    const now = Date.now();
+    const MAX_AGE = 14 * 24 * 60 * 60 * 1000;
+    const scored = (threadRows || [])
+      .map((r) => {
+        const last = r.last_reply_at ? new Date(r.last_reply_at).getTime() : 0;
+        const age = Math.max(1, now - last);
+        if (age > MAX_AGE) return null;
+        // Favor threads with replies in the last few days; views act as tiebreaker.
+        const replies = r.reply_count || 0;
+        const views = r.view_count || 0;
+        const recency = 1 / Math.log2(2 + age / (24 * 60 * 60 * 1000));
+        const score = (replies * 5 + views * 0.1 + 1) * recency;
+        return { title: r.title, slug: r.slug, score };
+      })
+      .filter(Boolean)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 7);
+    return scored;
+  }, [threadRows]);
+
   const viewFiltered = useMemo(() => {
     if (!view || view === 'subscriptions' || view === 'my-posts') return liveActivity;
     const now = Date.now();
@@ -240,7 +263,7 @@ export default function Forums() {
           <TradeFilterBanner />
 
           <OnlineUsersStrip data={ONLINE_MEMBERS} />
-          <HotTopicsStrip topics={HOT_TOPICS} />
+          <HotTopicsStrip topics={trendingTopics} />
 
           {!view && (
             <div className="forum-groups">
