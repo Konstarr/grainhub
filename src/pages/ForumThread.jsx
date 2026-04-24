@@ -79,7 +79,7 @@ function PostCard({ post, index, isOp, isAccepted, hasUpvoted, onUpvote, onQuote
             aria-label="Upvote"
             title={hasUpvoted ? 'Remove upvote' : 'Upvote'}
           >
-            \u25B2
+            ▲
           </button>
           <div className="vote-count">{post.upvote_count || 0}</div>
         </div>
@@ -90,7 +90,7 @@ function PostCard({ post, index, isOp, isAccepted, hasUpvoted, onUpvote, onQuote
           <div className="post-header">
             <span className="post-num">#{index + 1}</span>
             {isOp && <span className="post-op-badge">OP</span>}
-            {isAccepted && <span className="best-badge">\u2713 Accepted answer</span>}
+            {isAccepted && <span className="best-badge">✓ Accepted answer</span>}
             <span style={{ fontSize: '11px', color: 'var(--text-muted)', marginLeft: 'auto' }}>
               {timeAgo(post.created_at)}
             </span>
@@ -100,7 +100,7 @@ function PostCard({ post, index, isOp, isAccepted, hasUpvoted, onUpvote, onQuote
             <div className="post-quote">
               <div className="post-quote-author">{quoted.author.name} wrote:</div>
               <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
-                {(quoted.body || '').slice(0, 280)}{(quoted.body || '').length > 280 ? '\u2026' : ''}
+                {(quoted.body || '').slice(0, 280)}{(quoted.body || '').length > 280 ? '…' : ''}
               </div>
             </div>
           )}
@@ -112,10 +112,10 @@ function PostCard({ post, index, isOp, isAccepted, hasUpvoted, onUpvote, onQuote
           </div>
 
           <div className="post-footer">
-            <button type="button" className="post-action" onClick={onQuote}>\u201C Quote</button>
+            <button type="button" className="post-action" onClick={onQuote}>“ Quote</button>
             <button type="button" className="post-action" onClick={onUpvote}>{hasUpvoted ? 'Liked' : 'Like'}</button>
             <div className="post-footer-spacer" />
-            <span className="post-report" onClick={onReport}>\u2691 Report</span>
+            <span className="post-report" onClick={onReport}>⚑ Report</span>
           </div>
         </div>
       </div>
@@ -130,7 +130,7 @@ function ThreadHeader({ thread, category, hasUpvoted, onUpvote, onReport, onRepl
       <div className="thread-tags">
         {category && <span className="tag tag-cat">{category.name}</span>}
         {thread.is_pinned && <span className="tag tag-solved">Pinned</span>}
-        {thread.is_solved && <span className="tag tag-solved">\u2713 Solved</span>}
+        {thread.is_solved && <span className="tag tag-solved">✓ Solved</span>}
         {(thread.view_count || 0) > 1000 && <span className="tag tag-hot">Hot</span>}
       </div>
       <h1 className="thread-title">{thread.title}</h1>
@@ -152,9 +152,9 @@ function ThreadHeader({ thread, category, hasUpvoted, onUpvote, onReport, onRepl
           disabled={subscribeBusy}
           title={subscribed ? 'Stop tracking this thread' : 'Get notified about new replies'}
         >
-          {subscribed ? '\u{1F516} Subscribed' : '\u{1F516} Subscribe'}
+          {subscribed ? '🔖 Subscribed' : '🔖 Subscribe'}
         </button>
-        <button type="button" className="act-btn" onClick={onReport}>\u2691 Report</button>
+        <button type="button" className="act-btn" onClick={onReport}>⚑ Report</button>
       </div>
     </div>
   );
@@ -185,7 +185,7 @@ function ReplyBox({ value, onChange, onSubmit, disabled, quoteSnippet, onCancelQ
           <div style={{ color: 'var(--text-secondary)' }}>
             <strong>Replying to {quoteSnippet.authorName}:</strong>
             <div style={{ fontStyle: 'italic', marginTop: 4, color: 'var(--text-muted)' }}>
-              "{(quoteSnippet.body || '').slice(0, 200)}{(quoteSnippet.body || '').length > 200 ? '\u2026' : ''}"
+              "{(quoteSnippet.body || '').slice(0, 200)}{(quoteSnippet.body || '').length > 200 ? '…' : ''}"
             </div>
           </div>
           <button type="button" onClick={onCancelQuote} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', fontSize: '18px', lineHeight: 1 }}>x</button>
@@ -193,7 +193,7 @@ function ReplyBox({ value, onChange, onSubmit, disabled, quoteSnippet, onCancelQ
       )}
       <textarea
         className="reply-textarea"
-        placeholder="Share your take\u2026 be specific, include measurements and photos when they help."
+        placeholder="Share your take… be specific, include measurements and photos when they help."
         value={value}
         onChange={(e) => onChange(e.target.value)}
         disabled={disabled}
@@ -202,7 +202,7 @@ function ReplyBox({ value, onChange, onSubmit, disabled, quoteSnippet, onCancelQ
         <div className="reply-footer-left">Be kind. Stay on topic. Link sources.</div>
         <div className="reply-footer-right">
           <button type="button" className="act-btn primary" onClick={onSubmit} disabled={disabled || busy || !value.trim()}>
-            {busy ? 'Posting\u2026' : 'Post reply'}
+            {busy ? 'Posting…' : 'Post reply'}
           </button>
         </div>
       </div>
@@ -230,14 +230,17 @@ export default function ForumThread() {
 
   const [subscribed, setSubscribed] = useState(false);
   const [subscribeBusy, setSubscribeBusy] = useState(false);
+  const [loadError, setLoadError] = useState(null);
 
   useEffect(() => {
     if (!slug) return;
     let cancelled = false;
     (async () => {
       setLoading(true);
-      const { data: t } = await fetchThreadBySlug(slug);
+      setLoadError(null);
+      const { data: t, error } = await fetchThreadBySlug(slug);
       if (cancelled) return;
+      if (error) { setLoadError(error); setThread(null); setLoading(false); return; }
       if (!t) { setThread(null); setLoading(false); return; }
       setThread(t);
       incrementThreadViews(t.id).catch(() => null);
@@ -380,10 +383,25 @@ export default function ForumThread() {
 
       <div className="ft-wrap">
         <div>
-          {loading && <div style={{ padding: '2rem', color: 'var(--text-muted)' }}>Loading thread\u2026</div>}
+          {loading && <div style={{ padding: '2rem', color: 'var(--text-muted)' }}>Loading thread…</div>}
           {!loading && !thread && (
             <div style={{ padding: '2rem', color: 'var(--text-muted)' }}>
-              Thread not found. <Link to="/forums">Back to Forums \u2192</Link>
+              <div style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: 6 }}>
+                Thread not found
+              </div>
+              <div style={{ fontSize: 13, marginBottom: 10 }}>
+                No row in <code>forum_threads</code> matched slug: <code style={{ background: 'var(--wood-cream)', padding: '1px 6px', borderRadius: 4 }}>{slug}</code>
+              </div>
+              {loadError && (
+                <div style={{ fontSize: 12, color: '#991b1b', background: '#fef2f2', border: '1px solid #fecaca', padding: '0.5rem 0.75rem', borderRadius: 8, marginBottom: 10 }}>
+                  DB error: {loadError.message || String(loadError)}
+                  {loadError.code ? ' (code ' + loadError.code + ')' : ''}
+                </div>
+              )}
+              <div style={{ fontSize: 12 }}>
+                Likely cause: the <code>migration-forum-system.sql</code> hasn't been run yet, or RLS is blocking reads. {' '}
+                <Link to="/forums" style={{ color: 'var(--wood-warm)' }}>Back to Forums →</Link>
+              </div>
             </div>
           )}
           {thread && (
@@ -464,9 +482,9 @@ export default function ForumThread() {
               <div className="rs-header">You</div>
               <div className="rs-body" style={{ fontSize: 13 }}>
                 <div style={{ fontWeight: 500 }}>{profile.full_name || profile.username}</div>
-                <div style={{ color: 'var(--text-muted)', fontSize: 12 }}>{profile.reputation || 0} rep \u00B7 {profile.post_count || 0} posts</div>
+                <div style={{ color: 'var(--text-muted)', fontSize: 12 }}>{profile.reputation || 0} rep · {profile.post_count || 0} posts</div>
                 <Link to={'/profile/' + profile.username} style={{ display: 'inline-block', marginTop: 8, color: 'var(--wood-warm)', fontSize: 12 }}>
-                  View your profile \u2192
+                  View your profile →
                 </Link>
               </div>
             </div>
