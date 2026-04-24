@@ -53,6 +53,91 @@ function parseSalaryInput(v) {
   return n < 1000 ? n * 1000 : n;
 }
 
+/**
+ * Predicate builders — mirror the filter logic below so we can compute
+ * counts per option by counting rows each one would match against the
+ * unfiltered dataset.
+ */
+const MATCHERS = {
+  jobType: (opt) => (r) => {
+    const et = (r.employment_type || '').toLowerCase();
+    // "Temporary / Seasonal" collapses to an "other" bucket if no matching et
+    if (opt === 'Temporary / Seasonal') return /temp|season/i.test(et);
+    return et === opt.toLowerCase();
+  },
+  workLocation: (opt) => (r) => {
+    const isRemote = !!r.is_remote || /remote/i.test(r.location || '');
+    const isHybrid = !!r.is_hybrid || /hybrid/i.test(r.location || '');
+    if (opt === 'Remote')  return isRemote;
+    if (opt === 'Hybrid')  return isHybrid;
+    if (opt === 'On-site') return !isRemote && !isHybrid;
+    return false;
+  },
+  experienceLevel: (opt) => (r) => {
+    const hay = ((r.title || '') + ' ' + (r.description || '')).toLowerCase();
+    const hints = {
+      'Entry level (0–2 yrs)': ['entry', 'apprentice', 'junior', 'assistant'],
+      'Mid level (2–5 yrs)':   ['mid', 'specialist', 'operator'],
+      'Senior (5+ yrs)':       ['senior', 'lead', 'master', 'supervisor', 'foreman'],
+      'Lead / Supervisor':     ['lead', 'supervisor', 'foreman', 'manager', 'director'],
+    };
+    return (hints[opt] || []).some((h) => hay.includes(h));
+  },
+  shopSpecialty: (opt) => (r) => {
+    const hay = ((r.title || '') + ' ' + (r.description || '')).toLowerCase();
+    return hay.includes(opt.toLowerCase());
+  },
+  region: (opt) => (r) => {
+    const hay = (r.location || '').toLowerCase();
+    const token = opt.toLowerCase().replace(/\s*us$/, '').trim();
+    return token && hay.includes(token);
+  },
+  postedWithin: (opt) => (r) => {
+    if (opt === 'Any time' || !opt) return true;
+    if (!r.posted_at) return false;
+    const cutoff = postedWithinCutoff(opt);
+    if (!cutoff) return true;
+    return new Date(r.posted_at).getTime() >= cutoff;
+  },
+};
+
+/**
+ * Re-shape FILTER_OPTIONS with counts computed from the current rows.
+ * Options with zero matches get filtered out — the user shouldn't see
+ * a choice that does nothing.
+ */
+function filterOptionsWithCounts(rows, catalog) {
+  const recount = (section) =>
+    (catalog[section] || []).map((opt) => {
+      const match = MATCHERS[section](opt.label);
+      const count = (rows || []).filter(match).length;
+      return { ...opt, count };
+    }).filter((opt) => opt.count > 0);
+
+  return {
+    jobType:         recount('jobType'),
+    workLocation:    recount('workLocation'),
+    experienceLevel: recount('experienceLevel'),
+    shopSpecialty:   recount('shopSpecialty'),
+    region:          recount('region'),
+    postedWithin:    recount('postedWithin'),
+  };
+}
+
+/** Role pills — count jobs whose title contains any tokens from the pill label. */
+function rolePillsWithCounts(rows, pills) {
+  const total = (rows || []).length;
+  return pills.map((pill) => {
+    if (pill.label === 'All Roles') return { ...pill, count: total, isActive: false };
+    const tokens = pill.label.toLowerCase().split(/\s*\/\s*|\s+/).filter(Boolean);
+    const count = (rows || []).filter((r) => {
+      const t = (r.title || '').toLowerCase();
+      return tokens.some((w) => t.includes(w));
+    }).length;
+    return { ...pill, count, isActive: false };
+  }).filter((p) => p.label === 'All Roles' || p.count > 0);
+}
+
 export default function Jobs() {
   const [activeRole, setActiveRole] = useState('All Roles');
   const [keyword, setKeyword]       = useState('');
@@ -66,6 +151,16 @@ export default function Jobs() {
     order: { column: 'posted_at', ascending: false },
     limit: 200,
   });
+
+  // Live counts, re-derived whenever rows change
+  const liveFilterOptions = useMemo(
+    () => filterOptionsWithCounts(rows, FILTER_OPTIONS),
+    [rows]
+  );
+  const liveRolePills = useMemo(
+    () => rolePillsWithCounts(rows, ROLE_PILLS),
+    [rows]
+  );
 
   // ---------- filter ----------
   const filteredRows = useMemo(() => {
@@ -200,11 +295,11 @@ export default function Jobs() {
         onJobTypeChange={setHeroJobType}
       />
 
-      <RoleBar pills={ROLE_PILLS} activeRole={activeRole} setActiveRole={setActiveRole} />
+      <RoleBar pills={liveRolePills} activeRole={activeRole} setActiveRole={setActiveRole} />
 
       <div className="jobs-wrap">
         <FilterSidebar
-          filters={FILTER_OPTIONS}
+          filters={liveFilterOptions}
           active={filters}
           onChange={setFilters}
           onClear={() => setFilters(EMPTY_FILTERS)}
