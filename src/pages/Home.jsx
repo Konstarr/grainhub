@@ -27,8 +27,8 @@ export default function Home() {
   return (
     <>
       <Hero />
-      <SponsorStrip />
       <StatsStrip />
+      <SponsorStrip />
       <CommunitiesShowcase />
       <TradeCategoriesTiles />
 
