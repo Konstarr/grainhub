@@ -247,18 +247,23 @@ export function subscribeCommunityMessages(communityId, onInsert) {
  * we also fetch which posts they've already liked so the UI can render
  * an accurate "liked" state without another request per post.
  */
-export async function fetchCommunityPosts(communityId, { limit = 50, myUserId = null } = {}) {
+export async function fetchCommunityPosts(communityId, { limit = 50, myUserId = null, postType = null } = {}) {
   if (!communityId) return { data: [], error: null };
-  const { data: posts, error } = await supabase
+  let q = supabase
     .from('community_posts')
     .select(
-      'id, community_id, author_id, body, image_url, like_count, comment_count, created_at, deleted_at,' +
+      'id, community_id, author_id, body, image_url, like_count, comment_count, post_type, is_pinned, created_at, deleted_at,' +
       'author:author_id(id, username, full_name, avatar_url, trade)'
     )
     .eq('community_id', communityId)
     .is('deleted_at', null)
+    // Pinned posts surface above the rest. Postgres sorts booleans as
+    // false=0, true=1 so we need DESC to put pinned first.
+    .order('is_pinned', { ascending: false })
     .order('created_at', { ascending: false })
     .limit(limit);
+  if (postType) q = q.eq('post_type', postType);
+  const { data: posts, error } = await q;
   if (error) return { data: [], error };
 
   // Which of these posts have I already liked?
@@ -276,10 +281,12 @@ export async function fetchCommunityPosts(communityId, { limit = 50, myUserId = 
   return { data: decorated, error: null };
 }
 
-export async function createCommunityPost(communityId, { body, imageUrl = null }) {
+export async function createCommunityPost(communityId, { body, imageUrl = null, postType = 'discussion' }) {
   if (!communityId || !body?.trim()) {
     return { data: null, error: new Error('Empty post') };
   }
+  const validType = ['discussion', 'question', 'showcase', 'announcement'].includes(postType)
+    ? postType : 'discussion';
   const { data: session } = await supabase.auth.getSession();
   const uid = session?.session?.user?.id;
   if (!uid) return { data: null, error: new Error('Sign in to post.') };
@@ -291,11 +298,25 @@ export async function createCommunityPost(communityId, { body, imageUrl = null }
       author_id: uid,
       body: body.trim().slice(0, 8000),
       image_url: imageUrl || null,
+      post_type: validType,
     })
     .select(
-      'id, community_id, author_id, body, image_url, like_count, comment_count, created_at, deleted_at,' +
+      'id, community_id, author_id, body, image_url, like_count, comment_count, post_type, is_pinned, created_at, deleted_at,' +
       'author:author_id(id, username, full_name, avatar_url, trade)'
     )
+    .maybeSingle();
+  return { data, error };
+}
+
+/** Mod/owner-only: pin or unpin a post. The DB trigger rejects the
+ *  change from anyone else, but we short-circuit in the client too. */
+export async function setPostPinned(postId, pinned) {
+  if (!postId) return { data: null, error: new Error('Missing post id') };
+  const { data, error } = await supabase
+    .from('community_posts')
+    .update({ is_pinned: !!pinned })
+    .eq('id', postId)
+    .select('id, is_pinned')
     .maybeSingle();
   return { data, error };
 }

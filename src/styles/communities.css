@@ -1013,6 +1013,264 @@ textarea.comm-input { resize: vertical; min-height: 90px; }
   border-radius: 12px;
 }
 
+/* ══════════════════════════════════════════════════════
+   Group-style visual layer — tabs, avatar strip, type chips,
+   pinned banner, media grids.
+   ══════════════════════════════════════════════════════ */
+
+/* Banner with a slightly softer overlay + tighter avatar strip below the title */
+.comm-banner-soft::after {
+  background: linear-gradient(180deg, rgba(0,0,0,0.08), rgba(0,0,0,0.55));
+}
+.comm-banner-inner-rich {
+  align-items: flex-end;
+  padding: 2rem 2rem 1.5rem;
+}
+.comm-dot-public {
+  color: #A8E6A1;
+  font-weight: 600;
+}
+.comm-avatar-strip {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+.comm-avatar-chip {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid #3A2410;
+  background: linear-gradient(135deg, #6B3F1F, #A0522D);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  margin-left: -8px;
+  text-decoration: none;
+  transition: transform 0.12s, z-index 0s 0.12s;
+}
+.comm-avatar-chip:first-child { margin-left: 0; }
+.comm-avatar-chip img { width: 100%; height: 100%; object-fit: cover; }
+.comm-avatar-chip:hover {
+  transform: translateY(-2px);
+  z-index: 2;
+  position: relative;
+}
+.comm-avatar-more {
+  margin-left: 6px;
+  padding: 3px 10px;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.25);
+  color: #F5EAD6;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* Tabs bar — sits between banner and feed */
+.comm-tabs {
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 60px;
+  z-index: 5;
+}
+.comm-tabs-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+}
+.comm-tab {
+  background: transparent;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -1px;
+  padding: 14px 20px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: color 0.12s, border-color 0.12s;
+  white-space: nowrap;
+}
+.comm-tab:hover { color: var(--text-primary); }
+.comm-tab.active {
+  color: var(--wood-warm);
+  border-bottom-color: var(--wood-warm);
+}
+
+/* Filter chips row above the feed */
+.comm-filter-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin: 0 2px 4px;
+}
+.comm-filter-chip {
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--white);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.comm-filter-chip:hover {
+  background: var(--wood-cream, #F5EAD6);
+  color: var(--text-primary);
+}
+.comm-filter-chip.active {
+  background: var(--wood-warm);
+  border-color: var(--wood-warm);
+  color: #fff;
+}
+
+/* Post type chip row — used in composer AND inside post cards */
+.comm-type-chips {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.comm-type-chip {
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--white);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.12s;
+  display: inline-flex;
+  align-items: center;
+}
+.comm-type-chip:hover {
+  border-color: var(--wood-warm);
+  color: var(--text-primary);
+}
+.comm-type-chip.active {
+  font-weight: 700;
+  color: #fff;
+  background: var(--wood-warm);
+  border-color: var(--wood-warm);
+}
+
+/* Individual tints per post type (applied to .active and card-typebar chips) */
+.comm-type-chip.tint-discussion.active   { background: #6B3F1F; border-color: #6B3F1F; }
+.comm-type-chip.tint-question.active     { background: #2E6F8F; border-color: #2E6F8F; }
+.comm-type-chip.tint-showcase.active     { background: #8B4316; border-color: #8B4316; }
+.comm-type-chip.tint-announcement.active { background: #8E6A16; border-color: #8E6A16; }
+
+/* Inactive tint variations — subtle tinted background so the chip
+   hints at its category even when you haven't picked it. */
+.comm-type-chip.tint-discussion:not(.active)   { background: #F5EAD6; color: #6B3F1F; border-color: #E0CEA5; }
+.comm-type-chip.tint-question:not(.active)     { background: #E6F1FB; color: #2E6F8F; border-color: #BFDCEF; }
+.comm-type-chip.tint-showcase:not(.active)     { background: #FBEDE0; color: #8B4316; border-color: #E5C9A6; }
+.comm-type-chip.tint-announcement:not(.active) { background: #FBF4D9; color: #8E6A16; border-color: #E5D8A0; }
+
+/* Pinned group ribbon + post-card pinned state */
+.comm-pinned-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border: 1px dashed var(--wood-warm);
+  border-radius: 14px;
+  padding: 14px;
+  background: rgba(245, 234, 214, 0.4);
+}
+.comm-section-ribbon {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--wood-warm);
+}
+
+.post-card-pinned {
+  border-color: var(--wood-warm);
+  box-shadow: 0 0 0 2px rgba(138, 80, 48, 0.06), 0 1px 3px rgba(43, 26, 14, 0.04);
+}
+.post-card-typebar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.post-card-pin-pill {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--wood-warm);
+  background: rgba(138, 80, 48, 0.08);
+  padding: 3px 8px;
+  border-radius: 999px;
+}
+
+/* Right-rail side cards */
+.comm-side-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.comm-side-card + .comm-side-card {
+  margin-top: 12px;
+}
+.comm-side-media {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+  padding: 8px;
+}
+.comm-side-media img {
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  object-fit: cover;
+  border-radius: 4px;
+  transition: opacity 0.12s;
+}
+.comm-side-media img:hover { opacity: 0.85; cursor: pointer; }
+
+/* Full Media tab grid */
+.comm-media-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 6px;
+}
+.comm-media-tile {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid var(--border-light);
+  transition: transform 0.12s, box-shadow 0.12s;
+}
+.comm-media-tile:hover {
+  transform: scale(1.015);
+  box-shadow: 0 4px 12px rgba(43, 26, 14, 0.1);
+  cursor: pointer;
+}
+
 /* ── Profile communities chip (used on Profile page) ── */
 .pf-communities {
   display: flex;
