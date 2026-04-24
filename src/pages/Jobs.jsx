@@ -54,9 +54,37 @@ function parseSalaryInput(v) {
 }
 
 /**
+ * Return the single experience bucket a row belongs to, using a priority
+ * order so a "Senior Lead Foreman" job gets counted once (as Lead) rather
+ * than both in Senior and in Lead. Priority: Lead > Senior > Entry > Mid.
+ */
+function experienceBucket(r) {
+  const hay = ((r.title || '') + ' ' + (r.description || '')).toLowerCase();
+  // Lead / Supervisor — check first; most specific
+  if (/\b(lead|supervisor|foreman|manager|director|principal|head of)\b/.test(hay)) {
+    return 'Lead / Supervisor';
+  }
+  // Senior
+  if (/\b(senior|sr\.?|master|10\+\s*yrs?|8\+\s*yrs?|5\+\s*yrs?|journeyman)\b/.test(hay)) {
+    return 'Senior (5+ yrs)';
+  }
+  // Entry
+  if (/\b(entry|apprentice|junior|jr\.?|assistant|trainee|no experience)\b/.test(hay)) {
+    return 'Entry level (0–2 yrs)';
+  }
+  // Default bucket for anything else that doesn't scream entry/senior/lead
+  return 'Mid level (2–5 yrs)';
+}
+
+/**
  * Predicate builders — mirror the filter logic below so we can compute
  * counts per option by counting rows each one would match against the
  * unfiltered dataset.
+ *
+ * Invariant: for any section where the UI presents mutually-exclusive
+ * options (Employment type, Work location, Experience level, Region),
+ * each job contributes +1 to exactly one bucket's count, so the sum of
+ * the counts in that section equals the total number of listings.
  */
 const MATCHERS = {
   jobType: (opt) => (r) => {
@@ -69,20 +97,11 @@ const MATCHERS = {
     const isRemote = !!r.is_remote || /remote/i.test(r.location || '');
     const isHybrid = !!r.is_hybrid || /hybrid/i.test(r.location || '');
     if (opt === 'Remote')  return isRemote;
-    if (opt === 'Hybrid')  return isHybrid;
+    if (opt === 'Hybrid')  return !isRemote && isHybrid;
     if (opt === 'On-site') return !isRemote && !isHybrid;
     return false;
   },
-  experienceLevel: (opt) => (r) => {
-    const hay = ((r.title || '') + ' ' + (r.description || '')).toLowerCase();
-    const hints = {
-      'Entry level (0–2 yrs)': ['entry', 'apprentice', 'junior', 'assistant'],
-      'Mid level (2–5 yrs)':   ['mid', 'specialist', 'operator'],
-      'Senior (5+ yrs)':       ['senior', 'lead', 'master', 'supervisor', 'foreman'],
-      'Lead / Supervisor':     ['lead', 'supervisor', 'foreman', 'manager', 'director'],
-    };
-    return (hints[opt] || []).some((h) => hay.includes(h));
-  },
+  experienceLevel: (opt) => (r) => experienceBucket(r) === opt,
   shopSpecialty: (opt) => (r) => {
     const hay = ((r.title || '') + ' ' + (r.description || '')).toLowerCase();
     return hay.includes(opt.toLowerCase());
@@ -231,20 +250,11 @@ export default function Jobs() {
         const hay = (r.description || '').toLowerCase() + ' ' + (r.title || '').toLowerCase();
         if (!Array.from(specSet).some((t) => hay.includes(t))) return false;
       }
-      // experience — we can't reliably infer from the schema, so let through
+      // experience — use the single canonical bucket so filter behavior
+      // stays consistent with what the sidebar counts advertise
       if (expSet.size > 0) {
-        const hay = (r.title || '').toLowerCase() + ' ' + (r.description || '').toLowerCase();
-        // match any of the selected levels against title/description keywords
-        const hints = {
-          'entry level (0–2 yrs)': ['entry', 'apprentice', 'junior', 'assistant'],
-          'mid level (2–5 yrs)':   ['mid', 'specialist', 'operator'],
-          'senior (5+ yrs)':       ['senior', 'lead', 'master', 'supervisor', 'foreman'],
-          'lead / supervisor':     ['lead', 'supervisor', 'foreman', 'manager', 'director'],
-        };
-        const matched = Array.from(expSet).some((e) =>
-          (hints[e] || []).some((h) => hay.includes(h))
-        );
-        if (!matched) return false;
+        const bucket = experienceBucket(r).toLowerCase();
+        if (!expSet.has(bucket)) return false;
       }
       // salary
       if (minSalary != null && r.salary_max != null && r.salary_max < minSalary) return false;
