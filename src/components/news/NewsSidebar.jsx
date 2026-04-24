@@ -15,20 +15,64 @@ import { fetchRecentThreadsWithLastPost } from '../../lib/forumDb.js';
  *   - Sponsor / Newsletter cards unchanged (static marketing content)
  */
 
+/**
+ * Compute a "trending" score for an article using a Hacker News-style
+ * formula: views divided by age-with-gravity. Lets a brand-new article
+ * with a few hundred views outrank an old evergreen piece with tens of
+ * thousands — which is what readers expect when the card is titled
+ * "Trending This Week".
+ *
+ *   score = (views + 1) / (ageHours + 2)^1.5
+ *
+ * The +1 floor keeps zero-view articles competing on recency alone so
+ * the card stays populated even before view counters are seeded. The
+ * window is capped at 14 days — anything older drops out so last
+ * month's hits don't sit in the trending slot forever.
+ */
+function trendingScore(article) {
+  const publishedAt = article.published_at ? new Date(article.published_at).getTime() : 0;
+  const ageMs = Math.max(0, Date.now() - publishedAt);
+  const ageHours = ageMs / (1000 * 60 * 60);
+  const gravity = 1.5;
+  return (Number(article.view_count || 0) + 1) / Math.pow(ageHours + 2, gravity);
+}
+
 function TrendingCard() {
   const [items, setItems] = useState([]);
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      // Pick by view_count when populated; else fall back to recency.
+      // Pull the last 14 days of published articles (cap at 50 to keep
+      // it cheap), then score + sort client-side.
+      const sinceIso = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString();
       const { data } = await supabase
         .from('news_articles')
         .select('slug, title, view_count, category, published_at')
         .eq('is_published', true)
-        .order('view_count',   { ascending: false, nullsFirst: false })
+        .gte('published_at', sinceIso)
         .order('published_at', { ascending: false })
-        .limit(5);
-      if (!cancelled) setItems(data || []);
+        .limit(50);
+
+      // If the 14-day window is empty (e.g. demo with older seed data),
+      // fall back to the 50 most-recent published articles so the card
+      // still populates instead of going blank.
+      let pool = data || [];
+      if (pool.length === 0) {
+        const fb = await supabase
+          .from('news_articles')
+          .select('slug, title, view_count, category, published_at')
+          .eq('is_published', true)
+          .order('published_at', { ascending: false })
+          .limit(50);
+        pool = fb.data || [];
+      }
+
+      const scored = pool
+        .map((a) => ({ ...a, _score: trendingScore(a) }))
+        .sort((a, b) => b._score - a._score)
+        .slice(0, 5);
+
+      if (!cancelled) setItems(scored);
     })();
     return () => { cancelled = true; };
   }, []);
@@ -40,7 +84,7 @@ function TrendingCard() {
       <div className="rs-header">🔥 Trending This Week</div>
       <div className="rs-body">
         {items.map((a, idx) => (
-          <Link key={a.slug} to={`/news/${a.slug}`} className="trending-item">
+          <Link key={a.slug} to={`/news/article/${a.slug}`} className="trending-item">
             <div className="ti-num">{idx + 1}</div>
             <div style={{ minWidth: 0, flex: 1 }}>
               <div className="ti-title">{a.title}</div>
