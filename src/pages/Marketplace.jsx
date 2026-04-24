@@ -1,5 +1,5 @@
 import '../styles/marketplace.css';
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import CategoryHighway from '../components/marketplace/CategoryHighway.jsx';
 import FilterSidebar from '../components/marketplace/FilterSidebar.jsx';
 import ListingsArea from '../components/marketplace/ListingsArea.jsx';
@@ -53,6 +53,19 @@ const HIGHWAY_PATTERN = {
   'surplus': (c) => /surplus|closeout/i.test(c),
 };
 
+const SEARCH_CATEGORY_MAP = {
+  'All Categories': 'all',
+  'Machinery & Equipment': 'machinery',
+  'Lumber & Hardwood': 'lumber',
+  'Sheet Goods & Panel': 'sheet',
+  'Hardware & Fasteners': 'hardware',
+  'Finishing & Coatings': 'finishing',
+  'Tooling & Bits': 'tooling',
+  'Vehicles & Trailers': 'vehicles',
+  'Shop Fixtures & Furniture': 'shop',
+  'Surplus & Closeout': 'surplus',
+};
+
 const SIDEBAR_CAT_LABEL_PATTERN = {
   'Machinery': /machin|cnc|edgeband|moulder|saw|sander|dust|combin|panel/i,
   'Lumber & Hardwood': /lumber|hardwood/i,
@@ -95,6 +108,7 @@ function toListingCard(row) {
     category: m.category || 'Misc',
     condition: COND_LABEL[m.condition] || 'Used',
     title: m.title,
+    description: m.description || '',
     location: m.location || 'U.S.',
     shipping: 'Local pickup',
     price: m.price || 'Contact',
@@ -116,6 +130,10 @@ export default function Marketplace() {
   const [filters, setFilters] = useState(DEFAULT_FILTERS);
   const [sortMode, setSortMode] = useState('newest');
   const [viewMode, setViewMode] = useState('grid');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchCategory, setSearchCategory] = useState('All Categories');
+  const [searchRegion, setSearchRegion] = useState('Anywhere');
+  const listingsRef = useRef(null);
 
   const { data: rows } = useSupabaseList('marketplace_listings', {
     filter: (q) => q.eq('is_approved', true).eq('is_sold', false),
@@ -127,6 +145,10 @@ export default function Marketplace() {
 
   const visible = useMemo(() => {
     const highway = HIGHWAY_PATTERN[activeCategory] || (() => true);
+    const searchHighwayId = SEARCH_CATEGORY_MAP[searchCategory] || 'all';
+    const searchHighway = HIGHWAY_PATTERN[searchHighwayId] || (() => true);
+    const q = (searchQuery || '').trim().toLowerCase();
+    const regionRe = LOCATION_LABEL_PATTERN[searchRegion];
     const min = filters.priceMin === '' ? null : Number(filters.priceMin);
     const max = filters.priceMax === '' ? null : Number(filters.priceMax);
     const conds = filters.conditions || [];
@@ -137,6 +159,12 @@ export default function Marketplace() {
 
     let out = allListings.filter((l) => {
       if (highway(l.category) === false) return false;
+      if (searchHighway(l.category) === false) return false;
+      if (q) {
+        const hay = (l.title + ' ' + l.description + ' ' + l.category + ' ' + l.location).toLowerCase();
+        if (hay.includes(q) === false) return false;
+      }
+      if (regionRe && regionRe.test(l.location || '') === false) return false;
       if (sidebarCats.length > 0) {
         const anyMatch = sidebarCats.some((label) => {
           const re = SIDEBAR_CAT_LABEL_PATTERN[label];
@@ -168,7 +196,13 @@ export default function Marketplace() {
       out = [...out].sort((a, b) => (b.priceNumeric ?? -Infinity) - (a.priceNumeric ?? -Infinity));
     }
     return out;
-  }, [allListings, activeCategory, filters, sortMode]);
+  }, [allListings, activeCategory, filters, sortMode, searchQuery, searchCategory, searchRegion]);
+
+  const handleSearchSubmit = () => {
+    if (listingsRef.current) {
+      listingsRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
 
   return (
     <>
@@ -196,40 +230,56 @@ export default function Marketplace() {
                 <circle cx="7" cy="7" r="5.5" stroke="#9A7B5C" strokeWidth="1.5" />
                 <path d="M11 11 L14 14" stroke="#9A7B5C" strokeWidth="1.5" strokeLinecap="round" />
               </svg>
-              <input type="text" placeholder="Search for machinery, lumber, hardware, trucks..." />
+              <input
+                type="text"
+                placeholder="Search for machinery, lumber, hardware, trucks..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') handleSearchSubmit(); }}
+              />
             </div>
-            <select className="search-select">
-              <option>All Categories</option>
-              <option>Machinery & Equipment</option>
-              <option>Lumber & Hardwood</option>
-              <option>Sheet Goods & Panel</option>
-              <option>Hardware & Fasteners</option>
-              <option>Finishing & Coatings</option>
-              <option>Tooling & Bits</option>
-              <option>Vehicles & Trailers</option>
-              <option>Shop Fixtures & Furniture</option>
-              <option>Surplus & Closeout</option>
+            <select
+              className="search-select"
+              value={searchCategory}
+              onChange={(e) => setSearchCategory(e.target.value)}
+            >
+              {Object.keys(SEARCH_CATEGORY_MAP).map((label) => (
+                <option key={label} value={label}>{label}</option>
+              ))}
             </select>
-            <select className="search-select" style={{ minWidth: '130px' }}>
-              <option>Anywhere</option>
-              <option>Northeast US</option>
-              <option>Southeast US</option>
-              <option>Midwest US</option>
-              <option>West US</option>
-              <option>Canada</option>
+            <select
+              className="search-select"
+              style={{ minWidth: '130px' }}
+              value={searchRegion}
+              onChange={(e) => setSearchRegion(e.target.value)}
+            >
+              <option value="Anywhere">Anywhere</option>
+              <option value="Northeast US">Northeast US</option>
+              <option value="Southeast US">Southeast US</option>
+              <option value="Midwest US">Midwest US</option>
+              <option value="West US">West US</option>
+              <option value="Canada">Canada</option>
             </select>
-            <button className="search-btn">Search Listings →</button>
+            <button type="button" className="search-btn" onClick={handleSearchSubmit}>
+              Search Listings →
+            </button>
           </div>
         </div>
       </div>
 
       <CategoryHighway activeCategory={activeCategory} onCategorySelect={setActiveCategory} />
 
-      <div className="mk-wrap">
+      <div className="mk-wrap" ref={listingsRef}>
         <FilterSidebar
           filters={filters}
           onFilterChange={setFilters}
-          onClearAll={() => { setFilters(DEFAULT_FILTERS); setActiveCategory('all'); }}
+          onClearAll={() => {
+            setFilters(DEFAULT_FILTERS);
+            setActiveCategory('all');
+            setSearchQuery('');
+            setSearchCategory('All Categories');
+            setSearchRegion('Anywhere');
+          }}
         />
         <ListingsArea
           listings={visible}
