@@ -172,7 +172,16 @@ export function AuthProvider({ children }) {
     setProfile(Array.isArray(data) ? data[0] || null : data || null);
   };
 
-  const role = profile?.role || 'member';
+  // Primary source of truth for role: the loaded profile row.
+  // Safety backstop: if the profile query silently failed (column grants
+  // or missing RPC), fall back to recognizing the hard-coded owner email
+  // so staff-gated UI still renders. The DB still enforces admin access
+  // on every request — this only controls client-side menu visibility.
+  const OWNER_EMAIL = 'apkrichie@gmail.com';
+  const emailIsOwner =
+    session?.user?.email &&
+    session.user.email.toLowerCase() === OWNER_EMAIL.toLowerCase();
+  const role = profile?.role || (emailIsOwner ? 'owner' : 'member');
 
   const value = {
     session,
