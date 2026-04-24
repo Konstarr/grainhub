@@ -348,6 +348,28 @@ nav.site-nav {
 .gh-hero .events-eyebrow,
 .gh-hero .page-eyebrow     { margin: 0 0 0.4rem !important; }
 .gh-hero .stats-row        { margin-top: 0.75rem !important; }
+
+/* Home hero is the only one with CTA buttons + stat cards + headline —
+   let it breathe with a taller box, just on Home. */
+.hero.gh-hero {
+  height: auto;
+  min-height: 380px;
+  max-height: none;
+  padding: 2.5rem 2.5rem !important;
+}
+/* Home headline gets full size back since it's iconic */
+.hero.gh-hero h1 {
+  font-size: 3rem !important;
+  line-height: 1.05 !important;
+  margin: 0 0 0.75rem !important;
+}
+.hero.gh-hero .hero-sub  { font-size: 1.05rem !important; margin: 0 0 1rem !important; }
+.hero.gh-hero .hero-inner {
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 2rem;
+}
+.hero.gh-hero .hero-actions { margin-top: 0.75rem; }
 .gh-hero .header-top,
 .gh-hero .header-left,
 .gh-hero .hero-left,
