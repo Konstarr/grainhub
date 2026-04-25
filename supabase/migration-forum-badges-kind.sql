@@ -37,7 +37,9 @@ update public.badges set kind = 'accolade' where kind is null;
 -- 4) Seed a starter set of level badges (idempotent via upsert).
 --    Tiers map onto rough rep brackets. Admin can edit any of
 --    these or delete and re-create as needed.
-insert into public.badges (id, name, description, icon, tier, kind, metric_type, threshold, "order")
+--    NOTE: the column is named display_order in the original
+--    migration-forum-system.sql (not "order") — keep aligned.
+insert into public.badges (id, name, description, icon, tier, kind, metric_type, threshold, display_order)
 values
   ('level-newcomer',   'Newcomer',   'Welcome to the workshop.',                 '🌱', 'bronze',   'level', 'reputation', 0,    1),
   ('level-contributor','Contributor','Posting and helping out regularly.',       '🔨', 'bronze',   'level', 'reputation', 50,   2),
@@ -48,5 +50,5 @@ on conflict (id) do nothing;
 
 -- 5) Make sure the existing reputation-* badges sort below the
 --    starter levels so the new ones lead the list.
-update public.badges set "order" = 6 where id = 'reputation-100' and "order" < 6;
-update public.badges set "order" = 7 where id = 'reputation-500' and "order" < 7;
+update public.badges set display_order = 6 where id = 'reputation-100' and display_order < 6;
+update public.badges set display_order = 7 where id = 'reputation-500' and display_order < 7;

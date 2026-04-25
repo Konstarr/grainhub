@@ -38,7 +38,7 @@ const EMPTY = {
   kind: 'accolade',
   metric_type: 'reputation',
   threshold: 100,
-  order: 50,
+  display_order: 50,
 };
 
 /**
@@ -328,8 +328,8 @@ function BadgeForm({ badge, isNew, busy, onSave, onCancel }) {
         <Field label="Sort order (lower = first)">
           <input
             type="number"
-            value={form.order ?? 50}
-            onChange={set('order')}
+            value={form.display_order ?? 50}
+            onChange={set('display_order')}
             min="0"
             max="999"
             style={inputStyle}

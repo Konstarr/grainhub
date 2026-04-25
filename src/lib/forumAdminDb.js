@@ -286,10 +286,12 @@ export async function logFilterViolation(targetType, attemptedText) {
 /* ── Badges (admin CRUD) ───────────────────────────────── */
 
 export async function listBadges() {
+  // Column is named display_order in migration-forum-system.sql
+  // (not "order" — that would be a SQL reserved word).
   const { data, error } = await supabase
     .from('badges')
-    .select('id, name, description, icon, tier, kind, metric_type, threshold, "order"')
-    .order('"order"', { ascending: true });
+    .select('id, name, description, icon, tier, kind, metric_type, threshold, display_order')
+    .order('display_order', { ascending: true });
   return { data: data || [], error };
 }
 
@@ -301,16 +303,19 @@ export async function upsertBadge(badge) {
   if (!badge || !badge.id || !badge.id.trim()) {
     return { error: new Error('Badge id required') };
   }
+  // Accept either `display_order` or the legacy `order` field name
+  // from the form so callers don't have to keep them in sync.
+  const orderRaw = badge.display_order ?? badge.order;
   const row = {
-    id:          badge.id.trim().toLowerCase(),
-    name:        (badge.name || '').trim(),
-    description: badge.description || '',
-    icon:        badge.icon || '🏷',
-    tier:        badge.tier || 'bronze',
-    kind:        badge.kind || 'accolade',
-    metric_type: badge.metric_type || null,
-    threshold:   badge.threshold == null || badge.threshold === '' ? null : Number(badge.threshold),
-    order:       badge.order == null ? 99 : Number(badge.order),
+    id:            badge.id.trim().toLowerCase(),
+    name:          (badge.name || '').trim(),
+    description:   badge.description || '',
+    icon:          badge.icon || '🏷',
+    tier:          badge.tier || 'bronze',
+    kind:          badge.kind || 'accolade',
+    metric_type:   badge.metric_type || null,
+    threshold:     badge.threshold == null || badge.threshold === '' ? null : Number(badge.threshold),
+    display_order: orderRaw == null || orderRaw === '' ? 99 : Number(orderRaw),
   };
   const { error } = await supabase
     .from('badges')
