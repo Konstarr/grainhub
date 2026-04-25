@@ -188,20 +188,21 @@
   position: relative;
 }
 
-/* Tiny upvote pill anchored top-left of the user column.
-   Out of normal flow so the avatar/name stay centered. */
+/* Compact upvote pill at the top of the user column, in normal
+   flow (not absolute) so it can never overlap the username.
+   Self-aligns left so the visual layout matches the original
+   "vote in the top-left" idea without the position-absolute
+   collision. */
 .user-vote {
-  position: absolute;
-  top: 8px;
-  left: 8px;
+  align-self: flex-start;
   display: inline-flex;
   align-items: center;
   gap: 4px;
   padding: 2px 6px 2px 4px;
+  margin-bottom: 10px;
   background: #fff;
   border: 1px solid var(--border);
   border-radius: 999px;
-  z-index: 1;
 }
 .user-vote .vote-btn {
   width: 20px;
