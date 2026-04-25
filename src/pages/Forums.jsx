@@ -12,7 +12,6 @@ import ForumStats from '../components/forums/ForumStats.jsx';
 import TopContributors from '../components/forums/TopContributors.jsx';
 import ForumGuidelines from '../components/forums/ForumGuidelines.jsx';
 import ThreadLegend from '../components/forums/ThreadLegend.jsx';
-import { SponsorSidebar } from '../components/sponsors/AdSlot.jsx';
 import ForumsLeftSidebar from '../components/forums/ForumsLeftSidebar.jsx';
 import TradeFilterBanner from '../components/layout/TradeFilterBanner.jsx';
 import { matchesTrade } from '../lib/trades.js';
