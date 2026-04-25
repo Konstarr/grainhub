@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { updatePost } from '../../lib/forumDb.js';
 import { checkText } from '../../lib/wordFilter.js';
 
@@ -98,6 +99,7 @@ export default function EditablePostBody({ post, canEdit, onUpdate }) {
     <>
       <div className="post-text post-text-md">
         <ReactMarkdown
+          remarkPlugins={[remarkGfm]}
           components={{
             a: ({ node, ...props }) => (
               <a {...props} target="_blank" rel="noopener noreferrer" />
@@ -111,7 +113,7 @@ export default function EditablePostBody({ post, canEdit, onUpdate }) {
             ),
           }}
         >
-          {preserveLineBreaks(post.body || '')}
+          {post.body || ''}
         </ReactMarkdown>
       </div>
 
@@ -137,23 +139,6 @@ export default function EditablePostBody({ post, canEdit, onUpdate }) {
       )}
     </>
   );
-}
-
-/**
- * Markdown collapses a single newline into a space — that's why
- * shift+enter in the textarea looked like nothing happened in the
- * rendered post. Replace every standalone newline with a markdown
- * "hard break" (two trailing spaces + newline) so each line in
- * the textarea becomes its own visible line in the post body.
- *
- * Paragraph breaks (\n\n) are left alone — they already render
- * correctly as <p> separators. Lines inside fenced code blocks
- * keep their trailing spaces but render unchanged because code
- * blocks preserve whitespace literally.
- */
-function preserveLineBreaks(text) {
-  if (!text) return '';
-  return text.replace(/(?<!\n)\n(?!\n)/g, '  \n');
 }
 
 function formatEditedTime(iso) {
