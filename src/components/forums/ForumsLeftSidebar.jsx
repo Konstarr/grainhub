@@ -5,6 +5,7 @@ import { useAuth } from '../../context/AuthContext.jsx';
 import { fetchMyCommunities } from '../../lib/communityDb.js';
 import { supabase } from '../../lib/supabase.js';
 import { setForumMarkAllReadAt } from '../../lib/forumLastVisit.js';
+import { listAllTopics } from '../../lib/forumTopicsDb.js';
 
 /**
  * Reddit-style left navigation for the Forums section.
@@ -55,6 +56,21 @@ export default function ForumsLeftSidebar() {
   const [recents, setRecents] = useState([]);
   const [myCommunities, setMyCommunities] = useState([]);
   const [openGroups, setOpenGroups] = useState({ browse: false });
+  const [topics, setTopics] = useState([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    const load = async () => {
+      const { data } = await listAllTopics();
+      if (!cancelled) setTopics(data || []);
+    };
+    load();
+    const channel = supabase
+      .channel('forum_topics_sidebar')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'forum_topics' }, load)
+      .subscribe();
+    return () => { cancelled = true; supabase.removeChannel(channel); };
+  }, []);
 
   // Read recents on mount + whenever the route changes (so opening a
   // thread bumps the list without a full reload). After loading,
@@ -174,41 +190,61 @@ export default function ForumsLeftSidebar() {
         </Section>
       )}
 
-      {/* ── Forum topic groups (the built-in taxonomy) ── */}
+      {/* ── Topics grouped by their category ── */}
       <Section title="Browse topics">
-        {FORUM_GROUPS.map((group) => {
-          const isOpen = openGroups[group.id] ?? true;
-          return (
-            <div key={group.id} className="fs-group">
-              <button
-                type="button"
-                className="fs-group-header"
-                onClick={() => toggleGroup(group.id)}
-                aria-expanded={isOpen}
-              >
-                <span className="fs-group-icon">{group.icon || '#'}</span>
-                <span className="fs-group-name">{group.name}</span>
-                <span className={'fs-group-chevron ' + (isOpen ? 'open' : '')} aria-hidden="true">
-                  ▾
-                </span>
-              </button>
-              {isOpen && (
-                <div className="fs-group-children">
-                  {group.categories.map((cat) => (
-                    <Link
-                      key={cat.id}
-                      to={`/forums/category/${cat.id}`}
-                      className="fs-item fs-item-community"
-                    >
-                      <span className="fs-item-dot" aria-hidden="true" />
-                      <span className="fs-item-text">{cat.name}</span>
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
-          );
-        })}
+        {(() => {
+          const byCat = new Map();
+          topics.forEach((t) => {
+            if (!byCat.has(t.category_id)) byCat.set(t.category_id, []);
+            byCat.get(t.category_id).push(t);
+          });
+          // Walk FORUM_GROUPS so the sidebar groups stay in the
+          // same order the rest of the app uses, but only render
+          // categories that actually have at least one topic.
+          return FORUM_GROUPS.flatMap((group) => {
+            const groupCats = group.categories.filter((c) => (byCat.get(c.id) || []).length > 0);
+            if (groupCats.length === 0) return [];
+            const isOpen = openGroups[group.id] ?? false;
+            return [(
+              <div key={group.id} className="fs-group">
+                <button
+                  type="button"
+                  className="fs-group-header"
+                  onClick={() => toggleGroup(group.id)}
+                  aria-expanded={isOpen}
+                >
+                  <span className="fs-group-icon">{group.icon || '#'}</span>
+                  <span className="fs-group-name">{group.name}</span>
+                  <span className={'fs-group-chevron ' + (isOpen ? 'open' : '')} aria-hidden="true">▾</span>
+                </button>
+                {isOpen && (
+                  <div className="fs-group-children">
+                    {groupCats.map((cat) => (
+                      <div key={cat.id} className="fs-cat-block">
+                        <Link to={`/forums/category/${cat.id}`} className="fs-cat-header">
+                          {cat.icon ? <span aria-hidden="true">{cat.icon}</span> : null}
+                          <span>{cat.name}</span>
+                        </Link>
+                        {(byCat.get(cat.id) || []).map((t) => (
+                          <Link
+                            key={t.id}
+                            to={`/forums/category/${cat.id}/${t.slug}`}
+                            className="fs-item fs-item-topic"
+                            title={t.description || t.name}
+                          >
+                            <span className="fs-item-dot" aria-hidden="true" />
+                            <span className="fs-item-text">{t.name}</span>
+                            {t.is_official && <span className="fs-item-official" title="Official">✓</span>}
+                          </Link>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )];
+          });
+        })()}
       </Section>
     </aside>
   );

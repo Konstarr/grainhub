@@ -729,6 +729,34 @@
 .fs-item-with-icon { padding-left: 10px; }
 .fs-item-recent:hover,
 .fs-item-community:hover { color: var(--text-primary); }
+
+/* Sub-category header (clickable) inside the topic group block */
+.fs-cat-block { margin: 6px 4px 10px; }
+.fs-cat-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--wood-warm);
+  text-decoration: none;
+  border-radius: 6px;
+}
+.fs-cat-header:hover { background: var(--wood-cream); }
+
+.fs-item-topic {
+  padding-left: 22px;
+}
+.fs-item-official {
+  margin-left: auto;
+  color: #16A34A;
+  font-weight: 800;
+  font-size: 11px;
+}
 .fs-item-recent:hover .fs-item-dot,
 .fs-item-community:hover .fs-item-dot { background: var(--wood-warm); }
 .fs-item-dot {
