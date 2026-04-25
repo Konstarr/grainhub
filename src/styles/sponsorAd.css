@@ -145,6 +145,14 @@
   gap: 6px;
   width: 100%;
 }
+/* When exactly 3 ads are returned, span the third cell across
+   both columns so it reads as a wide bottom card instead of
+   hanging alone next to an empty cell. With 1, 2, or 4 ads the
+   grid flows naturally — only the 3-item case needs the override. */
+.ad-multi-grid > *:nth-child(3):last-child {
+  grid-column: 1 / -1;
+  aspect-ratio: 2 / 1;
+}
 /* Override the generic .ad-wrap > div / a styling so the cells
    stack neatly without inheriting the sidebar card chrome. */
 .ad-wrap-multi .ad-multi-grid > a,
