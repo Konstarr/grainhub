@@ -9,6 +9,7 @@ import Forums from './pages/Forums.jsx';
 import ForumCategory from './pages/ForumCategory.jsx';
 import ForumThread from './pages/ForumThread.jsx';
 import NewThread from './pages/NewThread.jsx';
+import ForumRules from './pages/ForumRules.jsx';
 import Jobs from './pages/Jobs.jsx';
 import JobDetail from './pages/JobDetail.jsx';
 import Wiki from './pages/Wiki.jsx';
@@ -131,6 +132,7 @@ export default function App() {
           <Route path="/login" element={<Login />} />
 
           <Route path="/forums/new" element={<RequireAuth><NewThread /></RequireAuth>} />
+          <Route path="/forums/rules" element={<ForumRules />} />
           <Route path="/forums/category/:id" element={<RequireAuth><ForumCategory /></RequireAuth>} />
           <Route path="/forums/thread/:slug" element={<RequireAuth><ForumThread /></RequireAuth>} />
           <Route path="/forums/thread" element={<RequireAuth><ForumThread /></RequireAuth>} />

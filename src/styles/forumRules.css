@@ -1,0 +1,93 @@
+.rules-wrap {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 1.25rem 1.25rem 4rem;
+}
+
+.rules-header { margin: 1rem 0 1.5rem; }
+.rules-eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--wood-warm);
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.rules-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.15;
+  margin: 0 0 6px;
+}
+.rules-effective {
+  color: var(--text-muted);
+  font-size: 13px;
+  margin: 0;
+}
+
+.rules-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.75rem 1.75rem 1.5rem;
+  box-shadow: 0 1px 2px rgba(90, 66, 38, 0.04);
+}
+
+.rules-lead {
+  font-size: 14.5px;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin: 0 0 1.25rem;
+  padding: 0.85rem 1rem;
+  background: linear-gradient(135deg, #FBF5E5, #F5E8C9);
+  border-left: 4px solid var(--wood-warm);
+  border-radius: 0 8px 8px 0;
+}
+
+.rules-section { margin-bottom: 1.4rem; }
+.rules-section-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.55rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--border-light);
+}
+.rules-section-num {
+  display: inline-block;
+  margin-right: 6px;
+  color: var(--wood-warm);
+  font-weight: 800;
+}
+.rules-section-body {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.65;
+}
+.rules-section-body p { margin: 0 0 0.7rem; }
+.rules-section-body p:last-child { margin-bottom: 0; }
+.rules-section-body ul {
+  margin: 0.4rem 0 0.6rem 0;
+  padding-left: 1.25rem;
+}
+.rules-section-body li { margin-bottom: 6px; }
+.rules-section-body strong { color: var(--text-primary); font-weight: 700; }
+.rules-section-body a { color: var(--wood-warm); text-decoration: underline; }
+.rules-section-body a:hover { color: var(--wood-mid); }
+
+.rules-footer {
+  margin: 1.5rem 0 0;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-light);
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+.rules-back-link {
+  color: var(--wood-warm);
+  font-weight: 600;
+  margin-left: 4px;
+}

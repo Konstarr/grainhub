@@ -119,6 +119,11 @@ export default function ForumsLeftSidebar() {
         <NavItem to="/forums/new" icon={<IconPen />} label="Start a thread" />
       </Section>
 
+      {/* ── Rules ── */}
+      <Section title="Community">
+        <NavItem to="/forums/rules" icon={<IconScale />} label="Forum rules" />
+      </Section>
+
       {/* ── Joined communities ── */}
       {myCommunities.length > 0 && (
         <Section title="Your communities">
@@ -227,6 +232,7 @@ function IconFlame()    { return <svg {...svg}><path d="M12 2c2 4 5 6 5 10a5 5 0
 function IconPlus()     { return <svg {...svg}><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>; }
 function IconBookmark() { return <svg {...svg}><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" /></svg>; }
 function IconPen()      { return <svg {...svg}><path d="M12 20h9" /><path d="M16.5 3.5a2.12 2.12 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z" /></svg>; }
+function IconScale()    { return <svg {...svg}><path d="M12 3v18" /><path d="M5 7h14" /><path d="M5 7l-3 7a4 4 0 0 0 6 0z" /><path d="M19 7l3 7a4 4 0 0 1-6 0z" /></svg>; }
 
 /* Tiny round icon used inside the "Your communities" sidebar list. */
 function CommIconSmall({ c }) {
