@@ -25,10 +25,10 @@
      Weight is what distinguishes "display" headlines from body copy. */
   --font-sans: 'Montserrat', 'Segoe UI', system-ui, -apple-system, sans-serif;
   --font-display: 'Montserrat', 'Segoe UI', system-ui, -apple-system, sans-serif;
-  --weight-body: 400;
-  --weight-medium: 500;
-  --weight-semibold: 600;
-  --weight-display: 700;
+  --weight-body: 500;
+  --weight-medium: 600;
+  --weight-semibold: 700;
+  --weight-display: 800;
 }
 
 /* Make display-class elements inherit the heavier weight automatically
@@ -60,10 +60,14 @@ html { scroll-behavior: smooth; }
 
 body {
   font-family: 'Montserrat', sans-serif;
+  font-weight: var(--weight-body);
   background: var(--wood-paper);
   color: var(--text-primary);
   line-height: 1.6;
   font-size: 15px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 a { text-decoration: none; color: inherit; }
