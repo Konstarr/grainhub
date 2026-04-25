@@ -283,6 +283,49 @@ export async function logFilterViolation(targetType, attemptedText) {
   return { error };
 }
 
+/* ── Badges (admin CRUD) ───────────────────────────────── */
+
+export async function listBadges() {
+  const { data, error } = await supabase
+    .from('badges')
+    .select('id, name, description, icon, tier, metric_type, threshold, "order"')
+    .order('"order"', { ascending: true });
+  return { data: data || [], error };
+}
+
+/**
+ * Create or update a badge. The `id` column is the primary key
+ * (text slug). Passing an existing id updates that row.
+ */
+export async function upsertBadge(badge) {
+  if (!badge || !badge.id || !badge.id.trim()) {
+    return { error: new Error('Badge id required') };
+  }
+  const row = {
+    id:          badge.id.trim().toLowerCase(),
+    name:        (badge.name || '').trim(),
+    description: badge.description || '',
+    icon:        badge.icon || '🏷',
+    tier:        badge.tier || 'bronze',
+    metric_type: badge.metric_type || null,
+    threshold:   badge.threshold == null || badge.threshold === '' ? null : Number(badge.threshold),
+    order:       badge.order == null ? 99 : Number(badge.order),
+  };
+  const { error } = await supabase
+    .from('badges')
+    .upsert(row, { onConflict: 'id' });
+  return { error };
+}
+
+export async function deleteBadge(id) {
+  if (!id) return { error: new Error('Id required') };
+  const { error } = await supabase
+    .from('badges')
+    .delete()
+    .eq('id', id);
+  return { error };
+}
+
 /* ── Forum-wide stats (for dashboard landing) ─────────── */
 
 /**
