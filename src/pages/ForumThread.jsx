@@ -69,11 +69,13 @@ function formatJoinDate(iso) {
    with 50 rep shows ~half-filled and 5000+ rep shows fully filled.
    Avoids the "endless empty bar" problem of linear scaling. */
 function repBarSegments(rep) {
-  // Bumped the cap from 5001 to 20001 so the bar grows more
-  // gradually — matches the new lower rep gain per upvote.
+  // 10-square reputation bar. Logarithmic curve so the first
+  // few squares fill up quickly (rewards early activity) and
+  // the last few are reserved for veterans. Cap at 20001 rep
+  // to match the slower per-upvote rep gain in forum_settings.
   const score = Math.max(0, Math.log10((rep || 0) + 1) / Math.log10(20001));
-  const filled = Math.min(5, Math.round(score * 5));
-  return { filled, total: 5 };
+  const filled = Math.min(10, Math.round(score * 10));
+  return { filled, total: 10 };
 }
 
 function timeAgo(iso) {

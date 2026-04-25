@@ -433,12 +433,33 @@
 }
 .user-rep-seg {
   flex: 1;
-  height: 6px;
-  background: var(--border-light);
+  /* Width is set by flex; height matches so each square stays
+     roughly square at typical author-card widths. */
+  aspect-ratio: 1 / 1;
+  max-height: 12px;
+  background: #E8E2D4;
+  border: 1px solid #6E5A3A;
   border-radius: 2px;
   transition: background 0.2s;
 }
-.user-rep-seg.on { background: linear-gradient(90deg, #5A8F3A 0%, #C49540 100%); }
+/* Dark green → bright green ramp for filled segments. Uses
+   nth-child so the first square is darkest and the tenth is
+   the lightest, matching the classic forum rep-bar look. The
+   border color stays dark green so each square reads as a
+   distinct cell even when the fill color is bright. */
+.user-rep-seg.on {
+  border-color: #0F3D0F;
+}
+.user-rep-seg.on:nth-child(1)  { background: #1A4D1A; }
+.user-rep-seg.on:nth-child(2)  { background: #225C22; }
+.user-rep-seg.on:nth-child(3)  { background: #2A6B2A; }
+.user-rep-seg.on:nth-child(4)  { background: #347B34; }
+.user-rep-seg.on:nth-child(5)  { background: #3D8B3D; }
+.user-rep-seg.on:nth-child(6)  { background: #469A46; }
+.user-rep-seg.on:nth-child(7)  { background: #50AB50; }
+.user-rep-seg.on:nth-child(8)  { background: #5ABC5A; }
+.user-rep-seg.on:nth-child(9)  { background: #65CF65; }
+.user-rep-seg.on:nth-child(10) { background: #71E471; }
 .user-rep-num {
   font-size: 10.5px;
   font-weight: 700;
