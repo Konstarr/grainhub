@@ -585,22 +585,9 @@ export async function fetchForumCounters() {
   };
 }
 
-/**
- * Per-category counters for the forum index, with optional
- * "new since user's last visit" tallies.
- *
- * Returns a Map<categoryId, { threads, posts, newCount }> where:
- *   - threads / posts are global totals for that category
- *   - newCount is the number of threads in that category whose
- *     latest activity is after `lastVisits[categoryId]`. A thread
- *     counts if EITHER it was created after the last visit (a new
- *     topic) OR someone replied to it after the last visit (last_
- *     reply_at moved). Both signals are what users mean by "new".
- *
- * If a user has no recorded visit for a category, we cap the
- * "new" window at 30 days so first-time browsers don't see a
- * 1,000+ tally that is technically accurate but useless.
- */
+// Per-category counters + "new since last visit" tallies.
+// Map<categoryId, { threads, posts, newCount }>.
+// No recorded visit → 30-day fallback window.
 const NEW_FALLBACK_DAYS = 30;
 
 export async function fetchCategoryCounters(lastVisits = {}) {
@@ -609,7 +596,6 @@ export async function fetchCategoryCounters(lastVisits = {}) {
     .select('id, category_id, reply_count, created_at, last_reply_at');
 
   const fallbackCutoff = Date.now() - NEW_FALLBACK_DAYS * 24 * 60 * 60 * 1000;
-
   const byCat = new Map();
   (threads || []).forEach((t) => {
     if (!t.category_id) return;
@@ -617,18 +603,10 @@ export async function fetchCategoryCounters(lastVisits = {}) {
     entry.threads += 1;
     entry.posts += (t.reply_count || 0) + 1;
 
-    // "Most recent activity" timestamp for this thread.
     const lastActivityIso = t.last_reply_at || t.created_at;
     const lastActivityMs = lastActivityIso ? new Date(lastActivityIso).getTime() : 0;
-
-    // Per-category cutoff. Use the user's recorded last-visit if we
-    // have one; otherwise the 30-day fallback so brand-new visitors
-    // see an "X new" badge with a sane number instead of "all of it".
     const recordedIso = lastVisits[t.category_id];
-    const cutoffMs = recordedIso
-      ? new Date(recordedIso).getTime()
-      : fallbackCutoff;
-
+    const cutoffMs = recordedIso ? new Date(recordedIso).getTime() : fallbackCutoff;
     if (lastActivityMs > cutoffMs) entry.newCount += 1;
 
     byCat.set(t.category_id, entry);

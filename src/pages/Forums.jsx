@@ -15,7 +15,7 @@ import ThreadLegend from '../components/forums/ThreadLegend.jsx';
 import ForumsLeftSidebar from '../components/forums/ForumsLeftSidebar.jsx';
 import TradeFilterBanner from '../components/layout/TradeFilterBanner.jsx';
 import { matchesTrade } from '../lib/trades.js';
-import { getForumLastVisits } from '../lib/forumLastVisit.js';
+import { getForumLastVisits, getForumThreadVisits, isThreadUnread } from '../lib/forumLastVisit.js';
 import {
   FORUMS_PAGE_HEADER,
   FORUM_GROUPS,
@@ -95,14 +95,20 @@ function toActivityItem(row) {
     lastAuthorUsername: t.lastAuthorUsername,
     lastAuthorAvatar: t.lastAuthorAvatar,
     lastSnippet: t.lastSnippet,
+    createdAt: t.createdAt,
+    createdAgo: t.createdAgo,
+    lastReplyAt: t.lastReplyAt,
+    lastReplyAgo: t.lastReplyAgo,
     time: t.lastReplyAgo || 'recently',
     replies: t.replyCount,
     views: t.viewCount,
     badges,
-    isUnread: false,
+    isUnread: isThreadUnread(t.id, t.lastReplyAt || t.createdAt, threadVisits),
     _raw: row,
   };
 }
+
+const threadVisits = typeof window === 'undefined' ? {} : getForumThreadVisits();
 
 export default function Forums() {
   const [searchParams] = useSearchParams();
@@ -198,10 +204,6 @@ export default function Forums() {
     (async () => {
       const c = await fetchForumCounters();
       const topRes = await fetchTopReputation(5);
-      // Per-user, per-category last-visit timestamps from
-      // localStorage. fetchCategoryCounters uses each entry as the
-      // cutoff for the "X new" badge; missing entries fall back to
-      // a 30-day window inside the fetcher.
       const cat = await fetchCategoryCounters(getForumLastVisits());
       if (cancelled) return;
       setCounters(c);
@@ -245,10 +247,6 @@ export default function Forums() {
         const live = catCounts.get(c.id);
         if (live) {
           groupPosts += live.posts;
-          // Replace the hardcoded newCount/isNew on the static forum
-          // catalog with the live, per-user "new since last visit"
-          // tally. isNew is just a non-zero count so the existing
-          // ForumGroup render logic doesn't need to change.
           const newCount = live.newCount || 0;
           return {
             ...c,

@@ -60,14 +60,29 @@ export default function RecentActivity({ items }) {
                 >
                   {item.category}
                 </span>
-                {item.lastAuthor && (
+                {item.isUnread && <span className="act-new-pill">NEW</span>}
+                {item.createdAgo && (
+                  <span className="act-meta-time" title={item.createdAt}>
+                    Started {item.createdAgo}
+                  </span>
+                )}
+                {item.lastReplyAgo && item.lastReplyAgo !== item.createdAgo && (
                   <>
-                    <span className="act-meta-lead">Last reply by</span>
-                    <span className="act-meta-author">{item.lastAuthor}</span>
                     <span>·</span>
+                    {item.lastAuthor ? (
+                      <>
+                        <span className="act-meta-lead">last reply by</span>
+                        <span className="act-meta-author">{item.lastAuthor}</span>
+                        <span>·</span>
+                        <span className="act-meta-time" title={item.lastReplyAt}>{item.lastReplyAgo}</span>
+                      </>
+                    ) : (
+                      <span className="act-meta-time" title={item.lastReplyAt}>
+                        last reply {item.lastReplyAgo}
+                      </span>
+                    )}
                   </>
                 )}
-                <span>{item.time}</span>
               </div>
 
               {item.lastSnippet && (

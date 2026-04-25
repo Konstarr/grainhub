@@ -1,6 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { markCategoryVisited } from '../lib/forumLastVisit.js';
+import {
+  markCategoryVisited,
+  getForumThreadVisits,
+  isThreadUnread,
+} from '../lib/forumLastVisit.js';
 import '../styles/forums.css';
 import PageBack from '../components/shared/PageBack.jsx';
 import RecentActivity from '../components/forums/RecentActivity.jsx';
@@ -23,7 +27,7 @@ function hashSlug(s = '') {
   return Math.abs(h);
 }
 
-function toActivityItem(row, categoryName) {
+function toActivityItem(row, categoryName, threadVisits) {
   const t = mapThreadRow(row);
   const h = hashSlug(t.slug || t.title || '');
   const avatarColor = AV_PALETTE[h % AV_PALETTE.length];
@@ -44,11 +48,17 @@ function toActivityItem(row, categoryName) {
     categoryBg: cat.bg,
     categoryText: cat.text,
     author: 'Community',
+    // Both timestamps now ride through to the row renderer so the
+    // meta line can show "started X ago · last reply Y ago".
+    createdAt: t.createdAt,
+    createdAgo: t.createdAgo,
+    lastReplyAt: t.lastReplyAt,
+    lastReplyAgo: t.lastReplyAgo,
     time: t.lastReplyAgo || 'recently',
     replies: t.replyCount,
     views: t.viewCount,
     badges,
-    isUnread: false,
+    isUnread: isThreadUnread(t.id, t.lastReplyAt || t.createdAt, threadVisits),
   };
 }
 
@@ -81,10 +91,6 @@ export default function ForumCategory() {
       if (error || !data) setThreadRows([]);
       else setThreadRows(data);
       setLoading(false);
-      // Stamp this category's last-visited timestamp so the "X new"
-      // badge on /forums clears when the user goes back. We do this
-      // here (after the page has rendered) rather than at navigation
-      // so the user has actually had a chance to see the new threads.
       markCategoryVisited(id);
     })();
     return () => { cancelled = true; };
@@ -95,7 +101,8 @@ export default function ForumCategory() {
   const categoryDesc = category?.description || '';
   const groupName = group?.name || 'Forums';
 
-  const items = threadRows.map((r) => toActivityItem(r, categoryName));
+  const threadVisits = getForumThreadVisits();
+  const items = threadRows.map((r) => toActivityItem(r, categoryName, threadVisits));
 
   return (
     <>

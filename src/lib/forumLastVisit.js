@@ -1,62 +1,77 @@
-/**
- * Per-user, per-category "last visited" tracker for the forum
- * "X new" badges. Stored in localStorage so we don't pay round-trips
- * on every render — accuracy is per-browser, which matches what
- * users intuitively expect from a "have I seen this?" indicator.
- *
- * Shape: { [categoryId]: ISOString }
- */
-const KEY = 'gh:forumLastVisits';
+// Per-user, per-category & per-thread "last visited" tracking.
+// localStorage. Per-browser is fine for a "have I seen this?" cue.
 
-function readMap() {
+const KEY = 'gh:forumLastVisits';
+const THREAD_KEY = 'gh:forumThreadVisits';
+const MAX_TRACKED = 500;
+
+function readMap(key) {
   if (typeof window === 'undefined') return {};
   try {
-    const raw = window.localStorage.getItem(KEY);
+    const raw = window.localStorage.getItem(key);
     return raw ? JSON.parse(raw) : {};
   } catch (_) { return {}; }
 }
 
-function writeMap(map) {
+function writeMap(key, map) {
   if (typeof window === 'undefined') return;
-  try { window.localStorage.setItem(KEY, JSON.stringify(map)); } catch (_) { /* quota / disabled */ }
+  try { window.localStorage.setItem(key, JSON.stringify(map)); } catch (_) {}
 }
 
-/**
- * Read the full map of last-visit timestamps. Used by Forums.jsx
- * to compute "new since" counts for every category in one batch.
- */
+/* ── Categories ────────────────────────────────────────── */
+
 export function getForumLastVisits() {
-  return readMap();
+  return readMap(KEY);
 }
 
-/**
- * Get the ISOString for one category, or null if the user has never
- * been there. Null is treated as "everything is new" — but we cap
- * the displayed count to avoid plastering 9999+ on a fresh visit;
- * the live counter only counts threads from the last 30 days when
- * there's no prior visit recorded.
- */
 export function getForumLastVisit(categoryId) {
   if (!categoryId) return null;
-  return readMap()[categoryId] || null;
+  return readMap(KEY)[categoryId] || null;
 }
 
-/**
- * Mark a category as visited. Called from ForumCategory.jsx (when
- * the user actually opens the category page) so the badge clears
- * the next time they return to /forums. We deliberately do NOT
- * mark visited on the forum index — visiting the index shouldn't
- * silence the badges; reading the category should.
- */
 export function markCategoryVisited(categoryId, when = new Date()) {
   if (!categoryId) return;
-  const map = readMap();
+  const map = readMap(KEY);
   map[categoryId] = (when instanceof Date ? when : new Date(when)).toISOString();
-  writeMap(map);
+  writeMap(KEY, map);
 }
 
-/** Wipe all forum-visit memory — used by an admin "clear" affordance. */
 export function clearForumLastVisits() {
   if (typeof window === 'undefined') return;
   try { window.localStorage.removeItem(KEY); } catch (_) {}
+}
+
+/* ── Threads ───────────────────────────────────────────── */
+
+export function getForumThreadVisits() {
+  return readMap(THREAD_KEY);
+}
+
+export function getForumThreadVisit(threadId) {
+  if (!threadId) return null;
+  return readMap(THREAD_KEY)[threadId] || null;
+}
+
+// Caps the map at MAX_TRACKED entries (oldest first).
+export function markThreadVisited(threadId, when = new Date()) {
+  if (!threadId) return;
+  const map = readMap(THREAD_KEY);
+  map[threadId] = (when instanceof Date ? when : new Date(when)).toISOString();
+  const entries = Object.entries(map);
+  if (entries.length > MAX_TRACKED) {
+    entries.sort((a, b) => new Date(a[1]).getTime() - new Date(b[1]).getTime());
+    writeMap(THREAD_KEY, Object.fromEntries(entries.slice(entries.length - MAX_TRACKED)));
+    return;
+  }
+  writeMap(THREAD_KEY, map);
+}
+
+// No prior visit → only "new" within `freshnessDays`.
+export function isThreadUnread(threadId, lastReplyAt, lastVisits, freshnessDays = 30) {
+  if (!threadId || !lastReplyAt) return false;
+  const replyMs = new Date(lastReplyAt).getTime();
+  if (Number.isNaN(replyMs)) return false;
+  const recordedIso = lastVisits ? lastVisits[threadId] : getForumThreadVisit(threadId);
+  if (recordedIso) return replyMs > new Date(recordedIso).getTime();
+  return replyMs > Date.now() - freshnessDays * 24 * 60 * 60 * 1000;
 }

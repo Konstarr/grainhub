@@ -796,11 +796,6 @@ a.hot-topic { text-decoration: none; }
   gap: 8px;
 }
 
-/* "X new" badge — warm cinnabar red that pops against the cream
-   subcategory rows but still belongs in the wood-tone palette
-   (sits between #B91C1C true-red and the existing wood-warm
-   brown). Subtle inner glow + soft drop-shadow draw the eye
-   without screaming. */
 .new-posts-badge {
   background: linear-gradient(135deg, #D8442B 0%, #B83118 100%);
   color: #FFF8EC;
@@ -913,7 +908,27 @@ a.hot-topic { text-decoration: none; }
 }
 
 .activity-item.unread {
-  border-left: 3px solid var(--wood-warm);
+  border-left: 3px solid #D8442B;
+  background: linear-gradient(90deg, #FEF3EE 0%, var(--white) 60%);
+}
+.activity-item.unread .act-title { font-weight: 700; }
+
+.act-new-pill {
+  background: linear-gradient(135deg, #D8442B 0%, #B83118 100%);
+  color: #FFF8EC;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  padding: 2px 7px;
+  border-radius: 4px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    0 1px 3px rgba(184, 49, 24, 0.35);
+}
+
+.act-meta-time {
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
 }
 
 .act-avatar {

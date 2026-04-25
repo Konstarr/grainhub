@@ -239,6 +239,8 @@ export function mapThreadRow(row) {
     isSolved: Boolean(row.is_solved),
     viewCount: row.view_count || 0,
     replyCount: row.reply_count || 0,
+    createdAt: row.created_at,
+    createdAgo: daysAgo(row.created_at),
     lastReplyAt: row.last_reply_at,
     lastReplyAgo: daysAgo(row.last_reply_at),
     lastAuthor: lastAuthorName,
