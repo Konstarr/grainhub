@@ -12,7 +12,7 @@ import ForumStats from '../components/forums/ForumStats.jsx';
 import TopContributors from '../components/forums/TopContributors.jsx';
 import ForumGuidelines from '../components/forums/ForumGuidelines.jsx';
 import ThreadLegend from '../components/forums/ThreadLegend.jsx';
-import SponsorCard from '../components/forums/SponsorCard.jsx';
+import { SponsorSidebar } from '../components/sponsors/AdSlot.jsx';
 import ForumsLeftSidebar from '../components/forums/ForumsLeftSidebar.jsx';
 import TradeFilterBanner from '../components/layout/TradeFilterBanner.jsx';
 import { matchesTrade } from '../lib/trades.js';
@@ -300,7 +300,7 @@ export default function Forums() {
           <TopContributors contributors={liveContribs} />
           <ForumGuidelines guidelines={FORUM_GUIDELINES} />
           <ThreadLegend items={THREAD_LEGEND} />
-          <SponsorCard />
+          <SponsorSidebar />
         </aside>
       </div>
     </>

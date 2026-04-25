@@ -1,12 +1,6 @@
-export default function SponsorCard() {
-  return (
-    <div className="sponsor-rs">
-      <div className="sp-label">Forum Sponsor</div>
-      <div className="sp-title">Blum CLIP top BLUMOTION</div>
-      <div className="sp-sub">
-        ±2mm side adjustment, integrated soft-close, 9 opening angles. The hinge behind thousands of GrainHub installs.
-      </div>
-      <button className="sp-btn">Download Catalog →</button>
-    </div>
-  );
-}
+// Deprecated. The forums sidebar now uses <SponsorSidebar /> from
+// components/sponsors/AdSlot.jsx, which pulls live rows from
+// sponsor_media (and falls back to a "Become a sponsor" CTA when
+// no sponsor is approved for the slot). Kept as a stub re-export
+// so any stragglers don't break — remove once nothing imports it.
+export { SponsorSidebar as default } from '../sponsors/AdSlot.jsx';

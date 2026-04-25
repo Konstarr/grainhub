@@ -1,4 +1,5 @@
 import { POPULAR_ARTICLES, TOP_CONTRIBUTORS } from '../../data/wikiData.js';
+import { SponsorSidebar } from '../sponsors/AdSlot.jsx';
 
 function PopularCard() {
   return (
@@ -41,26 +42,15 @@ function ContributorsCard() {
   );
 }
 
-function SponsorCard() {
-  return (
-    <div className="sponsor-rs">
-      <div className="sp-label">Wiki Sponsor</div>
-      <div className="sp-title">Blum CLIP top BLUMOTION</div>
-      <div className="sp-sub">The most-specified concealed hinge in North America. Download the full technical reference catalog.</div>
-      <button className="sp-btn">Download Catalog →</button>
-    </div>
-  );
-}
-
-// Slimmed sidebar: we kept the three highest-signal cards (Popular, Contributors,
-// Sponsor) and dropped Quality + Guidelines. Guidelines live on the contributor
-// page; featured-quality is already surfaced via badges on the main content cards.
+// Slimmed sidebar: Popular, Contributors, and the live sponsor slot
+// (which falls back to a 'Become a sponsor' card when no sponsor is
+// approved for the sidebar slot).
 export default function WikiSidebar() {
   return (
     <aside className="right-col">
       <PopularCard />
       <ContributorsCard />
-      <SponsorCard />
+      <SponsorSidebar />
     </aside>
   );
 }

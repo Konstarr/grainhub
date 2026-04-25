@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { SPONSOR_AD } from '../../data/newsData.js';
 import { supabase } from '../../lib/supabase.js';
 import { fetchRecentThreadsWithLastPost } from '../../lib/forumDb.js';
+import { SponsorSidebar } from '../sponsors/AdSlot.jsx';
 
 /**
  * News page right-side sidebar. Every item is now backed by real data
@@ -156,17 +156,6 @@ function ForumCard() {
   );
 }
 
-function SponsorCard() {
-  return (
-    <div className="sponsor-card">
-      <div className="sp-label">{SPONSOR_AD.label}</div>
-      <div className="sp-title">{SPONSOR_AD.title}</div>
-      <div className="sp-sub">{SPONSOR_AD.description}</div>
-      <Link to="/sponsor" className="sp-btn">Learn More &amp; Download Spec →</Link>
-    </div>
-  );
-}
-
 function NewsletterCard() {
   return (
     <div className="newsletter-card">
@@ -187,7 +176,7 @@ export default function NewsSidebar() {
     <aside className="right-col">
       <TrendingCard />
       <ForumCard />
-      <SponsorCard />
+      <SponsorSidebar />
       <NewsletterCard />
     </aside>
   );

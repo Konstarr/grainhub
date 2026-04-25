@@ -94,7 +94,7 @@ export function SponsorHero() {
   if (!a) return null;
   return (
     <div className="ad-wrap ad-wrap-hero" aria-label="Sponsored">
-      <div className="ad-label">Featured sponsor</div>
+      <div className="ad-label">Sponsored by</div>
       <AdWrapper asset={a} className="ad-hero">
         <img src={a.image_url} alt={a.alt_text || (a.owner?.business_name || 'Sponsor')} loading="lazy" />
       </AdWrapper>
@@ -108,7 +108,7 @@ export function SponsorLeaderboard() {
   if (!a) return null;
   return (
     <div className="ad-wrap ad-wrap-leaderboard" aria-label="Sponsored">
-      <div className="ad-label">Advertisement</div>
+      <div className="ad-label">Sponsored by</div>
       <AdWrapper asset={a} className="ad-leaderboard">
         <img src={a.image_url} alt={a.alt_text || (a.owner?.business_name || 'Sponsor')} loading="lazy" />
       </AdWrapper>
@@ -116,13 +116,28 @@ export function SponsorLeaderboard() {
   );
 }
 
-/* ----- Sidebar ----- */
+/* ----- Sidebar -----
+ * When there's no approved sponsor for this slot we render a soft
+ * "Become a sponsor" fallback instead of nothing — that way the
+ * sidebar real estate stays tied to the sponsorship circuit and
+ * never blends into the page background. */
 export function SponsorSidebar() {
   const a = useSponsorAsset('sidebar');
-  if (!a) return null;
+  if (!a) {
+    return (
+      <div className="ad-wrap ad-wrap-sidebar" aria-label="Sponsorship slot">
+        <div className="ad-label">Sponsored by</div>
+        <Link to="/sponsor" className="ad-sidebar ad-sidebar-empty">
+          <div className="ad-empty-title">This space is open</div>
+          <div className="ad-empty-sub">Reach the GrainHub community.</div>
+          <span className="ad-empty-cta">Become a sponsor →</span>
+        </Link>
+      </div>
+    );
+  }
   return (
     <div className="ad-wrap ad-wrap-sidebar" aria-label="Sponsored">
-      <div className="ad-label">Advertisement</div>
+      <div className="ad-label">Sponsored by</div>
       <AdWrapper asset={a} className="ad-sidebar">
         <img src={a.image_url} alt={a.alt_text || (a.owner?.business_name || 'Sponsor')} loading="lazy" />
       </AdWrapper>
