@@ -280,7 +280,11 @@ export default function AccountSubscription() {
       <h2 className="acct-section-heading">
         {isAuthed ? 'Change or add to your plan' : 'Browse plans'}
       </h2>
-      <PlanBrowse persona={persona} onPersonaChange={setPersona} />
+      <PlanBrowse
+        persona={persona}
+        onPersonaChange={setPersona}
+        accountType={isAuthed ? accountType : undefined}
+      />
     </div>
   );
 }

@@ -227,6 +227,76 @@ button.alacarte-cta:disabled {
   cursor: default;
 }
 
+/* ── Selected card highlight ─────────────────────────────
+   Subtle wood-warm tint + accent border applied to the WHOLE card
+   when something on it is staged. Makes it easy to scan the page
+   and see what's already in your pending changes. */
+.tier-card.tier-selected,
+.pack-hero.pack-selected,
+.sponsor-card-new.sponsor-selected,
+.alacarte-tile.alacarte-selected {
+  border-color: var(--wood-warm);
+  background: linear-gradient(180deg, #FDF6E8 0%, var(--white) 70%);
+  box-shadow: 0 4px 18px rgba(176, 128, 38, 0.14), 0 0 0 1px var(--wood-warm) inset;
+}
+.mb-strip-col.mb-selected {
+  border-color: var(--wood-warm);
+  background: linear-gradient(180deg, #FDF6E8 0%, var(--white) 70%);
+  box-shadow: 0 4px 14px rgba(176, 128, 38, 0.1);
+}
+
+/* ── Locked card state (account-type mismatch) ────────────
+   Card still renders so users see what the other account type
+   gets — just visually muted and the CTA is non-interactive. */
+.tier-card.tier-locked,
+.mb-strip-col.mb-locked {
+  opacity: 0.62;
+  filter: saturate(0.7);
+}
+.tier-card.tier-locked .tier-features li,
+.mb-strip-col.mb-locked .mb-feats li {
+  color: var(--text-muted);
+}
+.tier-cta-locked,
+.mb-cta-locked {
+  background: var(--border-light) !important;
+  color: var(--text-muted) !important;
+  border-color: var(--border) !important;
+  cursor: not-allowed !important;
+  font-style: italic;
+  font-weight: 600 !important;
+}
+
+/* Banner shown ABOVE locked sections explaining why */
+.locked-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin: 0 0 1.25rem;
+  padding: 0.85rem 1.1rem;
+  background: #FDF6E8;
+  border: 1px solid #E5C77A;
+  border-radius: 10px;
+  font-size: 13.5px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+.locked-banner-icon {
+  font-size: 18px;
+  line-height: 1;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.locked-banner strong {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+.locked-banner a {
+  color: var(--wood-warm);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
 /* "Selected ✓" — green confirmation state. Now CLICKABLE to unstage,
    so the cursor is a pointer. On hover the button shifts to a red
    "Remove ×" affordance via the .cta-default/.cta-hover label swap. */

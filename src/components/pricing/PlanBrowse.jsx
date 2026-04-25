@@ -16,20 +16,36 @@ import '../../styles/pricing.css';
  * Layout rules:
  *   - Membership tier set switches with the persona toggle (individual
  *     memberships vs business memberships) — only ONE can be staged.
- *   - Role packs, sponsorships, and à la carte items are SHARED: every
- *     visitor sees them regardless of persona, because the gating is
- *     about what the user wants, not who they are.
+ *   - Role packs, sponsorships, and à la carte items are SHARED — every
+ *     visitor sees them regardless of persona.
+ *
+ * Account-type gating (signed-in users only):
+ *   - Individual users CAN'T stage business memberships (and vice versa).
+ *     The cards still render so users can see what's available with the
+ *     other account type, but the CTA is locked with an "Email us to
+ *     switch" affordance.
+ *   - Anonymous users have no account_type yet — they can stage anything;
+ *     the signup flow reconciles persona to account type.
  *
  * Selection rules (matched in PlanContext.addChange):
- *   - One membership at a time (replaces previous selection)
+ *   - One membership at a time (replaces previous)
  *   - Many role packs allowed; ONE tier per pack-id
  *   - One sponsor tier at a time (replaces previous)
  *   - Many à la carte items allowed (deduped by id)
  *
- * Every "Selected ✓" button is clickable and unstages on click with
- * a hover affordance.
+ * Every "Selected ✓" button is clickable and unstages on click. The
+ * whole card also gets a subtle wood-warm tint while staged.
  */
-export default function PlanBrowse({ persona = 'individual', onPersonaChange }) {
+export default function PlanBrowse({
+  persona = 'individual',
+  onPersonaChange,
+  accountType,           // 'individual' | 'business' | undefined (anon)
+}) {
+  // A section is "locked" when the signed-in user's account_type doesn't
+  // match what the section is for. Anon users (no accountType) → never locked.
+  const businessMembershipsLocked = accountType === 'individual';
+  const individualMembershipsLocked = accountType === 'business';
+
   return (
     <>
       <div className="persona-toggle">
@@ -54,10 +70,11 @@ export default function PlanBrowse({ persona = 'individual', onPersonaChange }) 
         />
       </div>
 
-      {persona === 'individual' ? <IndividualMemberships /> : <BusinessMemberships />}
+      {persona === 'individual'
+        ? <IndividualMemberships locked={individualMembershipsLocked} />
+        : <BusinessMemberships    locked={businessMembershipsLocked} />}
 
-      {/* Add-ons are visible to every persona — pack purchases, sponsorships,
-          and one-off promotions all stack with any membership tier. */}
+      {/* Add-ons are open to every account type — no gating. */}
       <SharedAddOns />
 
       <div className="pricing-faq">
@@ -66,6 +83,12 @@ export default function PlanBrowse({ persona = 'individual', onPersonaChange }) 
           Yes. Pick one membership, stack as many role packs as you need, choose
           a sponsorship tier if you want extra brand visibility, and add à la
           carte one-offs whenever you have something to promote.
+        </FaqItem>
+        <FaqItem q="Can I switch between an individual and business account?">
+          Yes — email <a href="mailto:support@grainhub.io">support@grainhub.io</a>{' '}
+          and we'll convert your account within one business day. Membership
+          tiers, packs, and sponsorships available to you depend on your account
+          type.
         </FaqItem>
         <FaqItem q="What happens when I hit a cap?">
           Nothing hard-blocks at the cap. We give you a 2-week grace with a banner
@@ -78,33 +101,47 @@ export default function PlanBrowse({ persona = 'individual', onPersonaChange }) 
           Yes. Downgrade or cancel in one click; changes take effect at the end
           of your billing period.
         </FaqItem>
-        <FaqItem q="Do you take a cut of marketplace sales?">
-          No. Transactions happen directly between buyer and seller. We only
-          charge for listing visibility.
-        </FaqItem>
       </div>
     </>
   );
 }
 
-/* ── Membership sections — only one can be selected ── */
-function IndividualMemberships() {
+/* ── Locked-section banner ─────────────────────────────── */
+function LockedBanner({ requires }) {
+  return (
+    <div className="locked-banner">
+      <span className="locked-banner-icon" aria-hidden="true">🔒</span>
+      <div>
+        <strong>These plans require {requires === 'business' ? 'a business' : 'an individual'} account.</strong>{' '}
+        You can see what's available, but you'll need to switch your account
+        type to subscribe.{' '}
+        <a href="mailto:support@grainhub.io?subject=Switch%20account%20type">
+          Email us to switch →
+        </a>
+      </div>
+    </div>
+  );
+}
+
+/* ── Membership sections ──────────────────────────────── */
+function IndividualMemberships({ locked }) {
   return (
     <section className="pricing-section">
       <div className="section-heading">
         <h2>Individual memberships</h2>
         <p>For cabinetmakers, installers, designers, and anyone working in the trade.</p>
       </div>
+      {locked && <LockedBanner requires="individual" />}
       <div className="pricing-grid">
         {INDIVIDUAL_TIERS.map((t) => (
-          <TierCard key={t.id} tier={t} />
+          <TierCard key={t.id} tier={t} locked={locked} />
         ))}
       </div>
     </section>
   );
 }
 
-function BusinessMemberships() {
+function BusinessMemberships({ locked }) {
   return (
     <section className="pricing-section">
       <div className="section-heading">
@@ -112,12 +149,13 @@ function BusinessMemberships() {
         <h2>Business memberships</h2>
         <p>Start here. Company profile, team seats, and analytics.</p>
       </div>
-      <MembershipStrip tiers={BUSINESS_TIERS} />
+      {locked && <LockedBanner requires="business" />}
+      <MembershipStrip tiers={BUSINESS_TIERS} locked={locked} />
     </section>
   );
 }
 
-/* ── Add-ons — visible to everyone, regardless of persona ── */
+/* ── Add-ons (shared) ─────────────────────────────────── */
 function SharedAddOns() {
   return (
     <>
@@ -175,13 +213,20 @@ function SharedAddOns() {
 /* ══════════════════ Sub-components ══════════════════════ */
 
 /**
- * Reusable CTA. Three states:
- *   - contactSales: mailto link, no toggle behavior
- *   - staged: clickable, unstages on click. Hover swaps the label
- *     to a red "Remove" affordance so it's obvious it's a toggle.
- *   - default: stages the change on click
+ * Reusable CTA. States:
+ *   - locked: not selectable; no click handler
+ *   - contactSales: mailto link
+ *   - staged: clickable to unstage; hover swaps label to "Remove ×"
+ *   - default: stages on click
  */
-function PlanCta({ staged, onStage, onUnstage, contactSales = false, label = 'Add to plan' }) {
+function PlanCta({ staged, onStage, onUnstage, locked = false, contactSales = false, label = 'Add to plan', lockedLabel = 'Not available on your account' }) {
+  if (locked) {
+    return (
+      <button type="button" className="tier-cta tier-cta-locked" disabled>
+        {lockedLabel}
+      </button>
+    );
+  }
   if (contactSales) {
     return <a href="mailto:sales@grainhub.io" className="tier-cta">Contact sales</a>;
   }
@@ -206,14 +251,19 @@ function PlanCta({ staged, onStage, onUnstage, contactSales = false, label = 'Ad
 }
 
 /** Generic tier card — used by individual memberships. */
-function TierCard({ tier }) {
+function TierCard({ tier, locked = false }) {
   const plan = usePlanChanges();
-  const staged = plan.has((i) => i.type === 'membership' && i.id === tier.id);
-  const handleStage = () => plan.addChange({ type: 'membership', id: tier.id });
+  const staged = !locked && plan.has((i) => i.type === 'membership' && i.id === tier.id);
+  const handleStage   = () => plan.addChange({ type: 'membership', id: tier.id });
   const handleUnstage = () => plan.removeChange((i) => i.type === 'membership');
 
+  const cls = ['tier-card'];
+  if (tier.highlight) cls.push('tier-highlight');
+  if (staged)         cls.push('tier-selected');
+  if (locked)         cls.push('tier-locked');
+
   return (
-    <div className={'tier-card ' + (tier.highlight ? 'tier-highlight' : '')}>
+    <div className={cls.join(' ')}>
       {tier.highlight && <div className="tier-ribbon">Most popular</div>}
       <div className="tier-name">{tier.name}</div>
       <div className="tier-price">
@@ -225,6 +275,8 @@ function TierCard({ tier }) {
         {tier.features.map((f, i) => <li key={i}>{f}</li>)}
       </ul>
       <PlanCta
+        locked={locked}
+        lockedLabel="Individual account required"
         staged={staged}
         onStage={handleStage}
         onUnstage={handleUnstage}
@@ -234,22 +286,24 @@ function TierCard({ tier }) {
   );
 }
 
-/** Compact horizontal strip for the four business-membership levels.
- *  Inline button uses the same default/hover swap as PlanCta. */
-function MembershipStrip({ tiers }) {
+/** Compact horizontal strip for the four business-membership levels. */
+function MembershipStrip({ tiers, locked = false }) {
   const plan = usePlanChanges();
 
   return (
     <div className="mb-strip">
       {tiers.map((t, idx) => {
-        const staged = plan.has((i) => i.type === 'membership' && i.id === t.id);
-        const handleStage = () => plan.addChange({ type: 'membership', id: t.id });
+        const staged = !locked && plan.has((i) => i.type === 'membership' && i.id === t.id);
+        const handleStage   = () => plan.addChange({ type: 'membership', id: t.id });
         const handleUnstage = () => plan.removeChange((i) => i.type === 'membership');
+
+        const cls = ['mb-strip-col'];
+        if (t.highlight) cls.push('mb-highlight');
+        if (staged)      cls.push('mb-selected');
+        if (locked)      cls.push('mb-locked');
+
         return (
-          <div
-            key={t.id}
-            className={'mb-strip-col ' + (t.highlight ? 'mb-highlight' : '')}
-          >
+          <div key={t.id} className={cls.join(' ')}>
             {t.highlight && <span className="mb-badge">Most popular</span>}
             <div className="mb-step">Step {idx + 1}</div>
             <div className="mb-name">{t.name}</div>
@@ -264,7 +318,11 @@ function MembershipStrip({ tiers }) {
                 <li className="mb-more">+ {t.features.length - 4} more</li>
               )}
             </ul>
-            {t.priceMonthly === null ? (
+            {locked ? (
+              <button type="button" className="mb-cta mb-cta-locked" disabled>
+                Business account required
+              </button>
+            ) : t.priceMonthly === null ? (
               <a href="mailto:sales@grainhub.io" className="mb-cta">Contact sales</a>
             ) : staged ? (
               <button
@@ -305,20 +363,15 @@ function PackCard({ pack }) {
       ? 'Unlimited ' + pack.unitPlural
       : active.cap + ' ' + (active.cap === 1 ? pack.unit : pack.unitPlural);
 
-  // staged at this exact tier? → show Selected
-  // staged at a different tier? → show "Switch to X"
-  const stagedAtThisTier = plan.has(
-    (i) => i.type === 'pack' && i.id === pack.id && i.tierId === tierId,
-  );
-  const stagedAtOtherTier = plan.has(
-    (i) => i.type === 'pack' && i.id === pack.id && i.tierId !== tierId,
-  );
+  const stagedAtThisTier  = plan.has((i) => i.type === 'pack' && i.id === pack.id && i.tierId === tierId);
+  const stagedAtOtherTier = plan.has((i) => i.type === 'pack' && i.id === pack.id && i.tierId !== tierId);
+  const anyTierStaged     = plan.has((i) => i.type === 'pack' && i.id === pack.id);
 
-  const handleStage = () => plan.addChange({ type: 'pack', id: pack.id, tierId });
+  const handleStage   = () => plan.addChange({ type: 'pack', id: pack.id, tierId });
   const handleUnstage = () => plan.removeChange((i) => i.type === 'pack' && i.id === pack.id);
 
   return (
-    <div className="pack-hero">
+    <div className={'pack-hero ' + (anyTierStaged ? 'pack-selected' : '')}>
       <div className="pack-hero-head" style={{ background: visual.gradient }}>
         <div className="pack-hero-icon">{visual.icon}</div>
         <div>
@@ -375,14 +428,18 @@ const SPONSOR_VISUALS = {
 function SponsorMedallion({ tier }) {
   const plan = usePlanChanges();
   const v = SPONSOR_VISUALS[tier.id] || SPONSOR_VISUALS.silver;
-  const stagedAtThisTier = plan.has((i) => i.type === 'sponsor' && i.id === tier.id);
+  const stagedAtThisTier  = plan.has((i) => i.type === 'sponsor' && i.id === tier.id);
   const stagedAtOtherTier = plan.has((i) => i.type === 'sponsor' && i.id !== tier.id);
-  const handleStage = () => plan.addChange({ type: 'sponsor', id: tier.id });
+  const handleStage   = () => plan.addChange({ type: 'sponsor', id: tier.id });
   const handleUnstage = () => plan.removeChange((i) => i.type === 'sponsor');
   const label = tier.name.replace(' Sponsor', '');
 
+  const cls = ['sponsor-card-new'];
+  if (tier.highlight)     cls.push('sponsor-highlight');
+  if (stagedAtThisTier)   cls.push('sponsor-selected');
+
   return (
-    <div className={'sponsor-card-new ' + (tier.highlight ? 'sponsor-highlight' : '')}>
+    <div className={cls.join(' ')}>
       <div
         className="sponsor-medal"
         style={{
@@ -390,7 +447,7 @@ function SponsorMedallion({ tier }) {
           boxShadow: '0 4px 14px ' + v.ring + '55, inset 0 1px 0 rgba(255,255,255,0.4)',
         }}
       >
-                <span className="sponsor-medal-label">{label}</span>
+        <span className="sponsor-medal-label">{label}</span>
       </div>
       <div className="sponsor-card-body">
         <div className="sponsor-price">
@@ -415,11 +472,11 @@ function SponsorMedallion({ tier }) {
 function ALaCarteTile({ item }) {
   const plan = usePlanChanges();
   const staged = plan.has((i) => i.type === 'alacarte' && i.id === item.id);
-  const handleStage = () => plan.addChange({ type: 'alacarte', id: item.id });
+  const handleStage   = () => plan.addChange({ type: 'alacarte', id: item.id });
   const handleUnstage = () => plan.removeChange((i) => i.type === 'alacarte' && i.id === item.id);
 
   return (
-    <div className="alacarte-tile">
+    <div className={'alacarte-tile ' + (staged ? 'alacarte-selected' : '')}>
       <div className="alacarte-icon">{item.icon}</div>
       <div className="alacarte-name">{item.name}</div>
       <div className="alacarte-price">
