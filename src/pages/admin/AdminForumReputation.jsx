@@ -7,21 +7,20 @@ import {
 } from '../../lib/forumAdminDb.js';
 
 /**
- * /admin/forums/reputation — admin-tunable reputation gains and
- * badge thresholds. Both groups are stored as rows in
- * forum_settings; the upvote triggers read each value via
- * get_forum_setting() with safe fallback defaults.
+ * /admin/forums/reputation — admin-tunable reputation gains.
+ * Stored as rows in forum_settings; the upvote triggers read each
+ * value via get_forum_setting() with safe fallback defaults.
+ *
+ * Badge thresholds used to live on this page too, but they moved
+ * to /admin/forums/badges where you can also edit icons, names,
+ * descriptions and create new tiers. This page now just links
+ * across.
  */
 export default function AdminForumReputation() {
   const [vals, setVals] = useState({
     rep_thread_upvote: '',
     rep_post_upvote: '',
     rep_accepted_answer: '',
-    badge_trusted_rep: '',
-    badge_respected_rep: '',
-    badge_liked_upvotes: '',
-    badge_helpful_upvotes: '',
-    badge_authority_upvotes: '',
   });
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -75,8 +74,8 @@ export default function AdminForumReputation() {
 
   return (
     <AdminLayout
-      title="Reputation & badges"
-      subtitle="Tune the rep awarded per upvote and the unlock thresholds for each badge."
+      title="Reputation"
+      subtitle="Tune the rep awarded per upvote. Badge icons, names and thresholds live on the Badges page."
       actions={
         <Link to="/admin/forums" className="cart-btn ghost" style={{ padding: '6px 12px', fontSize: 12 }}>
           ← Back to forum mod.
@@ -117,58 +116,32 @@ export default function AdminForumReputation() {
             </div>
           </section>
 
-          {/* ── Badge thresholds ── */}
-          <section style={card}>
-            <h2 style={cardTitle}>Badge thresholds</h2>
+          {/* ── Pointer to the Badges admin page ── */}
+          <section style={{
+            ...card,
+            background: '#FBF2E5',
+            borderColor: '#A56939',
+            borderLeft: '4px solid #A56939',
+          }}>
+            <h2 style={cardTitle}>Levels & accolades</h2>
             <p style={cardSub}>
-              When users hit these milestones, the corresponding badge is awarded
-              automatically. Adjust to make badges easier or harder to earn.
+              Badge icons, names, descriptions, tiers and unlock rules
+              (reputation, post upvotes, threads, posts, solved questions, etc.)
+              are managed on the Badges page. You can also create new levels
+              and accolades there.
             </p>
-            <BadgeRow
-              icon="🛡️"
-              name="Trusted"
-              metric="reputation"
-              suffix="rep"
-              value={vals.badge_trusted_rep}
-              onChange={set('badge_trusted_rep')}
-              hint="Default 100"
-            />
-            <BadgeRow
-              icon="🏅"
-              name="Respected"
-              metric="reputation"
-              suffix="rep"
-              value={vals.badge_respected_rep}
-              onChange={set('badge_respected_rep')}
-              hint="Default 500"
-            />
-            <BadgeRow
-              icon="❤️"
-              name="Liked"
-              metric="total post upvotes"
-              suffix="upvotes"
-              value={vals.badge_liked_upvotes}
-              onChange={set('badge_liked_upvotes')}
-              hint="Default 10"
-            />
-            <BadgeRow
-              icon="💡"
-              name="Helpful"
-              metric="total post upvotes"
-              suffix="upvotes"
-              value={vals.badge_helpful_upvotes}
-              onChange={set('badge_helpful_upvotes')}
-              hint="Default 50"
-            />
-            <BadgeRow
-              icon="👑"
-              name="Authority"
-              metric="total post upvotes"
-              suffix="upvotes"
-              value={vals.badge_authority_upvotes}
-              onChange={set('badge_authority_upvotes')}
-              hint="Default 250"
-            />
+            <Link
+              to="/admin/forums/badges"
+              className="cart-btn primary"
+              style={{
+                display: 'inline-block',
+                padding: '0.55rem 1.1rem',
+                fontSize: 13.5,
+                textDecoration: 'none',
+              }}
+            >
+              Open Badges admin →
+            </Link>
           </section>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: '0.5rem' }}>
@@ -226,43 +199,6 @@ function Field({ label, value, onChange, hint }) {
       />
       {hint && <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{hint}</span>}
     </label>
-  );
-}
-
-function BadgeRow({ icon, name, metric, suffix, value, onChange, hint }) {
-  return (
-    <div style={{
-      display: 'flex',
-      alignItems: 'center',
-      gap: 14,
-      padding: '0.75rem 0',
-      borderTop: '1px solid var(--border-light)',
-      flexWrap: 'wrap',
-    }}>
-      <div style={{ fontSize: 24, lineHeight: 1, width: 32, textAlign: 'center' }}>{icon}</div>
-      <div style={{ flex: 1, minWidth: 200 }}>
-        <div style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 700, fontSize: 14, color: 'var(--text-primary)' }}>
-          {name}
-        </div>
-        <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>Awarded at {metric}</div>
-      </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-        <input
-          type="number"
-          min="0"
-          max="1000000"
-          value={value}
-          onChange={onChange}
-          style={{ ...inputStyle, width: 110 }}
-        />
-        <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{suffix}</span>
-      </div>
-      {hint && (
-        <span style={{ fontSize: 11, color: 'var(--text-muted)', minWidth: 90, textAlign: 'right' }}>
-          {hint}
-        </span>
-      )}
-    </div>
   );
 }
 
