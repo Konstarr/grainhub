@@ -138,23 +138,20 @@ export default function ForumCategory() {
                 {categoryDesc}
               </p>
             )}
-            <div style={{ marginTop: '1rem', display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
-              <Link
-                to={'/forums/new?category=' + encodeURIComponent(id)}
-                className="act-btn primary"
-                style={{ textDecoration: 'none' }}
-              >
-                ✏ Start a thread
-              </Link>
-              <Link to="/forums" style={{ color: 'var(--wood-warm)', fontSize: '13px', fontWeight: '500' }}>
-                → All forums
-              </Link>
-              <span style={{ color: 'var(--text-muted)', fontSize: '13px' }}>
-                {loading ? 'Loading threads…' : `${items.length} thread${items.length === 1 ? '' : 's'}`}
-              </span>
-            </div>
-            <div style={{ marginTop: '0.85rem' }}>
-              <ForumSearchBar size="md" placeholder={`Search ${categoryName}…`} />
+            <div className="cat-actionbar">
+              <div className="cat-actionbar-chips">
+                <Link
+                  to={'/forums/new?category=' + encodeURIComponent(id)}
+                  className="cat-chip cat-chip-primary"
+                >
+                  ✏ New thread
+                </Link>
+                <Link to="/forums" className="cat-chip">All forums</Link>
+                <span className="cat-chip cat-chip-muted">
+                  {loading ? 'Loading…' : `${items.length} thread${items.length === 1 ? '' : 's'}`}
+                </span>
+              </div>
+              <ForumSearchBar size="md" placeholder={`Search ${categoryName}…`} className="cat-actionbar-search" />
             </div>
           </div>
 

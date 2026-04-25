@@ -55,6 +55,65 @@
 .fsb-lg .fsb-input { font-size: 15px; padding: 9px 4px; }
 .fsb-lg .fsb-submit { padding: 9px 18px; font-size: 13.5px; }
 
+/* Category page action bar — chips on the left, search on the right */
+.cat-actionbar {
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.cat-actionbar-chips {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.cat-actionbar-search {
+  flex: 1;
+  min-width: 220px;
+  max-width: 360px;
+  margin-left: auto;
+}
+.cat-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--text-secondary);
+  background: var(--white);
+  border: 1px solid var(--border);
+  text-decoration: none;
+  transition: border-color 0.12s, color 0.12s, background 0.12s;
+  line-height: 1;
+}
+.cat-chip:hover {
+  border-color: var(--wood-warm);
+  color: var(--wood-warm);
+}
+.cat-chip-primary {
+  background: var(--wood-warm);
+  color: #fff;
+  border-color: var(--wood-warm);
+}
+.cat-chip-primary:hover {
+  background: var(--wood-mid);
+  border-color: var(--wood-mid);
+  color: #fff;
+}
+.cat-chip-muted {
+  color: var(--text-muted);
+  background: var(--wood-cream);
+  border-color: transparent;
+  cursor: default;
+}
+.cat-chip-muted:hover { color: var(--text-muted); border-color: transparent; }
+
 /* Forum search results page */
 .fs-results-card {
   background: var(--white);
