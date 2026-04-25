@@ -1,10 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import {
-  markCategoryVisited,
-  getForumThreadVisits,
-  isThreadUnread,
-} from '../lib/forumLastVisit.js';
+import { getForumThreadVisits, isThreadUnread } from '../lib/forumLastVisit.js';
 import '../styles/forums.css';
 import PageBack from '../components/shared/PageBack.jsx';
 import RecentActivity from '../components/forums/RecentActivity.jsx';
@@ -91,7 +87,6 @@ export default function ForumCategory() {
       if (error || !data) setThreadRows([]);
       else setThreadRows(data);
       setLoading(false);
-      markCategoryVisited(id);
     })();
     return () => { cancelled = true; };
   }, [id]);

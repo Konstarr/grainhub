@@ -15,7 +15,7 @@ import ThreadLegend from '../components/forums/ThreadLegend.jsx';
 import ForumsLeftSidebar from '../components/forums/ForumsLeftSidebar.jsx';
 import TradeFilterBanner from '../components/layout/TradeFilterBanner.jsx';
 import { matchesTrade } from '../lib/trades.js';
-import { getForumLastVisits, getForumThreadVisits, isThreadUnread } from '../lib/forumLastVisit.js';
+import { getForumThreadVisits, isThreadUnread } from '../lib/forumLastVisit.js';
 import {
   FORUMS_PAGE_HEADER,
   FORUM_GROUPS,
@@ -204,7 +204,7 @@ export default function Forums() {
     (async () => {
       const c = await fetchForumCounters();
       const topRes = await fetchTopReputation(5);
-      const cat = await fetchCategoryCounters(getForumLastVisits());
+      const cat = await fetchCategoryCounters(getForumThreadVisits());
       if (cancelled) return;
       setCounters(c);
       setTopContribs(topRes.data || []);

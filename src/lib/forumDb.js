@@ -585,12 +585,15 @@ export async function fetchForumCounters() {
   };
 }
 
-// Per-category counters + "new since last visit" tallies.
+// Per-category counters + unread-thread tallies.
 // Map<categoryId, { threads, posts, newCount }>.
-// No recorded visit → 30-day fallback window.
+// newCount counts threads in that category whose last activity is
+// after the user's per-thread visit (or within 30d if never visited).
+// The category badge therefore only clears once every thread inside
+// has been individually opened.
 const NEW_FALLBACK_DAYS = 30;
 
-export async function fetchCategoryCounters(lastVisits = {}) {
+export async function fetchCategoryCounters(threadVisits = {}) {
   const { data: threads } = await supabase
     .from('forum_threads')
     .select('id, category_id, reply_count, created_at, last_reply_at');
@@ -605,7 +608,7 @@ export async function fetchCategoryCounters(lastVisits = {}) {
 
     const lastActivityIso = t.last_reply_at || t.created_at;
     const lastActivityMs = lastActivityIso ? new Date(lastActivityIso).getTime() : 0;
-    const recordedIso = lastVisits[t.category_id];
+    const recordedIso = threadVisits[t.id];
     const cutoffMs = recordedIso ? new Date(recordedIso).getTime() : fallbackCutoff;
     if (lastActivityMs > cutoffMs) entry.newCount += 1;
 
