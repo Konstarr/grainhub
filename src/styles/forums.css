@@ -592,19 +592,29 @@ a.hot-topic { text-decoration: none; }
 .forum-group-header {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 0.4rem;
+  gap: 14px;
+  margin-bottom: 0.55rem;
+  /* Card-style band so the group title doesn't visually merge
+     with the subcategory list below. Subtle wood-cream wash +
+     left accent stripe in the wood-warm color. */
+  background: linear-gradient(90deg, #FAF3E2 0%, #FDF9EE 100%);
+  border: 1px solid #E8DCC1;
+  border-left: 4px solid var(--wood-warm);
+  border-radius: 10px;
+  padding: 0.65rem 1rem;
+  box-shadow: 0 1px 3px rgba(74, 42, 18, 0.06);
 }
 
 .fgh-icon {
-  width: 28px;
-  height: 28px;
-  border-radius: 7px;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
+  font-size: 18px;
   flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
 }
 
 .fgh-icon.brown {
@@ -645,25 +655,29 @@ a.hot-topic { text-decoration: none; }
 
 .fgh-name {
   font-family: 'Montserrat', sans-serif;
-  font-size: 15px;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
   color: var(--text-primary);
-  line-height: 1;
+  line-height: 1.15;
 }
 
 .fgh-desc {
-  font-size: 11px;
-  color: var(--text-muted);
-  margin-top: 1px;
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  margin-top: 3px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .fgh-stats {
-  font-size: 11px;
-  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--wood-warm);
   text-align: right;
   flex-shrink: 0;
+  letter-spacing: 0.01em;
 }
 
 .forum-categories {
@@ -678,7 +692,7 @@ a.hot-topic { text-decoration: none; }
   grid-template-columns: auto 1fr auto;
   gap: 0;
   border-bottom: 1px solid var(--border-light);
-  transition: background 0.12s;
+  transition: background 0.12s, transform 0.12s;
   cursor: pointer;
   align-items: stretch;
 }
@@ -688,7 +702,7 @@ a.hot-topic { text-decoration: none; }
 }
 
 .forum-cat:hover {
-  background: #FDFAF4;
+  background: #FDF7E8;
 }
 
 .forum-cat.has-new {
@@ -701,37 +715,39 @@ a.hot-topic { text-decoration: none; }
 
 /* CAT ICON CELL */
 .cat-icon-cell {
-  padding: 0.55rem 0.6rem 0.55rem 0.85rem;
+  padding: 0.75rem 0.75rem 0.75rem 1rem;
   display: flex;
   align-items: center;
 }
 
 .cat-icon {
-  width: 30px;
-  height: 30px;
-  border-radius: 8px;
+  width: 38px;
+  height: 38px;
+  border-radius: 9px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
+  font-size: 17px;
   flex-shrink: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
 }
 
 /* CAT INFO CELL */
 .cat-info-cell {
-  padding: 0.55rem 0.6rem;
+  padding: 0.75rem 0.75rem;
   flex: 1;
   min-width: 0;
 }
 
 .cat-name {
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 15.5px;
+  font-weight: 700;
   color: var(--text-primary);
-  margin-bottom: 1px;
+  margin-bottom: 3px;
   display: flex;
   align-items: center;
   gap: 8px;
+  letter-spacing: 0.01em;
 }
 
 .new-posts-badge {
@@ -744,9 +760,9 @@ a.hot-topic { text-decoration: none; }
 }
 
 .cat-description {
-  font-size: 12px;
-  color: var(--text-muted);
-  line-height: 1.35;
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.4;
   margin-bottom: 0;
   white-space: nowrap;
   overflow: hidden;
@@ -796,16 +812,20 @@ a.hot-topic { text-decoration: none; }
 }
 
 .cat-stat-num {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--wood-warm);
   line-height: 1;
+  letter-spacing: 0.01em;
 }
 
 .cat-stat-label {
-  font-size: 9px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   color: var(--text-muted);
-  margin-top: 1px;
+  margin-top: 3px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
