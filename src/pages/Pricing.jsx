@@ -9,7 +9,7 @@ import {
   A_LA_CARTE,
   formatPrice,
 } from '../lib/pricing.js';
-import { useCart } from '../context/CartContext.jsx';
+import { usePlanChanges } from '../context/PlanContext.jsx';
 
 /**
  * /pricing — public pricing page.
@@ -22,15 +22,16 @@ import { useCart } from '../context/CartContext.jsx';
  *   À la carte    → grid of icon tiles with one price each
  *   Sponsorships  → metallic medallion-style cards (silver/gold/platinum)
  *
- * All CTAs add to the cart instead of routing to /signup. The cart
- * keeps the user's selections so they can review everything before
- * confirming. Apply happens via apply_my_subscription RPC at /cart.
+ * CTAs stage subscription changes (not cart items). The user
+ * reviews them at /account/subscription and applies in one click.
+ * When Stripe is wired in, Apply will create a Checkout Session
+ * from the same staged-changes payload — no UX shifts needed.
  */
 export default function Pricing() {
   const [searchParams] = useSearchParams();
   const initial = searchParams.get('persona') === 'business' ? 'business' : 'individual';
   const [persona, setPersona] = useState(initial);
-  const cart = useCart();
+  const plan = usePlanChanges();
 
   return (
     <>
@@ -44,10 +45,10 @@ export default function Pricing() {
                 Flat monthly pricing. No per-listing fees, no per-application charges.
               </p>
             </div>
-            {cart.count > 0 && (
+            {plan.count > 0 && (
               <div className="header-right">
-                <Link to="/cart" className="pricing-cart-btn">
-                  Cart ({cart.count}) →
+                <Link to="/account/subscription" className="pricing-cart-btn">
+                  {plan.count} pending change{plan.count === 1 ? '' : 's'} →
                 </Link>
               </div>
             )}
@@ -184,45 +185,46 @@ function BusinessSection() {
 /* ══════════════════ Sub-components ══════════════════════ */
 
 /**
- * Reusable pill that flips between "Add to cart" and "Added ✓" plus a
- * "Review cart" jump. Used by every CTA on the page so the visual
- * language is consistent.
+ * Reusable CTA pill used across every card on the pricing page.
+ * Flips between three states: ready-to-stage, staged, and contact-sales.
+ * Routing target on review is always /account/subscription (the
+ * single management hub) — never a cart.
  */
-function CartCta({ added, onAdd, contactSales = false, addLabel = 'Add to cart' }) {
+function PlanCta({ staged, onStage, contactSales = false, label = 'Add to plan' }) {
   const navigate = useNavigate();
   if (contactSales) {
     return <a href="mailto:sales@grainhub.io" className="tier-cta">Contact sales</a>;
   }
-  if (added) {
+  if (staged) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
         <button type="button" className="tier-cta tier-cta-added" disabled>
-          Added ✓
+          Selected ✓
         </button>
         <button
           type="button"
           className="tier-cta-secondary"
-          onClick={() => navigate('/cart')}
+          onClick={() => navigate('/account/subscription')}
         >
-          Review cart →
+          Review in subscription →
         </button>
       </div>
     );
   }
   return (
-    <button type="button" className="tier-cta" onClick={onAdd}>
-      {addLabel}
+    <button type="button" className="tier-cta" onClick={onStage}>
+      {label}
     </button>
   );
 }
 
 /** Generic tier card — used by individuals only now. */
 function TierCard({ tier }) {
-  const cart = useCart();
-  const added = cart.has((i) => i.type === 'membership' && i.id === tier.id);
+  const plan = usePlanChanges();
+  const staged = plan.has((i) => i.type === 'membership' && i.id === tier.id);
 
-  const handleAdd = () => {
-    cart.addItem({ type: 'membership', id: tier.id });
+  const handleStage = () => {
+    plan.addChange({ type: 'membership', id: tier.id });
   };
 
   return (
@@ -237,10 +239,10 @@ function TierCard({ tier }) {
       <ul className="tier-features">
         {tier.features.map((f, i) => <li key={i}>{f}</li>)}
       </ul>
-      <CartCta
-        added={added}
-        onAdd={handleAdd}
-        addLabel={tier.priceMonthly === 0 ? 'Select Free' : 'Add ' + tier.name}
+      <PlanCta
+        staged={staged}
+        onStage={handleStage}
+        label={tier.priceMonthly === 0 ? 'Switch to Free' : 'Switch to ' + tier.name}
       />
     </div>
   );
@@ -249,12 +251,14 @@ function TierCard({ tier }) {
 /** Compact horizontal strip for the four business-membership levels.
  *  Much tighter than big cards — reads as a choose-your-baseline row. */
 function MembershipStrip({ tiers }) {
-  const cart = useCart();
+  const plan = usePlanChanges();
+  const navigate = useNavigate();
+
   return (
     <div className="mb-strip">
       {tiers.map((t, idx) => {
-        const added = cart.has((i) => i.type === 'membership' && i.id === t.id);
-        const handleAdd = () => cart.addItem({ type: 'membership', id: t.id });
+        const staged = plan.has((i) => i.type === 'membership' && i.id === t.id);
+        const handleStage = () => plan.addChange({ type: 'membership', id: t.id });
         return (
           <div
             key={t.id}
@@ -276,13 +280,17 @@ function MembershipStrip({ tiers }) {
             </ul>
             {t.priceMonthly === null ? (
               <a href="mailto:sales@grainhub.io" className="mb-cta">Contact sales</a>
-            ) : added ? (
-              <button type="button" className="mb-cta mb-cta-added" disabled>
-                Added ✓
+            ) : staged ? (
+              <button
+                type="button"
+                className="mb-cta mb-cta-added"
+                onClick={() => navigate('/account/subscription')}
+              >
+                Selected ✓
               </button>
             ) : (
-              <button type="button" className="mb-cta" onClick={handleAdd}>
-                {t.priceMonthly === 0 ? 'Select Free' : 'Add ' + t.name}
+              <button type="button" className="mb-cta" onClick={handleStage}>
+                {t.priceMonthly === 0 ? 'Switch to Free' : 'Switch to ' + t.name}
               </button>
             )}
           </div>
@@ -300,7 +308,7 @@ const PACK_VISUALS = {
 };
 
 function PackCard({ pack }) {
-  const cart = useCart();
+  const plan = usePlanChanges();
   const [tierId, setTierId] = useState(pack.tiers.find((t) => t.highlight)?.id || pack.tiers[0].id);
   const active = pack.tiers.find((t) => t.id === tierId) || pack.tiers[0];
   const visual = PACK_VISUALS[pack.id] || { icon: '✨', gradient: 'linear-gradient(135deg, #3A1A08, #6B3820)' };
@@ -310,15 +318,15 @@ function PackCard({ pack }) {
       ? 'Unlimited ' + pack.unitPlural
       : active.cap + ' ' + (active.cap === 1 ? pack.unit : pack.unitPlural);
 
-  const added = cart.has(
+  const staged = plan.has(
     (i) => i.type === 'pack' && i.id === pack.id && i.tierId === tierId,
   );
-  const otherTierAdded = cart.has(
+  const otherTierStaged = plan.has(
     (i) => i.type === 'pack' && i.id === pack.id && i.tierId !== tierId,
   );
 
-  const handleAdd = () => {
-    cart.addItem({ type: 'pack', id: pack.id, tierId });
+  const handleStage = () => {
+    plan.addChange({ type: 'pack', id: pack.id, tierId });
   };
 
   return (
@@ -358,11 +366,11 @@ function PackCard({ pack }) {
           {(active.extras || []).map((f, i) => <li key={'e' + i}>{f}</li>)}
         </ul>
 
-        <CartCta
-          added={added}
-          onAdd={handleAdd}
+        <PlanCta
+          staged={staged}
+          onStage={handleStage}
           contactSales={active.priceMonthly === null}
-          addLabel={(otherTierAdded ? 'Switch to ' : 'Add ') + active.name + ' tier'}
+          label={(otherTierStaged ? 'Switch to ' : 'Add ') + active.name + ' tier'}
         />
       </div>
     </div>
@@ -377,11 +385,11 @@ const SPONSOR_VISUALS = {
 };
 
 function SponsorMedallion({ tier }) {
-  const cart = useCart();
+  const plan = usePlanChanges();
   const v = SPONSOR_VISUALS[tier.id] || SPONSOR_VISUALS.silver;
-  const added = cart.has((i) => i.type === 'sponsor' && i.id === tier.id);
-  const otherAdded = cart.has((i) => i.type === 'sponsor' && i.id !== tier.id);
-  const handleAdd = () => cart.addItem({ type: 'sponsor', id: tier.id });
+  const staged = plan.has((i) => i.type === 'sponsor' && i.id === tier.id);
+  const otherStaged = plan.has((i) => i.type === 'sponsor' && i.id !== tier.id);
+  const handleStage = () => plan.addChange({ type: 'sponsor', id: tier.id });
   const label = tier.name.replace(' Sponsor', '');
 
   return (
@@ -398,10 +406,10 @@ function SponsorMedallion({ tier }) {
         <ul className="tier-features">
           {tier.features.map((f, i) => <li key={i}>{f}</li>)}
         </ul>
-        <CartCta
-          added={added}
-          onAdd={handleAdd}
-          addLabel={(otherAdded ? 'Switch to ' : 'Become ') + label}
+        <PlanCta
+          staged={staged}
+          onStage={handleStage}
+          label={(otherStaged ? 'Switch to ' : 'Become ') + label}
         />
       </div>
     </div>
@@ -410,10 +418,10 @@ function SponsorMedallion({ tier }) {
 
 /** Icon tile for à la carte items. */
 function ALaCarteTile({ item }) {
-  const cart = useCart();
-  const added = cart.has((i) => i.type === 'alacarte' && i.id === item.id);
+  const plan = usePlanChanges();
   const navigate = useNavigate();
-  const handleAdd = () => cart.addItem({ type: 'alacarte', id: item.id });
+  const staged = plan.has((i) => i.type === 'alacarte' && i.id === item.id);
+  const handleStage = () => plan.addChange({ type: 'alacarte', id: item.id });
 
   return (
     <div className="alacarte-tile">
@@ -425,17 +433,17 @@ function ALaCarteTile({ item }) {
       </div>
       <div className="alacarte-tagline">{item.tagline}</div>
       <div className="alacarte-desc">{item.description}</div>
-      {added ? (
+      {staged ? (
         <button
           type="button"
           className="alacarte-cta"
-          onClick={() => navigate('/cart')}
+          onClick={() => navigate('/account/subscription')}
         >
-          Added ✓ · Review cart
+          Selected ✓ · Review →
         </button>
       ) : (
-        <button type="button" className="alacarte-cta" onClick={handleAdd}>
-          Add to cart →
+        <button type="button" className="alacarte-cta" onClick={handleStage}>
+          Add to plan →
         </button>
       )}
     </div>

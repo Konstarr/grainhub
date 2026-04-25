@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { NavLink, Link, useNavigate } from 'react-router-dom';
 import Logo from './Logo.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
-import { useCart } from '../../context/CartContext.jsx';
+import { usePlanChanges } from '../../context/PlanContext.jsx';
 import { fetchUnreadCount } from '../../lib/messagingDb.js';
 
 const NAV_ITEMS = [
@@ -32,7 +32,7 @@ function initialsFromProfile(profile, user) {
 
 export default function Nav() {
   const { isAuthed, user, profile, signOut, isStaff, isAdmin } = useAuth();
-  const cart = useCart();
+  const plan = usePlanChanges();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
@@ -108,19 +108,6 @@ export default function Nav() {
           </svg>
           <input type="text" placeholder="Search GrainHub..." />
         </div>
-
-        {/* Cart — visible whenever the cart has items, for both signed-in
-            and signed-out users (signing up at checkout is allowed). */}
-        {cart.count > 0 && (
-          <Link to="/cart" className="nav-cart" aria-label={`Cart (${cart.count})`}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="9" cy="21" r="1" />
-              <circle cx="20" cy="21" r="1" />
-              <path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6" />
-            </svg>
-            <span className="nav-cart-badge">{cart.count}</span>
-          </Link>
-        )}
 
         {isAuthed ? (
           <div ref={menuRef} style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -229,7 +216,22 @@ export default function Nav() {
                   </span>
                 </MenuItem>
                 <MenuItem onClick={() => { setMenuOpen(false); navigate('/account/subscription'); }}>
-                  My subscription
+                  <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                    <span>Manage subscription</span>
+                    {plan.count > 0 && (
+                      <span style={{
+                        background: 'var(--wood-warm)',
+                        color: '#fff',
+                        borderRadius: 999,
+                        padding: '1px 7px',
+                        fontSize: 10.5,
+                        fontWeight: 700,
+                        lineHeight: 1.4,
+                      }}>
+                        {plan.count} pending
+                      </span>
+                    )}
+                  </span>
                 </MenuItem>
                 <MenuItem onClick={() => { setMenuOpen(false); navigate('/forums?view=my-posts'); }}>
                   My posts
