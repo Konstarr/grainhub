@@ -60,6 +60,27 @@ const ENCODED = [
   [108, 111, 108, 105],
   [115, 104, 111, 116, 97],
   [99, 112],
+  // Common profanity. Blocked because moderators flagged that
+  // titles like "bitch" were getting through and don't fit the
+  // tone of a professional trade community.
+  [98, 105, 116, 99, 104],                   // bitch
+  [98, 105, 116, 99, 104, 101, 115],         // bitches
+  [102, 117, 99, 107],                       // fuck
+  [102, 117, 99, 107, 105, 110, 103],        // fucking
+  [102, 117, 99, 107, 101, 114],             // fucker
+  [109, 111, 116, 104, 101, 114, 102, 117, 99, 107, 101, 114], // motherfucker
+  [115, 104, 105, 116],                      // shit
+  [98, 117, 108, 108, 115, 104, 105, 116],   // bullshit
+  [97, 115, 115, 104, 111, 108, 101],        // asshole
+  [100, 105, 99, 107, 104, 101, 97, 100],    // dickhead
+  [100, 111, 117, 99, 104, 101, 98, 97, 103],// douchebag
+  [112, 117, 115, 115, 121],                 // pussy
+  [119, 104, 111, 114, 101],                 // whore
+  [115, 108, 117, 116],                      // slut
+  [115, 108, 117, 116, 115],                 // sluts
+  [98, 97, 115, 116, 97, 114, 100],          // bastard
+  [112, 105, 115, 115],                      // piss
+  [112, 105, 115, 115, 101, 100],            // pissed
 ];
 
 const BLOCKLIST = ENCODED.map((codes) => String.fromCharCode(...codes));
