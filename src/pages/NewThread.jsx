@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import PageBack from '../components/shared/PageBack.jsx';
 import RichReplyBox from '../components/forums/RichReplyBox.jsx';
@@ -8,6 +8,7 @@ import { FORUM_GROUPS } from '../data/forumsData.js';
 import { createThread } from '../lib/forumDb.js';
 import { checkFields } from '../lib/wordFilter.js';
 import { logFilterViolation } from '../lib/forumAdminDb.js';
+import { listTopicsForCategory, setThreadTopic } from '../lib/forumTopicsDb.js';
 import '../styles/newThread.css';
 
 /**
@@ -26,12 +27,25 @@ export default function NewThread() {
   // Pre-select a category if one was passed via ?category=... from the
   // category page "Start a thread" button.
   const prefillCategory = searchParams.get('category') || '';
+  const prefillTopic = searchParams.get('topic') || '';
 
   const [title, setTitle] = useState('');
   const [categoryId, setCategoryId] = useState(prefillCategory);
+  const [topicId, setTopicId] = useState(prefillTopic);
+  const [topicOptions, setTopicOptions] = useState([]);
   const [body, setBody] = useState('');
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    if (!categoryId) { setTopicOptions([]); return; }
+    (async () => {
+      const { data } = await listTopicsForCategory(categoryId);
+      if (!cancelled) setTopicOptions(data || []);
+    })();
+    return () => { cancelled = true; };
+  }, [categoryId]);
 
   const categoryOptions = useMemo(() => {
     const opts = [];
@@ -68,16 +82,19 @@ export default function NewThread() {
       title,
       body,
     });
-    setBusy(false);
     if (error || !data?.thread) {
+      setBusy(false);
       const msg = error?.message || 'Could not create thread';
       setErr(msg);
-      // Server-side filter / rate-limit rejections are logged here.
       if (/blocked_language/i.test(msg)) {
         logFilterViolation('thread', `${title}\n\n${body}`).catch(() => {});
       }
       return;
     }
+    if (topicId) {
+      await setThreadTopic(data.thread.id, topicId).catch(() => null);
+    }
+    setBusy(false);
     navigate('/forums/thread/' + data.thread.slug);
   };
 
@@ -164,7 +181,7 @@ export default function NewThread() {
             <select
               className="nt-select"
               value={categoryId}
-              onChange={(e) => setCategoryId(e.target.value)}
+              onChange={(e) => { setCategoryId(e.target.value); setTopicId(''); }}
             >
               <option value="">Pick a category…</option>
               {FORUM_GROUPS.map((g) => (
@@ -178,6 +195,27 @@ export default function NewThread() {
               ))}
             </select>
           </label>
+
+          {topicOptions.length > 0 && (
+            <label className="nt-field">
+              <span className="nt-label">Topic <span style={{ fontWeight: 400, color: 'var(--text-muted)' }}>(optional)</span></span>
+              <select
+                className="nt-select"
+                value={topicId}
+                onChange={(e) => setTopicId(e.target.value)}
+              >
+                <option value="">No specific topic</option>
+                {topicOptions.map((t) => (
+                  <option key={t.id} value={t.id}>
+                    {t.icon ? t.icon + ' ' : ''}{t.name}{t.is_official ? ' ✓' : ''}
+                  </option>
+                ))}
+              </select>
+              <span className="nt-hint">
+                File this thread under a specific product or vendor topic so the right people see it.
+              </span>
+            </label>
+          )}
 
           <div className="nt-field">
             <span className="nt-label">Body</span>

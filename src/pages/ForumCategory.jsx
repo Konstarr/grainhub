@@ -5,6 +5,7 @@ import '../styles/forums.css';
 import PageBack from '../components/shared/PageBack.jsx';
 import RecentActivity from '../components/forums/RecentActivity.jsx';
 import ForumSearchBar from '../components/forums/ForumSearchBar.jsx';
+import { listTopicsForCategory } from '../lib/forumTopicsDb.js';
 import { supabase } from '../lib/supabase.js';
 import { mapThreadRow } from '../lib/mappers.js';
 import { FORUM_GROUPS } from '../data/forumsData.js';
@@ -71,6 +72,17 @@ export default function ForumCategory() {
   const { id } = useParams();
   const [threadRows, setThreadRows] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [topics, setTopics] = useState([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    if (!id) return;
+    (async () => {
+      const { data } = await listTopicsForCategory(id);
+      if (!cancelled) setTopics(data || []);
+    })();
+    return () => { cancelled = true; };
+  }, [id]);
 
   useEffect(() => {
     let cancelled = false;
@@ -138,6 +150,24 @@ export default function ForumCategory() {
                 {categoryDesc}
               </p>
             )}
+            {topics.length > 0 && (
+              <div className="cat-topics">
+                <span className="cat-topics-label">Topics:</span>
+                {topics.map((t) => (
+                  <Link
+                    key={t.id}
+                    to={`/forums/category/${id}/${t.slug}`}
+                    className={'cat-topic-chip ' + (t.is_official ? 'is-official' : '')}
+                    title={t.description || t.name}
+                  >
+                    {t.icon && <span aria-hidden="true">{t.icon}</span>}
+                    <span>{t.name}</span>
+                    {t.is_official && <span className="cat-topic-official" title="Official topic">✓</span>}
+                  </Link>
+                ))}
+              </div>
+            )}
+
             <div className="cat-actionbar">
               <div className="cat-actionbar-chips">
                 <Link

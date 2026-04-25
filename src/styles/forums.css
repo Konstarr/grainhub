@@ -156,6 +156,121 @@
 }
 .fsb-see-all:hover { background: #F2E5C7; }
 
+/* Topic chip row inside the category header */
+.cat-topics {
+  margin-top: 0.85rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+.cat-topics-label {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-right: 4px;
+}
+.cat-topic-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: var(--white);
+  border: 1px solid var(--border);
+  text-decoration: none;
+  transition: border-color 0.12s, color 0.12s, background 0.12s;
+}
+.cat-topic-chip:hover {
+  border-color: var(--wood-warm);
+  color: var(--wood-warm);
+}
+.cat-topic-chip.is-official {
+  background: linear-gradient(135deg, #FBF5DD, #F4E5B0);
+  border-color: #DABE6A;
+  color: #6B4F18;
+}
+.cat-topic-chip.is-official:hover {
+  border-color: #B89638;
+  color: #6B4F18;
+}
+.cat-topic-official {
+  color: #16A34A;
+  font-weight: 800;
+}
+
+/* Topic page header */
+.topic-header {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+.topic-header-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #FBF5DD, #F4E5B0);
+  border: 1px solid #E2C879;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  flex-shrink: 0;
+}
+.topic-header-body { flex: 1; min-width: 0; }
+.topic-header-eyebrow {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--wood-warm);
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.topic-official-pill {
+  background: #16A34A;
+  color: #fff;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 9.5px;
+  letter-spacing: 0.08em;
+}
+.topic-header-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.15;
+}
+.topic-header-desc {
+  margin: 6px 0 0;
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+.topic-header-owner {
+  margin-top: 8px;
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+.topic-header-owner strong { color: var(--wood-warm); }
+
 /* Category page action bar — chips on the left, search on the right */
 .cat-actionbar {
   margin-top: 1rem;
