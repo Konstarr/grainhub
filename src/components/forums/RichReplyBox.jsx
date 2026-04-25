@@ -248,8 +248,9 @@ export default function RichReplyBox({
             style={{
               ...TOOLBAR_BTN,
               fontWeight: mode === 'write' ? 700 : 500,
-              color: mode === 'write' ? 'var(--text-primary)' : 'var(--text-muted)',
-              borderBottom: mode === 'write' ? '2px solid var(--wood-warm)' : '2px solid transparent',
+              // Light tones to contrast with the dark-brown header bg.
+              color: mode === 'write' ? '#fff' : 'rgba(245, 234, 214, 0.65)',
+              borderBottom: mode === 'write' ? '2px solid var(--wood-cream)' : '2px solid transparent',
               borderRadius: 0,
             }}
           >
@@ -261,8 +262,8 @@ export default function RichReplyBox({
             style={{
               ...TOOLBAR_BTN,
               fontWeight: mode === 'preview' ? 700 : 500,
-              color: mode === 'preview' ? 'var(--text-primary)' : 'var(--text-muted)',
-              borderBottom: mode === 'preview' ? '2px solid var(--wood-warm)' : '2px solid transparent',
+              color: mode === 'preview' ? '#fff' : 'rgba(245, 234, 214, 0.65)',
+              borderBottom: mode === 'preview' ? '2px solid var(--wood-cream)' : '2px solid transparent',
               borderRadius: 0,
             }}
           >
