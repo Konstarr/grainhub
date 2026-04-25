@@ -49,7 +49,7 @@ export default function AdminForumReputation() {
     setBusy(true); setErr(null); setOkMsg(null);
 
     // Validate everything is a non-negative integer first
-    for (const [k, v] of Object.entries(vals)) {
+    for (const v of Object.values(vals)) {
       const n = parseInt(v, 10);
       if (!Number.isFinite(n) || n < 0 || n > 1_000_000) {
         setBusy(false);
