@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { markCategoryVisited } from '../lib/forumLastVisit.js';
 import '../styles/forums.css';
 import PageBack from '../components/shared/PageBack.jsx';
 import RecentActivity from '../components/forums/RecentActivity.jsx';
@@ -80,6 +81,11 @@ export default function ForumCategory() {
       if (error || !data) setThreadRows([]);
       else setThreadRows(data);
       setLoading(false);
+      // Stamp this category's last-visited timestamp so the "X new"
+      // badge on /forums clears when the user goes back. We do this
+      // here (after the page has rendered) rather than at navigation
+      // so the user has actually had a chance to see the new threads.
+      markCategoryVisited(id);
     })();
     return () => { cancelled = true; };
   }, [id]);
