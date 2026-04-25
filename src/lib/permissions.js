@@ -215,10 +215,3 @@ export async function loadPlan(supabase, profileId) {
     packs: data.packs || {},
   };
 }
-e,
-      membership_tier: data.membership_tier,
-      sponsor_tier: data.sponsor_tier,
-    },
-    packs: data.packs || {},
-  };
-}
