@@ -5,7 +5,9 @@
 
 /* PAGE LAYOUT */
 .ft-wrap {
-  max-width: 1380px;
+  /* Bumped from 1380 to 1440 so the wider author column doesn't
+     squeeze the post body. Center column stays the same width. */
+  max-width: 1440px;
   margin: 0 auto;
   padding: 2rem 2.5rem;
   display: grid;
@@ -171,9 +173,12 @@
 
 /* USER COLUMN */
 .user-col {
-  width: 120px;
+  /* Wider than before (120 → 170) so Join Date / Location aren't
+     truncated. The .ft-wrap max-width grew by 60 to absorb this
+     without shrinking the post body. */
+  width: 170px;
   flex-shrink: 0;
-  padding: 1.5rem 0.85rem;
+  padding: 1.5rem 1rem;
   border-right: 1px solid var(--border-light);
   display: flex;
   flex-direction: column;
@@ -233,7 +238,8 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  max-width: 70px;
+  /* Wider to fit "Apr 2025" / "Seattle, WA" without truncation. */
+  max-width: 110px;
 }
 
 /* Five-segment reputation bar with the numeric value at the right. */
