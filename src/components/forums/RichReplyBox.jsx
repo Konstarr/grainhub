@@ -30,6 +30,12 @@ function ToolbarButton({ title, onClick, children, disabled }) {
       type="button"
       title={title}
       onClick={onClick}
+      // Prevent the textarea from losing focus / clearing its
+      // selection when the user clicks a toolbar button. Without
+      // this, the wrap() helpers see selectionStart=selectionEnd=0
+      // because focus moves to the button before our click handler
+      // runs.
+      onMouseDown={(e) => e.preventDefault()}
       disabled={disabled}
       style={TOOLBAR_BTN}
       onMouseEnter={(e) => { if (!disabled) e.currentTarget.style.background = 'var(--wood-cream, #f5ead6)'; }}
