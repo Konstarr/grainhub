@@ -715,11 +715,11 @@
 .fs-item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 7px 12px;
+  gap: 9px;
+  padding: 6px 11px;
   margin: 1px 4px;
   border-radius: 8px;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
   color: var(--text-primary);
   text-decoration: none;
@@ -827,7 +827,7 @@
   border: 0;
   background: transparent;
   font-family: inherit;
-  font-size: 11.5px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.2px;
   color: var(--text-secondary);
@@ -1598,6 +1598,7 @@ a.hot-topic { text-decoration: none; }
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
+  font-size: 12px;
 }
 
 .rs-card {
@@ -1609,14 +1610,16 @@ a.hot-topic { text-decoration: none; }
 
 .rs-header {
   background: var(--wood-dark);
-  padding: 0.75rem 1.25rem;
+  padding: 0.65rem 1.1rem;
   font-family: 'Montserrat', sans-serif;
-  font-size: 15px;
+  font-size: 13px;
+  font-weight: 700;
   color: var(--wood-cream);
 }
 
 .rs-body {
-  padding: 1rem 1.25rem;
+  padding: 0.85rem 1.1rem;
+  font-size: 12px;
 }
 
 /* TOP CONTRIBUTORS */
