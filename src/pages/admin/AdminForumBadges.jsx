@@ -17,12 +17,25 @@ const METRIC_OPTIONS = [
 
 const TIER_OPTIONS = ['bronze', 'silver', 'gold', 'platinum'];
 
+/**
+ * Two conceptual buckets the admin page groups by:
+ *   level    — community standing tier from overall reputation
+ *              (Newcomer, Trusted, Respected…). One per user.
+ *   accolade — recognition on specific content (Liked, Helpful,
+ *              Authority…). Stackable, users can hold many.
+ */
+const KIND_OPTIONS = [
+  { value: 'level',    label: 'Level',    desc: 'Community standing tier (one at a time).' },
+  { value: 'accolade', label: 'Accolade', desc: 'Recognition for content (stackable).' },
+];
+
 const EMPTY = {
   id: '',
   name: '',
   description: '',
   icon: '🏷',
   tier: 'bronze',
+  kind: 'accolade',
   metric_type: 'reputation',
   threshold: 100,
   order: 50,
@@ -105,8 +118,11 @@ export default function AdminForumBadges() {
 
       {editing && (
         <BadgeForm
+          // Re-mount the form whenever a different row is selected so
+          // its internal state doesn't carry over from the previous edit.
+          key={editing.id || '__new__'}
           badge={editing}
-          isNew={!rows.find((r) => r.id === editing.id)}
+          isNew={!editing.id || !rows.find((r) => r.id === editing.id)}
           busy={busy}
           onSave={handleSave}
           onCancel={() => setEditing(null)}
@@ -125,6 +141,56 @@ export default function AdminForumBadges() {
           borderRadius: 10,
         }}>
           No badges yet. Click "+ New badge" to create one.
+        </div>
+      ) : (
+        <>
+          <BadgeGroup
+            heading="Levels"
+            blurb="Community standing tiers from overall reputation. Shown as a user's primary badge."
+            rows={rows.filter((r) => (r.kind || 'accolade') === 'level')}
+            onEdit={setEditing}
+            onDelete={handleDelete}
+          />
+          <BadgeGroup
+            heading="Accolades"
+            blurb="Recognition for content. Stackable — users collect these alongside their level."
+            rows={rows.filter((r) => (r.kind || 'accolade') !== 'level')}
+            onEdit={setEditing}
+            onDelete={handleDelete}
+          />
+        </>
+      )}
+    </AdminLayout>
+  );
+}
+
+function BadgeGroup({ heading, blurb, rows, onEdit, onDelete }) {
+  return (
+    <section style={{ marginBottom: '1.5rem' }}>
+      <div style={{ marginBottom: '0.5rem' }}>
+        <div style={{
+          fontFamily: 'Montserrat, sans-serif',
+          fontWeight: 700,
+          fontSize: 14,
+          letterSpacing: 1.2,
+          textTransform: 'uppercase',
+          color: 'var(--text-primary)',
+        }}>
+          {heading} <span style={{ color: 'var(--text-muted)', fontWeight: 500 }}>· {rows.length}</span>
+        </div>
+        <div style={{ fontSize: 12.5, color: 'var(--text-muted)', marginTop: 2 }}>{blurb}</div>
+      </div>
+      {rows.length === 0 ? (
+        <div style={{
+          padding: '1.25rem',
+          textAlign: 'center',
+          color: 'var(--text-muted)',
+          background: 'var(--white)',
+          border: '1px dashed var(--border)',
+          borderRadius: 10,
+          fontSize: 13,
+        }}>
+          None yet. Click "+ New badge" and pick "{heading.replace(/s$/, '')}" as the kind.
         </div>
       ) : (
         <div style={{
@@ -177,8 +243,8 @@ export default function AdminForumBadges() {
                     }
                   </td>
                   <td style={td}>
-                    <button type="button" onClick={() => setEditing(r)} style={btn}>Edit</button>
-                    <button type="button" onClick={() => handleDelete(r.id)} style={{ ...btn, ...btnDanger }}>Delete</button>
+                    <button type="button" onClick={() => onEdit(r)} style={btn}>Edit</button>
+                    <button type="button" onClick={() => onDelete(r.id)} style={{ ...btn, ...btnDanger }}>Delete</button>
                   </td>
                 </tr>
               ))}
@@ -186,7 +252,7 @@ export default function AdminForumBadges() {
           </table>
         </div>
       )}
-    </AdminLayout>
+    </section>
   );
 }
 
@@ -249,6 +315,11 @@ function BadgeForm({ badge, isNew, busy, onSave, onCancel }) {
             required
           />
         </Field>
+        <Field label="Kind">
+          <select value={form.kind || 'accolade'} onChange={set('kind')} style={inputStyle} disabled={busy}>
+            {KIND_OPTIONS.map((k) => <option key={k.value} value={k.value}>{k.label}</option>)}
+          </select>
+        </Field>
         <Field label="Tier">
           <select value={form.tier} onChange={set('tier')} style={inputStyle} disabled={busy}>
             {TIER_OPTIONS.map((t) => <option key={t} value={t}>{t}</option>)}
@@ -265,6 +336,10 @@ function BadgeForm({ badge, isNew, busy, onSave, onCancel }) {
             disabled={busy}
           />
         </Field>
+      </div>
+
+      <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: -4, marginBottom: 4 }}>
+        {KIND_OPTIONS.find((k) => k.value === (form.kind || 'accolade'))?.desc}
       </div>
 
       <Field label="Description" full>

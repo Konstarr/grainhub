@@ -288,7 +288,7 @@ export async function logFilterViolation(targetType, attemptedText) {
 export async function listBadges() {
   const { data, error } = await supabase
     .from('badges')
-    .select('id, name, description, icon, tier, metric_type, threshold, "order"')
+    .select('id, name, description, icon, tier, kind, metric_type, threshold, "order"')
     .order('"order"', { ascending: true });
   return { data: data || [], error };
 }
@@ -307,6 +307,7 @@ export async function upsertBadge(badge) {
     description: badge.description || '',
     icon:        badge.icon || '🏷',
     tier:        badge.tier || 'bronze',
+    kind:        badge.kind || 'accolade',
     metric_type: badge.metric_type || null,
     threshold:   badge.threshold == null || badge.threshold === '' ? null : Number(badge.threshold),
     order:       badge.order == null ? 99 : Number(badge.order),
