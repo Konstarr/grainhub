@@ -47,6 +47,9 @@ const AdminUsers            = lazy(() => import('./pages/admin/AdminUsers.jsx'))
 const AdminUserEdit         = lazy(() => import('./pages/admin/AdminUserEdit.jsx'));
 const AdminSponsors         = lazy(() => import('./pages/admin/AdminSponsors.jsx'));
 const AdminConnections      = lazy(() => import('./pages/admin/AdminConnections.jsx'));
+const AdminForums           = lazy(() => import('./pages/admin/AdminForums.jsx'));
+const AdminForumThreads     = lazy(() => import('./pages/admin/AdminForumThreads.jsx'));
+const AdminForumReports     = lazy(() => import('./pages/admin/AdminForumReports.jsx'));
 
 const AdminFallback = (
   <div style={{
@@ -89,6 +92,9 @@ export default function App() {
         <Route path="/admin/users/:id"        element={adminRoute('admin', AdminUserEdit)} />
         <Route path="/admin/sponsors"         element={adminRoute('admin', AdminSponsors)} />
         <Route path="/admin/connections"      element={adminRoute('admin', AdminConnections)} />
+        <Route path="/admin/forums"           element={adminRoute('mod',   AdminForums)} />
+        <Route path="/admin/forums/threads"   element={adminRoute('mod',   AdminForumThreads)} />
+        <Route path="/admin/forums/reports"   element={adminRoute('mod',   AdminForumReports)} />
 
         <Route element={<Layout />}>
           <Route path="/" element={<Home />} />
@@ -124,7 +130,6 @@ export default function App() {
 
           <Route path="/news/article/:slug" element={<RequireAuth><NewsArticle /></RequireAuth>} />
           <Route path="/news/article" element={<RequireAuth><NewsArticle /></RequireAuth>} />
-
           <Route path="/marketplace/listing/:slug" element={<RequireAuth><Listing /></RequireAuth>} />
           <Route path="/marketplace/listing" element={<RequireAuth><Listing /></RequireAuth>} />
 

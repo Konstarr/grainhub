@@ -24,8 +24,9 @@ export const ADMIN_SECTIONS = [
   {
     group: 'Community',
     items: [
-      { to: '/admin/forums',      label: 'Forum mod.',  icon: <IconShield />,  enabled: false },
-      { to: '/admin/reports',     label: 'Reports',     icon: <IconFlag />,    enabled: false },
+      { to: '/admin/forums',          label: 'Forum mod.',     icon: <IconShield />,  enabled: true  },
+      { to: '/admin/forums/threads',  label: 'Threads',        icon: <IconShield />,  enabled: true  },
+      { to: '/admin/forums/reports',  label: 'Forum reports',  icon: <IconFlag />,    enabled: true  },
       { to: '/admin/users',       label: 'Users',       icon: <IconUsers />,   enabled: true  },
       { to: '/admin/connections', label: 'Connections', icon: <IconLink />,    enabled: true  },
     ],
