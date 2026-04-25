@@ -7,6 +7,8 @@ import ReportModal from '../components/shared/ReportModal.jsx';
 import RichReplyBox from '../components/forums/RichReplyBox.jsx';
 import ThreadModToolbar from '../components/forums/ThreadModToolbar.jsx';
 import EditablePostBody from '../components/forums/EditablePostBody.jsx';
+import { checkText } from '../lib/wordFilter.js';
+import { logFilterViolation } from '../lib/forumAdminDb.js';
 import { recordForumRecent } from '../components/forums/ForumsLeftSidebar.jsx';
 import { SponsorSidebar } from '../components/sponsors/AdSlot.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
@@ -382,6 +384,13 @@ export default function ForumThread() {
   const handleSubmitReply = async () => {
     if (!isAuthed || !thread) return;
     if (!replyBody.trim()) return;
+    // Client-side word-filter gate. Logs the attempt to filter_violations.
+    if (!checkText(replyBody).ok) {
+      // eslint-disable-next-line no-alert
+      alert('Your reply contains language we don\'t allow on GrainHub. Please remove it and try again.');
+      logFilterViolation('post', replyBody).catch(() => {});
+      return;
+    }
     setReplyBusy(true);
     const { data, error } = await createPost({
       threadId: thread.id,
@@ -391,7 +400,13 @@ export default function ForumThread() {
     });
     setReplyBusy(false);
     if (error || !data) {
-      alert('Could not post reply: ' + (error?.message || 'unknown error'));
+      const msg = error?.message || 'unknown error';
+      // Server-side trigger rejection — log the attempt for the mod log.
+      if (/blocked_language/i.test(msg)) {
+        logFilterViolation('post', replyBody).catch(() => {});
+      }
+      // eslint-disable-next-line no-alert
+      alert('Could not post reply: ' + msg);
       return;
     }
     setPosts((ps) => [...ps, data]);
