@@ -213,7 +213,7 @@ function PostCard({ post, index, isOp, isAccepted, hasUpvoted, onUpvote, onQuote
               </button>
             )}
             <div className="post-footer-spacer" />
-            <span className="post-report" onClick={onReport}>⚑ Report</span>
+            <button type="button" className="post-report" onClick={onReport}>⚑ Report</button>
           </div>
         </div>
       </div>
