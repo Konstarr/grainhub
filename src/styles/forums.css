@@ -3,6 +3,11 @@
    Extracted from grainhub-forums.html reference
    ────────────────────────────────────────────────────────── */
 
+/* Forum search wrapper — anchors the dropdown beneath the bar */
+.fsb-wrap { position: relative; }
+.fsb-wrap-md { width: auto; }
+.fsb-wrap-lg { width: 100%; }
+
 /* Forum search bar (reusable across forum surfaces) */
 .fsb {
   display: flex;
@@ -54,6 +59,102 @@
 .fsb-lg .fsb-icon { font-size: 16px; }
 .fsb-lg .fsb-input { font-size: 15px; padding: 9px 4px; }
 .fsb-lg .fsb-submit { padding: 9px 18px; font-size: 13.5px; }
+
+/* Typeahead dropdown */
+.fsb-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 10px 32px rgba(44, 26, 14, 0.12);
+  z-index: 80;
+  overflow: hidden;
+  max-height: 420px;
+  overflow-y: auto;
+}
+.fsb-empty {
+  padding: 14px 16px;
+  font-size: 13px;
+  color: var(--text-muted);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+.fsb-empty-cta {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: var(--wood-warm);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.fsb-hit {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--border-light);
+  padding: 10px 14px;
+  cursor: pointer;
+  font-family: 'Montserrat', sans-serif;
+  transition: background 0.1s;
+}
+.fsb-hit:last-of-type { border-bottom: 0; }
+.fsb-hit:hover,
+.fsb-hit-active {
+  background: var(--wood-cream, #FBF6EC);
+}
+.fsb-hit-title {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.35;
+  margin-bottom: 3px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.fsb-hit-meta {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  font-size: 11.5px;
+  color: var(--text-muted);
+  flex-wrap: wrap;
+}
+.fsb-hit-cat {
+  background: #EDE0C4;
+  color: #6B3F1F;
+  padding: 1px 7px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.fsb-see-all {
+  display: block;
+  width: 100%;
+  text-align: center;
+  background: var(--wood-cream, #FBF6EC);
+  border: 0;
+  border-top: 1px solid var(--border-light);
+  padding: 9px 14px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--wood-warm);
+  cursor: pointer;
+  letter-spacing: 0.02em;
+}
+.fsb-see-all:hover { background: #F2E5C7; }
 
 /* Category page action bar — chips on the left, search on the right */
 .cat-actionbar {
