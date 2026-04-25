@@ -221,6 +221,68 @@ export async function removeBlockedWord(id) {
   return { error };
 }
 
+/* ── Forum settings (rate limits) ──────────────────────── */
+
+export async function fetchForumSettings() {
+  const { data, error } = await supabase
+    .from('forum_settings')
+    .select('key, value, updated_at');
+  if (error) return { data: {}, error };
+  const map = {};
+  (data || []).forEach((r) => { map[r.key] = r.value; });
+  return { data: map, error: null };
+}
+
+export async function updateForumSetting(key, value) {
+  const { error } = await supabase.rpc('update_forum_setting', {
+    key_in: key,
+    value_in: String(value),
+  });
+  return { error };
+}
+
+/* ── Moderation log + filter violations ────────────────── */
+
+export async function listModerationLog({ limit = 100, action = null } = {}) {
+  let q = supabase
+    .from('moderation_log')
+    .select(
+      'id, action, target_type, target_id, summary, details, created_at, ' +
+      'actor:actor_id (id, username, full_name, avatar_url)',
+    )
+    .order('created_at', { ascending: false })
+    .limit(limit);
+  if (action) q = q.eq('action', action);
+  const { data, error } = await q;
+  return { data: data || [], error };
+}
+
+export async function listFilterViolations({ limit = 100 } = {}) {
+  const { data, error } = await supabase
+    .from('filter_violations')
+    .select(
+      'id, target_type, attempted_text, matched_word, created_at, ' +
+      'user:user_id (id, username, full_name, avatar_url)',
+    )
+    .order('created_at', { ascending: false })
+    .limit(limit);
+  return { data: data || [], error };
+}
+
+/**
+ * Called from public submit handlers when the server returns a
+ * "blocked_language" error so admins can see what was attempted.
+ * Fire-and-forget — failures here shouldn't surface to the user.
+ */
+export async function logFilterViolation(targetType, attemptedText) {
+  if (!attemptedText || !attemptedText.trim()) return;
+  const { error } = await supabase.rpc('log_filter_violation', {
+    target_type_in: targetType,
+    attempted_text_in: attemptedText,
+  });
+  return { error };
+}
+
 /* ── Forum-wide stats (for dashboard landing) ─────────── */
 
 /**

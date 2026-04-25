@@ -5,6 +5,8 @@ import {
   listBlockedWords,
   addBlockedWord,
   removeBlockedWord,
+  fetchForumSettings,
+  updateForumSetting,
 } from '../../lib/forumAdminDb.js';
 
 /**
@@ -222,8 +224,48 @@ function WordGroup({ label, rows, onRemove, busy }) {
 }
 
 function RateLimitCard() {
+  const [threads, setThreads] = useState('');
+  const [posts, setPosts]     = useState('');
+  const [busy, setBusy]       = useState(false);
+  const [saved, setSaved]     = useState(null);
+  const [err, setErr]         = useState(null);
+
+  useEffect(() => {
+    (async () => {
+      const { data } = await fetchForumSettings();
+      setThreads(data.thread_rate_limit_per_hour || '2');
+      setPosts(data.post_rate_limit_per_hour || '30');
+    })();
+  }, []);
+
+  const handleSave = async (e) => {
+    e.preventDefault();
+    setBusy(true); setErr(null); setSaved(null);
+    const t = parseInt(threads, 10);
+    const p = parseInt(posts, 10);
+    if (!Number.isFinite(t) || t < 1 || t > 1000) {
+      setBusy(false);
+      setErr('Threads/hour must be 1–1000.');
+      return;
+    }
+    if (!Number.isFinite(p) || p < 1 || p > 10000) {
+      setBusy(false);
+      setErr('Posts/hour must be 1–10000.');
+      return;
+    }
+    const r1 = await updateForumSetting('thread_rate_limit_per_hour', t);
+    const r2 = await updateForumSetting('post_rate_limit_per_hour', p);
+    setBusy(false);
+    if (r1.error || r2.error) {
+      setErr((r1.error || r2.error).message || 'Save failed.');
+      return;
+    }
+    setSaved('Saved.');
+    setTimeout(() => setSaved(null), 2500);
+  };
+
   return (
-    <div style={{
+    <form onSubmit={handleSave} style={{
       background: '#FDF6E8',
       border: '1px solid #E5C77A',
       borderRadius: 10,
@@ -234,20 +276,56 @@ function RateLimitCard() {
       lineHeight: 1.55,
     }}>
       <strong style={{ color: 'var(--text-primary)', fontFamily: 'Montserrat, sans-serif' }}>
-        Current rate limits
+        Rate limits
       </strong>
-      <ul style={{ margin: '6px 0 0', paddingLeft: '1.2rem' }}>
-        <li>Threads: <strong>2 per author per hour</strong></li>
-        <li>Replies: <strong>30 per author per hour</strong></li>
-        <li>Staff (moderator / admin / owner) bypass both</li>
-      </ul>
-      <div style={{ marginTop: 6, fontSize: 11.5, color: 'var(--text-muted)' }}>
-        To change, edit the constants in{' '}
-        <code style={{ background: '#fff', padding: '1px 6px', borderRadius: 4 }}>
-          supabase/migration-forum-moderation.sql
-        </code>{' '}
-        and re-run the migration.
+      <div style={{ display: 'flex', gap: 12, marginTop: 8, flexWrap: 'wrap', alignItems: 'flex-end' }}>
+        <label style={{ display: 'flex', flexDirection: 'column', gap: 4, fontSize: 12 }}>
+          <span>Threads / author / hour</span>
+          <input
+            type="number"
+            min="1"
+            max="1000"
+            value={threads}
+            onChange={(e) => setThreads(e.target.value)}
+            style={inputStyle}
+          />
+        </label>
+        <label style={{ display: 'flex', flexDirection: 'column', gap: 4, fontSize: 12 }}>
+          <span>Replies / author / hour</span>
+          <input
+            type="number"
+            min="1"
+            max="10000"
+            value={posts}
+            onChange={(e) => setPosts(e.target.value)}
+            style={inputStyle}
+          />
+        </label>
+        <button
+          type="submit"
+          className="cart-btn primary"
+          disabled={busy}
+          style={{ padding: '0.5rem 1rem', fontSize: 13 }}
+        >
+          {busy ? 'Saving…' : 'Save limits'}
+        </button>
+        {saved && <span style={{ color: '#2D5016', fontSize: 12 }}>{saved}</span>}
+        {err && <span style={{ color: '#991b1b', fontSize: 12 }}>{err}</span>}
       </div>
-    </div>
+      <div style={{ marginTop: 6, fontSize: 11.5, color: 'var(--text-muted)' }}>
+        Staff (moderator / admin / owner) bypass both limits. Changes
+        apply immediately to the next post — no migration needed.
+      </div>
+    </form>
   );
 }
+
+const inputStyle = {
+  width: 110,
+  padding: '0.45rem 0.65rem',
+  border: '1px solid var(--border)',
+  borderRadius: 6,
+  fontSize: 13.5,
+  fontFamily: 'inherit',
+  background: 'var(--white)',
+};

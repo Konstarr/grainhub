@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 import { FORUM_GROUPS } from '../data/forumsData.js';
 import { createThread } from '../lib/forumDb.js';
 import { checkFields } from '../lib/wordFilter.js';
+import { logFilterViolation } from '../lib/forumAdminDb.js';
 import '../styles/newThread.css';
 
 /**
@@ -54,6 +55,8 @@ export default function NewThread() {
     const filterResult = checkFields([title, body]);
     if (!filterResult.ok) {
       setErr('Your thread contains language we don\'t allow on GrainHub. Please remove it and try again.');
+      // Log fire-and-forget so admins see it in /admin/forums/log
+      logFilterViolation('thread', `${title}\n\n${body}`).catch(() => {});
       return;
     }
     setBusy(true);
@@ -66,7 +69,12 @@ export default function NewThread() {
     });
     setBusy(false);
     if (error || !data?.thread) {
-      setErr(error?.message || 'Could not create thread');
+      const msg = error?.message || 'Could not create thread';
+      setErr(msg);
+      // Server-side filter / rate-limit rejections are logged here.
+      if (/blocked_language/i.test(msg)) {
+        logFilterViolation('thread', `${title}\n\n${body}`).catch(() => {});
+      }
       return;
     }
     navigate('/forums/thread/' + data.thread.slug);

@@ -28,6 +28,7 @@ export const ADMIN_SECTIONS = [
       { to: '/admin/forums/threads',  label: 'Threads',        icon: <IconShield />,  enabled: true  },
       { to: '/admin/forums/reports',  label: 'Forum reports',  icon: <IconFlag />,    enabled: true  },
       { to: '/admin/forums/words',    label: 'Blocked words',  icon: <IconShield />,  enabled: true  },
+      { to: '/admin/forums/log',      label: 'Mod log',        icon: <IconFlag />,    enabled: true  },
       { to: '/admin/users',       label: 'Users',       icon: <IconUsers />,   enabled: true  },
       { to: '/admin/connections', label: 'Connections', icon: <IconLink />,    enabled: true  },
     ],
