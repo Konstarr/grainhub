@@ -96,6 +96,87 @@
   font-weight: 500;
 }
 
+/* ----- Featured (top of right rail, platinum tier) -----
+   Compact card sized to roughly match the height of the
+   OnlineUsersStrip on the main column so the two top rows
+   line up visually. */
+.ad-wrap-featured {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+}
+.ad-wrap-featured .ad-label {
+  color: #8B6914;
+  font-weight: 800;
+}
+.ad-featured {
+  min-height: 64px;
+  max-height: 96px;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #E2C879 !important;
+  background: linear-gradient(135deg, #FBF5DD, #F4E5B0) !important;
+  padding: 0 !important;
+}
+.ad-featured img {
+  max-height: 96px;
+  width: 100%;
+  object-fit: contain;
+  padding: 6px 10px;
+  background: #FFFDF6;
+}
+.ad-featured-empty {
+  flex-direction: column;
+  text-align: center;
+  padding: 14px 16px !important;
+}
+
+/* ----- Multi (bottom of right rail, gold tier, 2×2 grid) ----- */
+.ad-wrap-multi {
+  margin-top: 1.25rem;
+}
+.ad-wrap-multi .ad-label {
+  color: var(--wood-warm);
+  font-weight: 700;
+}
+.ad-multi-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  width: 100%;
+}
+/* Override the generic .ad-wrap > div / a styling so the cells
+   stack neatly without inheriting the sidebar card chrome. */
+.ad-wrap-multi .ad-multi-grid > a,
+.ad-wrap-multi .ad-multi-grid > div {
+  display: block;
+  border: 1px solid #DABE6A;
+  background: #FFFDF6;
+  border-radius: 8px;
+  overflow: hidden;
+  padding: 6px;
+  aspect-ratio: 1 / 1;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+}
+.ad-multi-cell img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.ad-multi-empty {
+  display: block !important;
+  padding: 1.25rem !important;
+  text-align: center;
+  border: 1px dashed #DABE6A !important;
+  background: linear-gradient(135deg, #FBF5DD, #F4E5B0) !important;
+  border-radius: 12px;
+  text-decoration: none;
+  color: var(--text-primary);
+  font-family: 'Montserrat', sans-serif;
+}
+
 /* Empty-state sidebar card — shown when no approved sponsor is
    live in the 'sidebar' slot. Uses the wood-warm palette so the
    card never blends into the page background. */

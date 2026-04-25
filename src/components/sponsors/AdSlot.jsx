@@ -32,13 +32,24 @@ function pickOne(rows) {
   return rows[Math.floor(Math.random() * rows.length)];
 }
 
-export function useSponsorAsset(slot) {
-  const [asset, setAsset] = useState(null);
+export function useSponsorAsset(slot, { tier } = {}) {
+  const assets = useSponsorAssets(slot, { tier, limit: 1 });
+  return assets[0] || null;
+}
+
+/**
+ * Fetch up to `limit` approved+active sponsor rows for a slot,
+ * optionally filtered by tier ('platinum' / 'gold' / etc.).
+ * The full set is shuffled on each mount so sponsors rotate
+ * fairly across page loads.
+ */
+export function useSponsorAssets(slot, { tier, limit = 1 } = {}) {
+  const [assets, setAssets] = useState([]);
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const { data, error } = await supabase
+      let q = supabase
         .from('sponsor_media')
         .select(`
           id, image_url, click_url, alt_text, tier, starts_at, ends_at, sort_order,
@@ -47,20 +58,25 @@ export function useSponsorAsset(slot) {
         .eq('slot', slot)
         .eq('is_approved', true)
         .eq('is_active', true);
+      if (tier) q = q.eq('tier', tier);
+      const { data, error } = await q;
       if (cancelled) return;
-      if (error) { setAsset(null); return; }
+      if (error) { setAssets([]); return; }
       const now = Date.now();
       const live = (data || []).filter((r) => {
         if (r.starts_at && new Date(r.starts_at).getTime() > now) return false;
         if (r.ends_at   && new Date(r.ends_at).getTime()   < now) return false;
         return true;
       });
-      setAsset(pickOne(live));
+      // Shuffle and take top `limit` so all sponsors get airtime
+      // across page loads without scheduling work.
+      const shuffled = [...live].sort(() => Math.random() - 0.5);
+      setAssets(shuffled.slice(0, limit));
     })();
     return () => { cancelled = true; };
-  }, [slot]);
+  }, [slot, tier, limit]);
 
-  return asset;
+  return assets;
 }
 
 function AdWrapper({ asset, children, className }) {
@@ -112,6 +128,74 @@ export function SponsorLeaderboard() {
       <AdWrapper asset={a} className="ad-leaderboard">
         <img src={a.image_url} alt={a.alt_text || (a.owner?.business_name || 'Sponsor')} loading="lazy" />
       </AdWrapper>
+    </div>
+  );
+}
+
+/* ----- Featured (platinum-only, single, compact) -----
+ * Top of the right rail on the Forums page. Designed to sit
+ * shoulder-to-shoulder with the Online Members strip — short
+ * card, single platinum sponsor, "Featured sponsors" label. */
+export function SponsorFeatured() {
+  const a = useSponsorAsset('sidebar', { tier: 'platinum' });
+  if (!a) {
+    return (
+      <div className="ad-wrap ad-wrap-featured" aria-label="Featured sponsorship slot">
+        <div className="ad-label">Featured sponsors</div>
+        <Link to="/sponsor" className="ad-featured ad-featured-empty">
+          <div className="ad-empty-title">Premier slot open</div>
+          <div className="ad-empty-cta">Become a Platinum sponsor →</div>
+        </Link>
+      </div>
+    );
+  }
+  return (
+    <div className="ad-wrap ad-wrap-featured" aria-label="Featured sponsor">
+      <div className="ad-label">Featured sponsors</div>
+      <AdWrapper asset={a} className="ad-featured">
+        <img src={a.image_url} alt={a.alt_text || (a.owner?.business_name || 'Sponsor')} loading="lazy" />
+      </AdWrapper>
+      {(a.owner?.business_name || a.owner?.sponsor_company) && (
+        <div className="ad-sponsor-name">
+          {a.owner?.business_name || a.owner?.sponsor_company}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ----- Multi (gold tier, up to 4 ads in a 2×2 grid) -----
+ * Bottom of the right rail. Quad of gold-tier sponsors so the
+ * slot rewards the broader pool of paying sponsors who didn't
+ * pony up for platinum. */
+export function SponsorMulti() {
+  const assets = useSponsorAssets('sidebar', { tier: 'gold', limit: 4 });
+  if (assets.length === 0) {
+    return (
+      <div className="ad-wrap ad-wrap-multi" aria-label="Sponsorship slot">
+        <div className="ad-label">Sponsored by</div>
+        <Link to="/sponsor" className="ad-multi-empty">
+          <div className="ad-empty-title">This space is open</div>
+          <div className="ad-empty-sub">4 spots for gold sponsors.</div>
+          <span className="ad-empty-cta">Become a sponsor →</span>
+        </Link>
+      </div>
+    );
+  }
+  return (
+    <div className="ad-wrap ad-wrap-multi" aria-label="Sponsored">
+      <div className="ad-label">Sponsored by</div>
+      <div className="ad-multi-grid">
+        {assets.map((a) => (
+          <AdWrapper key={a.id} asset={a} className="ad-multi-cell">
+            <img
+              src={a.image_url}
+              alt={a.alt_text || (a.owner?.business_name || 'Sponsor')}
+              loading="lazy"
+            />
+          </AdWrapper>
+        ))}
+      </div>
     </div>
   );
 }
