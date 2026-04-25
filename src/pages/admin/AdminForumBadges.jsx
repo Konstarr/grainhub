@@ -74,24 +74,30 @@ export default function AdminForumBadges() {
     const { error } = await upsertBadge(badge);
     setBusy(false);
     if (error) {
-      setErr(error.message || 'Save failed.');
+      // Surface the full error so we can tell auth issues apart from
+      // schema issues etc. The console gets the raw object too.
+      console.error('[AdminForumBadges] save failed', error);
+      setErr(`Save failed: ${error.message || error.code || 'unknown error'}${error.details ? ' — ' + error.details : ''}${error.hint ? ' (' + error.hint + ')' : ''}`);
       return;
     }
-    setOkMsg('Saved.');
-    setTimeout(() => setOkMsg(null), 2500);
+    setOkMsg(`Saved "${badge.name || badge.id}".`);
+    setTimeout(() => setOkMsg(null), 3500);
     setEditing(null);
     reload();
   };
 
   const handleDelete = async (id) => {
     if (!window.confirm(`Delete the "${id}" badge? Existing awards stay on user profiles.`)) return;
-    setBusy(true);
+    setBusy(true); setErr(null);
     const { error } = await deleteBadge(id);
     setBusy(false);
     if (error) {
-      setErr(error.message || 'Delete failed.');
+      console.error('[AdminForumBadges] delete failed', error);
+      setErr(`Delete failed: ${error.message || error.code || 'unknown error'}${error.details ? ' — ' + error.details : ''}`);
       return;
     }
+    setOkMsg(`Deleted "${id}".`);
+    setTimeout(() => setOkMsg(null), 3500);
     reload();
   };
 
@@ -105,8 +111,36 @@ export default function AdminForumBadges() {
         </Link>
       }
     >
-      {err && <div className="cart-err" style={{ marginBottom: '1rem' }}>{err}</div>}
-      {okMsg && <div className="cart-ok" style={{ marginBottom: '1rem' }}>{okMsg}</div>}
+      {err && (
+        <div style={{
+          marginBottom: '1rem',
+          padding: '0.85rem 1rem',
+          background: '#FEF2F2',
+          border: '2px solid #DC2626',
+          borderRadius: 8,
+          color: '#7F1D1D',
+          fontSize: 13.5,
+          fontWeight: 600,
+          fontFamily: 'Montserrat, sans-serif',
+        }}>
+          {err}
+        </div>
+      )}
+      {okMsg && (
+        <div style={{
+          marginBottom: '1rem',
+          padding: '0.75rem 1rem',
+          background: '#F0FDF4',
+          border: '2px solid #16A34A',
+          borderRadius: 8,
+          color: '#14532D',
+          fontSize: 13.5,
+          fontWeight: 600,
+          fontFamily: 'Montserrat, sans-serif',
+        }}>
+          ✓ {okMsg}
+        </div>
+      )}
 
       {editing && (
         <BadgeForm

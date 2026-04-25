@@ -296,34 +296,71 @@ export async function listBadges() {
 }
 
 /**
- * Create or update a badge via the admin_upsert_badge SECURITY
- * DEFINER RPC. Going through the RPC sidesteps any RLS quirks
- * (the function itself enforces is_admin()) and gives us a clean
- * "Not authorized" error when the caller isn't staff.
+ * Create or update a badge. Prefers the admin_upsert_badge
+ * SECURITY DEFINER RPC (which enforces is_admin() inside Postgres
+ * and bypasses RLS), but falls back to a direct table upsert if
+ * the RPC isn't deployed yet — that way the admin page works
+ * even when the latest migration hasn't been re-run.
+ *
+ * Logs each attempt to the console so write failures are
+ * diagnosable without server-side access.
  */
 export async function upsertBadge(badge) {
   if (!badge || !badge.id || !badge.id.trim()) {
     return { error: new Error('Badge id required') };
   }
   const orderRaw = badge.display_order ?? badge.order;
-  const { error } = await supabase.rpc('admin_upsert_badge', {
-    p_id:            badge.id.trim().toLowerCase(),
-    p_name:          (badge.name || '').trim(),
-    p_description:   badge.description || '',
-    p_icon:          badge.icon || '🏷',
-    p_tier:          badge.tier || 'bronze',
-    p_kind:          badge.kind || 'accolade',
-    p_metric_type:   badge.metric_type || null,
-    p_threshold:     badge.threshold == null || badge.threshold === '' ? null : Number(badge.threshold),
-    p_display_order: orderRaw == null || orderRaw === '' ? 99 : Number(orderRaw),
+  const cleaned = {
+    id:            badge.id.trim().toLowerCase(),
+    name:          (badge.name || '').trim(),
+    description:   badge.description || '',
+    icon:          badge.icon || '🏷',
+    tier:          badge.tier || 'bronze',
+    kind:          badge.kind || 'accolade',
+    metric_type:   badge.metric_type || null,
+    threshold:     badge.threshold == null || badge.threshold === '' ? null : Number(badge.threshold),
+    display_order: orderRaw == null || orderRaw === '' ? 99 : Number(orderRaw),
+  };
+
+  console.log('[upsertBadge] calling admin_upsert_badge', cleaned);
+  const rpcRes = await supabase.rpc('admin_upsert_badge', {
+    p_id:            cleaned.id,
+    p_name:          cleaned.name,
+    p_description:   cleaned.description,
+    p_icon:          cleaned.icon,
+    p_tier:          cleaned.tier,
+    p_kind:          cleaned.kind,
+    p_metric_type:   cleaned.metric_type,
+    p_threshold:     cleaned.threshold,
+    p_display_order: cleaned.display_order,
   });
-  return { error };
+  console.log('[upsertBadge] rpc response', rpcRes);
+
+  // PGRST202 = function not found. Migration probably hasn't run.
+  // Fall back to a direct upsert so the page still works.
+  if (rpcRes.error && (rpcRes.error.code === 'PGRST202' || /could not find the function/i.test(rpcRes.error.message || ''))) {
+    console.warn('[upsertBadge] RPC missing — falling back to direct upsert. Run migration-forum-badges-kind.sql to enable the SECURITY DEFINER path.');
+    const fallback = await supabase.from('badges').upsert(cleaned, { onConflict: 'id' });
+    console.log('[upsertBadge] direct upsert response', fallback);
+    return { error: fallback.error };
+  }
+
+  return { error: rpcRes.error };
 }
 
 export async function deleteBadge(id) {
   if (!id) return { error: new Error('Id required') };
-  const { error } = await supabase.rpc('admin_delete_badge', { p_id: id });
-  return { error };
+  console.log('[deleteBadge] calling admin_delete_badge', id);
+  const rpcRes = await supabase.rpc('admin_delete_badge', { p_id: id });
+  console.log('[deleteBadge] rpc response', rpcRes);
+
+  if (rpcRes.error && (rpcRes.error.code === 'PGRST202' || /could not find the function/i.test(rpcRes.error.message || ''))) {
+    console.warn('[deleteBadge] RPC missing — falling back to direct delete.');
+    const fallback = await supabase.from('badges').delete().eq('id', id);
+    console.log('[deleteBadge] direct delete response', fallback);
+    return { error: fallback.error };
+  }
+  return { error: rpcRes.error };
 }
 
 /* ── Forum-wide stats (for dashboard landing) ─────────── */
