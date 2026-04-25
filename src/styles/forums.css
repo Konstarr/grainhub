@@ -457,15 +457,63 @@
   flex-shrink: 0;
 }
 
-.hot-topics {
+/* Marquee viewport — clips the track and fades the edges so chips
+   ease in and dissolve at the boundaries. */
+.hot-marquee {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  min-width: 0;
+  mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    rgba(0,0,0,0.35) 4%,
+    #000 12%,
+    #000 88%,
+    rgba(0,0,0,0.35) 96%,
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    rgba(0,0,0,0.35) 4%,
+    #000 12%,
+    #000 88%,
+    rgba(0,0,0,0.35) 96%,
+    transparent 100%
+  );
+}
+
+/* Two .hot-group children sit side-by-side; the second is an ARIA-
+   hidden duplicate so the loop seam is invisible. translateX(-50%)
+   in the keyframes scrolls exactly the width of one group so the
+   transition back to start is undetectable. */
+.hot-track {
+  display: flex;
+  width: max-content;
+  animation: hot-scroll var(--hot-duration, 60s) linear infinite;
+  will-change: transform;
+}
+.hot-track:hover {
+  animation-play-state: paused;
+}
+
+.hot-group {
   display: flex;
   gap: 8px;
-  flex: 1;
-  min-width: 0;
-  overflow-x: auto;
-  scrollbar-width: none; /* Firefox */
+  padding-right: 8px;
+  flex-shrink: 0;
+  align-items: center;
 }
-.hot-topics::-webkit-scrollbar { display: none; }
+
+@keyframes hot-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hot-track { animation: none; }
+}
 
 .hot-topic {
   background: rgba(255,255,255,0.1);
