@@ -88,7 +88,7 @@ export default function SponsorStrip() {
     const content = (
       <>
         {s.logoUrl ? (
-          <img src={s.logoUrl} alt={s.name ? s.name + ' logo' : ''} className="sponsor-logo-badge sponsor-logo-img" />
+          <img src={s.logoUrl} alt={s.name ? s.name + ' logo' : ''} className="sponsor-logo-badge sponsor-logo-img" loading="lazy" decoding="async" />
         ) : (
           <span className="sponsor-logo-badge">{(s.name || '?').charAt(0)}</span>
         )}

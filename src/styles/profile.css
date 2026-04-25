@@ -135,6 +135,15 @@
   background: var(--wood-cream, #FBF6EC);
 }
 
+.pf-chip.pf-chip-verified {
+  background: #E8F2FB;
+  border-color: #B7D7F0;
+  color: #1D6FB8;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.pf-chip.pf-chip-verified .verified-check { margin-left: 0; }
+
 .pf-chip.pf-chip-link {
   color: var(--wood-warm);
   text-decoration: none;

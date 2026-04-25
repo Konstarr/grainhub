@@ -146,7 +146,9 @@ export default function Marketplace() {
       // have a `trade` string column; fall back to a title/desc search
       // so the filter still narrows usefully on older listings.
       if (tradeSlug) {
-        const tradeTerm = tradeSlug.replace(/-/g, ' ');
+        const tradeTerm = tradeSlug.replace(/-/g, ' ')
+          .replace(/[%_]/g, (c) => '\\' + c)
+          .replace(/[,()]/g, ' ');
         out = out.or(`trade.ilike.%${tradeTerm}%,title.ilike.%${tradeTerm}%,description.ilike.%${tradeTerm}%`);
       }
       return out;

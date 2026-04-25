@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Link } from 'react-router-dom';
 
 function lastAuthorInitials(name) {
@@ -11,7 +12,7 @@ function lastAuthorInitials(name) {
     .toUpperCase() || '??';
 }
 
-export default function RecentActivity({ items }) {
+function RecentActivity({ items }) {
   return (
     <div className="recent-activity">
       <div
@@ -127,3 +128,10 @@ export default function RecentActivity({ items }) {
     </div>
   );
 }
+
+// Memoize so the activity list doesn't re-render every time the
+// surrounding Forums page re-renders (search bar typing, page nav,
+// timer ticks for "X minutes ago", etc.). The items array is built
+// inside a useMemo upstream so reference identity is stable across
+// renders that don't actually change the data.
+export default memo(RecentActivity);

@@ -18,7 +18,9 @@ export async function fetchCommunities({ search = '', limit = 100 } = {}) {
     .order('member_count', { ascending: false })
     .limit(limit);
   if (search && search.trim()) {
-    const s = search.trim();
+    const s = search.trim()
+      .replace(/[%_]/g, (c) => '\\' + c)
+      .replace(/[,()]/g, ' ');
     q = q.or(`name.ilike.%${s}%,slug.ilike.%${s}%`);
   }
   const { data, error } = await q;

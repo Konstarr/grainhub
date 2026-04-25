@@ -1,7 +1,15 @@
-import { useEffect, useMemo, useState } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import PageBack from '../components/shared/PageBack.jsx';
-import RichReplyBox from '../components/forums/RichReplyBox.jsx';
+// Lazy so the TipTap editor bundle (~300KB) only ships when this
+// composer page is actually opened, not on every initial site load.
+const RichReplyBox = lazy(() => import('../components/forums/RichReplyBox.jsx'));
+
+const EditorFallback = (
+  <div style={{ padding: '1rem', color: 'var(--text-secondary)', fontSize: 13 }}>
+    Loading editor...
+  </div>
+);
 import ForumSearchBar from '../components/forums/ForumSearchBar.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { FORUM_GROUPS } from '../data/forumsData.js';
@@ -16,7 +24,7 @@ import '../styles/newThread.css';
  * - Title (required)
  * - Category (grouped dropdown)
  * - Body (RichReplyBox with markdown, emoji, file upload)
- * - Publish → inserts into forum_threads + opening post, then navigates to
+ * - Publish to inserts into forum_threads + opening post, then navigates to
  *   the new thread.
  */
 export default function NewThread() {
@@ -69,9 +77,9 @@ export default function NewThread() {
     // Word-filter check before hitting the network
     const filterResult = checkFields([title, body]);
     if (!filterResult.ok) {
-      setErr('Your thread contains language we don\'t allow on GrainHub. Please remove it and try again.');
+      setErr('Your thread contains language we do not allow on GrainHub. Please remove it and try again.');
       // Log fire-and-forget so admins see it in /admin/forums/log
-      logFilterViolation('thread', `${title}\n\n${body}`).catch(() => {});
+      logFilterViolation('thread', title + '\n\n' + body).catch(() => {});
       return;
     }
     setBusy(true);
@@ -87,7 +95,7 @@ export default function NewThread() {
       const msg = error?.message || 'Could not create thread';
       setErr(msg);
       if (/blocked_language/i.test(msg)) {
-        logFilterViolation('thread', `${title}\n\n${body}`).catch(() => {});
+        logFilterViolation('thread', title + '\n\n' + body).catch(() => {});
       }
       return;
     }
@@ -143,7 +151,7 @@ export default function NewThread() {
           <div className="nt-search-title">
             <span aria-hidden="true">🔎</span> Has someone already asked this?
           </div>
-          <ForumSearchBar size="lg" placeholder="Search existing threads first…" />
+          <ForumSearchBar size="lg" placeholder="Search existing threads first..." />
         </div>
 
         <div className="nt-guidelines">
@@ -154,9 +162,9 @@ export default function NewThread() {
             <li><strong>Search first.</strong> A duplicate thread fragments the answer and may be closed.</li>
             <li><strong>Pick the right category</strong> so the people who know find your post.</li>
             <li><strong>Be specific.</strong> Include species, sizes, brands, photos, and what you&apos;ve already tried.</li>
-            <li><strong>Be respectful.</strong> No personal attacks, slurs, or harassment — staff moderate.</li>
+            <li><strong>Be respectful.</strong> No personal attacks, slurs, or harassment - staff moderate.</li>
             <li><strong>No spam, doxxing, or off-topic ads.</strong> Sponsorships have their own program.</li>
-            <li><strong>Mark answers as solved</strong> when your question is resolved — it helps the next person.</li>
+            <li><strong>Mark answers as solved</strong> when your question is resolved - it helps the next person.</li>
           </ul>
         </div>
 
@@ -166,13 +174,13 @@ export default function NewThread() {
             <input
               type="text"
               className="nt-input"
-              placeholder="e.g. Best dust collection hose for an 18&quot; planer?"
+              placeholder='e.g. Best dust collection hose for an 18" planer?'
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               maxLength={180}
             />
             <span className="nt-hint">
-              {title.length}/180 · A good title is a short, specific question.
+              {title.length}/180 - A good title is a short, specific question.
             </span>
           </label>
 
@@ -183,7 +191,7 @@ export default function NewThread() {
               value={categoryId}
               onChange={(e) => { setCategoryId(e.target.value); setTopicId(''); }}
             >
-              <option value="">Pick a category…</option>
+              <option value="">Pick a category...</option>
               {FORUM_GROUPS.map((g) => (
                 <optgroup key={g.id} label={g.name}>
                   {g.categories.map((c) => (
@@ -207,7 +215,7 @@ export default function NewThread() {
                 <option value="">No specific topic</option>
                 {topicOptions.map((t) => (
                   <option key={t.id} value={t.id}>
-                    {t.icon ? t.icon + ' ' : ''}{t.name}{t.is_official ? ' ✓' : ''}
+                    {t.icon ? t.icon + ' ' : ''}{t.name}{t.is_official ? ' (official)' : ''}
                   </option>
                 ))}
               </select>
@@ -219,16 +227,18 @@ export default function NewThread() {
 
           <div className="nt-field">
             <span className="nt-label">Body</span>
-            <RichReplyBox
-              value={body}
-              onChange={setBody}
-              onSubmit={submit}
-              busy={busy}
-              disabled={busy}
-              signedIn={true}
-              quoteSnippet={null}
-              onCancelQuote={() => null}
-            />
+            <Suspense fallback={EditorFallback}>
+              <RichReplyBox
+                value={body}
+                onChange={setBody}
+                onSubmit={submit}
+                busy={busy}
+                disabled={busy}
+                signedIn={true}
+                quoteSnippet={null}
+                onCancelQuote={() => null}
+              />
+            </Suspense>
           </div>
 
           {err && (
@@ -250,7 +260,7 @@ export default function NewThread() {
                 disabled={!canSubmit}
                 title={canSubmit ? 'Publish thread' : 'Fill in title, category, and body (min 10 chars)'}
               >
-                {busy ? 'Publishing…' : 'Publish thread'}
+                {busy ? 'Publishing...' : 'Publish thread'}
               </button>
             </div>
           </div>
@@ -258,7 +268,7 @@ export default function NewThread() {
           {profile && (
             <div className="nt-postingas">
               Posting as <strong>{profile.full_name || profile.username}</strong>
-              {profile.trade ? ' · ' + profile.trade : ''}
+              {profile.trade ? ' - ' + profile.trade : ''}
             </div>
           )}
         </div>

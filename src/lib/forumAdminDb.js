@@ -32,7 +32,10 @@ export async function listForumThreadsForAdmin({
       { count: 'exact' },
     );
 
-  if (search.trim()) q = q.ilike('title', `%${search.trim()}%`);
+  if (search.trim()) {
+    const escaped = search.trim().replace(/[%_]/g, (c) => '\\' + c);
+    q = q.ilike('title', `%${escaped}%`);
+  }
   if (categoryId)   q = q.eq('category_id', categoryId);
   if (state === 'locked') q = q.eq('is_locked', true);
   if (state === 'pinned') q = q.eq('is_pinned', true);

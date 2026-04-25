@@ -32,13 +32,14 @@ export async function listNewsArticles({ search = '', limit = 200 } = {}) {
     'published_at, created_at, updated_at, view_count, author_id, ' +
     'author:author_id(id, username, full_name, avatar_url)';
 
+  const escapedSearch = (search || '').trim().replace(/[%_]/g, (c) => '\\' + c);
   let q = supabase
     .from('news_articles')
     .select(fullSelect)
     .order('created_at', { ascending: false })
     .limit(limit);
-  if (search && search.trim()) {
-    q = q.ilike('title', '%' + search.trim() + '%');
+  if (escapedSearch) {
+    q = q.ilike('title', '%' + escapedSearch + '%');
   }
   let { data, error } = await q;
 
@@ -52,7 +53,7 @@ export async function listNewsArticles({ search = '', limit = 200 } = {}) {
       )
       .order('created_at', { ascending: false })
       .limit(limit);
-    if (search && search.trim()) fb = fb.ilike('title', '%' + search.trim() + '%');
+    if (escapedSearch) fb = fb.ilike('title', '%' + escapedSearch + '%');
     const res = await fb;
     data = res.data || [];
     error = res.error || null;
@@ -140,13 +141,14 @@ export async function deleteNewsArticle(id) {
 // ------------------------------------------------------------
 
 export async function listEvents({ search = '', limit = 200 } = {}) {
+  const escapedSearch = (search || '').trim().replace(/[%_]/g, (c) => '\\' + c);
   let q = supabase
     .from('events')
     .select('id, title, slug, event_type, start_date, end_date, location, venue_name, is_online, is_approved, cover_image_url, created_at, author_id, registration_url, trade')
     .order('start_date', { ascending: true })
     .limit(limit);
-  if (search && search.trim()) {
-    q = q.ilike('title', '%' + search.trim() + '%');
+  if (escapedSearch) {
+    q = q.ilike('title', '%' + escapedSearch + '%');
   }
   const { data, error } = await q;
   return { data: data || [], error };
@@ -238,7 +240,9 @@ export async function listJobs({ search = '', limit = 200 } = {}) {
     .order('posted_at', { ascending: false })
     .limit(limit);
   if (search && search.trim()) {
-    const s = search.trim();
+    const s = search.trim()
+      .replace(/[%_]/g, (c) => '\\' + c)
+      .replace(/[,()]/g, ' ');
     q = q.or(`title.ilike.%${s}%,company.ilike.%${s}%,location.ilike.%${s}%`);
   }
   const { data, error } = await q;
@@ -316,7 +320,11 @@ export async function listProfiles({ search = '', accountType = null, limit = 20
     q = q.eq('account_type', accountType);
   }
   if (search && search.trim()) {
-    const s = search.trim();
+    // Escape ILIKE wildcards (% and _) AND PostgREST .or() delimiters
+    // (commas, parens) so user input can't break out of the filter.
+    const s = search.trim()
+      .replace(/[%_]/g, (c) => '\\' + c)
+      .replace(/[,()]/g, ' ');
     q = q.or(`username.ilike.%${s}%,full_name.ilike.%${s}%,business_name.ilike.%${s}%`);
   }
   const { data, error } = await q;
@@ -410,8 +418,13 @@ export async function adminDeleteConnection(id) {
 
 /** Search profiles by name / username — for the admin "create connection" picker. */
 export async function searchProfiles(query, { limit = 12 } = {}) {
-  const q = (query || '').trim();
-  if (!q) return { data: [], error: null };
+  const raw = (query || '').trim();
+  if (!raw) return { data: [], error: null };
+  // Escape ILIKE wildcards (% and _) AND PostgREST .or() delimiters
+  // (commas, parens) so user input can't break out of the filter.
+  const q = raw
+    .replace(/[%_]/g, (c) => '\\' + c)
+    .replace(/[,()]/g, ' ');
   const { data, error } = await supabase
     .from('profiles')
     .select('id, username, full_name, avatar_url, business_name, account_type')
@@ -521,7 +534,10 @@ export async function listSponsorMedia({ slot = null, search = '', limit = 200 }
     .order('sort_order', { ascending: true })
     .limit(limit);
   if (slot) q = q.eq('slot', slot);
-  if (search && search.trim()) q = q.ilike('name', '%' + search.trim() + '%');
+  if (search && search.trim()) {
+    const s = search.trim().replace(/[%_]/g, (c) => '\\' + c);
+    q = q.ilike('name', '%' + s + '%');
+  }
   const { data, error } = await q;
   return { data: data || [], error };
 }

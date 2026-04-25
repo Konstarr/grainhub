@@ -176,7 +176,9 @@ export default function Jobs() {
       // Role keyword from the site-wide SecondaryNav (?role=cabinet%20maker
       // etc.) — loose match against title + description.
       if (navRoleKeyword) {
-        const kw = navRoleKeyword.trim();
+        const kw = navRoleKeyword.trim()
+          .replace(/[%_]/g, (c) => '\\' + c)
+          .replace(/[,()]/g, ' ');
         out = out.or(`title.ilike.%${kw}%,description.ilike.%${kw}%`);
       }
       return out;

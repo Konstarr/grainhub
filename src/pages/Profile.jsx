@@ -225,15 +225,18 @@ export default function Profile() {
             <div className="pf-head">
               <div className="pf-identity">
                 <div className="pf-displayname">
-                  <h1 className="pf-name">
-                    {profile.full_name || profile.username}
-                    <VerifiedCheck verified={profile.is_verified} size={20} />
-                  </h1>
+                  <h1 className="pf-name">{profile.full_name || profile.username}</h1>
                   <span className="pf-handle">@{profile.username}</span>
                 </div>
 
                 <div className="pf-chips">
                   {profile.trade && <span className="pf-chip"><IconTrade /> {profile.trade}</span>}
+                  {profile.is_verified && (
+                    <span className="pf-chip pf-chip-verified" title="Verified">
+                      <VerifiedCheck verified size={13} />
+                      Verified
+                    </span>
+                  )}
                   {profile.location && <span className="pf-chip"><IconPin /> {profile.location}</span>}
                   {joinedStr && <span className="pf-chip"><IconCal /> Joined {joinedStr}</span>}
                   {profile.website && (

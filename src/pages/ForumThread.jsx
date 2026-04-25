@@ -1,10 +1,19 @@
-import { useEffect, useMemo, useState } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import '../styles/forumThread.css';
 import PageBack from '../components/shared/PageBack.jsx';
 import ReportModal from '../components/shared/ReportModal.jsx';
-import RichReplyBox from '../components/forums/RichReplyBox.jsx';
+// Lazy-load the TipTap-powered reply editor — pulls in ~300KB of
+// editor code that we don't need until the user is actively replying
+// (and most thread visitors never do).
+const RichReplyBox = lazy(() => import('../components/forums/RichReplyBox.jsx'));
+
+const ReplyFallback = (
+  <div style={{ padding: '1rem', color: 'var(--text-secondary)', fontSize: 13 }}>
+    Loading editor...
+  </div>
+);
 import ThreadModToolbar from '../components/forums/ThreadModToolbar.jsx';
 import EditablePostBody from '../components/forums/EditablePostBody.jsx';
 import { checkText } from '../lib/wordFilter.js';
@@ -546,16 +555,18 @@ export default function ForumThread() {
                 ))}
               </div>
 
-              <RichReplyBox
-                value={replyBody}
-                onChange={setReplyBody}
-                onSubmit={handleSubmitReply}
-                busy={replyBusy}
-                disabled={replyBusy}
-                signedIn={isAuthed}
-                quoteSnippet={quoteTarget}
-                onCancelQuote={() => setQuoteTarget(null)}
-              />
+              <Suspense fallback={ReplyFallback}>
+                <RichReplyBox
+                  value={replyBody}
+                  onChange={setReplyBody}
+                  onSubmit={handleSubmitReply}
+                  busy={replyBusy}
+                  disabled={replyBusy}
+                  signedIn={isAuthed}
+                  quoteSnippet={quoteTarget}
+                  onCancelQuote={() => setQuoteTarget(null)}
+                />
+              </Suspense>
             </>
           )}
         </div>

@@ -89,7 +89,7 @@ function CommunityShowcaseCard({ c, accentIndex }) {
       />
       <div className="home-comm-icon-wrap">
         {c.icon_url ? (
-          <img src={c.icon_url} alt="" className="home-comm-icon" />
+          <img src={c.icon_url} alt="" className="home-comm-icon" loading="lazy" decoding="async" />
         ) : (
           <div className="home-comm-icon home-comm-icon-fb" style={{ background: accent }}>
             {initials}
