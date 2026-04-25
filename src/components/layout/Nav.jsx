@@ -14,7 +14,6 @@ const NAV_ITEMS = [
   { label: 'Jobs', to: '/jobs' },
   { label: 'Suppliers', to: '/suppliers' },
   { label: 'Events', to: '/events' },
-  { label: 'Pricing', to: '/account/subscription' },
 ];
 
 function initialsFromProfile(profile, user) {

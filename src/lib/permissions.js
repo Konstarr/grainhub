@@ -157,17 +157,11 @@ export function canPostSupplierPromo({ profile, packs = {}, monthCount = 0 }) {
 }
 
 /**
- * Eligibility to BUY a sponsorship tier. Business-only, any tier.
+ * Eligibility to BUY a sponsorship tier. Open to both individuals
+ * and businesses — any tier. Just gates anonymous visitors.
  */
 export function canBuySponsorship({ profile }) {
   if (!profile) return { allowed: false, reason: 'Sign in.' };
-  if (profile.account_type !== 'business') {
-    return {
-      allowed: false,
-      reason: 'Sponsorships are for business accounts only.',
-      upgradeTo: { axis: 'convert-to-business' },
-    };
-  }
   return { allowed: true };
 }
 
