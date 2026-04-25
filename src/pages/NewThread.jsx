@@ -121,6 +121,20 @@ export default function NewThread() {
           </p>
         </header>
 
+        <div className="nt-guidelines">
+          <div className="nt-guidelines-title">
+            <span aria-hidden="true">📋</span> Posting guidelines
+          </div>
+          <ul className="nt-guidelines-list">
+            <li><strong>Search first.</strong> A duplicate thread fragments the answer and may be closed.</li>
+            <li><strong>Pick the right category</strong> so the people who know find your post.</li>
+            <li><strong>Be specific.</strong> Include species, sizes, brands, photos, and what you&apos;ve already tried.</li>
+            <li><strong>Be respectful.</strong> No personal attacks, slurs, or harassment — staff moderate.</li>
+            <li><strong>No spam, doxxing, or off-topic ads.</strong> Sponsorships have their own program.</li>
+            <li><strong>Mark answers as solved</strong> when your question is resolved — it helps the next person.</li>
+          </ul>
+        </div>
+
         <div className="nt-card">
           <label className="nt-field">
             <span className="nt-label">Title</span>

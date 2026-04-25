@@ -31,6 +31,36 @@
   margin: 0;
 }
 
+.nt-guidelines {
+  background: linear-gradient(135deg, #FBF5E5, #F5E8C9);
+  border: 1px solid #E2C879;
+  border-left: 4px solid var(--wood-warm);
+  border-radius: 12px;
+  padding: 0.85rem 1.1rem 0.95rem;
+  margin-bottom: 1.25rem;
+}
+.nt-guidelines-title {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  color: var(--wood-warm);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 0.45rem;
+}
+.nt-guidelines-list {
+  margin: 0;
+  padding-left: 1.1rem;
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.55;
+}
+.nt-guidelines-list li { margin-bottom: 3px; }
+.nt-guidelines-list li:last-child { margin-bottom: 0; }
+.nt-guidelines-list strong { color: var(--text-primary); font-weight: 700; }
+
 .nt-card {
   background: var(--white);
   border: 1px solid var(--border);
