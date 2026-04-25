@@ -422,13 +422,16 @@ export async function searchProfiles(query, { limit = 12 } = {}) {
 
 export async function updateProfileAdmin(id, patch) {
   if (!id) return { data: null, error: new Error('Missing id') };
-  const { data, error } = await supabase
-    .from('profiles')
-    .update(patch)
-    .eq('id', id)
-    .select('*')
-    .maybeSingle();
-  return { data, error };
+  // Route through the SECURITY DEFINER RPC so admin profile edits
+  // bypass the column-grant layer that was rejecting direct UPDATE.
+  // See supabase/migration-admin-profile-update.sql.
+  const { data, error } = await supabase.rpc('admin_update_profile', {
+    target_id: id,
+    patch,
+  });
+  if (error) return { data: null, error };
+  const row = Array.isArray(data) ? data[0] : data;
+  return { data: row || null, error: null };
 }
 
 // ── Subscription packs (admin) ────────────────────────────
