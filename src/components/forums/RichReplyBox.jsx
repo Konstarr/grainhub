@@ -1,19 +1,22 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import ReactMarkdown from 'react-markdown';
+import { useEditor, EditorContent } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+import LinkExt from '@tiptap/extension-link';
+import ImageExt from '@tiptap/extension-image';
+import Placeholder from '@tiptap/extension-placeholder';
+import { Markdown } from 'tiptap-markdown';
 import { supabase } from '../../lib/supabase.js';
 import { safeLinkUrl } from '../../lib/urlSafety.js';
 
 const EMOJIS = [
-  // common
   '👍', '👎', '❤️', '🔥', '✨', '😂', '😮', '😢', '👏', '🙌',
   '✅', '❌', '⚠️', '💡', '🎯', '🚀', '📌', '🔖', '🔗', '💬',
-  // woodworking
   '🪵', '🌲', '🌳', '🪚', '🔨', '🔩', '📏', '📐', '📦', '🏗️',
   '🧰', '🪛', '⚙️', '🛠️', '🧱', '🪑', '🚪', '🏡', '🪞', '🖼️',
 ];
 
-const TOOLBAR_BTN = {
+const TBTN = {
   background: 'transparent',
   border: 'none',
   padding: '4px 8px',
@@ -24,28 +27,36 @@ const TOOLBAR_BTN = {
   color: 'var(--text-secondary)',
   lineHeight: 1,
 };
+const TBTN_ACTIVE = {
+  ...TBTN,
+  background: 'var(--wood-warm)',
+  color: '#fff',
+};
 
-function ToolbarButton({ title, onClick, children, disabled }) {
+function ToolbarButton({ title, onClick, children, active, disabled }) {
   return (
     <button
       type="button"
       title={title}
       onClick={onClick}
-      // Prevent the textarea from losing focus / clearing its
-      // selection when the user clicks a toolbar button. Without
-      // this, the wrap() helpers see selectionStart=selectionEnd=0
-      // because focus moves to the button before our click handler
-      // runs.
       onMouseDown={(e) => e.preventDefault()}
       disabled={disabled}
-      style={TOOLBAR_BTN}
-      onMouseEnter={(e) => { if (!disabled) e.currentTarget.style.background = 'var(--wood-cream, #f5ead6)'; }}
-      onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+      style={active ? TBTN_ACTIVE : TBTN}
+      onMouseEnter={(e) => { if (!disabled && !active) e.currentTarget.style.background = 'var(--wood-cream, #f5ead6)'; }}
+      onMouseLeave={(e) => { if (!active) e.currentTarget.style.background = 'transparent'; }}
     >
       {children}
     </button>
   );
 }
+
+const ALLOWED_MIME = new Set([
+  'image/jpeg', 'image/png', 'image/gif', 'image/webp',
+  'application/pdf', 'text/plain', 'text/csv',
+]);
+const ALLOWED_EXT = new Set(['jpg', 'jpeg', 'png', 'gif', 'webp', 'pdf', 'txt', 'csv']);
+const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
+const MAX_OTHER_BYTES = 8 * 1024 * 1024;
 
 export default function RichReplyBox({
   value,
@@ -57,12 +68,56 @@ export default function RichReplyBox({
   busy,
   signedIn,
 }) {
-  const taRef = useRef(null);
   const fileRef = useRef(null);
-  const [mode, setMode] = useState('write'); // 'write' | 'preview'
   const [emojiOpen, setEmojiOpen] = useState(false);
   const [uploadBusy, setUploadBusy] = useState(false);
   const [uploadErr, setUploadErr] = useState(null);
+
+  const editor = useEditor({
+    extensions: [
+      StarterKit.configure({ codeBlock: { HTMLAttributes: { class: 'reply-codeblock' } } }),
+      LinkExt.configure({ openOnClick: false, autolink: true, HTMLAttributes: { rel: 'noopener noreferrer' } }),
+      ImageExt,
+      Placeholder.configure({ placeholder: 'Type your reply…' }),
+      Markdown.configure({ html: false, breaks: true, transformPastedText: true }),
+    ],
+    content: value || '',
+    editable: !disabled,
+    editorProps: {
+      attributes: {
+        class: 'reply-editor',
+      },
+      handleKeyDown: (view, event) => {
+        if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
+          event.preventDefault();
+          if (!busy && editor && editor.storage.markdown.getMarkdown().trim()) onSubmit();
+          return true;
+        }
+        return false;
+      },
+    },
+    onUpdate: ({ editor }) => {
+      onChange(editor.storage.markdown.getMarkdown());
+    },
+  });
+
+  // If parent value changes externally (cleared after submit, quote
+  // inserted, etc.) and the editor's serialized output is different,
+  // reset the editor content to match.
+  useEffect(() => {
+    if (!editor) return;
+    const current = editor.storage.markdown.getMarkdown();
+    if ((value || '') !== current) {
+      editor.commands.setContent(value || '', false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value, editor]);
+
+  useEffect(() => {
+    if (!editor) return;
+    if (editor.options.editable === !disabled) return;
+    editor.setEditable(!disabled);
+  }, [disabled, editor]);
 
   if (!signedIn) {
     return (
@@ -78,138 +133,57 @@ export default function RichReplyBox({
     );
   }
 
-  // Wrap current selection (or insert placeholder) with prefix/suffix.
-  const wrap = (prefix, suffix = prefix, placeholder = 'text') => {
-    const ta = taRef.current;
-    if (!ta) return;
-    const start = ta.selectionStart;
-    const end = ta.selectionEnd;
-    const before = value.slice(0, start);
-    const selected = value.slice(start, end) || placeholder;
-    const after = value.slice(end);
-    const next = before + prefix + selected + suffix + after;
-    onChange(next);
-    // Restore selection around the inserted text.
-    requestAnimationFrame(() => {
-      ta.focus();
-      const pos = before.length + prefix.length;
-      ta.setSelectionRange(pos, pos + selected.length);
-    });
+  const focus = () => editor?.chain().focus();
+
+  const insertText = (text) => {
+    if (!editor) return;
+    editor.chain().focus().insertContent(text).run();
   };
 
-  // Insert at start of each selected line (for lists, quotes, headings).
-  const linePrefix = (prefix) => {
-    const ta = taRef.current;
-    if (!ta) return;
-    const start = ta.selectionStart;
-    const end = ta.selectionEnd;
-    // Expand selection to full lines
-    const lineStart = value.lastIndexOf('\n', start - 1) + 1;
-    const lineEnd = value.indexOf('\n', end);
-    const realEnd = lineEnd === -1 ? value.length : lineEnd;
-    const block = value.slice(lineStart, realEnd);
-    const lines = block.split('\n');
-    const newBlock = lines.map((ln, i) => {
-      if (typeof prefix === 'function') return prefix(i) + ln;
-      return prefix + ln;
-    }).join('\n');
-    const next = value.slice(0, lineStart) + newBlock + value.slice(realEnd);
-    onChange(next);
-    requestAnimationFrame(() => {
-      ta.focus();
-      ta.setSelectionRange(lineStart, lineStart + newBlock.length);
-    });
-  };
-
-  const insertAtCursor = (text) => {
-    const ta = taRef.current;
-    if (!ta) return;
-    const start = ta.selectionStart;
-    const end = ta.selectionEnd;
-    const next = value.slice(0, start) + text + value.slice(end);
-    onChange(next);
-    requestAnimationFrame(() => {
-      ta.focus();
-      const pos = start + text.length;
-      ta.setSelectionRange(pos, pos);
-    });
-  };
-
-  const onPickEmoji = (emoji) => {
-    insertAtCursor(emoji);
+  const onPickEmoji = (em) => {
+    insertText(em);
     setEmojiOpen(false);
   };
 
   const onInsertLink = () => {
     const raw = window.prompt('Link URL:', 'https://');
     if (!raw) return;
-    // Validate the URL through the centralized safeLinkUrl helper.
-    // Blocks javascript:, data:, file:, vbscript:, etc. and rejects
-    // anything that isn't http/https/mailto/tel.
     const safe = safeLinkUrl(raw);
     if (!safe) {
-      // eslint-disable-next-line no-alert
-      alert(
-        'That URL isn\'t allowed. Only http://, https://, mailto:, and ' +
-        'tel: links are accepted. Please paste a regular web link.',
-      );
+      alert('That URL isn\'t allowed. Only http://, https://, mailto:, and tel: links are accepted.');
       return;
     }
-    // Cap length so a 4 KB nasty URL can\'t balloon the post.
     if (safe.length > 2000) {
-      // eslint-disable-next-line no-alert
       alert('Link URL is too long (max 2000 characters).');
       return;
     }
-    wrap('[', `](${safe})`, 'link text');
+    if (editor.state.selection.empty) {
+      // No selection — insert "[link text](url)" placeholder
+      editor.chain().focus().insertContent(`[link text](${safe})`).run();
+    } else {
+      editor.chain().focus().setLink({ href: safe }).run();
+    }
   };
 
-  const onUploadClick = () => {
-    if (fileRef.current) fileRef.current.click();
-  };
-
-  // ── File upload safety ───────────────────────────────────
-  // Whitelist common safe types only. Executables, scripts, archives,
-  // SVGs, and HTML are blocked because they can carry XSS or malware
-  // even when uploaded through a trusted UI.
-  const ALLOWED_MIME = new Set([
-    'image/jpeg', 'image/png', 'image/gif', 'image/webp',
-    'application/pdf',
-    'text/plain', 'text/csv',
-  ]);
-  const ALLOWED_EXT = new Set([
-    'jpg', 'jpeg', 'png', 'gif', 'webp', 'pdf', 'txt', 'csv',
-  ]);
-  // Per-file caps. Images compress reasonably so 5 MB covers any
-  // phone photo. Non-images get 8 MB (PDFs / CSVs).
-  const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
-  const MAX_OTHER_BYTES = 8 * 1024 * 1024;
+  const onUploadClick = () => fileRef.current?.click();
 
   const onFileChosen = async (e) => {
     const file = e.target.files && e.target.files[0];
-    e.target.value = ''; // allow re-selecting the same file later
+    e.target.value = '';
     if (!file) return;
     setUploadErr(null);
 
-    // Validate type (MIME + extension — both must pass to defeat
-    // simple "rename file.exe to file.png" tricks).
     const ext = (file.name.split('.').pop() || '').toLowerCase();
     const mime = (file.type || '').toLowerCase();
     if (!ALLOWED_MIME.has(mime) || !ALLOWED_EXT.has(ext)) {
-      setUploadErr(
-        'Unsupported file type. Allowed: images (JPG / PNG / GIF / WEBP), PDF, TXT, CSV.',
-      );
+      setUploadErr('Unsupported file type. Allowed: images (JPG / PNG / GIF / WEBP), PDF, TXT, CSV.');
       return;
     }
-
-    // Validate size
     const isImage = mime.startsWith('image/');
     const cap = isImage ? MAX_IMAGE_BYTES : MAX_OTHER_BYTES;
     if (file.size > cap) {
       const capMb = Math.round(cap / (1024 * 1024));
-      setUploadErr(
-        `File too large. ${isImage ? 'Images' : 'Files'} must be ${capMb} MB or less.`,
-      );
+      setUploadErr(`File too large. ${isImage ? 'Images' : 'Files'} must be ${capMb} MB or less.`);
       return;
     }
 
@@ -219,17 +193,17 @@ export default function RichReplyBox({
         .replace(/[^a-zA-Z0-9_-]+/g, '-').slice(0, 40);
       const key = `forum/${Date.now()}-${Math.random().toString(36).slice(2, 8)}-${safeBase}.${ext}`;
       const { error } = await supabase.storage.from('media').upload(key, file, {
-        cacheControl: '3600',
-        upsert: false,
-        contentType: file.type || undefined,
+        cacheControl: '3600', upsert: false, contentType: file.type || undefined,
       });
       if (error) throw error;
       const { data: pub } = supabase.storage.from('media').getPublicUrl(key);
       const url = pub?.publicUrl;
       if (!url) throw new Error('Could not resolve public URL');
-      const isImage = (file.type || '').startsWith('image/');
-      const snippet = isImage ? `![${safeBase}](${url})` : `[${file.name}](${url})`;
-      insertAtCursor('\n' + snippet + '\n');
+      if (isImage) {
+        editor.chain().focus().setImage({ src: url, alt: safeBase }).run();
+      } else {
+        editor.chain().focus().insertContent(`[${file.name}](${url})`).run();
+      }
     } catch (err) {
       setUploadErr(err.message || 'Upload failed');
     } finally {
@@ -237,39 +211,13 @@ export default function RichReplyBox({
     }
   };
 
+  const isActive = (name, attrs) => editor?.isActive(name, attrs);
+  const hasContent = () => editor?.storage.markdown.getMarkdown().trim().length > 0;
+
   return (
     <div className="reply-box" id="reply-box">
-      <div className="reply-box-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div className="reply-box-header">
         <strong>Post a reply</strong>
-        <div style={{ display: 'flex', gap: 4, fontSize: 12 }}>
-          <button
-            type="button"
-            onClick={() => setMode('write')}
-            style={{
-              ...TOOLBAR_BTN,
-              fontWeight: mode === 'write' ? 700 : 500,
-              // Light tones to contrast with the dark-brown header bg.
-              color: mode === 'write' ? '#fff' : 'rgba(245, 234, 214, 0.65)',
-              borderBottom: mode === 'write' ? '2px solid var(--wood-cream)' : '2px solid transparent',
-              borderRadius: 0,
-            }}
-          >
-            Write
-          </button>
-          <button
-            type="button"
-            onClick={() => setMode('preview')}
-            style={{
-              ...TOOLBAR_BTN,
-              fontWeight: mode === 'preview' ? 700 : 500,
-              color: mode === 'preview' ? '#fff' : 'rgba(245, 234, 214, 0.65)',
-              borderBottom: mode === 'preview' ? '2px solid var(--wood-cream)' : '2px solid transparent',
-              borderRadius: 0,
-            }}
-          >
-            Preview
-          </button>
-        </div>
       </div>
 
       {quoteSnippet && (
@@ -284,173 +232,107 @@ export default function RichReplyBox({
         </div>
       )}
 
-      {mode === 'write' && (
-        <>
-          <div style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: 2,
-            padding: '6px 10px',
-            borderBottom: '1px solid var(--border)',
-            background: 'var(--wood-cream, #FBF6EC)',
-            position: 'relative',
-          }}>
-            <ToolbarButton title="Bold (Ctrl+B)" onClick={() => wrap('**', '**', 'bold')}>
-              <strong>B</strong>
-            </ToolbarButton>
-            <ToolbarButton title="Italic (Ctrl+I)" onClick={() => wrap('*', '*', 'italic')}>
-              <em>I</em>
-            </ToolbarButton>
-            <ToolbarButton title="Strikethrough" onClick={() => wrap('~~', '~~', 'strike')}>
-              <span style={{ textDecoration: 'line-through' }}>S</span>
-            </ToolbarButton>
-            <ToolbarButton title="Inline code" onClick={() => wrap('`', '`', 'code')}>
-              <span style={{ fontFamily: 'monospace' }}>{'< >'}</span>
-            </ToolbarButton>
-            <span style={{ width: 1, background: 'var(--border)', margin: '2px 4px' }} />
+      <div style={{
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: 2,
+        padding: '6px 10px',
+        borderBottom: '1px solid var(--border)',
+        background: 'var(--wood-cream, #FBF6EC)',
+        position: 'relative',
+      }}>
+        <ToolbarButton title="Bold (Ctrl+B)" active={isActive('bold')} onClick={() => focus()?.toggleBold().run()}>
+          <strong>B</strong>
+        </ToolbarButton>
+        <ToolbarButton title="Italic (Ctrl+I)" active={isActive('italic')} onClick={() => focus()?.toggleItalic().run()}>
+          <em>I</em>
+        </ToolbarButton>
+        <ToolbarButton title="Strikethrough" active={isActive('strike')} onClick={() => focus()?.toggleStrike().run()}>
+          <span style={{ textDecoration: 'line-through' }}>S</span>
+        </ToolbarButton>
+        <ToolbarButton title="Inline code" active={isActive('code')} onClick={() => focus()?.toggleCode().run()}>
+          <span style={{ fontFamily: 'monospace' }}>{'< >'}</span>
+        </ToolbarButton>
+        <span style={{ width: 1, background: 'var(--border)', margin: '2px 4px' }} />
 
-            <ToolbarButton title="Heading" onClick={() => linePrefix('## ')}>
-              H
-            </ToolbarButton>
-            <ToolbarButton title="Quote" onClick={() => linePrefix('> ')}>
-              ❝
-            </ToolbarButton>
-            <ToolbarButton title="Bulleted list" onClick={() => linePrefix('- ')}>
-              •
-            </ToolbarButton>
-            <ToolbarButton title="Numbered list" onClick={() => linePrefix((i) => (i + 1) + '. ')}>
-              1.
-            </ToolbarButton>
-            <ToolbarButton title="Code block" onClick={() => wrap('\n```\n', '\n```\n', 'code here')}>
-              {'{ }'}
-            </ToolbarButton>
-            <span style={{ width: 1, background: 'var(--border)', margin: '2px 4px' }} />
+        <ToolbarButton title="Heading" active={isActive('heading', { level: 2 })} onClick={() => focus()?.toggleHeading({ level: 2 }).run()}>
+          H
+        </ToolbarButton>
+        <ToolbarButton title="Quote" active={isActive('blockquote')} onClick={() => focus()?.toggleBlockquote().run()}>
+          ❝
+        </ToolbarButton>
+        <ToolbarButton title="Bulleted list" active={isActive('bulletList')} onClick={() => focus()?.toggleBulletList().run()}>
+          •
+        </ToolbarButton>
+        <ToolbarButton title="Numbered list" active={isActive('orderedList')} onClick={() => focus()?.toggleOrderedList().run()}>
+          1.
+        </ToolbarButton>
+        <ToolbarButton title="Code block" active={isActive('codeBlock')} onClick={() => focus()?.toggleCodeBlock().run()}>
+          {'{ }'}
+        </ToolbarButton>
+        <span style={{ width: 1, background: 'var(--border)', margin: '2px 4px' }} />
 
-            <ToolbarButton title="Insert link" onClick={onInsertLink}>
-              🔗
-            </ToolbarButton>
-            <ToolbarButton
-              title={uploadBusy ? 'Uploading…' : 'Upload image or file'}
-              onClick={onUploadClick}
-              disabled={uploadBusy}
-            >
-              {uploadBusy ? '…' : '📎'}
-            </ToolbarButton>
-            <input
-              ref={fileRef}
-              type="file"
-              onChange={onFileChosen}
-              style={{ display: 'none' }}
-              accept="image/*,.pdf,.txt,.md,.csv,.doc,.docx,.xls,.xlsx"
-            />
-            <ToolbarButton title="Emoji" onClick={() => setEmojiOpen((v) => !v)}>
-              😊
-            </ToolbarButton>
-
-            {emojiOpen && (
-              <div style={{
-                position: 'absolute',
-                top: 'calc(100% + 4px)',
-                right: 10,
-                background: 'var(--white, #fff)',
-                border: '1px solid var(--border)',
-                borderRadius: 10,
-                boxShadow: '0 10px 30px rgba(0,0,0,0.12)',
-                padding: 8,
-                display: 'grid',
-                gridTemplateColumns: 'repeat(10, 1fr)',
-                gap: 2,
-                zIndex: 20,
-                maxWidth: 320,
-              }}>
-                {EMOJIS.map((em) => (
-                  <button
-                    key={em}
-                    type="button"
-                    onClick={() => onPickEmoji(em)}
-                    style={{
-                      background: 'transparent',
-                      border: 'none',
-                      fontSize: 18,
-                      padding: 4,
-                      cursor: 'pointer',
-                      borderRadius: 4,
-                      lineHeight: 1,
-                    }}
-                    onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--wood-cream)'; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
-                  >
-                    {em}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {uploadErr && (
-            <div style={{ padding: '0.5rem 1rem', background: '#fef2f2', color: '#991b1b', borderBottom: '1px solid #fecaca', fontSize: 12 }}>
-              Upload failed: {uploadErr}
-            </div>
-          )}
-
-          <textarea
-            ref={taRef}
-            className="reply-textarea"
-            placeholder="Type your reply…"
-            value={value}
-            onChange={(e) => onChange(e.target.value)}
-            disabled={disabled}
-            onKeyDown={(e) => {
-              if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b') {
-                e.preventDefault();
-                wrap('**', '**', 'bold');
-              } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'i') {
-                e.preventDefault();
-                wrap('*', '*', 'italic');
-              } else if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-                e.preventDefault();
-                if (!busy && value.trim()) onSubmit();
-              }
-            }}
-          />
-        </>
-      )}
-
-      {mode === 'preview' && (
-        <div
-          className="reply-preview"
-          style={{
-            padding: '1rem 1.25rem',
-            minHeight: 160,
-            background: 'var(--white, #fff)',
-            borderBottom: '1px solid var(--border)',
-            fontSize: 14,
-            color: 'var(--text-primary)',
-            lineHeight: 1.55,
-          }}
+        <ToolbarButton title="Insert link" onClick={onInsertLink}>🔗</ToolbarButton>
+        <ToolbarButton
+          title={uploadBusy ? 'Uploading…' : 'Upload image or file'}
+          onClick={onUploadClick}
+          disabled={uploadBusy}
         >
-          {value.trim() ? (
-            <div className="md-body">
-              <ReactMarkdown>{value}</ReactMarkdown>
-            </div>
-          ) : (
-            <div style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>
-              Nothing to preview. Switch back to Write and type something.
-            </div>
-          )}
+          {uploadBusy ? '…' : '📎'}
+        </ToolbarButton>
+        <input
+          ref={fileRef}
+          type="file"
+          onChange={onFileChosen}
+          style={{ display: 'none' }}
+          accept="image/*,.pdf,.txt,.csv"
+        />
+        <ToolbarButton title="Emoji" onClick={() => setEmojiOpen((v) => !v)}>😊</ToolbarButton>
+
+        {emojiOpen && (
+          <div style={{
+            position: 'absolute', top: 'calc(100% + 4px)', right: 10,
+            background: 'var(--white, #fff)', border: '1px solid var(--border)',
+            borderRadius: 10, boxShadow: '0 10px 30px rgba(0,0,0,0.12)',
+            padding: 8, display: 'grid', gridTemplateColumns: 'repeat(10, 1fr)',
+            gap: 2, zIndex: 20, maxWidth: 320,
+          }}>
+            {EMOJIS.map((em) => (
+              <button
+                key={em}
+                type="button"
+                onClick={() => onPickEmoji(em)}
+                style={{ background: 'transparent', border: 'none', fontSize: 18, padding: 4, cursor: 'pointer', borderRadius: 4, lineHeight: 1 }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--wood-cream)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+              >
+                {em}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {uploadErr && (
+        <div style={{ padding: '0.5rem 1rem', background: '#fef2f2', color: '#991b1b', borderBottom: '1px solid #fecaca', fontSize: 12 }}>
+          Upload failed: {uploadErr}
         </div>
       )}
 
+      <div className="reply-editor-shell">
+        <EditorContent editor={editor} />
+      </div>
+
       <div className="reply-footer">
         <div className="reply-footer-left">
-          Markdown supported · Ctrl+Enter to submit · Ctrl+B / Ctrl+I for formatting
+          Ctrl+Enter to submit · Ctrl+B / Ctrl+I for formatting
         </div>
         <div className="reply-footer-right">
           <button
             type="button"
             className="act-btn primary"
             onClick={onSubmit}
-            disabled={disabled || busy || !value.trim()}
+            disabled={disabled || busy || !hasContent()}
           >
             {busy ? 'Posting…' : 'Post reply'}
           </button>
