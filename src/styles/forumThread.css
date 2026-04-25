@@ -6,12 +6,17 @@
 /* PAGE LAYOUT */
 .ft-wrap {
   /* Bumped from 1380 to 1440 so the wider author column doesn't
-     squeeze the post body. Center column stays the same width. */
+     squeeze the post body. Center column stays the same width.
+     minmax(0, 1fr) — NOT plain 1fr — is essential here. Plain
+     1fr defaults to minmax(auto, 1fr), which lets long unbroken
+     content push the column wider than its share, so post bodies
+     stop wrapping. minmax(0, 1fr) clamps the floor at 0 and lets
+     the post body's overflow-wrap actually take effect. */
   max-width: 1440px;
   margin: 0 auto;
   padding: 2rem 2.5rem;
   display: grid;
-  grid-template-columns: 1fr 300px;
+  grid-template-columns: minmax(0, 1fr) 300px;
   gap: 2rem;
   align-items: start;
 }
@@ -124,7 +129,9 @@
 .sort-opt.active { background: var(--wood-cream); border-color: var(--wood-light); color: var(--wood-warm); font-weight: 500; }
 
 /* POSTS */
-.posts { display: flex; flex-direction: column; gap: 6px; }
+/* min-width: 0 prevents flex items inside from forcing the column
+   wider than the grid track when post bodies contain long text. */
+.posts { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
 
 .post {
   background: var(--white);
@@ -132,12 +139,13 @@
   border-radius: 12px;
   overflow: hidden;
   transition: border-color 0.15s;
+  min-width: 0;
 }
 .post:hover { border-color: var(--wood-light); }
 .post.op { border-left: 4px solid var(--wood-warm); }
 .post.best { border-left: 4px solid var(--accent-green); border-color: #5A9E35; }
 
-.post-inner { display: flex; }
+.post-inner { display: flex; min-width: 0; }
 
 /* VOTE COLUMN */
 .vote-col {
