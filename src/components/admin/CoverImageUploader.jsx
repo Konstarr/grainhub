@@ -26,7 +26,35 @@ function randomId() {
   return Math.random().toString(36).slice(2, 10) + Math.random().toString(36).slice(2, 10);
 }
 
-export default function CoverImageUploader({ value, onChange, folder = 'news' }) {
+/**
+ * Re-encode the file through createImageBitmap → canvas → Blob so the
+ * EXIF orientation flag is honored and stripped before upload. Phone
+ * photos taken in portrait often carry an "rotate 90 CW" EXIF tag that
+ * Supabase Storage / browsers respect inconsistently, which is why
+ * uploaded avatars sometimes rendered sideways.
+ */
+async function normalizeOrientation(file) {
+  if (!file.type || !file.type.startsWith('image/')) return file;
+  // SVG and animated GIF aren't bitmap-able; pass through.
+  if (file.type === 'image/svg+xml' || file.type === 'image/gif') return file;
+  try {
+    const bitmap = await createImageBitmap(file, { imageOrientation: 'from-image' });
+    const canvas = document.createElement('canvas');
+    canvas.width = bitmap.width;
+    canvas.height = bitmap.height;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(bitmap, 0, 0);
+    bitmap.close?.();
+    const blob = await new Promise((resolve) => canvas.toBlob(resolve, file.type, 0.92));
+    if (!blob) return file;
+    return new File([blob], file.name, { type: file.type, lastModified: Date.now() });
+  } catch (_) {
+    // Older browser / image too large — fall back to the raw file.
+    return file;
+  }
+}
+
+export default function CoverImageUploader({ value, onChange, folder = 'news', noUrl = false }) {
   const inputRef = useRef(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
@@ -60,14 +88,12 @@ export default function CoverImageUploader({ value, onChange, folder = 'news' })
     }
     setBusy(true);
     try {
-      // User filename is intentionally discarded — MIME decides the ext,
-      // the rest is a random id so malformed / malicious names never hit
-      // storage paths.
+      const normalized = await normalizeOrientation(file);
       const key = `${folder}/${Date.now()}-${randomId()}.${ext}`;
 
       const { error: upErr } = await supabase.storage
         .from('media')
-        .upload(key, file, { cacheControl: '3600', upsert: false, contentType: file.type });
+        .upload(key, normalized, { cacheControl: '3600', upsert: false, contentType: file.type });
 
       if (upErr) throw upErr;
 
@@ -218,19 +244,21 @@ export default function CoverImageUploader({ value, onChange, folder = 'news' })
         </div>
       )}
 
-      <div style={{ marginTop: 10 }}>
-        <label style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: 3 }}>
-          Or paste an image URL
-        </label>
-        <input
-          type="text"
-          className="adm-input"
-          value={urlInput}
-          onChange={(e) => setUrlInput(e.target.value)}
-          onBlur={handleUrlBlur}
-          placeholder="https://…"
-        />
-      </div>
+      {!noUrl && (
+        <div style={{ marginTop: 10 }}>
+          <label style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-muted)', display: 'block', marginBottom: 3 }}>
+            Or paste an image URL
+          </label>
+          <input
+            type="text"
+            className="adm-input"
+            value={urlInput}
+            onChange={(e) => setUrlInput(e.target.value)}
+            onBlur={handleUrlBlur}
+            placeholder="https://…"
+          />
+        </div>
+      )}
     </div>
   );
 }

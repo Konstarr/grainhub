@@ -142,8 +142,6 @@ export default function AdminUserEdit() {
       {error && <div className="adm-error" style={{ marginBottom: 12 }}>{error}</div>}
       {okMsg && <div className="adm-ok" style={{ marginBottom: 12 }}>{okMsg}</div>}
 
-      <ActivityPanel activity={activity} />
-
       <div className="adm-user-grid">
 
       {/* ------------- Account type (admin override) ------------- */}
@@ -230,6 +228,7 @@ export default function AdminUserEdit() {
               value={form.avatar_url || ''}
               onChange={(url) => set('avatar_url')(url)}
               folder="avatars"
+              noUrl
             />
           </div>
         </div>
@@ -495,6 +494,8 @@ export default function AdminUserEdit() {
       </div>
 
       </div>
+
+      <ActivityPanel activity={activity} />
 
       {/* ------------- Save ------------- */}
       <div className="adm-footer" style={{ marginTop: 12 }}>

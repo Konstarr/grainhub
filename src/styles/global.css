@@ -501,6 +501,15 @@ nav.site-nav {
   gap: 12px;
 }
 
+.verified-check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  margin-left: 4px;
+  flex-shrink: 0;
+}
+
 /* ── Image-backed hero variant ────────────────────────── */
 /* The hero photo is now a real <img> (.hero-image-bg) so the browser
    can apply fetchpriority="high" and decode it on the LCP path. The

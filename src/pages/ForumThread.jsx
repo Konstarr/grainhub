@@ -11,6 +11,7 @@ import { checkText } from '../lib/wordFilter.js';
 import { logFilterViolation } from '../lib/forumAdminDb.js';
 import { recordForumRecent, forgetForumRecent } from '../components/forums/ForumsLeftSidebar.jsx';
 import { markThreadVisited } from '../lib/forumLastVisit.js';
+import VerifiedCheck from '../components/shared/VerifiedCheck.jsx';
 import { SponsorSidebar } from '../components/sponsors/AdSlot.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { FORUM_GROUPS } from '../data/forumsData.js';
@@ -41,7 +42,7 @@ function authorDisplay(author) {
     return {
       handle: 'community', name: 'Community', initials: 'GH',
       trade: '', reputation: 0, location: '', postCount: 0,
-      joinDate: null, avatarUrl: null,
+      joinDate: null, avatarUrl: null, isVerified: false,
     };
   }
   const name = author.full_name || author.username || 'Member';
@@ -55,6 +56,7 @@ function authorDisplay(author) {
     postCount:  author.post_count || 0,
     joinDate:   author.joined_at  || author.created_at || null,
     avatarUrl:  author.avatar_url || null,
+    isVerified: !!author.is_verified,
   };
 }
 
@@ -118,7 +120,10 @@ function AuthorCard({ author, voteCount, hasUpvoted, onUpvote, voteDisabled }) {
         </div>
       )}
       <Link to={'/profile/' + a.handle} style={{ textDecoration: 'none', color: 'inherit' }}>
-        <div className="user-name">{a.name}</div>
+        <div className="user-name">
+          {a.name}
+          <VerifiedCheck verified={a.isVerified} size={14} />
+        </div>
       </Link>
       <Link
         to={'/profile/' + a.handle}

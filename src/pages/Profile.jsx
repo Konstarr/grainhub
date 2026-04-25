@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import PageBack from '../components/shared/PageBack.jsx';
 import ReportModal from '../components/shared/ReportModal.jsx';
+import VerifiedCheck from '../components/shared/VerifiedCheck.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import {
   fetchProfileByHandle,
@@ -224,7 +225,10 @@ export default function Profile() {
             <div className="pf-head">
               <div className="pf-identity">
                 <div className="pf-displayname">
-                  <h1 className="pf-name">{profile.full_name || profile.username}</h1>
+                  <h1 className="pf-name">
+                    {profile.full_name || profile.username}
+                    <VerifiedCheck verified={profile.is_verified} size={20} />
+                  </h1>
                   <span className="pf-handle">@{profile.username}</span>
                 </div>
 
