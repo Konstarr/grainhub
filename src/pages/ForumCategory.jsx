@@ -4,6 +4,7 @@ import { getForumThreadVisits, isThreadUnread } from '../lib/forumLastVisit.js';
 import '../styles/forums.css';
 import PageBack from '../components/shared/PageBack.jsx';
 import RecentActivity from '../components/forums/RecentActivity.jsx';
+import ForumSearchBar from '../components/forums/ForumSearchBar.jsx';
 import { supabase } from '../lib/supabase.js';
 import { mapThreadRow } from '../lib/mappers.js';
 import { FORUM_GROUPS } from '../data/forumsData.js';
@@ -151,6 +152,9 @@ export default function ForumCategory() {
               <span style={{ color: 'var(--text-muted)', fontSize: '13px' }}>
                 {loading ? 'Loading threads…' : `${items.length} thread${items.length === 1 ? '' : 's'}`}
               </span>
+            </div>
+            <div style={{ marginTop: '0.85rem' }}>
+              <ForumSearchBar size="md" placeholder={`Search ${categoryName}…`} />
             </div>
           </div>
 

@@ -31,6 +31,25 @@
   margin: 0;
 }
 
+.nt-search {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.85rem 1.1rem 1rem;
+  margin-bottom: 1rem;
+}
+.nt-search-title {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  color: var(--wood-warm);
+  margin-bottom: 0.55rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .nt-guidelines {
   background: linear-gradient(135deg, #FBF5E5, #F5E8C9);
   border: 1px solid #E2C879;

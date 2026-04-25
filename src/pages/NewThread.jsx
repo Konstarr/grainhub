@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import PageBack from '../components/shared/PageBack.jsx';
 import RichReplyBox from '../components/forums/RichReplyBox.jsx';
+import ForumSearchBar from '../components/forums/ForumSearchBar.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { FORUM_GROUPS } from '../data/forumsData.js';
 import { createThread } from '../lib/forumDb.js';
@@ -120,6 +121,13 @@ export default function NewThread() {
             Be specific. Clear titles and useful details get better answers faster.
           </p>
         </header>
+
+        <div className="nt-search">
+          <div className="nt-search-title">
+            <span aria-hidden="true">🔎</span> Has someone already asked this?
+          </div>
+          <ForumSearchBar size="lg" placeholder="Search existing threads first…" />
+        </div>
 
         <div className="nt-guidelines">
           <div className="nt-guidelines-title">

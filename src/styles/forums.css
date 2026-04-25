@@ -3,6 +3,85 @@
    Extracted from grainhub-forums.html reference
    ────────────────────────────────────────────────────────── */
 
+/* Forum search bar (reusable across forum surfaces) */
+.fsb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 4px 4px 4px 14px;
+  transition: border-color 0.12s, box-shadow 0.12s;
+}
+.fsb:focus-within {
+  border-color: var(--wood-warm);
+  box-shadow: 0 0 0 3px rgba(165, 105, 57, 0.12);
+}
+.fsb-icon {
+  font-size: 13px;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+.fsb-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 13.5px;
+  color: var(--text-primary);
+  padding: 6px 4px;
+  min-width: 0;
+}
+.fsb-input::placeholder { color: var(--text-muted); }
+.fsb-submit {
+  background: var(--wood-warm);
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 7px 14px;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.fsb-submit:hover:not(:disabled) { background: var(--wood-mid); }
+.fsb-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+.fsb-lg { padding: 6px 6px 6px 18px; }
+.fsb-lg .fsb-icon { font-size: 16px; }
+.fsb-lg .fsb-input { font-size: 15px; padding: 9px 4px; }
+.fsb-lg .fsb-submit { padding: 9px 18px; font-size: 13.5px; }
+
+/* Forum search results page */
+.fs-results-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.5rem 1.75rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 1px 2px rgba(90, 66, 38, 0.04);
+}
+.fs-results-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 4px;
+}
+.fs-results-title em {
+  font-style: normal;
+  color: var(--wood-warm);
+}
+.fs-results-sub {
+  margin: 0 0 14px;
+  color: var(--text-secondary);
+  font-size: 13.5px;
+}
+
+
 /* PAGE HEADER */
 .page-header {
   background: var(--wood-dark);
@@ -144,7 +223,9 @@
   display: flex;
   gap: 8px;
   align-items: center;
+  flex-wrap: wrap;
 }
+.toolbar-search { min-width: 220px; max-width: 320px; }
 
 .new-thread-btn {
   background: var(--wood-warm);

@@ -592,6 +592,24 @@ export async function fetchForumCounters() {
 // A markAllReadAt baseline overrides everything older than itself.
 const NEW_FALLBACK_DAYS = 30;
 
+/**
+ * Search forum_threads by title (and optionally first-post body).
+ * Returns rows shaped for mapThreadRow + RecentActivity. Uses ilike
+ * so partial words match; SQL %20%-escapes itself via supabase-js.
+ */
+export async function searchForumThreads(q, { limit = 50 } = {}) {
+  const term = (q || '').trim();
+  if (!term) return { data: [], error: null };
+  const escaped = term.replace(/[%_]/g, (c) => '\\' + c);
+  const { data, error } = await supabase
+    .from('forum_threads')
+    .select('*')
+    .ilike('title', `%${escaped}%`)
+    .order('last_reply_at', { ascending: false, nullsFirst: false })
+    .limit(limit);
+  return { data: data || [], error };
+}
+
 export async function fetchCategoryCounters(threadVisits = {}, markAllReadAt = null) {
   const { data: threads } = await supabase
     .from('forum_threads')
