@@ -1,4 +1,5 @@
 import { useSearchParams, useNavigate } from 'react-router-dom';
+import { setForumMarkAllReadAt } from '../../lib/forumLastVisit.js';
 
 /**
  * View-filter tab bar for the Forums index. Each tab sets ?view=...
@@ -54,8 +55,13 @@ export default function ToolbarSection() {
           <button
             type="button"
             className="mark-read-btn"
-            onClick={() => setView('')}
-            title="Clear filters"
+            onClick={() => {
+              setForumMarkAllReadAt();
+              // Reload so every component reads the new baseline
+              // (subcategory badges, NEW pills on rows, etc.).
+              window.location.reload();
+            }}
+            title="Clear all 'new' indicators across the forum"
           >
             ✓ Mark All Read
           </button>

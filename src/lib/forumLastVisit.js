@@ -67,11 +67,37 @@ export function markThreadVisited(threadId, when = new Date()) {
 }
 
 // No prior visit → only "new" within `freshnessDays`.
+// A global "Mark all read" baseline trumps the freshness window:
+// anything before that baseline is treated as read regardless.
 export function isThreadUnread(threadId, lastReplyAt, lastVisits, freshnessDays = 30) {
   if (!threadId || !lastReplyAt) return false;
   const replyMs = new Date(lastReplyAt).getTime();
   if (Number.isNaN(replyMs)) return false;
+  const baselineMs = getMarkAllReadAtMs();
+  if (baselineMs && replyMs <= baselineMs) return false;
   const recordedIso = lastVisits ? lastVisits[threadId] : getForumThreadVisit(threadId);
   if (recordedIso) return replyMs > new Date(recordedIso).getTime();
   return replyMs > Date.now() - freshnessDays * 24 * 60 * 60 * 1000;
+}
+
+/* ── Mark all read baseline ────────────────────────────── */
+
+const MARK_ALL_KEY = 'gh:forumMarkAllReadAt';
+
+export function setForumMarkAllReadAt(when = new Date()) {
+  if (typeof window === 'undefined') return;
+  const iso = (when instanceof Date ? when : new Date(when)).toISOString();
+  try { window.localStorage.setItem(MARK_ALL_KEY, iso); } catch (_) {}
+}
+
+export function getForumMarkAllReadAt() {
+  if (typeof window === 'undefined') return null;
+  try { return window.localStorage.getItem(MARK_ALL_KEY) || null; } catch (_) { return null; }
+}
+
+function getMarkAllReadAtMs() {
+  const iso = getForumMarkAllReadAt();
+  if (!iso) return 0;
+  const ms = new Date(iso).getTime();
+  return Number.isNaN(ms) ? 0 : ms;
 }

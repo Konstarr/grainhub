@@ -589,16 +589,16 @@ export async function fetchForumCounters() {
 // Map<categoryId, { threads, posts, newCount }>.
 // newCount counts threads in that category whose last activity is
 // after the user's per-thread visit (or within 30d if never visited).
-// The category badge therefore only clears once every thread inside
-// has been individually opened.
+// A markAllReadAt baseline overrides everything older than itself.
 const NEW_FALLBACK_DAYS = 30;
 
-export async function fetchCategoryCounters(threadVisits = {}) {
+export async function fetchCategoryCounters(threadVisits = {}, markAllReadAt = null) {
   const { data: threads } = await supabase
     .from('forum_threads')
     .select('id, category_id, reply_count, created_at, last_reply_at');
 
   const fallbackCutoff = Date.now() - NEW_FALLBACK_DAYS * 24 * 60 * 60 * 1000;
+  const baselineMs = markAllReadAt ? new Date(markAllReadAt).getTime() : 0;
   const byCat = new Map();
   (threads || []).forEach((t) => {
     if (!t.category_id) return;
@@ -608,6 +608,11 @@ export async function fetchCategoryCounters(threadVisits = {}) {
 
     const lastActivityIso = t.last_reply_at || t.created_at;
     const lastActivityMs = lastActivityIso ? new Date(lastActivityIso).getTime() : 0;
+    if (baselineMs && lastActivityMs <= baselineMs) {
+      // Anything older than the user's "Mark all read" click is read.
+      byCat.set(t.category_id, entry);
+      return;
+    }
     const recordedIso = threadVisits[t.id];
     const cutoffMs = recordedIso ? new Date(recordedIso).getTime() : fallbackCutoff;
     if (lastActivityMs > cutoffMs) entry.newCount += 1;
