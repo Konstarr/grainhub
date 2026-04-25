@@ -24,6 +24,7 @@ import {
   incrementThreadViews,
   isSubscribed,
   toggleSubscription,
+  deletePost,
 } from '../lib/forumDb.js';
 
 function findCategoryMeta(id) {
@@ -147,11 +148,16 @@ function AuthorCard({ author, voteCount, hasUpvoted, onUpvote, voteDisabled }) {
   );
 }
 
-function PostCard({ post, index, isOp, isAccepted, hasUpvoted, onUpvote, onQuote, onReport, onPostUpdate, currentUserId }) {
+function PostCard({ post, index, isOp, isAccepted, hasUpvoted, onUpvote, onQuote, onReport, onPostUpdate, onDelete, currentUserId, isStaff }) {
   const quoted = post.quoted_post_id && post.__quoted
     ? { author: authorDisplay(post.__quoted.author), body: post.__quoted.body }
     : null;
   const isSelf = currentUserId && post.author_id === currentUserId;
+  // Author can delete their own writing; staff (mod/admin/owner)
+  // can delete anyone's. The delete_forum_post RPC enforces this
+  // server-side too — the UI gate just hides the button when the
+  // viewer wouldn't be able to act on it anyway.
+  const canDelete = isSelf || isStaff;
 
   return (
     <div className={'post ' + (isOp ? 'op ' : '') + (isAccepted ? 'best' : '')}>
@@ -193,6 +199,16 @@ function PostCard({ post, index, isOp, isAccepted, hasUpvoted, onUpvote, onQuote
           <div className="post-footer">
             <button type="button" className="post-action" onClick={onQuote}>“ Quote</button>
             <button type="button" className="post-action" onClick={onUpvote}>{hasUpvoted ? 'Liked' : 'Like'}</button>
+            {canDelete && (
+              <button
+                type="button"
+                className="post-action post-action-delete"
+                onClick={onDelete}
+                title={isSelf ? 'Delete your post' : 'Delete post (staff)'}
+              >
+                🗑 Delete
+              </button>
+            )}
             <div className="post-footer-spacer" />
             <span className="post-report" onClick={onReport}>⚑ Report</span>
           </div>
@@ -242,7 +258,7 @@ function ThreadHeader({ thread, category, hasUpvoted, onUpvote, onReport, onRepl
 export default function ForumThread() {
   const { slug } = useParams();
   const navigate = useNavigate();
-  const { user, profile, isAuthed } = useAuth();
+  const { user, profile, isAuthed, isStaff } = useAuth();
 
   const [thread, setThread] = useState(null);
   const [posts, setPosts] = useState([]);
@@ -362,6 +378,22 @@ export default function ForumThread() {
   // so the "Edited" footer renders immediately.
   const handlePostUpdate = (postId, patch) => {
     setPosts((ps) => ps.map((p) => (p.id === postId ? { ...p, ...patch } : p)));
+  };
+
+  // Soft-delete a post. The delete_forum_post RPC handles auth
+  // (author OR staff) inside Postgres; we just optimistically
+  // drop the row from local state on success. Refusing to roll
+  // back on error lets the user see exactly what the server said
+  // via the alert.
+  const handlePostDelete = async (postId) => {
+    if (!isAuthed) { navigate('/login'); return; }
+    if (!window.confirm('Delete this post? It will disappear from the thread.')) return;
+    const { error } = await deletePost(postId);
+    if (error) {
+      alert('Could not delete post: ' + (error.message || 'unknown error'));
+      return;
+    }
+    setPosts((ps) => ps.filter((p) => p.id !== postId));
   };
 
   const handleQuote = (post) => {
@@ -488,6 +520,7 @@ export default function ForumThread() {
                     post={p}
                     index={idx}
                     currentUserId={user?.id}
+                    isStaff={isStaff}
                     isOp={thread.author_id && p.author?.id === thread.author_id}
                     isAccepted={thread.accepted_post_id === p.id}
                     hasUpvoted={postUpvotedSet.has(p.id)}
@@ -495,6 +528,7 @@ export default function ForumThread() {
                     onQuote={() => handleQuote(p)}
                     onReport={() => openReport('post', p.id)}
                     onPostUpdate={handlePostUpdate}
+                    onDelete={() => handlePostDelete(p.id)}
                   />
                 ))}
               </div>

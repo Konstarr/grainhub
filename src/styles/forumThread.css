@@ -624,6 +624,8 @@
 }
 .post-action:hover { background: var(--wood-cream); color: var(--text-secondary); }
 .post-action.liked { color: var(--wood-warm); font-weight: 500; }
+.post-action-delete { color: #B91C1C; }
+.post-action-delete:hover { background: #FEE2E2; color: #7F1D1D; }
 
 .post-footer-spacer { flex: 1; }
 .post-report {

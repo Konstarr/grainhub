@@ -181,12 +181,19 @@ export async function updatePost(postId, body) {
   return { data, error };
 }
 
+/**
+ * Soft-delete a forum post via the delete_forum_post RPC. The
+ * function checks (caller is author OR staff) inside Postgres,
+ * so neither the post owner nor moderators have to fight RLS to
+ * make this work.
+ *
+ * Returns { error } — Supabase RPC errors propagate as
+ * `error.message` so callers can display them directly.
+ */
 export async function deletePost(postId) {
-  const { data, error } = await supabase
-    .from('forum_posts')
-    .update({ is_deleted: true })
-    .eq('id', postId);
-  return { data, error };
+  if (!postId) return { error: new Error('Missing postId') };
+  const { error } = await supabase.rpc('delete_forum_post', { p_post_id: postId });
+  return { error };
 }
 
 // ------------------------------------------------------------
