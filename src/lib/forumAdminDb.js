@@ -72,6 +72,20 @@ export async function setThreadSolved(threadId, solved) {
 }
 
 /**
+ * Move a thread into a different category. RLS already lets
+ * the author or any moderator update the row, so a plain
+ * UPDATE works — no SECURITY DEFINER needed.
+ */
+export async function setThreadCategory(threadId, categoryId) {
+  if (!threadId || !categoryId) return { error: new Error('Missing threadId or categoryId') };
+  const { error } = await supabase
+    .from('forum_threads')
+    .update({ category_id: categoryId })
+    .eq('id', threadId);
+  return { error };
+}
+
+/**
  * Hard-delete is rare for forum threads. Prefer locking + author
  * delete. Admin "delete" here removes the thread row; cascade on
  * forum_posts handles cleanup.

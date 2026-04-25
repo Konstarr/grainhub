@@ -535,6 +535,21 @@
   border-color: #fecaca;
 }
 .thread-mod-btn-danger:hover { background: #fecaca; border-color: #fca5a5; }
+.thread-mod-select {
+  padding: 5px 9px;
+  font-size: 12px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  background: #fff;
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: border-color 0.12s;
+  max-width: 220px;
+}
+.thread-mod-select:hover { border-color: var(--wood-warm); }
+.thread-mod-select:disabled { cursor: wait; opacity: 0.6; }
 .thread-mod-err {
   width: 100%;
   margin-top: 4px;
