@@ -482,18 +482,3 @@ function PendingChangesPanel({
     </section>
   );
 }
-        Recurring changes activate immediately. À la carte one-offs route to
-        our team for scheduling — we'll email you within one business day.
-      </div>
-    </section>
-  );
-}
-     )}
-
-      <div className="cart-summary-foot">
-        Recurring changes activate immediately. À la carte one-offs route to
-        our team for scheduling — we'll email you within one business day.
-      </div>
-    </section>
-  );
-}
