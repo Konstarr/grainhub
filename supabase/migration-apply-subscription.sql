@@ -14,11 +14,12 @@
 -- writes to auth.uid(); a caller cannot apply a subscription to
 -- someone else.
 --
--- Both individuals and businesses can subscribe to any add-on
--- (role packs, sponsorships, à la carte). Membership tiers are
--- naturally bound to the user's account_type via the UI, but the
--- DB doesn't gate them — that match-up is enforced client-side in
--- PlanBrowse so we have one source of truth.
+-- Gating model:
+--   • Membership tiers — UI-gated to the user's account_type
+--   • Role packs        — open to BOTH individuals and businesses
+--   • Sponsorships      — business-only (DB + UI)
+--   • À la carte        — business-only (UI-only; à la carte items
+--                         go through email follow-up, not this RPC)
 -- ============================================================
 
 create or replace function public.apply_my_subscription(
@@ -33,6 +34,7 @@ set search_path = public
 as $$
 declare
   uid uuid := auth.uid();
+  acct text;
   pack_slug text;
   tier_slug text;
 begin
@@ -45,11 +47,17 @@ begin
     raise exception 'invalid_membership_tier: %', membership_tier_in using errcode = 'P0001';
   end if;
 
-  -- 2) Sponsor tier: just validate the slug; both individuals and
-  --    businesses can subscribe to any sponsorship tier.
+  -- 2) Look up account type so we can gate sponsorships
+  select account_type into acct from public.profiles where id = uid;
+
+  -- 3) Sponsor tier: business accounts only. Validate slug too.
   if sponsor_tier_in is not null and sponsor_tier_in <> '' then
     if sponsor_tier_in not in ('silver','gold','platinum') then
       raise exception 'invalid_sponsor_tier: %', sponsor_tier_in using errcode = 'P0001';
+    end if;
+    if coalesce(acct, 'individual') <> 'business' then
+      raise exception 'sponsor_business_only: switch to a business account to add a sponsorship'
+        using errcode = 'P0001';
     end if;
   end if;
 

@@ -249,9 +249,16 @@ button.alacarte-cta:disabled {
    Card still renders so users see what the other account type
    gets — just visually muted and the CTA is non-interactive. */
 .tier-card.tier-locked,
-.mb-strip-col.mb-locked {
+.mb-strip-col.mb-locked,
+.sponsor-card-new.sponsor-locked,
+.alacarte-tile.alacarte-locked {
   opacity: 0.62;
   filter: saturate(0.7);
+}
+.alacarte-cta-locked {
+  font-style: italic;
+  color: var(--text-muted) !important;
+  cursor: not-allowed !important;
 }
 .tier-card.tier-locked .tier-features li,
 .mb-strip-col.mb-locked .mb-feats li {
@@ -265,6 +272,62 @@ button.alacarte-cta:disabled {
   cursor: not-allowed !important;
   font-style: italic;
   font-weight: 600 !important;
+}
+
+/* ── Current plan badge & CTA ──────────────────────────
+   Shown when the card matches what's actually on the user's
+   profile. Subtle green-cream tint + corner pill so the user
+   can see at a glance "this is what I'm on". */
+.tier-card.tier-current,
+.mb-strip-col.mb-current,
+.sponsor-card-new.sponsor-current {
+  border-color: #5A8F3A;
+  background: linear-gradient(180deg, #F2F8EC 0%, var(--white) 70%);
+  box-shadow: 0 2px 12px rgba(90, 143, 58, 0.1);
+  position: relative;
+}
+.card-current-pill {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  background: #5A8F3A;
+  color: #fff;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border-radius: 999px;
+  z-index: 2;
+}
+.card-current-pill-overlay {
+  /* For pack-hero where the head is positioned over the body */
+  z-index: 5;
+}
+.tier-cta-current,
+.mb-cta-current {
+  background: #ECF6E4 !important;
+  color: #2D5016 !important;
+  border-color: #C9E0B6 !important;
+  cursor: default !important;
+  font-style: italic;
+}
+
+/* Pack tier pill that matches the user's currently active tier
+   gets a subtle green dot so they can find it in the pill row. */
+.pack-tier-pill-current {
+  position: relative;
+}
+.pack-tier-pill-current::after {
+  content: '';
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 6px;
+  height: 6px;
+  background: #5A8F3A;
+  border-radius: 50%;
 }
 
 /* Banner shown ABOVE locked sections explaining why */

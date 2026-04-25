@@ -191,7 +191,10 @@ export default function AccountSubscription() {
             </div>
           </section>
 
-          {accountType === 'business' && (
+          {/* Role packs are open to both individuals and businesses.
+              Show the section only if there's something to show OR the
+              user is a business (so they get the empty-state CTA). */}
+          {(packEntries.length > 0 || accountType === 'business') && (
             <section className="acct-section">
               <div className="acct-section-title">
                 <span>Role packs</span>
@@ -284,6 +287,9 @@ export default function AccountSubscription() {
         persona={persona}
         onPersonaChange={setPersona}
         accountType={isAuthed ? accountType : undefined}
+        currentMembershipId={isAuthed ? membershipId : undefined}
+        currentPacks={isAuthed ? (current.packs || {}) : {}}
+        currentSponsorId={isAuthed ? sponsorId : undefined}
       />
     </div>
   );
@@ -468,6 +474,21 @@ function PendingChangesPanel({
           Sign up to apply →
         </Link>
       )}
+
+      <div className="cart-summary-foot">
+        Recurring changes activate immediately. À la carte one-offs route to
+        our team for scheduling — we'll email you within one business day.
+      </div>
+    </section>
+  );
+}
+        Recurring changes activate immediately. À la carte one-offs route to
+        our team for scheduling — we'll email you within one business day.
+      </div>
+    </section>
+  );
+}
+     )}
 
       <div className="cart-summary-foot">
         Recurring changes activate immediately. À la carte one-offs route to
