@@ -237,6 +237,15 @@ export default function Forums() {
   const viewTitle = VIEW_TITLES[view] || VIEW_TITLES[''];
   const viewEmpty = VIEW_EMPTIES[view] || VIEW_EMPTIES[''];
 
+  const PAGE_SIZE = 5;
+  const [activityPage, setActivityPage] = useState(0);
+  useEffect(() => { setActivityPage(0); }, [view, trade, navGroup]);
+  const totalPages = Math.max(1, Math.ceil(filteredActivity.length / PAGE_SIZE));
+  const pagedActivity = filteredActivity.slice(
+    activityPage * PAGE_SIZE,
+    activityPage * PAGE_SIZE + PAGE_SIZE,
+  );
+
   const groupsWithLive = useMemo(() => {
     const source = navGroup
       ? FORUM_GROUPS.filter((g) => g.id === navGroup)
@@ -301,7 +310,33 @@ export default function Forums() {
                 {viewEmpty}
               </div>
             ) : (
-              <RecentActivity items={filteredActivity} />
+              <>
+                <RecentActivity items={pagedActivity} />
+                {totalPages > 1 && (
+                  <div className="pager">
+                    <button
+                      type="button"
+                      className="pager-btn"
+                      onClick={() => setActivityPage((p) => Math.max(0, p - 1))}
+                      disabled={activityPage === 0}
+                    >
+                      ← Prev
+                    </button>
+                    <span className="pager-status">
+                      Page {activityPage + 1} of {totalPages}
+                      <span className="pager-count">{filteredActivity.length} threads</span>
+                    </span>
+                    <button
+                      type="button"
+                      className="pager-btn"
+                      onClick={() => setActivityPage((p) => Math.min(totalPages - 1, p + 1))}
+                      disabled={activityPage >= totalPages - 1}
+                    >
+                      Next →
+                    </button>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>
