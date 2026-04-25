@@ -22,6 +22,15 @@
 alter table public.badges
   add column if not exists kind text;
 
+-- 1b) Widen the tier check constraint so admins can pick
+--     'platinum' (the original schema only allowed bronze/silver/
+--     gold). Drop-and-recreate is the cleanest path; the constraint
+--     name is the auto-generated badges_tier_check.
+alter table public.badges drop constraint if exists badges_tier_check;
+alter table public.badges
+  add constraint badges_tier_check
+  check (tier in ('bronze','silver','gold','platinum'));
+
 -- Soft constraint at the app layer; promote to CHECK later if we
 -- want hard enforcement. For now we accept 'level' / 'accolade' /
 -- 'custom' / null (treated as accolade in the UI).
