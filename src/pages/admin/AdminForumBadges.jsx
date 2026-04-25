@@ -8,11 +8,13 @@ import {
 } from '../../lib/forumAdminDb.js';
 
 const METRIC_OPTIONS = [
-  { value: 'reputation',         label: 'Reputation total' },
-  { value: 'post_upvotes_total', label: 'Total post upvotes' },
-  { value: 'thread_count',       label: 'Threads created' },
-  { value: 'post_count',         label: 'Posts written' },
-  { value: 'manual',             label: 'Manual award only' },
+  { value: 'reputation',           label: 'Reputation total' },
+  { value: 'post_upvotes_total',   label: 'Total post upvotes' },
+  { value: 'thread_upvotes_total', label: 'Total thread upvotes' },
+  { value: 'thread_count',         label: 'Threads created' },
+  { value: 'post_count',           label: 'Posts written' },
+  { value: 'solved_thread_count',  label: 'Solved questions' },
+  { value: 'manual',               label: 'Manual award only' },
 ];
 
 const TIER_OPTIONS = ['bronze', 'silver', 'gold', 'platinum'];
@@ -98,19 +100,9 @@ export default function AdminForumBadges() {
       title="Badges"
       subtitle="Create new tiers, change icons, tune unlock thresholds. Awards happen automatically on the next upvote."
       actions={
-        <>
-          <Link to="/admin/forums" className="cart-btn ghost" style={{ padding: '6px 12px', fontSize: 12, marginRight: 6 }}>
-            ← Back to forum mod.
-          </Link>
-          <button
-            type="button"
-            className="cart-btn primary"
-            onClick={() => setEditing({ ...EMPTY })}
-            style={{ padding: '6px 14px', fontSize: 12.5 }}
-          >
-            + New badge
-          </button>
-        </>
+        <Link to="/admin/forums" className="cart-btn ghost" style={{ padding: '6px 12px', fontSize: 12 }}>
+          ← Back to forum mod.
+        </Link>
       }
     >
       {err && <div className="cart-err" style={{ marginBottom: '1rem' }}>{err}</div>}
@@ -143,42 +135,84 @@ export default function AdminForumBadges() {
           No badges yet. Click "+ New badge" to create one.
         </div>
       ) : (
-        <>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           <BadgeGroup
+            kind="level"
             heading="Levels"
-            blurb="Community standing tiers from overall reputation. Shown as a user's primary badge."
+            blurb="Community standing tiers earned from overall reputation. One per user — the highest threshold they've crossed becomes their primary badge."
+            accent="#A56939"
+            tint="#FBF2E5"
             rows={rows.filter((r) => (r.kind || 'accolade') === 'level')}
+            onAdd={() => setEditing({ ...EMPTY, kind: 'level', metric_type: 'reputation', display_order: 5 })}
             onEdit={setEditing}
             onDelete={handleDelete}
           />
           <BadgeGroup
+            kind="accolade"
             heading="Accolades"
-            blurb="Recognition for content. Stackable — users collect these alongside their level."
+            blurb="Recognition for content — Liked, Helpful, Authority, etc. Stackable; users can hold many at once."
+            accent="#5C7A3F"
+            tint="#F2F6E9"
             rows={rows.filter((r) => (r.kind || 'accolade') !== 'level')}
+            onAdd={() => setEditing({ ...EMPTY, kind: 'accolade', metric_type: 'post_upvotes_total', display_order: 50 })}
             onEdit={setEditing}
             onDelete={handleDelete}
           />
-        </>
+        </div>
       )}
     </AdminLayout>
   );
 }
 
-function BadgeGroup({ heading, blurb, rows, onEdit, onDelete }) {
+function BadgeGroup({ heading, blurb, rows, accent, tint, onAdd, onEdit, onDelete }) {
   return (
-    <section style={{ marginBottom: '1.5rem' }}>
-      <div style={{ marginBottom: '0.5rem' }}>
-        <div style={{
-          fontFamily: 'Montserrat, sans-serif',
-          fontWeight: 700,
-          fontSize: 14,
-          letterSpacing: 1.2,
-          textTransform: 'uppercase',
-          color: 'var(--text-primary)',
-        }}>
-          {heading} <span style={{ color: 'var(--text-muted)', fontWeight: 500 }}>· {rows.length}</span>
+    <section style={{
+      background: tint,
+      border: `1px solid ${accent}33`,
+      borderLeft: `4px solid ${accent}`,
+      borderRadius: 12,
+      padding: '1.1rem 1.25rem',
+      boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+    }}>
+      <div style={{
+        display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between',
+        gap: '1rem', marginBottom: '0.85rem',
+      }}>
+        <div>
+          <div style={{
+            fontFamily: 'Montserrat, sans-serif',
+            fontWeight: 800,
+            fontSize: 15,
+            letterSpacing: 1.4,
+            textTransform: 'uppercase',
+            color: accent,
+          }}>
+            {heading} <span style={{ color: 'var(--text-muted)', fontWeight: 600 }}>· {rows.length}</span>
+          </div>
+          <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', marginTop: 4, maxWidth: 720 }}>
+            {blurb}
+          </div>
         </div>
-        <div style={{ fontSize: 12.5, color: 'var(--text-muted)', marginTop: 2 }}>{blurb}</div>
+        <button
+          type="button"
+          onClick={onAdd}
+          style={{
+            padding: '6px 12px',
+            fontSize: 12.5,
+            fontFamily: 'Montserrat, sans-serif',
+            fontWeight: 700,
+            letterSpacing: 0.4,
+            background: accent,
+            color: '#fff',
+            border: 'none',
+            borderRadius: 6,
+            cursor: 'pointer',
+            whiteSpace: 'nowrap',
+            flexShrink: 0,
+          }}
+        >
+          + New {heading.replace(/s$/, '').toLowerCase()}
+        </button>
       </div>
       {rows.length === 0 ? (
         <div style={{
@@ -186,11 +220,11 @@ function BadgeGroup({ heading, blurb, rows, onEdit, onDelete }) {
           textAlign: 'center',
           color: 'var(--text-muted)',
           background: 'var(--white)',
-          border: '1px dashed var(--border)',
+          border: `1px dashed ${accent}55`,
           borderRadius: 10,
           fontSize: 13,
         }}>
-          None yet. Click "+ New badge" and pick "{heading.replace(/s$/, '')}" as the kind.
+          None yet. Click "+ New {heading.replace(/s$/, '').toLowerCase()}" to add one.
         </div>
       ) : (
         <div style={{

@@ -296,39 +296,33 @@ export async function listBadges() {
 }
 
 /**
- * Create or update a badge. The `id` column is the primary key
- * (text slug). Passing an existing id updates that row.
+ * Create or update a badge via the admin_upsert_badge SECURITY
+ * DEFINER RPC. Going through the RPC sidesteps any RLS quirks
+ * (the function itself enforces is_admin()) and gives us a clean
+ * "Not authorized" error when the caller isn't staff.
  */
 export async function upsertBadge(badge) {
   if (!badge || !badge.id || !badge.id.trim()) {
     return { error: new Error('Badge id required') };
   }
-  // Accept either `display_order` or the legacy `order` field name
-  // from the form so callers don't have to keep them in sync.
   const orderRaw = badge.display_order ?? badge.order;
-  const row = {
-    id:            badge.id.trim().toLowerCase(),
-    name:          (badge.name || '').trim(),
-    description:   badge.description || '',
-    icon:          badge.icon || '🏷',
-    tier:          badge.tier || 'bronze',
-    kind:          badge.kind || 'accolade',
-    metric_type:   badge.metric_type || null,
-    threshold:     badge.threshold == null || badge.threshold === '' ? null : Number(badge.threshold),
-    display_order: orderRaw == null || orderRaw === '' ? 99 : Number(orderRaw),
-  };
-  const { error } = await supabase
-    .from('badges')
-    .upsert(row, { onConflict: 'id' });
+  const { error } = await supabase.rpc('admin_upsert_badge', {
+    p_id:            badge.id.trim().toLowerCase(),
+    p_name:          (badge.name || '').trim(),
+    p_description:   badge.description || '',
+    p_icon:          badge.icon || '🏷',
+    p_tier:          badge.tier || 'bronze',
+    p_kind:          badge.kind || 'accolade',
+    p_metric_type:   badge.metric_type || null,
+    p_threshold:     badge.threshold == null || badge.threshold === '' ? null : Number(badge.threshold),
+    p_display_order: orderRaw == null || orderRaw === '' ? 99 : Number(orderRaw),
+  });
   return { error };
 }
 
 export async function deleteBadge(id) {
   if (!id) return { error: new Error('Id required') };
-  const { error } = await supabase
-    .from('badges')
-    .delete()
-    .eq('id', id);
+  const { error } = await supabase.rpc('admin_delete_badge', { p_id: id });
   return { error };
 }
 
