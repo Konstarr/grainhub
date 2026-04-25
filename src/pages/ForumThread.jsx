@@ -6,6 +6,7 @@ import PageBack from '../components/shared/PageBack.jsx';
 import ReportModal from '../components/shared/ReportModal.jsx';
 import RichReplyBox from '../components/forums/RichReplyBox.jsx';
 import ThreadModToolbar from '../components/forums/ThreadModToolbar.jsx';
+import EditablePostBody from '../components/forums/EditablePostBody.jsx';
 import { recordForumRecent } from '../components/forums/ForumsLeftSidebar.jsx';
 import { SponsorSidebar } from '../components/sponsors/AdSlot.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
@@ -144,7 +145,7 @@ function AuthorCard({ author, voteCount, hasUpvoted, onUpvote, voteDisabled }) {
   );
 }
 
-function PostCard({ post, index, isOp, isAccepted, hasUpvoted, onUpvote, onQuote, onReport, currentUserId }) {
+function PostCard({ post, index, isOp, isAccepted, hasUpvoted, onUpvote, onQuote, onReport, onPostUpdate, currentUserId }) {
   const quoted = post.quoted_post_id && post.__quoted
     ? { author: authorDisplay(post.__quoted.author), body: post.__quoted.body }
     : null;
@@ -181,24 +182,11 @@ function PostCard({ post, index, isOp, isAccepted, hasUpvoted, onUpvote, onQuote
             </div>
           )}
 
-          <div className="post-text post-text-md">
-            <ReactMarkdown
-              components={{
-                a: ({ node, ...props }) => (
-                  <a {...props} target="_blank" rel="noopener noreferrer" />
-                ),
-                img: ({ node, ...props }) => (
-                  <img
-                    {...props}
-                    loading="lazy"
-                    style={{ maxWidth: '100%', borderRadius: 8, border: '1px solid var(--border)' }}
-                  />
-                ),
-              }}
-            >
-              {post.body || ''}
-            </ReactMarkdown>
-          </div>
+          <EditablePostBody
+            post={post}
+            canEdit={isSelf}
+            onUpdate={(patch) => onPostUpdate?.(post.id, patch)}
+          />
 
           <div className="post-footer">
             <button type="button" className="post-action" onClick={onQuote}>“ Quote</button>
@@ -367,6 +355,13 @@ export default function ForumThread() {
     }
   };
 
+  // Patch local post state after an inline edit. The DB trigger
+  // forum_posts_touch already bumped updated_at; we mirror that here
+  // so the "Edited" footer renders immediately.
+  const handlePostUpdate = (postId, patch) => {
+    setPosts((ps) => ps.map((p) => (p.id === postId ? { ...p, ...patch } : p)));
+  };
+
   const handleQuote = (post) => {
     setQuoteTarget({
       postId: post.id,
@@ -484,6 +479,7 @@ export default function ForumThread() {
                     onUpvote={() => handlePostUpvote(p.id)}
                     onQuote={() => handleQuote(p)}
                     onReport={() => openReport('post', p.id)}
+                    onPostUpdate={handlePostUpdate}
                   />
                 ))}
               </div>

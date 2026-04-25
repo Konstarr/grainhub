@@ -412,6 +412,25 @@ export async function fetchRecentThreadsByAuthor(authorId, limit = 10) {
   return { data: data || [], error };
 }
 
+/**
+ * Edit your own forum post body. The forum_posts_update_own RLS
+ * policy allows author-only writes; the forum_posts_touch trigger
+ * bumps updated_at automatically so we don't need to set it here.
+ * Returns the updated row (with new updated_at) so the UI can
+ * render the "edited" footer immediately.
+ */
+export async function updatePost(postId, body) {
+  if (!postId) return { data: null, error: new Error('Missing post id') };
+  if (!body || !body.trim()) return { data: null, error: new Error('Body required') };
+  const { data, error } = await supabase
+    .from('forum_posts')
+    .update({ body: body.trim() })
+    .eq('id', postId)
+    .select()
+    .maybeSingle();
+  return { data, error };
+}
+
 export async function updateOwnProfile(userId, patch) {
   if (!userId) return { data: null, error: new Error('Not signed in') };
   const clean = { ...patch };

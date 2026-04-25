@@ -243,6 +243,98 @@
 .user-vote-disabled .vote-btn { cursor: not-allowed; }
 .user-vote-disabled .vote-btn:hover { color: var(--text-muted); }
 
+/* ── Inline post edit ───────────────────────────────────── */
+.post-edit-shell {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 4px 0 8px;
+}
+.post-edit-textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--wood-warm);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.55;
+  resize: vertical;
+  background: #FFFCF6;
+  color: var(--text-primary);
+}
+.post-edit-textarea:focus {
+  outline: none;
+  border-color: var(--wood-warm);
+  box-shadow: 0 0 0 3px rgba(176, 128, 38, 0.15);
+}
+.post-edit-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+}
+.post-edit-cancel,
+.post-edit-save {
+  padding: 6px 14px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 1px solid var(--border);
+}
+.post-edit-cancel {
+  background: #fff;
+  color: var(--text-secondary);
+}
+.post-edit-cancel:hover { border-color: var(--wood-warm); color: var(--wood-warm); }
+.post-edit-save {
+  background: var(--wood-warm);
+  color: #fff;
+  border-color: var(--wood-warm);
+}
+.post-edit-save:hover { background: #8B4316; }
+.post-edit-save:disabled,
+.post-edit-cancel:disabled { opacity: 0.6; cursor: wait; }
+.post-edit-err {
+  padding: 6px 10px;
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  font-size: 12.5px;
+}
+
+/* "Edited Xm ago" footer + Edit button row, shown below the body. */
+.post-edit-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+  padding-top: 6px;
+  border-top: 1px dashed var(--border-light);
+  font-size: 11.5px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+.post-edited-label {
+  cursor: help; /* native title shows the full timestamp on hover */
+}
+.post-edit-btn {
+  margin-left: auto;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  padding: 3px 11px;
+  border-radius: 5px;
+  font-size: 11.5px;
+  font-weight: 600;
+  font-family: 'Montserrat', sans-serif;
+  cursor: pointer;
+  font-style: normal;
+  transition: border-color 0.12s, color 0.12s;
+}
+.post-edit-btn:hover { border-color: var(--wood-warm); color: var(--wood-warm); }
+
 .user-avatar {
   width: 52px;
   height: 52px;
