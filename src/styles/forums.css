@@ -1134,22 +1134,27 @@ a.hot-topic { text-decoration: none; }
   display: flex;
   align-items: center;
   gap: 14px;
-  margin-bottom: 0.85rem;
-  background: var(--white);
-  border: 1px solid #E8DCC1;
-  border-left: 6px solid var(--wood-warm);
-  border-radius: 12px;
-  padding: 0.95rem 1.25rem;
+  margin-bottom: 0;
+  background: linear-gradient(135deg, #2C1A0E 0%, #4A2A12 50%, #6B3F1F 100%);
+  border: 1px solid #1A0E06;
+  border-radius: 12px 12px 0 0;
+  padding: 1rem 1.25rem;
   box-shadow:
-    0 4px 14px rgba(74, 42, 18, 0.10),
-    0 1px 3px rgba(74, 42, 18, 0.06);
-  transition: box-shadow 0.15s, transform 0.15s;
+    0 4px 14px rgba(28, 14, 6, 0.18),
+    0 1px 3px rgba(28, 14, 6, 0.10);
+  position: relative;
 }
-.forum-group-header:hover {
-  box-shadow:
-    0 8px 22px rgba(74, 42, 18, 0.14),
-    0 2px 5px rgba(74, 42, 18, 0.08);
-  transform: translateY(-1px);
+/* Notch the wood-warm accent in as a strong vertical bar on the
+   left edge so the band feels stamped, not just colored. */
+.forum-group-header::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 12px;
+  bottom: 12px;
+  width: 4px;
+  background: var(--wood-warm);
+  border-radius: 0 4px 4px 0;
 }
 
 .fgh-icon {
@@ -1202,17 +1207,18 @@ a.hot-topic { text-decoration: none; }
 
 .fgh-name {
   font-family: 'Montserrat', sans-serif;
-  font-size: 17px;
-  font-weight: 700;
-  letter-spacing: 0.01em;
-  color: var(--text-primary);
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: #FFF1D6;
   line-height: 1.15;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
 }
 
 .fgh-desc {
   font-size: 12.5px;
-  color: var(--text-secondary);
-  margin-top: 3px;
+  color: rgba(255, 241, 214, 0.78);
+  margin-top: 4px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1220,17 +1226,19 @@ a.hot-topic { text-decoration: none; }
 
 .fgh-stats {
   font-size: 12px;
-  font-weight: 600;
-  color: var(--wood-warm);
+  font-weight: 700;
+  color: #E8C795;
   text-align: right;
   flex-shrink: 0;
-  letter-spacing: 0.01em;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .forum-categories {
   background: var(--white);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-top: none;
+  border-radius: 0 0 12px 12px;
   overflow: hidden;
 }
 
