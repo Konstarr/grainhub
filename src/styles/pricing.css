@@ -227,13 +227,37 @@ button.alacarte-cta:disabled {
   cursor: default;
 }
 
-/* "Added ✓" — green confirmation state */
+/* "Selected ✓" — green confirmation state. Now CLICKABLE to unstage,
+   so the cursor is a pointer. On hover the button shifts to a red
+   "Remove ×" affordance via the .cta-default/.cta-hover label swap. */
 .tier-cta-added,
-.mb-cta-added {
+.mb-cta-added,
+.alacarte-cta-added {
   background: #2D5016 !important;
   color: #fff !important;
   border-color: #2D5016 !important;
+  cursor: pointer !important;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
+.tier-cta-added:hover,
+.mb-cta-added:hover {
+  background: #b91c1c !important;
+  border-color: #b91c1c !important;
+}
+.alacarte-cta-added:hover {
+  color: #b91c1c !important;
+}
+
+/* Default/hover label swap — child spans inside the staged buttons */
+.tier-cta-added .cta-hover,
+.mb-cta-added .cta-hover,
+.alacarte-cta-added .cta-hover { display: none; }
+.tier-cta-added:hover .cta-default,
+.mb-cta-added:hover .cta-default,
+.alacarte-cta-added:hover .cta-default { display: none; }
+.tier-cta-added:hover .cta-hover,
+.mb-cta-added:hover .cta-hover,
+.alacarte-cta-added:hover .cta-hover { display: inline; }
 
 .tier-cta-secondary {
   display: inline-block;

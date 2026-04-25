@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   INDIVIDUAL_TIERS,
   BUSINESS_TIERS,
@@ -12,11 +11,23 @@ import { usePlanChanges } from '../../context/PlanContext.jsx';
 import '../../styles/pricing.css';
 
 /**
- * PlanBrowse — the "shop" portion of the subscription hub. Renders
- * the four pricing axes (memberships, role packs, sponsorships, à la
- * carte) with CTAs that stage changes into the user's pending-changes
- * list. Used inside /account/subscription so there's no separate
- * pricing page anymore.
+ * PlanBrowse — the "browse and pick" portion of the subscription hub.
+ *
+ * Layout rules:
+ *   - Membership tier set switches with the persona toggle (individual
+ *     memberships vs business memberships) — only ONE can be staged.
+ *   - Role packs, sponsorships, and à la carte items are SHARED: every
+ *     visitor sees them regardless of persona, because the gating is
+ *     about what the user wants, not who they are.
+ *
+ * Selection rules (matched in PlanContext.addChange):
+ *   - One membership at a time (replaces previous selection)
+ *   - Many role packs allowed; ONE tier per pack-id
+ *   - One sponsor tier at a time (replaces previous)
+ *   - Many à la carte items allowed (deduped by id)
+ *
+ * Every "Selected ✓" button is clickable and unstages on click with
+ * a hover affordance.
  */
 export default function PlanBrowse({ persona = 'individual', onPersonaChange }) {
   return (
@@ -43,14 +54,18 @@ export default function PlanBrowse({ persona = 'individual', onPersonaChange }) 
         />
       </div>
 
-      {persona === 'individual' ? <IndividualSection /> : <BusinessSection />}
+      {persona === 'individual' ? <IndividualMemberships /> : <BusinessMemberships />}
+
+      {/* Add-ons are visible to every persona — pack purchases, sponsorships,
+          and one-off promotions all stack with any membership tier. */}
+      <SharedAddOns />
 
       <div className="pricing-faq">
         <h2>Common questions</h2>
         <FaqItem q="Can I mix and match?">
-          Yes. Businesses can combine a membership tier, any role packs they need,
-          sponsorships, and one-off à la carte promotions — billed on a single invoice.
-          Individuals just pick one membership tier.
+          Yes. Pick one membership, stack as many role packs as you need, choose
+          a sponsorship tier if you want extra brand visibility, and add à la
+          carte one-offs whenever you have something to promote.
         </FaqItem>
         <FaqItem q="What happens when I hit a cap?">
           Nothing hard-blocks at the cap. We give you a 2-week grace with a banner
@@ -60,20 +75,20 @@ export default function PlanBrowse({ persona = 'individual', onPersonaChange }) 
           Annual plans get 2 months free (10× monthly). Available at checkout.
         </FaqItem>
         <FaqItem q="Cancel anytime?">
-          Yes. Downgrade or cancel in one click; changes take effect at the
-          end of your billing period.
+          Yes. Downgrade or cancel in one click; changes take effect at the end
+          of your billing period.
         </FaqItem>
         <FaqItem q="Do you take a cut of marketplace sales?">
-          No. Transactions happen directly between buyer and seller. We only charge
-          for listing visibility.
+          No. Transactions happen directly between buyer and seller. We only
+          charge for listing visibility.
         </FaqItem>
       </div>
     </>
   );
 }
 
-/* ══════════════════ Individual section ══════════════════ */
-function IndividualSection() {
+/* ── Membership sections — only one can be selected ── */
+function IndividualMemberships() {
   return (
     <section className="pricing-section">
       <div className="section-heading">
@@ -89,26 +104,30 @@ function IndividualSection() {
   );
 }
 
-/* ══════════════════ Business section ═════════════════════ */
-function BusinessSection() {
+function BusinessMemberships() {
+  return (
+    <section className="pricing-section">
+      <div className="section-heading">
+        <div className="axis-eyebrow">Axis 1 · Baseline</div>
+        <h2>Business memberships</h2>
+        <p>Start here. Company profile, team seats, and analytics.</p>
+      </div>
+      <MembershipStrip tiers={BUSINESS_TIERS} />
+    </section>
+  );
+}
+
+/* ── Add-ons — visible to everyone, regardless of persona ── */
+function SharedAddOns() {
   return (
     <>
       <section className="pricing-section">
         <div className="section-heading">
-          <div className="axis-eyebrow">Axis 1 · Baseline</div>
-          <h2>Business memberships</h2>
-          <p>Start here. Company profile, team seats, and analytics.</p>
-        </div>
-        <MembershipStrip tiers={BUSINESS_TIERS} />
-      </section>
-
-      <section className="pricing-section">
-        <div className="section-heading">
-          <div className="axis-eyebrow">Axis 2 · Scale</div>
+          <div className="axis-eyebrow">Add-on · Scale</div>
           <h2>Role packs</h2>
           <p>
-            Stack these onto any membership. Pick the volume that matches how you
-            actually use the platform.
+            Stack any number of these onto your membership. Pick the volume that
+            matches how you actually use the platform.
           </p>
         </div>
         <div className="pack-grid">
@@ -120,11 +139,11 @@ function BusinessSection() {
 
       <section className="pricing-section">
         <div className="section-heading">
-          <div className="axis-eyebrow">Axis 3 · Brand</div>
+          <div className="axis-eyebrow">Add-on · Brand</div>
           <h2>Sponsorships</h2>
           <p>
-            Pure brand exposure. Independent from memberships and packs — stack
-            with any combination or buy alone.
+            Pure brand exposure. Pick one tier — stack with any membership and
+            any combination of packs.
           </p>
         </div>
         <div className="sponsor-grid">
@@ -139,8 +158,8 @@ function BusinessSection() {
           <div className="axis-eyebrow">One-offs</div>
           <h2>À la carte</h2>
           <p>
-            Not ready for a monthly commitment? Buy exactly what you need for a launch,
-            an announcement, or a seasonal push.
+            Add as many one-time promotions as you'd like — perfect for product
+            launches, announcements, or seasonal pushes.
           </p>
         </div>
         <div className="alacarte-grid">
@@ -156,17 +175,26 @@ function BusinessSection() {
 /* ══════════════════ Sub-components ══════════════════════ */
 
 /**
- * Reusable CTA pill across every card. Three states:
- * ready-to-stage, staged, contact-sales.
+ * Reusable CTA. Three states:
+ *   - contactSales: mailto link, no toggle behavior
+ *   - staged: clickable, unstages on click. Hover swaps the label
+ *     to a red "Remove" affordance so it's obvious it's a toggle.
+ *   - default: stages the change on click
  */
-function PlanCta({ staged, onStage, contactSales = false, label = 'Add to plan' }) {
+function PlanCta({ staged, onStage, onUnstage, contactSales = false, label = 'Add to plan' }) {
   if (contactSales) {
     return <a href="mailto:sales@grainhub.io" className="tier-cta">Contact sales</a>;
   }
   if (staged) {
     return (
-      <button type="button" className="tier-cta tier-cta-added" disabled>
-        Selected ✓
+      <button
+        type="button"
+        className="tier-cta tier-cta-added"
+        onClick={onUnstage}
+        title="Click to remove from pending changes"
+      >
+        <span className="cta-default">Selected ✓</span>
+        <span className="cta-hover">Remove ×</span>
       </button>
     );
   }
@@ -182,6 +210,7 @@ function TierCard({ tier }) {
   const plan = usePlanChanges();
   const staged = plan.has((i) => i.type === 'membership' && i.id === tier.id);
   const handleStage = () => plan.addChange({ type: 'membership', id: tier.id });
+  const handleUnstage = () => plan.removeChange((i) => i.type === 'membership');
 
   return (
     <div className={'tier-card ' + (tier.highlight ? 'tier-highlight' : '')}>
@@ -198,13 +227,15 @@ function TierCard({ tier }) {
       <PlanCta
         staged={staged}
         onStage={handleStage}
+        onUnstage={handleUnstage}
         label={tier.priceMonthly === 0 ? 'Switch to Free' : 'Switch to ' + tier.name}
       />
     </div>
   );
 }
 
-/** Compact horizontal strip for the four business-membership levels. */
+/** Compact horizontal strip for the four business-membership levels.
+ *  Inline button uses the same default/hover swap as PlanCta. */
 function MembershipStrip({ tiers }) {
   const plan = usePlanChanges();
 
@@ -213,6 +244,7 @@ function MembershipStrip({ tiers }) {
       {tiers.map((t, idx) => {
         const staged = plan.has((i) => i.type === 'membership' && i.id === t.id);
         const handleStage = () => plan.addChange({ type: 'membership', id: t.id });
+        const handleUnstage = () => plan.removeChange((i) => i.type === 'membership');
         return (
           <div
             key={t.id}
@@ -235,8 +267,14 @@ function MembershipStrip({ tiers }) {
             {t.priceMonthly === null ? (
               <a href="mailto:sales@grainhub.io" className="mb-cta">Contact sales</a>
             ) : staged ? (
-              <button type="button" className="mb-cta mb-cta-added" disabled>
-                Selected ✓
+              <button
+                type="button"
+                className="mb-cta mb-cta-added"
+                onClick={handleUnstage}
+                title="Click to remove from pending changes"
+              >
+                <span className="cta-default">Selected ✓</span>
+                <span className="cta-hover">Remove ×</span>
               </button>
             ) : (
               <button type="button" className="mb-cta" onClick={handleStage}>
@@ -267,14 +305,17 @@ function PackCard({ pack }) {
       ? 'Unlimited ' + pack.unitPlural
       : active.cap + ' ' + (active.cap === 1 ? pack.unit : pack.unitPlural);
 
-  const staged = plan.has(
+  // staged at this exact tier? → show Selected
+  // staged at a different tier? → show "Switch to X"
+  const stagedAtThisTier = plan.has(
     (i) => i.type === 'pack' && i.id === pack.id && i.tierId === tierId,
   );
-  const otherTierStaged = plan.has(
+  const stagedAtOtherTier = plan.has(
     (i) => i.type === 'pack' && i.id === pack.id && i.tierId !== tierId,
   );
 
   const handleStage = () => plan.addChange({ type: 'pack', id: pack.id, tierId });
+  const handleUnstage = () => plan.removeChange((i) => i.type === 'pack' && i.id === pack.id);
 
   return (
     <div className="pack-hero">
@@ -314,10 +355,11 @@ function PackCard({ pack }) {
         </ul>
 
         <PlanCta
-          staged={staged}
+          staged={stagedAtThisTier}
           onStage={handleStage}
+          onUnstage={handleUnstage}
           contactSales={active.priceMonthly === null}
-          label={(otherTierStaged ? 'Switch to ' : 'Add ') + active.name + ' tier'}
+          label={(stagedAtOtherTier ? 'Switch to ' : 'Add ') + active.name + ' tier'}
         />
       </div>
     </div>
@@ -333,9 +375,10 @@ const SPONSOR_VISUALS = {
 function SponsorMedallion({ tier }) {
   const plan = usePlanChanges();
   const v = SPONSOR_VISUALS[tier.id] || SPONSOR_VISUALS.silver;
-  const staged = plan.has((i) => i.type === 'sponsor' && i.id === tier.id);
-  const otherStaged = plan.has((i) => i.type === 'sponsor' && i.id !== tier.id);
+  const stagedAtThisTier = plan.has((i) => i.type === 'sponsor' && i.id === tier.id);
+  const stagedAtOtherTier = plan.has((i) => i.type === 'sponsor' && i.id !== tier.id);
   const handleStage = () => plan.addChange({ type: 'sponsor', id: tier.id });
+  const handleUnstage = () => plan.removeChange((i) => i.type === 'sponsor');
   const label = tier.name.replace(' Sponsor', '');
 
   return (
@@ -347,7 +390,7 @@ function SponsorMedallion({ tier }) {
           boxShadow: '0 4px 14px ' + v.ring + '55, inset 0 1px 0 rgba(255,255,255,0.4)',
         }}
       >
-        <span className="sponsor-medal-label">{label}</span>
+                <span className="sponsor-medal-label">{label}</span>
       </div>
       <div className="sponsor-card-body">
         <div className="sponsor-price">
@@ -359,9 +402,10 @@ function SponsorMedallion({ tier }) {
           {tier.features.map((f, i) => <li key={i}>{f}</li>)}
         </ul>
         <PlanCta
-          staged={staged}
+          staged={stagedAtThisTier}
           onStage={handleStage}
-          label={(otherStaged ? 'Switch to ' : 'Become ') + label}
+          onUnstage={handleUnstage}
+          label={(stagedAtOtherTier ? 'Switch to ' : 'Become ') + label}
         />
       </div>
     </div>
@@ -372,6 +416,7 @@ function ALaCarteTile({ item }) {
   const plan = usePlanChanges();
   const staged = plan.has((i) => i.type === 'alacarte' && i.id === item.id);
   const handleStage = () => plan.addChange({ type: 'alacarte', id: item.id });
+  const handleUnstage = () => plan.removeChange((i) => i.type === 'alacarte' && i.id === item.id);
 
   return (
     <div className="alacarte-tile">
@@ -384,8 +429,14 @@ function ALaCarteTile({ item }) {
       <div className="alacarte-tagline">{item.tagline}</div>
       <div className="alacarte-desc">{item.description}</div>
       {staged ? (
-        <button type="button" className="alacarte-cta" disabled>
-          Selected ✓
+        <button
+          type="button"
+          className="alacarte-cta alacarte-cta-added"
+          onClick={handleUnstage}
+          title="Click to remove from pending changes"
+        >
+          <span className="cta-default">Selected ✓</span>
+          <span className="cta-hover">Remove ×</span>
         </button>
       ) : (
         <button type="button" className="alacarte-cta" onClick={handleStage}>
