@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { usePlanChanges } from '../context/PlanContext.jsx';
 import { supabase } from '../lib/supabase.js';
@@ -13,29 +13,38 @@ import {
   A_LA_CARTE,
   formatPrice,
 } from '../lib/pricing.js';
+import PlanBrowse from '../components/pricing/PlanBrowse.jsx';
 import '../styles/cart.css';
 
 /**
- * /account/subscription — single hub for everything plan-related.
+ * /account/subscription — the ONE place for everything plan-related.
  *
- * Top section: pending changes (only when count > 0). Diff-style
- * read of "current → new" for each change, with Discard / Apply.
+ * No separate /pricing page. The hub renders, in order:
+ *   1) Pending changes panel (when user has staged changes)
+ *   2) Current plan summary (signed-in only)
+ *   3) Browse-plans (memberships, role packs, sponsorships, à la carte)
+ *      with persona toggle and FAQ
  *
- * Below that: the user's CURRENT plan, broken into Membership /
- * Role packs / Sponsorship sections. Each section has CTAs that
- * route over to /pricing where the user stages additional changes.
+ * Works for both signed-in and signed-out visitors. Anonymous users
+ * can browse and stage selections — Apply prompts them to sign in.
  *
- * Apply calls apply_my_subscription RPC for the recurring items.
- * À la carte one-offs are flagged for follow-up (until Stripe is
- * live, our team handles them manually). When Stripe wires in,
- * Apply will create a Checkout Session from the same payload —
- * no UX changes needed.
+ * Apply calls apply_my_subscription RPC. When Stripe is wired in,
+ * Apply becomes "create Checkout Session" using the same payload
+ * — no UX changes needed.
  */
 export default function AccountSubscription() {
   const { user, profile, isAuthed, refreshProfile } = useAuth();
   const plan = usePlanChanges();
+  const [searchParams] = useSearchParams();
+
+  const initialPersona =
+    searchParams.get('persona') === 'business' ? 'business'
+      : profile?.account_type === 'business' ? 'business'
+      : 'individual';
+  const [persona, setPersona] = useState(initialPersona);
+
   const [current, setCurrent] = useState({ packs: {}, profile: null });
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(isAuthed);
   const [applying, setApplying] = useState(false);
   const [err, setErr] = useState(null);
   const [okMsg, setOkMsg] = useState(null);
@@ -43,6 +52,7 @@ export default function AccountSubscription() {
   useEffect(() => {
     let cancelled = false;
     if (!user?.id) { setLoading(false); return; }
+    setLoading(true);
     (async () => {
       const data = await loadPlan(supabase, user.id);
       if (!cancelled) {
@@ -52,26 +62,6 @@ export default function AccountSubscription() {
     })();
     return () => { cancelled = true; };
   }, [user?.id]);
-
-  if (!isAuthed) {
-    return (
-      <div className="acct-wrap">
-        <div className="cart-empty">
-          <h1>Sign in to manage your subscription</h1>
-          <p>You need to be signed in to view and update your plan.</p>
-          <Link to="/login" className="cart-btn primary">Log in</Link>
-        </div>
-      </div>
-    );
-  }
-
-  if (loading) {
-    return (
-      <div className="acct-wrap">
-        <div className="acct-empty">Loading your plan…</div>
-      </div>
-    );
-  }
 
   const accountType  = current.profile?.account_type  || profile?.account_type  || 'individual';
   const membershipId = current.profile?.membership_tier || profile?.membership_tier || 'free';
@@ -83,14 +73,18 @@ export default function AccountSubscription() {
 
   const sponsor = sponsorId ? findSponsorTier(sponsorId) : null;
 
-  const packEntries = Object.entries(current.packs || {})
-    .map(([packId, tierId]) => {
-      const pack = findPack(packId);
-      const tier = findPackTier(packId, tierId);
-      if (!pack) return null;
-      return { pack, tier };
-    })
-    .filter(Boolean);
+  const packEntries = useMemo(
+    () =>
+      Object.entries(current.packs || {})
+        .map(([packId, tierId]) => {
+          const pack = findPack(packId);
+          const tier = findPackTier(packId, tierId);
+          if (!pack) return null;
+          return { pack, tier };
+        })
+        .filter(Boolean),
+    [current.packs],
+  );
 
   const currentMrr =
     (membership?.priceMonthly || 0) +
@@ -106,9 +100,8 @@ export default function AccountSubscription() {
     const packChanges      = plan.pendingChanges.filter((c) => c.type === 'pack');
     const aLaCarteChanges  = plan.pendingChanges.filter((c) => c.type === 'alacarte');
 
-    // Build the merged packs map. Start from current packs, overlay
-    // any pending pack additions/changes. RPC fully replaces packs,
-    // so we always send the FULL set.
+    // Merge pending pack changes onto the current packs map. The RPC
+    // fully replaces the packs set, so we always send the FULL state.
     const mergedPacks = { ...(current.packs || {}) };
     packChanges.forEach((p) => { mergedPacks[p.id] = p.tierId; });
 
@@ -125,37 +118,47 @@ export default function AccountSubscription() {
     }
 
     await refreshProfile();
-    // Refresh the current plan view too so the page reflects new state
     if (user?.id) {
       const fresh = await loadPlan(supabase, user.id);
       setCurrent(fresh);
     }
     setApplying(false);
-    if (aLaCarteChanges.length > 0) {
-      setOkMsg(
-        'Plan updated. We\'ll email you within one business day to schedule the one-off promotions.',
-      );
-    } else {
-      setOkMsg('Plan updated. Your new tier is active immediately.');
-    }
+    setOkMsg(
+      aLaCarteChanges.length > 0
+        ? 'Plan updated. We\'ll email you within one business day to schedule the one-off promotions.'
+        : 'Plan updated. Your new tier is active immediately.',
+    );
     plan.discard();
   };
 
   return (
     <div className="acct-wrap">
       <div className="acct-head">
-        <div className="acct-eyebrow">Account</div>
-        <h1 className="acct-title">Manage subscription</h1>
+        <div className="acct-eyebrow">{isAuthed ? 'Account' : 'Plans & pricing'}</div>
+        <h1 className="acct-title">
+          {isAuthed ? 'Manage subscription' : 'Pick a plan that fits your shop'}
+        </h1>
+        {!isAuthed && (
+          <p style={{
+            margin: '0.6rem 0 0',
+            fontSize: 14,
+            color: 'var(--text-secondary)',
+            maxWidth: 640,
+          }}>
+            Browse and select what you need. Sign in or sign up to apply your selections.
+          </p>
+        )}
       </div>
 
-      {/* ── Pending changes (only when count > 0) ── */}
+      {/* Pending changes — for both signed-in and signed-out users */}
       {plan.count > 0 && (
         <PendingChangesPanel
           plan={plan}
+          isAuthed={isAuthed}
           accountType={accountType}
-          currentMembership={membership}
-          currentSponsor={sponsor}
-          currentPacks={current.packs || {}}
+          currentMembership={isAuthed ? membership : null}
+          currentSponsor={isAuthed ? sponsor : null}
+          currentPacks={isAuthed ? (current.packs || {}) : {}}
           onApply={handleApply}
           applying={applying}
           err={err}
@@ -164,134 +167,132 @@ export default function AccountSubscription() {
 
       {okMsg && <div className="cart-ok" style={{ marginBottom: '1rem' }}>{okMsg}</div>}
 
-      {/* ── Membership ── */}
-      <section className="acct-section">
-        <div className="acct-section-title">
-          <span>Membership</span>
-          <Link
-            to={accountType === 'business' ? '/pricing?persona=business' : '/pricing'}
-            className="cart-btn ghost"
-            style={{ padding: '6px 12px', fontSize: 12 }}
-          >
-            Change plan
-          </Link>
-        </div>
-        <div className="acct-row">
-          <div>
-            <div className="acct-row-name">{membership?.name || membershipId}</div>
-            {membership?.tagline && <div className="acct-row-sub">{membership.tagline}</div>}
-            <div className="acct-row-sub" style={{ fontStyle: 'italic', marginTop: 4 }}>
-              {accountType === 'business' ? 'Business account' : 'Individual account'}
-            </div>
-          </div>
-          <div className="acct-row-price">
-            {formatPrice(membership?.priceMonthly || 0)}
-            {(membership?.priceMonthly || 0) > 0 && '/mo'}
-          </div>
-        </div>
-      </section>
+      {/* Current plan summary — signed-in users only */}
+      {isAuthed && !loading && (
+        <>
+          <h2 className="acct-section-heading">Your current plan</h2>
 
-      {/* ── Role packs (business only) ── */}
-      {accountType === 'business' && (
-        <section className="acct-section">
-          <div className="acct-section-title">
-            <span>Role packs</span>
-            <Link
-              to="/pricing?persona=business"
-              className="cart-btn ghost"
-              style={{ padding: '6px 12px', fontSize: 12 }}
-            >
-              Add or change packs
-            </Link>
-          </div>
-          {packEntries.length === 0 ? (
-            <div className="acct-empty">
-              No role packs active. Recruiter / vendor / supplier packs unlock
-              additional placement, volume, and tools.
+          <section className="acct-section">
+            <div className="acct-section-title">
+              <span>Membership</span>
             </div>
-          ) : (
-            packEntries.map(({ pack, tier }) => (
-              <div className="acct-row" key={pack.id}>
-                <div>
-                  <div className="acct-row-name">{pack.name}</div>
-                  <div className="acct-row-sub">
-                    {tier?.name || 'Active'}
-                    {tier?.cap !== undefined && tier.cap !== Infinity && (
-                      <> · up to {tier.cap} {tier.cap === 1 ? pack.unit : pack.unitPlural}</>
-                    )}
-                  </div>
-                </div>
-                <div className="acct-row-price">
-                  {formatPrice(tier?.priceMonthly || 0)}
-                  {(tier?.priceMonthly || 0) > 0 && '/mo'}
+            <div className="acct-row">
+              <div>
+                <div className="acct-row-name">{membership?.name || membershipId}</div>
+                {membership?.tagline && <div className="acct-row-sub">{membership.tagline}</div>}
+                <div className="acct-row-sub" style={{ fontStyle: 'italic', marginTop: 4 }}>
+                  {accountType === 'business' ? 'Business account' : 'Individual account'}
                 </div>
               </div>
-            ))
+              <div className="acct-row-price">
+                {formatPrice(membership?.priceMonthly || 0)}
+                {(membership?.priceMonthly || 0) > 0 && '/mo'}
+              </div>
+            </div>
+          </section>
+
+          {accountType === 'business' && (
+            <section className="acct-section">
+              <div className="acct-section-title">
+                <span>Role packs</span>
+              </div>
+              {packEntries.length === 0 ? (
+                <div className="acct-empty">
+                  No role packs active. Recruiter / vendor / supplier packs unlock
+                  additional placement, volume, and tools.
+                </div>
+              ) : (
+                packEntries.map(({ pack, tier }) => (
+                  <div className="acct-row" key={pack.id}>
+                    <div>
+                      <div className="acct-row-name">{pack.name}</div>
+                      <div className="acct-row-sub">
+                        {tier?.name || 'Active'}
+                        {tier?.cap !== undefined && tier.cap !== Infinity && (
+                          <> · up to {tier.cap} {tier.cap === 1 ? pack.unit : pack.unitPlural}</>
+                        )}
+                      </div>
+                    </div>
+                    <div className="acct-row-price">
+                      {formatPrice(tier?.priceMonthly || 0)}
+                      {(tier?.priceMonthly || 0) > 0 && '/mo'}
+                    </div>
+                  </div>
+                ))
+              )}
+            </section>
           )}
-        </section>
+
+          <section className="acct-section">
+            <div className="acct-section-title">
+              <span>Sponsorship</span>
+            </div>
+            {sponsor ? (
+              <div className="acct-row">
+                <div>
+                  <div className="acct-row-name">{sponsor.name}</div>
+                  {sponsor.tagline && <div className="acct-row-sub">{sponsor.tagline}</div>}
+                </div>
+                <div className="acct-row-price">{formatPrice(sponsor.priceMonthly)}/mo</div>
+              </div>
+            ) : (
+              <div className="acct-empty">
+                Not currently sponsoring. Sponsor tiers offer site-wide brand visibility.
+              </div>
+            )}
+          </section>
+
+          <section className="acct-section" style={{ background: '#FDFBF5' }}>
+            <div className="acct-section-title">Your monthly total</div>
+            <div className="acct-row">
+              <div>
+                <div className="acct-row-name">Recurring (per month)</div>
+                <div className="acct-row-sub">
+                  Excludes one-off promotions and "Contact sales" tiers.
+                </div>
+              </div>
+              <div className="acct-row-price" style={{ fontSize: 22 }}>
+                ${currentMrr.toLocaleString()}
+              </div>
+            </div>
+          </section>
+
+          <div style={{
+            marginBottom: '2rem',
+            padding: '1rem 1.25rem',
+            background: 'var(--white)',
+            border: '1px dashed var(--border)',
+            borderRadius: 10,
+            fontSize: 12.5,
+            color: 'var(--text-muted)',
+            lineHeight: 1.5,
+          }}>
+            Need to cancel or downgrade?{' '}
+            <a href="mailto:support@grainhub.io" style={{ color: 'var(--wood-warm)' }}>
+              Email us
+            </a>{' '}
+            and we'll handle it within one business day.
+          </div>
+        </>
       )}
 
-      {/* ── Sponsorship ── */}
-      <section className="acct-section">
-        <div className="acct-section-title">
-          <span>Sponsorship</span>
-          <Link to="/sponsor" className="cart-btn ghost" style={{ padding: '6px 12px', fontSize: 12 }}>
-            {sponsor ? 'Change tier' : 'Become a sponsor'}
-          </Link>
-        </div>
-        {sponsor ? (
-          <div className="acct-row">
-            <div>
-              <div className="acct-row-name">{sponsor.name}</div>
-              {sponsor.tagline && <div className="acct-row-sub">{sponsor.tagline}</div>}
-            </div>
-            <div className="acct-row-price">{formatPrice(sponsor.priceMonthly)}/mo</div>
-          </div>
-        ) : (
-          <div className="acct-empty">
-            Not currently sponsoring. Sponsor tiers offer site-wide brand visibility.
-          </div>
-        )}
-      </section>
-
-      {/* ── Monthly total ── */}
-      <section className="acct-section" style={{ background: '#FDFBF5' }}>
-        <div className="acct-section-title">Your monthly total</div>
-        <div className="acct-row">
-          <div>
-            <div className="acct-row-name">Recurring (per month)</div>
-            <div className="acct-row-sub">
-              Excludes one-off promotions and "Contact sales" tiers.
-            </div>
-          </div>
-          <div className="acct-row-price" style={{ fontSize: 22 }}>
-            ${currentMrr.toLocaleString()}
-          </div>
-        </div>
-      </section>
-
-      <div style={{
-        marginTop: '1.25rem',
-        padding: '1rem 1.25rem',
-        background: 'var(--white)',
-        border: '1px dashed var(--border)',
-        borderRadius: 10,
-        fontSize: 12.5,
-        color: 'var(--text-muted)',
-        lineHeight: 1.5,
-      }}>
-        Need to cancel or downgrade?{' '}
-        <a href="mailto:support@grainhub.io" style={{ color: 'var(--wood-warm)' }}>
-          Email us
-        </a>{' '}
-        and we'll handle it within one business day.
-      </div>
+      {/* Browse plans — visible to everyone */}
+      <h2 className="acct-section-heading">
+        {isAuthed ? 'Change or add to your plan' : 'Browse plans'}
+      </h2>
+      <PlanBrowse persona={persona} onPersonaChange={setPersona} />
     </div>
   );
 }
 
+/* ── Pending-changes panel ─────────────────────────────────
+ * Diff-style "current → new" for each staged change. Handles
+ * both signed-in (Apply works) and signed-out (Sign in to apply)
+ * users. Each row has an × to drop just that change.
+ */
 function PendingChangesPanel({
   plan,
+  isAuthed,
   accountType,
   currentMembership,
   currentSponsor,
@@ -309,10 +310,12 @@ function PendingChangesPanel({
           : findIndividualTier(c.id);
         out.push({
           key: 'm-' + c.id,
-          icon: '\u21BB',
+          icon: '↻',
           title: 'Membership',
-          detail: (currentMembership?.name || 'Free') + ' \u2192 ' + (newTier?.name || c.id),
-          monthly: (newTier?.priceMonthly || 0) - (currentMembership?.priceMonthly || 0),
+          detail: isAuthed && currentMembership
+            ? currentMembership.name + ' → ' + (newTier?.name || c.id)
+            : 'New: ' + (newTier?.name || c.id),
+          monthly: (newTier?.priceMonthly || 0) - (isAuthed ? (currentMembership?.priceMonthly || 0) : 0),
           remove: () => plan.removeChange((i) => i.type === 'membership'),
         });
       } else if (c.type === 'pack') {
@@ -322,10 +325,10 @@ function PendingChangesPanel({
         const currentTier = currentTierId ? findPackTier(c.id, currentTierId) : null;
         out.push({
           key: 'p-' + c.id,
-          icon: currentTier ? '\u21BB' : '+',
+          icon: currentTier ? '↻' : '＋',
           title: pack?.name || c.id,
           detail: currentTier
-            ? currentTier.name + ' \u2192 ' + (newTier?.name || c.tierId)
+            ? currentTier.name + ' → ' + (newTier?.name || c.tierId)
             : 'Add at ' + (newTier?.name || c.tierId) + ' tier',
           monthly: (newTier?.priceMonthly || 0) - (currentTier?.priceMonthly || 0),
           remove: () => plan.removeChange((i) => i.type === 'pack' && i.id === c.id),
@@ -334,10 +337,10 @@ function PendingChangesPanel({
         const newTier = findSponsorTier(c.id);
         out.push({
           key: 's-' + c.id,
-          icon: currentSponsor ? '\u21BB' : '+',
+          icon: currentSponsor ? '↻' : '＋',
           title: 'Sponsorship',
           detail: currentSponsor
-            ? currentSponsor.name + ' \u2192 ' + (newTier?.name || c.id)
+            ? currentSponsor.name + ' → ' + (newTier?.name || c.id)
             : 'Become ' + (newTier?.name || c.id),
           monthly: (newTier?.priceMonthly || 0) - (currentSponsor?.priceMonthly || 0),
           remove: () => plan.removeChange((i) => i.type === 'sponsor'),
@@ -346,8 +349,8 @@ function PendingChangesPanel({
         const ac = A_LA_CARTE.find((a) => a.id === c.id);
         out.push({
           key: 'a-' + c.id,
-          icon: '+',
-          title: 'One-off \u00B7 ' + (ac?.name || c.id),
+          icon: '＋',
+          title: 'One-off · ' + (ac?.name || c.id),
           detail: ac?.tagline || 'Promotional package',
           oneTime: ac?.price || 0,
           remove: () => plan.removeChange((i) => i.type === 'alacarte' && i.id === c.id),
@@ -355,7 +358,7 @@ function PendingChangesPanel({
       }
     });
     return out;
-  }, [plan.pendingChanges, accountType, currentMembership, currentSponsor, currentPacks]);
+  }, [plan.pendingChanges, isAuthed, accountType, currentMembership, currentSponsor, currentPacks]);
 
   const totals = rows.reduce(
     (acc, r) => ({
@@ -415,7 +418,7 @@ function PendingChangesPanel({
                 aria-label="Remove change"
                 disabled={applying}
               >
-                {String.fromCharCode(215)}
+                ×
               </button>
             </div>
           </div>
@@ -426,10 +429,11 @@ function PendingChangesPanel({
 
       {totals.mrrDelta !== 0 && (
         <div className="cart-summary-row">
-          <span>Recurring change</span>
+          <span>{isAuthed ? 'Recurring change' : 'New recurring'}</span>
           <strong>
-            {totals.mrrDelta > 0 ? '+' : '\u2212'}$
-            {Math.abs(totals.mrrDelta).toLocaleString()}/mo
+            {isAuthed && totals.mrrDelta > 0 ? '+' : ''}
+            {isAuthed && totals.mrrDelta < 0 ? '−' : ''}
+            ${Math.abs(totals.mrrDelta).toLocaleString()}/mo
           </strong>
         </div>
       )}
@@ -442,14 +446,24 @@ function PendingChangesPanel({
 
       {err && <div className="cart-err">{err}</div>}
 
-      <button
-        type="button"
-        className="cart-btn primary cart-confirm"
-        onClick={onApply}
-        disabled={applying}
-      >
-        {applying ? 'Applying\u2026' : 'Apply changes'}
-      </button>
+      {isAuthed ? (
+        <button
+          type="button"
+          className="cart-btn primary cart-confirm"
+          onClick={onApply}
+          disabled={applying}
+        >
+          {applying ? 'Applying…' : 'Apply changes'}
+        </button>
+      ) : (
+        <Link
+          to="/signup?next=/account/subscription"
+          className="cart-btn primary cart-confirm"
+          style={{ display: 'inline-flex', justifyContent: 'center' }}
+        >
+          Sign up to apply →
+        </Link>
+      )}
 
       <div className="cart-summary-foot">
         Recurring changes activate immediately. À la carte one-offs route to

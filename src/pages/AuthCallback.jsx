@@ -54,7 +54,7 @@ export default function AuthCallback() {
           }
           // Businesses land on the pricing page so they can pick
           // role packs right away; individuals go to their feed.
-          redirect = persona === 'business' ? '/pricing?persona=business' : '/';
+          redirect = persona === 'business' ? '/account/subscription?persona=business' : '/';
           sessionStorage.removeItem('signup:accountType');
         }
       } catch (_) { /* storage disabled — skip */ }

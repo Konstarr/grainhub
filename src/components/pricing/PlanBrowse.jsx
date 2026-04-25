@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import '../styles/pricing.css';
+import { useNavigate } from 'react-router-dom';
 import {
   INDIVIDUAL_TIERS,
   BUSINESS_TIERS,
@@ -8,90 +7,66 @@ import {
   SPONSOR_TIERS,
   A_LA_CARTE,
   formatPrice,
-} from '../lib/pricing.js';
-import { usePlanChanges } from '../context/PlanContext.jsx';
+} from '../../lib/pricing.js';
+import { usePlanChanges } from '../../context/PlanContext.jsx';
+import '../../styles/pricing.css';
 
 /**
- * /pricing — public pricing page.
- *
- * Design principle: each of the four business "axes" gets its OWN
- * visual treatment so the page doesn't feel like wall-to-wall cards.
- *
- *   Memberships   → a tight compact 4-up table row ("baseline")
- *   Role packs    → big hero cards with icons + pill tier selector
- *   À la carte    → grid of icon tiles with one price each
- *   Sponsorships  → metallic medallion-style cards (silver/gold/platinum)
- *
- * CTAs stage subscription changes (not cart items). The user
- * reviews them at /account/subscription and applies in one click.
- * When Stripe is wired in, Apply will create a Checkout Session
- * from the same staged-changes payload — no UX shifts needed.
+ * PlanBrowse — the "shop" portion of the subscription hub. Renders
+ * the four pricing axes (memberships, role packs, sponsorships, à la
+ * carte) with CTAs that stage changes into the user's pending-changes
+ * list. Used inside /account/subscription so there's no separate
+ * pricing page anymore.
  */
-export default function Pricing() {
-  const [searchParams] = useSearchParams();
-  const initial = searchParams.get('persona') === 'business' ? 'business' : 'individual';
-  const [persona, setPersona] = useState(initial);
-  const plan = usePlanChanges();
-
+export default function PlanBrowse({ persona = 'individual', onPersonaChange }) {
   return (
     <>
-      <div className="page-header gh-hero">
-        <div className="header-inner">
-          <div className="header-top">
-            <div className="header-left">
-              <div className="page-eyebrow">Pricing</div>
-              <h1 className="page-title">Pick the plan that fits your shop.</h1>
-              <p className="page-subtitle">
-                Flat monthly pricing. No per-listing fees, no per-application charges.
-              </p>
-            </div>
-            {plan.count > 0 && (
-              <div className="header-right">
-                <Link to="/account/subscription" className="pricing-cart-btn">
-                  {plan.count} pending change{plan.count === 1 ? '' : 's'} →
-                </Link>
-              </div>
-            )}
-          </div>
-        </div>
+      <div className="persona-toggle">
+        <button
+          type="button"
+          className={'persona-btn ' + (persona === 'individual' ? 'active' : '')}
+          onClick={() => onPersonaChange?.('individual')}
+        >
+          Individual
+        </button>
+        <button
+          type="button"
+          className={'persona-btn ' + (persona === 'business' ? 'active' : '')}
+          onClick={() => onPersonaChange?.('business')}
+        >
+          Business
+        </button>
+        <span
+          className="persona-thumb"
+          style={{ transform: persona === 'individual' ? 'translateX(0%)' : 'translateX(100%)' }}
+          aria-hidden="true"
+        />
       </div>
 
-      <div className="pricing-wrap">
-        <div className="persona-toggle">
-          <button type="button" className={'persona-btn ' + (persona === 'individual' ? 'active' : '')} onClick={() => setPersona('individual')}>
-            Individual
-          </button>
-          <button type="button" className={'persona-btn ' + (persona === 'business' ? 'active' : '')} onClick={() => setPersona('business')}>
-            Business
-          </button>
-          <span className="persona-thumb" style={{ transform: persona === 'individual' ? 'translateX(0%)' : 'translateX(100%)' }} aria-hidden="true" />
-        </div>
+      {persona === 'individual' ? <IndividualSection /> : <BusinessSection />}
 
-        {persona === 'individual' ? <IndividualSection /> : <BusinessSection />}
-
-        <div className="pricing-faq">
-          <h2>Common questions</h2>
-          <FaqItem q="Can I mix and match?">
-            Yes. Businesses can combine a membership tier, any role packs they need,
-            sponsorships, and one-off à la carte promotions — billed on a single invoice.
-            Individuals just pick one membership tier.
-          </FaqItem>
-          <FaqItem q="What happens when I hit a cap?">
-            Nothing hard-blocks at the cap. We give you a 2-week grace with a banner
-            suggesting an upgrade. Only at 2× the cap does posting actually lock.
-          </FaqItem>
-          <FaqItem q="Annual billing?">
-            Annual plans get 2 months free (10× monthly). Available at checkout.
-          </FaqItem>
-          <FaqItem q="Cancel anytime?">
-            Yes. Downgrade or cancel in one click from your account; changes take
-            effect at the end of your billing period.
-          </FaqItem>
-          <FaqItem q="Do you take a cut of marketplace sales?">
-            No. Transactions happen directly between buyer and seller. We only charge
-            for listing visibility.
-          </FaqItem>
-        </div>
+      <div className="pricing-faq">
+        <h2>Common questions</h2>
+        <FaqItem q="Can I mix and match?">
+          Yes. Businesses can combine a membership tier, any role packs they need,
+          sponsorships, and one-off à la carte promotions — billed on a single invoice.
+          Individuals just pick one membership tier.
+        </FaqItem>
+        <FaqItem q="What happens when I hit a cap?">
+          Nothing hard-blocks at the cap. We give you a 2-week grace with a banner
+          suggesting an upgrade. Only at 2× the cap does posting actually lock.
+        </FaqItem>
+        <FaqItem q="Annual billing?">
+          Annual plans get 2 months free (10× monthly). Available at checkout.
+        </FaqItem>
+        <FaqItem q="Cancel anytime?">
+          Yes. Downgrade or cancel in one click; changes take effect at the
+          end of your billing period.
+        </FaqItem>
+        <FaqItem q="Do you take a cut of marketplace sales?">
+          No. Transactions happen directly between buyer and seller. We only charge
+          for listing visibility.
+        </FaqItem>
       </div>
     </>
   );
@@ -118,7 +93,6 @@ function IndividualSection() {
 function BusinessSection() {
   return (
     <>
-      {/* ── MEMBERSHIPS — compact compare strip ── */}
       <section className="pricing-section">
         <div className="section-heading">
           <div className="axis-eyebrow">Axis 1 · Baseline</div>
@@ -128,7 +102,6 @@ function BusinessSection() {
         <MembershipStrip tiers={BUSINESS_TIERS} />
       </section>
 
-      {/* ── ROLE PACKS — big hero cards with icons ── */}
       <section className="pricing-section">
         <div className="section-heading">
           <div className="axis-eyebrow">Axis 2 · Scale</div>
@@ -145,14 +118,13 @@ function BusinessSection() {
         </div>
       </section>
 
-      {/* ── SPONSORSHIPS — metallic medallion cards ── */}
       <section className="pricing-section">
         <div className="section-heading">
           <div className="axis-eyebrow">Axis 3 · Brand</div>
           <h2>Sponsorships</h2>
           <p>
-            Pure brand exposure. Independent from memberships and packs — stack with
-            any combination or buy alone.
+            Pure brand exposure. Independent from memberships and packs — stack
+            with any combination or buy alone.
           </p>
         </div>
         <div className="sponsor-grid">
@@ -162,7 +134,6 @@ function BusinessSection() {
         </div>
       </section>
 
-      {/* ── À LA CARTE — one-off icon tiles ── */}
       <section className="pricing-section">
         <div className="section-heading">
           <div className="axis-eyebrow">One-offs</div>
@@ -185,30 +156,18 @@ function BusinessSection() {
 /* ══════════════════ Sub-components ══════════════════════ */
 
 /**
- * Reusable CTA pill used across every card on the pricing page.
- * Flips between three states: ready-to-stage, staged, and contact-sales.
- * Routing target on review is always /account/subscription (the
- * single management hub) — never a cart.
+ * Reusable CTA pill across every card. Three states:
+ * ready-to-stage, staged, contact-sales.
  */
 function PlanCta({ staged, onStage, contactSales = false, label = 'Add to plan' }) {
-  const navigate = useNavigate();
   if (contactSales) {
     return <a href="mailto:sales@grainhub.io" className="tier-cta">Contact sales</a>;
   }
   if (staged) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-        <button type="button" className="tier-cta tier-cta-added" disabled>
-          Selected ✓
-        </button>
-        <button
-          type="button"
-          className="tier-cta-secondary"
-          onClick={() => navigate('/account/subscription')}
-        >
-          Review in subscription →
-        </button>
-      </div>
+      <button type="button" className="tier-cta tier-cta-added" disabled>
+        Selected ✓
+      </button>
     );
   }
   return (
@@ -218,14 +177,11 @@ function PlanCta({ staged, onStage, contactSales = false, label = 'Add to plan' 
   );
 }
 
-/** Generic tier card — used by individuals only now. */
+/** Generic tier card — used by individual memberships. */
 function TierCard({ tier }) {
   const plan = usePlanChanges();
   const staged = plan.has((i) => i.type === 'membership' && i.id === tier.id);
-
-  const handleStage = () => {
-    plan.addChange({ type: 'membership', id: tier.id });
-  };
+  const handleStage = () => plan.addChange({ type: 'membership', id: tier.id });
 
   return (
     <div className={'tier-card ' + (tier.highlight ? 'tier-highlight' : '')}>
@@ -248,11 +204,9 @@ function TierCard({ tier }) {
   );
 }
 
-/** Compact horizontal strip for the four business-membership levels.
- *  Much tighter than big cards — reads as a choose-your-baseline row. */
+/** Compact horizontal strip for the four business-membership levels. */
 function MembershipStrip({ tiers }) {
   const plan = usePlanChanges();
-  const navigate = useNavigate();
 
   return (
     <div className="mb-strip">
@@ -281,11 +235,7 @@ function MembershipStrip({ tiers }) {
             {t.priceMonthly === null ? (
               <a href="mailto:sales@grainhub.io" className="mb-cta">Contact sales</a>
             ) : staged ? (
-              <button
-                type="button"
-                className="mb-cta mb-cta-added"
-                onClick={() => navigate('/account/subscription')}
-              >
+              <button type="button" className="mb-cta mb-cta-added" disabled>
                 Selected ✓
               </button>
             ) : (
@@ -300,7 +250,6 @@ function MembershipStrip({ tiers }) {
   );
 }
 
-/** Big hero-style pack card with icon + tier pill selector. */
 const PACK_VISUALS = {
   recruiter: { icon: '👥', gradient: 'linear-gradient(135deg, #2D5016 0%, #5A8F3A 100%)' },
   vendor:    { icon: '🛒', gradient: 'linear-gradient(135deg, #8B4316 0%, #C07A3C 100%)' },
@@ -325,9 +274,7 @@ function PackCard({ pack }) {
     (i) => i.type === 'pack' && i.id === pack.id && i.tierId !== tierId,
   );
 
-  const handleStage = () => {
-    plan.addChange({ type: 'pack', id: pack.id, tierId });
-  };
+  const handleStage = () => plan.addChange({ type: 'pack', id: pack.id, tierId });
 
   return (
     <div className="pack-hero">
@@ -377,7 +324,6 @@ function PackCard({ pack }) {
   );
 }
 
-/** Metallic medallion card for Silver / Gold / Platinum. */
 const SPONSOR_VISUALS = {
   silver:   { gradient: 'linear-gradient(135deg, #9CA0A6 0%, #D4D7DC 50%, #9CA0A6 100%)', ring: '#B8BCC2' },
   gold:     { gradient: 'linear-gradient(135deg, #C49540 0%, #F3D67E 50%, #C49540 100%)', ring: '#D4A848' },
@@ -394,7 +340,13 @@ function SponsorMedallion({ tier }) {
 
   return (
     <div className={'sponsor-card-new ' + (tier.highlight ? 'sponsor-highlight' : '')}>
-      <div className="sponsor-medal" style={{ background: v.gradient, boxShadow: `0 4px 14px ${v.ring}55, inset 0 1px 0 rgba(255,255,255,0.4)` }}>
+      <div
+        className="sponsor-medal"
+        style={{
+          background: v.gradient,
+          boxShadow: '0 4px 14px ' + v.ring + '55, inset 0 1px 0 rgba(255,255,255,0.4)',
+        }}
+      >
         <span className="sponsor-medal-label">{label}</span>
       </div>
       <div className="sponsor-card-body">
@@ -416,10 +368,8 @@ function SponsorMedallion({ tier }) {
   );
 }
 
-/** Icon tile for à la carte items. */
 function ALaCarteTile({ item }) {
   const plan = usePlanChanges();
-  const navigate = useNavigate();
   const staged = plan.has((i) => i.type === 'alacarte' && i.id === item.id);
   const handleStage = () => plan.addChange({ type: 'alacarte', id: item.id });
 
@@ -434,12 +384,8 @@ function ALaCarteTile({ item }) {
       <div className="alacarte-tagline">{item.tagline}</div>
       <div className="alacarte-desc">{item.description}</div>
       {staged ? (
-        <button
-          type="button"
-          className="alacarte-cta"
-          onClick={() => navigate('/account/subscription')}
-        >
-          Selected ✓ · Review →
+        <button type="button" className="alacarte-cta" disabled>
+          Selected ✓
         </button>
       ) : (
         <button type="button" className="alacarte-cta" onClick={handleStage}>

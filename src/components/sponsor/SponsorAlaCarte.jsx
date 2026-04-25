@@ -18,7 +18,7 @@ export default function SponsorAlaCarte() {
           </h2>
           <p className="sponsor-section-sub">
             One-off promotions for product launches, events, or seasonal pushes — no monthly
-            commitment. Stack with any package on the <Link to="/pricing">pricing page</Link>.
+            commitment. Stack with any package on the <Link to="/account/subscription">pricing page</Link>.
           </p>
         </div>
         <div className="sponsor-alacarte-grid">

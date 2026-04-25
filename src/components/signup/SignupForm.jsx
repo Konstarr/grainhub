@@ -629,7 +629,7 @@ export default function SignupForm() {
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '1.5rem' }}>
                 <Link
-                  to={accountType === 'business' ? '/pricing?persona=business' : '/pricing'}
+                  to={accountType === 'business' ? '/account/subscription?persona=business' : '/account/subscription'}
                   className="signup-success-btn"
                   style={{ width: '100%', textDecoration: 'none', textAlign: 'center' }}
                 >

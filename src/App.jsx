@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext.jsx';
 import RequireAuth from './components/auth/RequireAuth.jsx';
 import RequireStaff from './components/auth/RequireStaff.jsx';
@@ -22,7 +22,6 @@ import SupplierProfile from './pages/SupplierProfile.jsx';
 import Signup from './pages/Signup.jsx';
 import Login from './pages/Login.jsx';
 import Sponsor from './pages/Sponsor.jsx';
-import Pricing from './pages/Pricing.jsx';
 import Communities from './pages/Communities.jsx';
 import CommunityNew from './pages/CommunityNew.jsx';
 import CommunityHome from './pages/CommunityHome.jsx';
@@ -106,8 +105,11 @@ export default function App() {
           <Route path="/communities/new" element={<RequireAuth><CommunityNew /></RequireAuth>} />
           <Route path="/c/:slug" element={<CommunityHome />} />
           <Route path="/sponsor" element={<Sponsor />} />
-          <Route path="/pricing" element={<Pricing />} />
-          <Route path="/account/subscription" element={<RequireAuth><AccountSubscription /></RequireAuth>} />
+          {/* /pricing folded into /account/subscription. Keep as a
+              redirect so old links / bookmarks / search results still
+              land in the right place. */}
+          <Route path="/pricing" element={<Navigate to="/account/subscription" replace />} />
+          <Route path="/account/subscription" element={<AccountSubscription />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/login" element={<Login />} />

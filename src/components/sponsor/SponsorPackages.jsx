@@ -23,7 +23,7 @@ export default function SponsorPackages() {
           </div>
           <p>
             Three flat tiers, billed monthly, no per-impression fees. Stack with any business
-            membership or role pack on the <Link to="/pricing">pricing page</Link>.
+            membership or role pack on the <Link to="/account/subscription">pricing page</Link>.
           </p>
         </div>
 
@@ -53,7 +53,7 @@ export default function SponsorPackages() {
                   ))}
                 </div>
                 <Link
-                  to="/pricing?persona=business"
+                  to="/account/subscription?persona=business"
                   className={'sponsor-pkg-btn sponsor-pkg-btn-' + (tier.highlight ? 'primary' : 'secondary')}
                   style={{ textDecoration: 'none', display: 'inline-block', textAlign: 'center' }}
                 >

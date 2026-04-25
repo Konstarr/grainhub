@@ -349,3 +349,28 @@
   background: #FDFBF5;
   border-radius: 8px;
 }
+
+/* Pending-changes panel — warm tone so it reads as "needs action" */
+.acct-section.pending-panel {
+  background: linear-gradient(180deg, #FDF6E8 0%, #FBF1DA 100%);
+  border-color: #E5C77A;
+  box-shadow: 0 2px 12px rgba(176, 128, 38, 0.08);
+}
+.acct-section.pending-panel .acct-row {
+  border-bottom-color: rgba(176, 128, 38, 0.2);
+}
+.acct-section.pending-panel .cart-summary-row {
+  padding: 5px 0;
+}
+
+/* Section dividers between hub regions */
+.acct-section-heading {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+  color: var(--text-primary);
+  margin: 1.5rem 0 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-light);
+}
