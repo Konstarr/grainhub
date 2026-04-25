@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import { supabase } from '../../lib/supabase.js';
+import { safeLinkUrl } from '../../lib/urlSafety.js';
 
 const EMOJIS = [
   // common
@@ -140,9 +141,27 @@ export default function RichReplyBox({
   };
 
   const onInsertLink = () => {
-    const url = window.prompt('Link URL:', 'https://');
-    if (!url) return;
-    wrap('[', `](${url})`, 'link text');
+    const raw = window.prompt('Link URL:', 'https://');
+    if (!raw) return;
+    // Validate the URL through the centralized safeLinkUrl helper.
+    // Blocks javascript:, data:, file:, vbscript:, etc. and rejects
+    // anything that isn't http/https/mailto/tel.
+    const safe = safeLinkUrl(raw);
+    if (!safe) {
+      // eslint-disable-next-line no-alert
+      alert(
+        'That URL isn\'t allowed. Only http://, https://, mailto:, and ' +
+        'tel: links are accepted. Please paste a regular web link.',
+      );
+      return;
+    }
+    // Cap length so a 4 KB nasty URL can\'t balloon the post.
+    if (safe.length > 2000) {
+      // eslint-disable-next-line no-alert
+      alert('Link URL is too long (max 2000 characters).');
+      return;
+    }
+    wrap('[', `](${safe})`, 'link text');
   };
 
   const onUploadClick = () => {
