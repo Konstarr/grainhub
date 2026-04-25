@@ -32,11 +32,42 @@ function findCategoryMeta(id) {
 }
 
 function authorDisplay(author) {
-  if (!author) return { handle: 'community', name: 'Community', initials: 'GH', trade: '', reputation: 0 };
+  if (!author) {
+    return {
+      handle: 'community', name: 'Community', initials: 'GH',
+      trade: '', reputation: 0, location: '', postCount: 0,
+      joinDate: null, avatarUrl: null,
+    };
+  }
   const name = author.full_name || author.username || 'Member';
   const handle = author.username || 'member';
   const initials = name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase() || 'GH';
-  return { handle, name, initials, trade: author.trade || '', reputation: author.reputation || 0 };
+  return {
+    handle, name, initials,
+    trade:      author.trade      || '',
+    reputation: author.reputation || 0,
+    location:   author.location   || '',
+    postCount:  author.post_count || 0,
+    joinDate:   author.joined_at  || author.created_at || null,
+    avatarUrl:  author.avatar_url || null,
+  };
+}
+
+/* Format a join date as "Join Date: Sep 2013" — short month + year. */
+function formatJoinDate(iso) {
+  if (!iso) return '';
+  try {
+    return new Date(iso).toLocaleDateString(undefined, { month: 'short', year: 'numeric' });
+  } catch (_) { return ''; }
+}
+
+/* Reputation bar: 5 segments, fills based on log scale so a user
+   with 50 rep shows ~half-filled and 5000+ rep shows fully filled.
+   Avoids the "endless empty bar" problem of linear scaling. */
+function repBarSegments(rep) {
+  const score = Math.max(0, Math.log10((rep || 0) + 1) / Math.log10(5001));
+  const filled = Math.min(5, Math.round(score * 5));
+  return { filled, total: 5 };
 }
 
 function timeAgo(iso) {
@@ -54,16 +85,43 @@ function timeAgo(iso) {
 
 function AuthorCard({ author }) {
   const a = authorDisplay(author);
+  const join = formatJoinDate(a.joinDate);
+  const rep = repBarSegments(a.reputation);
   return (
     <div className="user-col">
-      <Link to={'/profile/' + a.handle} className={'user-avatar av-a'} style={{ textDecoration: 'none' }}>
-        {a.initials}
-      </Link>
       <Link to={'/profile/' + a.handle} style={{ textDecoration: 'none', color: 'inherit' }}>
         <div className="user-name">{a.name}</div>
       </Link>
+      <Link
+        to={'/profile/' + a.handle}
+        className="user-avatar av-a"
+        style={{
+          textDecoration: 'none',
+          backgroundImage: a.avatarUrl ? 'url(' + a.avatarUrl + ')' : undefined,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+        aria-label={a.name + ' profile'}
+      >
+        {!a.avatarUrl && a.initials}
+      </Link>
       {a.trade && <div className="user-title">{a.trade}</div>}
-      <div className="user-rep">{a.reputation} rep</div>
+
+      <ul className="user-stats">
+        {join       && <li><span>Join Date:</span> <strong>{join}</strong></li>}
+        {a.location && <li><span>Location:</span> <strong>{a.location}</strong></li>}
+        <li><span>Posts:</span> <strong>{a.postCount.toLocaleString()}</strong></li>
+      </ul>
+
+      <div className="user-rep-row" title={a.reputation.toLocaleString() + ' reputation'}>
+        <span className="user-rep-label">Rep</span>
+        <div className="user-rep-bar" aria-label={'Reputation ' + a.reputation}>
+          {Array.from({ length: rep.total }).map((_, i) => (
+            <span key={i} className={'user-rep-seg ' + (i < rep.filled ? 'on' : '')} />
+          ))}
+        </div>
+        <span className="user-rep-num">{a.reputation.toLocaleString()}</span>
+      </div>
     </div>
   );
 }

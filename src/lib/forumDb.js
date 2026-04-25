@@ -9,7 +9,7 @@ import { supabase } from './supabase.js';
 
 // Columns guaranteed to exist in the base schema (pre-migration safe).
 // Reputation is enriched via fetchReputations() after the main fetch.
-const AUTHOR_COLS_SAFE = 'id, username, full_name, avatar_url, trade';
+const AUTHOR_COLS_SAFE = 'id, username, full_name, avatar_url, trade, location, reputation, post_count, joined_at, created_at';
 
 async function fetchReputations(profileIds) {
   const ids = Array.from(new Set(profileIds.filter(Boolean)));
