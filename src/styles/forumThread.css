@@ -173,18 +173,45 @@
 
 /* USER COLUMN */
 .user-col {
-  /* Wider than before (120 → 170) so Join Date / Location aren't
-     truncated. The .ft-wrap max-width grew by 60 to absorb this
-     without shrinking the post body. */
-  width: 170px;
+  /* The separate vote column was removed, freeing 58px. We rolled
+     that into user-col so we can fit "Seattle, Washington" and
+     similar without truncation. Center post body width unchanged. */
+  width: 200px;
   flex-shrink: 0;
-  padding: 1.5rem 1rem;
+  padding: 1.25rem 1rem;
   border-right: 1px solid var(--border-light);
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
   background: #FDFAF4;
+}
+
+/* Inline upvote pill at the top of the user column. Replaces the
+   old standalone .vote-col entirely. */
+.user-vote {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding: 4px 8px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+}
+.user-vote .vote-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+}
+.user-vote .vote-count {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-family: 'Montserrat', sans-serif;
+  line-height: 1;
+  min-width: 16px;
+  text-align: center;
 }
 
 .user-avatar {
@@ -238,8 +265,9 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  /* Wider to fit "Apr 2025" / "Seattle, WA" without truncation. */
-  max-width: 110px;
+  /* Wider still — user-col went 170 → 200 after merging the vote
+     column, so location like "Seattle, Washington" now fits. */
+  max-width: 140px;
 }
 
 /* Five-segment reputation bar with the numeric value at the right. */

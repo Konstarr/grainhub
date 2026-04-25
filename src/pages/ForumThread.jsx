@@ -83,12 +83,27 @@ function timeAgo(iso) {
   return new Date(iso).toLocaleDateString();
 }
 
-function AuthorCard({ author }) {
+function AuthorCard({ author, voteCount, hasUpvoted, onUpvote }) {
   const a = authorDisplay(author);
   const join = formatJoinDate(a.joinDate);
   const rep = repBarSegments(a.reputation);
   return (
     <div className="user-col">
+      {/* Upvote pill at the top — saves the entire vote column. */}
+      {onUpvote && (
+        <div className="user-vote">
+          <button
+            type="button"
+            className={'vote-btn ' + (hasUpvoted ? 'voted' : '')}
+            onClick={onUpvote}
+            aria-label="Upvote"
+            title={hasUpvoted ? 'Remove upvote' : 'Upvote'}
+          >
+            ▲
+          </button>
+          <div className="vote-count">{voteCount || 0}</div>
+        </div>
+      )}
       <Link to={'/profile/' + a.handle} style={{ textDecoration: 'none', color: 'inherit' }}>
         <div className="user-name">{a.name}</div>
       </Link>
@@ -134,20 +149,13 @@ function PostCard({ post, index, isOp, isAccepted, hasUpvoted, onUpvote, onQuote
   return (
     <div className={'post ' + (isOp ? 'op ' : '') + (isAccepted ? 'best' : '')}>
       <div className="post-inner">
-        <div className="vote-col">
-          <button
-            type="button"
-            className={'vote-btn ' + (hasUpvoted ? 'voted' : '')}
-            onClick={onUpvote}
-            aria-label="Upvote"
-            title={hasUpvoted ? 'Remove upvote' : 'Upvote'}
-          >
-            ▲
-          </button>
-          <div className="vote-count">{post.upvote_count || 0}</div>
-        </div>
 
-        <AuthorCard author={post.author} />
+        <AuthorCard
+          author={post.author}
+          voteCount={post.upvote_count || 0}
+          hasUpvoted={hasUpvoted}
+          onUpvote={onUpvote}
+        />
 
         <div className="post-body">
           <div className="post-header">
