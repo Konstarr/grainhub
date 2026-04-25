@@ -3,6 +3,7 @@ import { Link, NavLink, useLocation } from 'react-router-dom';
 import { FORUM_GROUPS } from '../../data/forumsData.js';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { fetchMyCommunities } from '../../lib/communityDb.js';
+import { supabase } from '../../lib/supabase.js';
 
 /**
  * Reddit-style left navigation for the Forums section.
@@ -30,6 +31,23 @@ export function recordForumRecent({ slug, title }) {
   } catch (_) { /* localStorage disabled or quota */ }
 }
 
+/**
+ * Drop a slug from the local "recent threads" list. Called from
+ * ForumThread.jsx when fetchThreadBySlug returns nothing (the
+ * thread was deleted by its author or by staff after the user
+ * clicked into it once) so we don't keep showing a dead link
+ * in the sidebar.
+ */
+export function forgetForumRecent(slug) {
+  if (!slug || typeof window === 'undefined') return;
+  try {
+    const raw = localStorage.getItem(RECENTS_KEY);
+    if (!raw) return;
+    const next = JSON.parse(raw).filter((r) => r.slug !== slug);
+    localStorage.setItem(RECENTS_KEY, JSON.stringify(next));
+  } catch (_) { /* ignore */ }
+}
+
 export default function ForumsLeftSidebar() {
   const { isAuthed } = useAuth();
   const location = useLocation();
@@ -38,12 +56,38 @@ export default function ForumsLeftSidebar() {
   const [openGroups, setOpenGroups] = useState({ browse: false });
 
   // Read recents on mount + whenever the route changes (so opening a
-  // thread bumps the list without a full reload).
+  // thread bumps the list without a full reload). After loading,
+  // verify each slug still exists in forum_threads — drop any that
+  // were deleted upstream so the sidebar never shows a dead link.
   useEffect(() => {
+    let raw;
     try {
-      const raw = localStorage.getItem(RECENTS_KEY);
-      setRecents(raw ? JSON.parse(raw) : []);
-    } catch (_) { setRecents([]); }
+      raw = localStorage.getItem(RECENTS_KEY);
+    } catch (_) { setRecents([]); return; }
+
+    const parsed = raw ? JSON.parse(raw) : [];
+    if (parsed.length === 0) { setRecents([]); return; }
+
+    // Optimistic render so the sidebar doesn't blink while we verify.
+    setRecents(parsed);
+
+    let cancelled = false;
+    (async () => {
+      const slugs = parsed.map((r) => r.slug).filter(Boolean);
+      if (slugs.length === 0) return;
+      const { data, error } = await supabase
+        .from('forum_threads')
+        .select('slug')
+        .in('slug', slugs);
+      if (cancelled || error) return;
+      const alive = new Set((data || []).map((r) => r.slug));
+      const filtered = parsed.filter((r) => alive.has(r.slug));
+      if (filtered.length !== parsed.length) {
+        try { localStorage.setItem(RECENTS_KEY, JSON.stringify(filtered)); } catch (_) {}
+        setRecents(filtered);
+      }
+    })();
+    return () => { cancelled = true; };
   }, [location.pathname]);
 
   // Load joined communities for the logged-in user.

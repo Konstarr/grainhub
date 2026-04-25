@@ -9,7 +9,7 @@ import ThreadModToolbar from '../components/forums/ThreadModToolbar.jsx';
 import EditablePostBody from '../components/forums/EditablePostBody.jsx';
 import { checkText } from '../lib/wordFilter.js';
 import { logFilterViolation } from '../lib/forumAdminDb.js';
-import { recordForumRecent } from '../components/forums/ForumsLeftSidebar.jsx';
+import { recordForumRecent, forgetForumRecent } from '../components/forums/ForumsLeftSidebar.jsx';
 import { SponsorSidebar } from '../components/sponsors/AdSlot.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { FORUM_GROUPS } from '../data/forumsData.js';
@@ -288,7 +288,16 @@ export default function ForumThread() {
       const { data: t, error } = await fetchThreadBySlug(slug);
       if (cancelled) return;
       if (error) { setLoadError(error); setThread(null); setLoading(false); return; }
-      if (!t) { setThread(null); setLoading(false); return; }
+      if (!t) {
+        // The slug was probably in the user's local "recents" but
+        // the underlying thread has since been deleted by its
+        // author or by staff. Prune the dead entry so the sidebar
+        // stops linking to it on the next render.
+        forgetForumRecent(slug);
+        setThread(null);
+        setLoading(false);
+        return;
+      }
       setThread(t);
       incrementThreadViews(t.id).catch(() => null);
       // Track in the left-sidebar "Recent" list.
