@@ -692,7 +692,7 @@ a.hot-topic { text-decoration: none; }
   grid-template-columns: auto 1fr auto;
   gap: 0;
   border-bottom: 1px solid var(--border-light);
-  transition: background 0.12s, transform 0.12s;
+  transition: background 0.12s;
   cursor: pointer;
   align-items: stretch;
 }
@@ -702,7 +702,7 @@ a.hot-topic { text-decoration: none; }
 }
 
 .forum-cat:hover {
-  background: #FDF7E8;
+  background: #FDFAF4;
 }
 
 .forum-cat.has-new {
@@ -715,39 +715,37 @@ a.hot-topic { text-decoration: none; }
 
 /* CAT ICON CELL */
 .cat-icon-cell {
-  padding: 0.75rem 0.75rem 0.75rem 1rem;
+  padding: 0.55rem 0.6rem 0.55rem 0.85rem;
   display: flex;
   align-items: center;
 }
 
 .cat-icon {
-  width: 38px;
-  height: 38px;
-  border-radius: 9px;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 17px;
+  font-size: 14px;
   flex-shrink: 0;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
 }
 
 /* CAT INFO CELL */
 .cat-info-cell {
-  padding: 0.75rem 0.75rem;
+  padding: 0.55rem 0.6rem;
   flex: 1;
   min-width: 0;
 }
 
 .cat-name {
-  font-size: 15.5px;
-  font-weight: 700;
+  font-size: 14px;
+  font-weight: 500;
   color: var(--text-primary);
-  margin-bottom: 3px;
+  margin-bottom: 1px;
   display: flex;
   align-items: center;
   gap: 8px;
-  letter-spacing: 0.01em;
 }
 
 .new-posts-badge {
@@ -760,9 +758,9 @@ a.hot-topic { text-decoration: none; }
 }
 
 .cat-description {
-  font-size: 13px;
-  color: var(--text-secondary);
-  line-height: 1.4;
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.35;
   margin-bottom: 0;
   white-space: nowrap;
   overflow: hidden;
@@ -812,20 +810,16 @@ a.hot-topic { text-decoration: none; }
 }
 
 .cat-stat-num {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--wood-warm);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
   line-height: 1;
-  letter-spacing: 0.01em;
 }
 
 .cat-stat-label {
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  font-size: 9px;
   color: var(--text-muted);
-  margin-top: 3px;
+  margin-top: 1px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
