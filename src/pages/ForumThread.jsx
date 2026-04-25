@@ -65,7 +65,9 @@ function formatJoinDate(iso) {
    with 50 rep shows ~half-filled and 5000+ rep shows fully filled.
    Avoids the "endless empty bar" problem of linear scaling. */
 function repBarSegments(rep) {
-  const score = Math.max(0, Math.log10((rep || 0) + 1) / Math.log10(5001));
+  // Bumped the cap from 5001 to 20001 so the bar grows more
+  // gradually — matches the new lower rep gain per upvote.
+  const score = Math.max(0, Math.log10((rep || 0) + 1) / Math.log10(20001));
   const filled = Math.min(5, Math.round(score * 5));
   return { filled, total: 5 };
 }
@@ -83,7 +85,7 @@ function timeAgo(iso) {
   return new Date(iso).toLocaleDateString();
 }
 
-function AuthorCard({ author, voteCount, hasUpvoted, onUpvote }) {
+function AuthorCard({ author, voteCount, hasUpvoted, onUpvote, voteDisabled }) {
   const a = authorDisplay(author);
   const join = formatJoinDate(a.joinDate);
   const rep = repBarSegments(a.reputation);
@@ -91,13 +93,14 @@ function AuthorCard({ author, voteCount, hasUpvoted, onUpvote }) {
     <div className="user-col">
       {/* Compact upvote pinned to the top-left corner. */}
       {onUpvote && (
-        <div className="user-vote">
+        <div className={'user-vote ' + (voteDisabled ? 'user-vote-disabled' : '')}>
           <button
             type="button"
             className={'vote-btn ' + (hasUpvoted ? 'voted' : '')}
-            onClick={onUpvote}
-            aria-label="Upvote"
-            title={hasUpvoted ? 'Remove upvote' : 'Upvote'}
+            onClick={voteDisabled ? undefined : onUpvote}
+            disabled={voteDisabled}
+            aria-label={voteDisabled ? 'You cannot upvote your own post' : 'Upvote'}
+            title={voteDisabled ? 'You cannot upvote your own post' : (hasUpvoted ? 'Remove upvote' : 'Upvote')}
           >
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <line x1="12" y1="19" x2="12" y2="5" />
@@ -141,10 +144,11 @@ function AuthorCard({ author, voteCount, hasUpvoted, onUpvote }) {
   );
 }
 
-function PostCard({ post, index, isOp, isAccepted, hasUpvoted, onUpvote, onQuote, onReport }) {
+function PostCard({ post, index, isOp, isAccepted, hasUpvoted, onUpvote, onQuote, onReport, currentUserId }) {
   const quoted = post.quoted_post_id && post.__quoted
     ? { author: authorDisplay(post.__quoted.author), body: post.__quoted.body }
     : null;
+  const isSelf = currentUserId && post.author_id === currentUserId;
 
   return (
     <div className={'post ' + (isOp ? 'op ' : '') + (isAccepted ? 'best' : '')}>
@@ -155,6 +159,7 @@ function PostCard({ post, index, isOp, isAccepted, hasUpvoted, onUpvote, onQuote
           voteCount={post.upvote_count || 0}
           hasUpvoted={hasUpvoted}
           onUpvote={onUpvote}
+          voteDisabled={isSelf}
         />
 
         <div className="post-body">
@@ -472,6 +477,7 @@ export default function ForumThread() {
                     key={p.id}
                     post={p}
                     index={idx}
+                    currentUserId={user?.id}
                     isOp={thread.author_id && p.author?.id === thread.author_id}
                     isAccepted={thread.accepted_post_id === p.id}
                     hasUpvoted={postUpvotedSet.has(p.id)}

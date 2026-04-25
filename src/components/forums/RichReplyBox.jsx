@@ -149,14 +149,53 @@ export default function RichReplyBox({
     if (fileRef.current) fileRef.current.click();
   };
 
+  // ── File upload safety ───────────────────────────────────
+  // Whitelist common safe types only. Executables, scripts, archives,
+  // SVGs, and HTML are blocked because they can carry XSS or malware
+  // even when uploaded through a trusted UI.
+  const ALLOWED_MIME = new Set([
+    'image/jpeg', 'image/png', 'image/gif', 'image/webp',
+    'application/pdf',
+    'text/plain', 'text/csv',
+  ]);
+  const ALLOWED_EXT = new Set([
+    'jpg', 'jpeg', 'png', 'gif', 'webp', 'pdf', 'txt', 'csv',
+  ]);
+  // Per-file caps. Images compress reasonably so 5 MB covers any
+  // phone photo. Non-images get 8 MB (PDFs / CSVs).
+  const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
+  const MAX_OTHER_BYTES = 8 * 1024 * 1024;
+
   const onFileChosen = async (e) => {
     const file = e.target.files && e.target.files[0];
     e.target.value = ''; // allow re-selecting the same file later
     if (!file) return;
     setUploadErr(null);
+
+    // Validate type (MIME + extension — both must pass to defeat
+    // simple "rename file.exe to file.png" tricks).
+    const ext = (file.name.split('.').pop() || '').toLowerCase();
+    const mime = (file.type || '').toLowerCase();
+    if (!ALLOWED_MIME.has(mime) || !ALLOWED_EXT.has(ext)) {
+      setUploadErr(
+        'Unsupported file type. Allowed: images (JPG / PNG / GIF / WEBP), PDF, TXT, CSV.',
+      );
+      return;
+    }
+
+    // Validate size
+    const isImage = mime.startsWith('image/');
+    const cap = isImage ? MAX_IMAGE_BYTES : MAX_OTHER_BYTES;
+    if (file.size > cap) {
+      const capMb = Math.round(cap / (1024 * 1024));
+      setUploadErr(
+        `File too large. ${isImage ? 'Images' : 'Files'} must be ${capMb} MB or less.`,
+      );
+      return;
+    }
+
     setUploadBusy(true);
     try {
-      const ext = (file.name.split('.').pop() || 'bin').toLowerCase();
       const safeBase = (file.name.split('.').slice(0, -1).join('.') || 'upload')
         .replace(/[^a-zA-Z0-9_-]+/g, '-').slice(0, 40);
       const key = `forum/${Date.now()}-${Math.random().toString(36).slice(2, 8)}-${safeBase}.${ext}`;

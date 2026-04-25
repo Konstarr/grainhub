@@ -233,6 +233,16 @@
   text-align: center;
 }
 
+/* Greyed-out state when the viewer is the post author. Click does
+   nothing, the arrow + count fade so it's clear self-upvote isn't
+   allowed (Reddit-style). */
+.user-vote-disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.user-vote-disabled .vote-btn { cursor: not-allowed; }
+.user-vote-disabled .vote-btn:hover { color: var(--text-muted); }
+
 .user-avatar {
   width: 52px;
   height: 52px;
