@@ -112,16 +112,13 @@ function AuthorCard({ author, voteCount, hasUpvoted, onUpvote }) {
       </Link>
       <Link
         to={'/profile/' + a.handle}
-        className="user-avatar av-a"
-        style={{
-          textDecoration: 'none',
-          backgroundImage: a.avatarUrl ? 'url(' + a.avatarUrl + ')' : undefined,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
+        className={'user-avatar ' + (a.avatarUrl ? 'has-img' : 'av-a')}
+        style={{ textDecoration: 'none' }}
         aria-label={a.name + ' profile'}
       >
-        {!a.avatarUrl && a.initials}
+        {a.avatarUrl
+          ? <img src={a.avatarUrl} alt="" loading="lazy" />
+          : a.initials}
       </Link>
       {a.trade && <div className="user-title">{a.trade}</div>}
 

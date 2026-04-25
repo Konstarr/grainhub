@@ -243,6 +243,17 @@
   font-weight: 600;
   color: white;
   margin-bottom: 9px;
+  overflow: hidden; /* clip the inner img to the circle */
+}
+/* When the user has uploaded an avatar, the link contains an <img>
+   that fills the circle. .has-img drops the colored fallback bg so
+   the photo is the only thing visible. */
+.user-avatar.has-img { background: transparent !important; }
+.user-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .av-a { background: #A0522D; }
