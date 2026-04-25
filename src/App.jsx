@@ -52,6 +52,7 @@ const AdminForumThreads     = lazy(() => import('./pages/admin/AdminForumThreads
 const AdminForumReports     = lazy(() => import('./pages/admin/AdminForumReports.jsx'));
 const AdminForumWords       = lazy(() => import('./pages/admin/AdminForumWords.jsx'));
 const AdminForumLog         = lazy(() => import('./pages/admin/AdminForumLog.jsx'));
+const AdminForumReputation  = lazy(() => import('./pages/admin/AdminForumReputation.jsx'));
 
 const AdminFallback = (
   <div style={{
@@ -101,6 +102,7 @@ export default function App() {
         <Route path="/admin/forums/reports"   element={adminRoute('admin', AdminForumReports)} />
         <Route path="/admin/forums/words"     element={adminRoute('admin', AdminForumWords)} />
         <Route path="/admin/forums/log"       element={adminRoute('admin', AdminForumLog)} />
+        <Route path="/admin/forums/reputation" element={adminRoute('admin', AdminForumReputation)} />
 
         <Route element={<Layout />}>
           <Route path="/" element={<Home />} />
