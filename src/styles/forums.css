@@ -235,10 +235,7 @@
   padding: 0 2.5rem;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  flex-wrap: wrap;
-  min-height: 54px;
+  min-height: 48px;
 }
 
 .forum-toolbar-inner {
@@ -248,24 +245,31 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
-  flex-wrap: wrap;
-  padding: 8px 0;
+  gap: 10px;
+  flex-wrap: nowrap;
+  padding: 6px 0;
 }
 
 .toolbar-tabs {
   display: flex;
   gap: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  flex: 1;
+  min-width: 0;
 }
+.toolbar-tabs::-webkit-scrollbar { display: none; }
 
 .toolbar-tab {
-  padding: 8px 16px;
-  font-size: 13px;
+  padding: 6px 11px;
+  font-size: 12px;
+  font-weight: 600;
   color: var(--text-secondary);
   cursor: pointer;
   border-bottom: 2px solid transparent;
   transition: all 0.15s;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .toolbar-tab:hover {
@@ -275,52 +279,62 @@
 .toolbar-tab.active {
   color: var(--wood-warm);
   border-bottom-color: var(--wood-warm);
-  font-weight: 500;
 }
 
 .toolbar-actions {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   align-items: center;
-  flex-wrap: wrap;
+  flex-shrink: 0;
 }
-.toolbar-search { min-width: 220px; max-width: 320px; }
+.toolbar-search { min-width: 160px; width: 200px; }
+.toolbar-search.fsb { padding: 2px 2px 2px 10px; }
+.toolbar-search .fsb-input { font-size: 12px; padding: 5px 2px; }
+.toolbar-search .fsb-submit { padding: 5px 11px; font-size: 11.5px; }
 
 .new-thread-btn {
   background: var(--wood-warm);
   color: white;
   border: none;
-  padding: 8px 18px;
-  border-radius: 7px;
-  font-size: 13px;
-  font-weight: 500;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
   cursor: pointer;
   font-family: 'Montserrat', sans-serif;
   transition: background 0.15s;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
+  white-space: nowrap;
 }
 
 .new-thread-btn:hover {
-  background: #8B4316;
+  background: var(--wood-mid);
 }
 
 .mark-read-btn {
   background: transparent;
   color: var(--text-secondary);
   border: 1px solid var(--border);
-  padding: 8px 14px;
-  border-radius: 7px;
-  font-size: 13px;
+  padding: 6px 11px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
   cursor: pointer;
   font-family: 'Montserrat', sans-serif;
   transition: all 0.12s;
+  white-space: nowrap;
 }
 
 .mark-read-btn:hover {
   border-color: var(--wood-warm);
   color: var(--wood-warm);
+}
+
+@media (max-width: 720px) {
+  .forum-toolbar-inner { flex-wrap: wrap; }
 }
 
 /* MAIN LAYOUT */
