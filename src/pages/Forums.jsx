@@ -153,22 +153,34 @@ export default function Forums() {
   const sourceRows = customRows != null ? customRows : threadRows;
   const liveActivity = useMemo(() => sourceRows.map(toActivityItem), [sourceRows]);
 
-  // Compute real "trending" threads from the live thread set.
-  // Ranking = recency-boosted activity: replies × views × recency-decay.
-  // Everything stale (> 14 days) drops out so the strip stays current.
+  // Trending = engagement weighted by sharp recency decay. Modeled
+  // after Reddit's "hot" — exponential decay with a 2-day half-life
+  // so a fresh thread with real momentum always beats an older one.
+  // Excludes threads with no real engagement (zero replies, zero
+  // upvotes, fewer than 25 views) to keep the strip clean.
   const trendingTopics = useMemo(() => {
     const now = Date.now();
-    const MAX_AGE = 14 * 24 * 60 * 60 * 1000;
+    const DAY = 24 * 60 * 60 * 1000;
+    const MAX_AGE_DAYS = 7;
+    const HALF_LIFE_DAYS = 2;
     const scored = (threadRows || [])
       .map((r) => {
-        const last = r.last_reply_at ? new Date(r.last_reply_at).getTime() : 0;
-        const age = Math.max(1, now - last);
-        if (age > MAX_AGE) return null;
-        // Favor threads with replies in the last few days; views act as tiebreaker.
+        const lastIso = r.last_reply_at || r.created_at;
+        if (!lastIso) return null;
+        const ageDays = (now - new Date(lastIso).getTime()) / DAY;
+        if (ageDays < 0 || ageDays > MAX_AGE_DAYS) return null;
+
         const replies = r.reply_count || 0;
-        const views = r.view_count || 0;
-        const recency = 1 / Math.log2(2 + age / (24 * 60 * 60 * 1000));
-        const score = (replies * 5 + views * 0.1 + 1) * recency;
+        const upvotes = r.upvote_count || 0;
+        const views   = r.view_count || 0;
+        if (replies === 0 && upvotes === 0 && views < 25) return null;
+
+        // Engagement: replies are strongest (real conversation),
+        // upvotes second (passive endorsement), views light tiebreaker.
+        const engagement = replies * 8 + upvotes * 4 + views * 0.05;
+        // exp(-ln2 * t / halfLife) → score halves every HALF_LIFE_DAYS.
+        const recency = Math.exp(-Math.LN2 * ageDays / HALF_LIFE_DAYS);
+        const score = engagement * recency;
         return { title: r.title, slug: r.slug, score };
       })
       .filter(Boolean)
