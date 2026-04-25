@@ -75,8 +75,16 @@ export default function SponsorMediaEditor({ ownerId, tier }) {
   };
 
   const handleSave = async (form) => {
-    // Force-tag the tier + owner on every write so sponsors can't drift outside their plan
-    const payload = { ...form, owner_id: ownerId, tier };
+    // Owner is always force-tagged. Tier and slot use whatever the
+    // form provides — admins can override the profile's sponsor_tier
+    // here when they need to file a row in a different bucket
+    // (e.g. platinum sponsor with a gold-tier multi-grid ad).
+    const payload = {
+      ...form,
+      owner_id: ownerId,
+      tier: form.tier || tier,
+      slot: form.slot,
+    };
     if (form.id) {
       const patch = { ...payload };
       delete patch.id;
@@ -189,9 +197,11 @@ export default function SponsorMediaEditor({ ownerId, tier }) {
 }
 
 function SponsorMediaModal({ row, tier, onCancel, onSave }) {
-  const [form, setForm] = useState(row);
+  const [form, setForm] = useState({ ...row, tier: row.tier || tier });
   const set = (k) => (v) => setForm((f) => ({ ...f, [k]: v }));
   const slotMeta = SLOT_META[form.slot] || {};
+  const TIER_OPTIONS = ['silver', 'gold', 'platinum'];
+  const SLOT_OPTIONS = ['marquee', 'sidebar', 'leaderboard', 'hero'];
 
   return (
     <div
@@ -222,6 +232,37 @@ function SponsorMediaModal({ row, tier, onCancel, onSave }) {
           <div className="adm-field">
             <label className="adm-label">Name</label>
             <input type="text" className="adm-input" value={form.name || ''} onChange={(e) => set('name')(e.target.value)} placeholder="Internal label — e.g. Blum SERVO-DRIVE" />
+          </div>
+          <div className="adm-form-grid">
+            <div className="adm-field">
+              <label className="adm-label">Tier (where this row qualifies)</label>
+              <select
+                className="adm-input"
+                value={form.tier || ''}
+                onChange={(e) => set('tier')(e.target.value)}
+              >
+                {TIER_OPTIONS.map((t) => (
+                  <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)}</option>
+                ))}
+              </select>
+              <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 3 }}>
+                Defaults to the owner's profile tier. Override to file this
+                ad under a different bucket (e.g. a platinum sponsor with a
+                gold-tier multi-grid ad).
+              </div>
+            </div>
+            <div className="adm-field">
+              <label className="adm-label">Slot (where it appears)</label>
+              <select
+                className="adm-input"
+                value={form.slot || ''}
+                onChange={(e) => set('slot')(e.target.value)}
+              >
+                {SLOT_OPTIONS.map((s) => (
+                  <option key={s} value={s}>{SLOT_META[s]?.label || s}</option>
+                ))}
+              </select>
+            </div>
           </div>
           <div className="adm-form-grid">
             <div className="adm-field">
