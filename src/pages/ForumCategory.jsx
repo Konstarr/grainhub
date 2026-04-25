@@ -151,20 +151,34 @@ export default function ForumCategory() {
               </p>
             )}
             {topics.length > 0 && (
-              <div className="cat-topics">
-                <span className="cat-topics-label">Topics:</span>
-                {topics.map((t) => (
-                  <Link
-                    key={t.id}
-                    to={`/forums/category/${id}/${t.slug}`}
-                    className={'cat-topic-chip ' + (t.is_official ? 'is-official' : '')}
-                    title={t.description || t.name}
-                  >
-                    {t.icon && <span aria-hidden="true">{t.icon}</span>}
-                    <span>{t.name}</span>
-                    {t.is_official && <span className="cat-topic-official" title="Official topic">✓</span>}
-                  </Link>
-                ))}
+              <div className="topic-list-wrap">
+                <div className="topic-list-heading">
+                  Topics in {categoryName}
+                  <span className="topic-list-count">{topics.length}</span>
+                </div>
+                <div className="topic-list">
+                  {topics.map((t) => (
+                    <Link
+                      key={t.id}
+                      to={`/forums/category/${id}/${t.slug}`}
+                      className={'topic-row ' + (t.is_official ? 'is-official' : '')}
+                    >
+                      <div className="topic-row-icon" aria-hidden="true">
+                        {t.icon || '📌'}
+                      </div>
+                      <div className="topic-row-info">
+                        <div className="topic-row-name">
+                          {t.name}
+                          {t.is_official && <span className="topic-row-official">✓ Official</span>}
+                        </div>
+                        {t.description && (
+                          <div className="topic-row-desc">{t.description}</div>
+                        )}
+                      </div>
+                      <div className="topic-row-arrow" aria-hidden="true">→</div>
+                    </Link>
+                  ))}
+                </div>
               </div>
             )}
 
