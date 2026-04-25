@@ -178,6 +178,49 @@ export async function setReportStatus(reportId, status, resolverId) {
   return { error };
 }
 
+/* ── Blocked words (admin-managed filter list) ─────────── */
+
+/**
+ * List of currently-blocked words. Admin-only via RLS.
+ * Sorted alphabetically. Returns severity so the UI can group
+ * (profanity / slur / minor).
+ */
+export async function listBlockedWords() {
+  const { data, error } = await supabase
+    .from('blocked_words')
+    .select('id, word, severity, added_at, added_by')
+    .order('word', { ascending: true });
+  return { data: data || [], error };
+}
+
+/**
+ * Add a word to the blocklist. Lowercased + trimmed before insert.
+ * The unique constraint on `word` makes this idempotent (re-adding
+ * an existing word returns a duplicate-key error which we surface
+ * as "already on the list").
+ */
+export async function addBlockedWord(word, severity = 'profanity') {
+  const cleaned = (word || '').trim().toLowerCase();
+  if (!cleaned) return { error: new Error('Word required') };
+  if (cleaned.length > 80) return { error: new Error('Word too long (max 80 chars)') };
+  const { error } = await supabase
+    .from('blocked_words')
+    .insert({ word: cleaned, severity });
+  if (error && error.code === '23505') {
+    return { error: new Error('That word is already on the list.') };
+  }
+  return { error };
+}
+
+export async function removeBlockedWord(id) {
+  if (!id) return { error: new Error('Missing id') };
+  const { error } = await supabase
+    .from('blocked_words')
+    .delete()
+    .eq('id', id);
+  return { error };
+}
+
 /* ── Forum-wide stats (for dashboard landing) ─────────── */
 
 /**
