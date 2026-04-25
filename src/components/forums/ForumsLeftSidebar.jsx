@@ -4,6 +4,7 @@ import { FORUM_GROUPS } from '../../data/forumsData.js';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { fetchMyCommunities } from '../../lib/communityDb.js';
 import { supabase } from '../../lib/supabase.js';
+import { setForumMarkAllReadAt } from '../../lib/forumLastVisit.js';
 
 /**
  * Reddit-style left navigation for the Forums section.
@@ -114,9 +115,20 @@ export default function ForumsLeftSidebar() {
 
       {/* ── Actions ── */}
       <Section>
+        <NavItem to="/forums/new" icon={<IconPen />} label="Start a thread" />
+        <button
+          type="button"
+          className="fs-item fs-item-action"
+          onClick={() => {
+            setForumMarkAllReadAt();
+            window.location.reload();
+          }}
+        >
+          <span className="fs-item-icon"><IconCheck /></span>
+          <span className="fs-item-text">Mark all read</span>
+        </button>
         <NavItem to="/communities/new" icon={<IconPlus />} label="Start a community" />
         <NavItem to="/communities" icon={<IconBookmark />} label="Browse communities" />
-        <NavItem to="/forums/new" icon={<IconPen />} label="Start a thread" />
       </Section>
 
       {/* ── Rules ── */}
@@ -233,6 +245,7 @@ function IconPlus()     { return <svg {...svg}><line x1="12" y1="5" x2="12" y2="
 function IconBookmark() { return <svg {...svg}><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" /></svg>; }
 function IconPen()      { return <svg {...svg}><path d="M12 20h9" /><path d="M16.5 3.5a2.12 2.12 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z" /></svg>; }
 function IconScale()    { return <svg {...svg}><path d="M12 3v18" /><path d="M5 7h14" /><path d="M5 7l-3 7a4 4 0 0 0 6 0z" /><path d="M19 7l3 7a4 4 0 0 1-6 0z" /></svg>; }
+function IconCheck()    { return <svg {...svg}><polyline points="20 6 9 17 4 12" /></svg>; }
 
 /* Tiny round icon used inside the "Your communities" sidebar list. */
 function CommIconSmall({ c }) {

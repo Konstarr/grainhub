@@ -1,24 +1,18 @@
-import { useSearchParams, useNavigate } from 'react-router-dom';
-import { setForumMarkAllReadAt } from '../../lib/forumLastVisit.js';
+import { useSearchParams } from 'react-router-dom';
 import ForumSearchBar from './ForumSearchBar.jsx';
 
-/**
- * View-filter tab bar for the Forums index. Each tab sets ?view=...
- * on the URL so the page knows which filter to apply.
- */
 const TABS = [
   { key: '',              label: 'All Forums' },
   { key: 'hot',           label: '\u{1F525} Hot Today' },
-  { key: 'new',           label: '\u2728 New Posts' },
-  { key: 'unanswered',    label: '\u2753 Unanswered' },
-  { key: 'solved',        label: '\u2713 Solved' },
+  { key: 'new',           label: '✨ New Posts' },
+  { key: 'unanswered',    label: '❓ Unanswered' },
+  { key: 'solved',        label: '✓ Solved' },
   { key: 'subscriptions', label: '\u{1F516} My Subscriptions' },
   { key: 'my-posts',      label: '\u{1F464} My Posts' },
 ];
 
 export default function ToolbarSection() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const navigate = useNavigate();
   const current = searchParams.get('view') || '';
 
   const setView = (key) => {
@@ -40,39 +34,14 @@ export default function ToolbarSection() {
                 type="button"
                 className={'toolbar-tab ' + (active ? 'active' : '')}
                 onClick={() => setView(tab.key)}
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  font: 'inherit',
-                  cursor: 'pointer',
-                }}
+                style={{ background: 'transparent', border: 'none', font: 'inherit', cursor: 'pointer' }}
               >
                 {tab.label}
               </button>
             );
           })}
         </div>
-        <div className="toolbar-actions">
-          <ForumSearchBar size="md" placeholder="Search threads…" className="toolbar-search" />
-          <button
-            type="button"
-            className="mark-read-btn"
-            onClick={() => {
-              setForumMarkAllReadAt();
-              window.location.reload();
-            }}
-            title="Clear all 'new' indicators across the forum"
-          >
-            ✓ Mark All Read
-          </button>
-          <button
-            type="button"
-            className="new-thread-btn"
-            onClick={() => navigate('/forums/new')}
-          >
-            ✏ New Thread
-          </button>
-        </div>
+        <ForumSearchBar size="md" placeholder="Search threads…" className="toolbar-search" />
       </div>
     </div>
   );

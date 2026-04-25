@@ -281,16 +281,13 @@
   border-bottom-color: var(--wood-warm);
 }
 
-.toolbar-actions {
-  display: flex;
-  gap: 6px;
-  align-items: center;
+.toolbar-search {
+  flex: 1;
+  min-width: 240px;
+  max-width: 480px;
+  margin-left: 12px;
   flex-shrink: 0;
 }
-.toolbar-search { min-width: 160px; width: 200px; }
-.toolbar-search.fsb { padding: 2px 2px 2px 10px; }
-.toolbar-search .fsb-input { font-size: 12px; padding: 5px 2px; }
-.toolbar-search .fsb-submit { padding: 5px 11px; font-size: 11.5px; }
 
 .new-thread-btn {
   background: var(--wood-warm);
