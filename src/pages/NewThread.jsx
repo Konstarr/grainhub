@@ -5,6 +5,7 @@ import RichReplyBox from '../components/forums/RichReplyBox.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { FORUM_GROUPS } from '../data/forumsData.js';
 import { createThread } from '../lib/forumDb.js';
+import { checkFields } from '../lib/wordFilter.js';
 import '../styles/newThread.css';
 
 /**
@@ -49,6 +50,12 @@ export default function NewThread() {
 
   const submit = async () => {
     if (!canSubmit) return;
+    // Word-filter check before hitting the network
+    const filterResult = checkFields([title, body]);
+    if (!filterResult.ok) {
+      setErr('Your thread contains language we don\'t allow on GrainHub. Please remove it and try again.');
+      return;
+    }
     setBusy(true);
     setErr(null);
     const { data, error } = await createThread({

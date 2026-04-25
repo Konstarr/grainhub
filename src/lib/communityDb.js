@@ -115,6 +115,39 @@ export async function leaveCommunity(communityId) {
   return { data: null, error };
 }
 
+/**
+ * Transfer ownership of the community to another member. Required
+ * before an owner can leave. Routes through a SECURITY DEFINER RPC
+ * so both updates (promote new, demote old) happen atomically with
+ * a single permission check.
+ */
+export async function transferOwnership(communityId, newOwnerProfileId) {
+  if (!communityId || !newOwnerProfileId) {
+    return { error: new Error('Missing community id or new owner id') };
+  }
+  const { error } = await supabase.rpc('transfer_community_ownership', {
+    community_id_in: communityId,
+    new_owner_in:    newOwnerProfileId,
+  });
+  return { error };
+}
+
+/**
+ * Promote a member to moderator, or demote a moderator to member.
+ * Owners only (enforced by the RPC).
+ */
+export async function setMemberRole(communityId, profileId, role) {
+  if (!['member', 'mod'].includes(role)) {
+    return { error: new Error('Invalid role') };
+  }
+  const { error } = await supabase.rpc('set_community_member_role', {
+    community_id_in: communityId,
+    member_in:       profileId,
+    new_role_in:     role,
+  });
+  return { error };
+}
+
 /** Is the current user a member + what's their role? */
 export async function fetchMyMembership(communityId) {
   if (!communityId) return { data: null, error: null };

@@ -1087,8 +1087,12 @@ textarea.comm-input { resize: vertical; min-height: 90px; }
   padding: 0 2rem;
   display: flex;
   gap: 4px;
+  /* Hide scrollbar but keep horizontal scroll for narrow viewports */
   overflow-x: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
 }
+.comm-tabs-inner::-webkit-scrollbar { display: none; }
 .comm-tab {
   background: transparent;
   border: 0;
@@ -1107,6 +1111,36 @@ textarea.comm-input { resize: vertical; min-height: 90px; }
 .comm-tab.active {
   color: var(--wood-warm);
   border-bottom-color: var(--wood-warm);
+}
+
+/* Role badge shown next to the Leave button in the community header.
+   Color-coded so owners stand out from moderators and members. */
+.comm-role-badge {
+  display: inline-flex;
+  align-items: center;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+}
+.comm-role-owner {
+  background: rgba(196, 149, 64, 0.18);
+  color: #C49540;
+  border-color: rgba(196, 149, 64, 0.4);
+}
+.comm-role-mod {
+  background: rgba(28, 74, 110, 0.18);
+  color: #5A8FB8;
+  border-color: rgba(28, 74, 110, 0.4);
+}
+.comm-role-member {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.75);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 /* Filter chips row above the feed */

@@ -16,7 +16,8 @@
   text-transform: uppercase;
   color: var(--text-muted);
   margin-bottom: 6px;
-  align-self: flex-start;
+  align-self: center;
+  text-align: center;
 }
 
 .ad-wrap a,

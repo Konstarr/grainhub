@@ -433,13 +433,15 @@
 .hot-strip {
   background: linear-gradient(135deg, #3A1A08, #6B3820);
   border-radius: 10px;
-  padding: 0.85rem 1.25rem;
+  padding: 0.65rem 1.25rem;
   margin-bottom: 1.5rem;
   display: flex;
   align-items: center;
   gap: 1rem;
+  /* Single-row layout: pills overflow horizontally rather than wrap
+     into a tall stack. Keeps the strip ~40px tall regardless of how
+     many trending topics there are. */
   overflow: hidden;
-  flex-wrap: wrap;
 }
 
 .hot-label {
@@ -458,8 +460,12 @@
 .hot-topics {
   display: flex;
   gap: 8px;
-  flex-wrap: wrap;
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none; /* Firefox */
 }
+.hot-topics::-webkit-scrollbar { display: none; }
 
 .hot-topic {
   background: rgba(255,255,255,0.1);
@@ -472,12 +478,12 @@
   border-radius: 20px;
   cursor: pointer;
   text-decoration: none;
-  max-width: 280px;
+  max-width: 220px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  flex-shrink: 0;
   transition: background 0.12s, border-color 0.12s, transform 0.1s;
-  white-space: nowrap;
 }
 
 .hot-topic:hover {
