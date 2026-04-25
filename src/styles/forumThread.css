@@ -472,7 +472,15 @@
 .post-op-badge { background: #FFF3DC; color: #8B5E08; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
 .best-badge { background: #EAF3DE; color: #2D5016; padding: 3px 10px; border-radius: 5px; font-size: 11px; font-weight: 700; }
 
-.post-text { font-size: 14px; color: var(--text-primary); line-height: 1.85; }
+.post-text {
+  font-size: 14px;
+  color: var(--text-primary);
+  line-height: 1.85;
+  /* Wrap very long words / unbroken URLs / strings so the post body
+     grows downward instead of getting clipped on the right edge. */
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
 .post-text p { margin-bottom: 0.85rem; }
 .post-text p:last-child { margin-bottom: 0; }
 .post-text strong { font-weight: 500; }
@@ -610,8 +618,14 @@
 .post-action.liked { color: var(--wood-warm); font-weight: 500; }
 
 .post-footer-spacer { flex: 1; }
-.post-report { font-size: 11px; color: var(--text-muted); cursor: pointer; opacity: 0.5; }
-.post-report:hover { opacity: 1; color: #A32D2D; }
+.post-report {
+  font-size: 11px;
+  color: #A32D2D;
+  cursor: pointer;
+  opacity: 0.85;
+  font-weight: 600;
+}
+.post-report:hover { opacity: 1; }
 
 /* CALLOUT IN POST */
 .post-callout {

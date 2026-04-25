@@ -21,13 +21,16 @@ export default function EditablePostBody({ post, canEdit, onUpdate }) {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState(null);
 
-  // updated_at differs from created_at when the post has been edited.
-  // The DB trigger `forum_posts_touch` keeps these in sync on every
-  // UPDATE; on INSERT they're identical down to the second.
+  // Only call it "edited" when updated_at is meaningfully later
+  // than created_at. 60-second tolerance covers any clock skew or
+  // trigger-timing variance on insert (the DB trigger
+  // `forum_posts_touch` only fires on UPDATE so on INSERT both
+  // timestamps come from the same `now()`, but historical / seeded
+  // rows may have a small delta).
   const wasEdited =
     post.updated_at &&
     post.created_at &&
-    Math.abs(new Date(post.updated_at).getTime() - new Date(post.created_at).getTime()) > 1500;
+    (new Date(post.updated_at).getTime() - new Date(post.created_at).getTime()) > 60_000;
 
   const handleSave = async () => {
     if (!draft.trim()) {
