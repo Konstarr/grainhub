@@ -342,6 +342,8 @@ export async function fetchRecentThreadsWithLastPost(limit = 50) {
   const { data: threads, error } = await supabase
     .from('forum_threads')
     .select(`*, last_author:last_reply_by(${AUTHOR_COLS_SAFE})`)
+    // Pinned threads always sort to the top, then by most recent activity.
+    .order('is_pinned',     { ascending: false })
     .order('last_reply_at', { ascending: false })
     .limit(limit);
 

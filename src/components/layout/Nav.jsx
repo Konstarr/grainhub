@@ -239,10 +239,12 @@ export default function Nav() {
                   Thread subscriptions
                 </MenuItem>
 
-                {isStaff && (
+                {/* Admin panel is admin/owner only — moderators do their
+                    work inline on the forum/community pages instead. */}
+                {isAdmin && (
                   <>
                     <div style={{ borderTop: '1px solid var(--border)', margin: '4px 0' }} />
-                    <MenuItem onClick={() => { setMenuOpen(false); navigate(isAdmin ? '/admin/news' : '/admin'); }}>
+                    <MenuItem onClick={() => { setMenuOpen(false); navigate('/admin/news'); }}>
                       <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
                         <span style={{
                           display: 'inline-flex',

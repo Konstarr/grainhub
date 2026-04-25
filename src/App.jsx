@@ -92,9 +92,11 @@ export default function App() {
         <Route path="/admin/users/:id"        element={adminRoute('admin', AdminUserEdit)} />
         <Route path="/admin/sponsors"         element={adminRoute('admin', AdminSponsors)} />
         <Route path="/admin/connections"      element={adminRoute('admin', AdminConnections)} />
-        <Route path="/admin/forums"           element={adminRoute('mod',   AdminForums)} />
-        <Route path="/admin/forums/threads"   element={adminRoute('mod',   AdminForumThreads)} />
-        <Route path="/admin/forums/reports"   element={adminRoute('mod',   AdminForumReports)} />
+        {/* Admin panel routes are admin/owner level only — moderators
+            do their work inline on /forums/thread/:slug instead. */}
+        <Route path="/admin/forums"           element={adminRoute('admin', AdminForums)} />
+        <Route path="/admin/forums/threads"   element={adminRoute('admin', AdminForumThreads)} />
+        <Route path="/admin/forums/reports"   element={adminRoute('admin', AdminForumReports)} />
 
         <Route element={<Layout />}>
           <Route path="/" element={<Home />} />

@@ -5,6 +5,7 @@ import '../styles/forumThread.css';
 import PageBack from '../components/shared/PageBack.jsx';
 import ReportModal from '../components/shared/ReportModal.jsx';
 import RichReplyBox from '../components/forums/RichReplyBox.jsx';
+import ThreadModToolbar from '../components/forums/ThreadModToolbar.jsx';
 import { recordForumRecent } from '../components/forums/ForumsLeftSidebar.jsx';
 import { SponsorSidebar } from '../components/sponsors/AdSlot.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
@@ -375,6 +376,10 @@ export default function ForumThread() {
           )}
           {thread && (
             <>
+              <ThreadModToolbar
+                thread={thread}
+                onChange={(patch) => setThread((t) => (t ? { ...t, ...patch } : t))}
+              />
               <ThreadHeader
                 thread={thread}
                 category={category}
