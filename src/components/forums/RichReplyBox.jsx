@@ -396,7 +396,7 @@ export default function RichReplyBox({
           <textarea
             ref={taRef}
             className="reply-textarea"
-            placeholder="Share your take… use **bold**, *italic*, `code`, or paste images. Markdown supported."
+            placeholder="Type your reply…"
             value={value}
             onChange={(e) => onChange(e.target.value)}
             disabled={disabled}
