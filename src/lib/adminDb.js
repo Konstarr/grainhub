@@ -434,6 +434,36 @@ export async function updateProfileAdmin(id, patch) {
   return { data: row || null, error: null };
 }
 
+// Communities owned + last-N threads + last-N posts for the
+// "Activity" panel on /admin/users/:id.
+export async function fetchUserAdminActivity(profileId, { limit = 10 } = {}) {
+  if (!profileId) return { communities: [], threads: [], posts: [] };
+  const [comm, threads, posts] = await Promise.all([
+    supabase
+      .from('communities')
+      .select('id, slug, name, member_count, created_at')
+      .eq('owner_id', profileId)
+      .order('created_at', { ascending: false }),
+    supabase
+      .from('forum_threads')
+      .select('id, slug, title, created_at, reply_count, view_count, is_solved, is_locked')
+      .eq('author_id', profileId)
+      .order('created_at', { ascending: false })
+      .limit(limit),
+    supabase
+      .from('forum_posts')
+      .select('id, body, created_at, is_deleted, thread:thread_id(id, slug, title)')
+      .eq('author_id', profileId)
+      .order('created_at', { ascending: false })
+      .limit(limit),
+  ]);
+  return {
+    communities: comm.data || [],
+    threads:     threads.data || [],
+    posts:       posts.data || [],
+  };
+}
+
 // ── Subscription packs (admin) ────────────────────────────
 // Role packs (recruiter / vendor / supplier) live in their own table;
 // each row is (profile_id, pack_slug) → tier_slug. These helpers let

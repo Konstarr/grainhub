@@ -9,6 +9,7 @@ import {
   fetchSubscriptionPacks,
   setSubscriptionPack,
   removeSubscriptionPack,
+  fetchUserAdminActivity,
 } from '../../lib/adminDb.js';
 import { useAuth } from '../../context/AuthContext.jsx';
 import {
@@ -48,16 +49,17 @@ export default function AdminUserEdit() {
   const [error, setError]     = useState(null);
   const [okMsg, setOkMsg]     = useState(null);
   const [form, setForm]       = useState(null);
-  // Role-pack map: { recruiter: 'growth', vendor: 'starter', supplier: null, ... }
   const [packs, setPacks]     = useState({});
+  const [activity, setActivity] = useState({ communities: [], threads: [], posts: [] });
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
       setLoading(true);
-      const [{ data, error }, packRes] = await Promise.all([
+      const [{ data, error }, packRes, act] = await Promise.all([
         getProfile(id),
         fetchSubscriptionPacks(id),
+        fetchUserAdminActivity(id, { limit: 10 }),
       ]);
       if (cancelled) return;
       if (error || !data) {
@@ -67,6 +69,7 @@ export default function AdminUserEdit() {
       }
       setForm(data);
       setPacks(packRes.data || {});
+      setActivity(act);
       setLoading(false);
     })();
     return () => { cancelled = true; };
@@ -138,6 +141,10 @@ export default function AdminUserEdit() {
     >
       {error && <div className="adm-error" style={{ marginBottom: 12 }}>{error}</div>}
       {okMsg && <div className="adm-ok" style={{ marginBottom: 12 }}>{okMsg}</div>}
+
+      <ActivityPanel activity={activity} />
+
+      <div className="adm-user-grid">
 
       {/* ------------- Account type (admin override) ------------- */}
       <div className="adm-card">
@@ -487,6 +494,8 @@ export default function AdminUserEdit() {
         )}
       </div>
 
+      </div>
+
       {/* ------------- Save ------------- */}
       <div className="adm-footer" style={{ marginTop: 12 }}>
         <div className="adm-timestamp">
@@ -503,6 +512,85 @@ export default function AdminUserEdit() {
         </div>
       </div>
     </AdminLayout>
+  );
+}
+
+function ActivityPanel({ activity }) {
+  const { communities, threads, posts } = activity || {};
+  const total = (communities?.length || 0) + (threads?.length || 0) + (posts?.length || 0);
+  if (total === 0) {
+    return (
+      <div className="adm-card adm-activity">
+        <div className="adm-activity-title">Activity</div>
+        <div className="adm-empty" style={{ marginTop: 0 }}>
+          No communities owned, threads, or posts yet.
+        </div>
+      </div>
+    );
+  }
+  return (
+    <div className="adm-card adm-activity">
+      <div className="adm-activity-title">Activity</div>
+      <div className="adm-activity-grid">
+        <div>
+          <div className="adm-activity-h">Communities owned ({communities.length})</div>
+          {communities.length === 0 ? (
+            <div className="adm-activity-empty">None</div>
+          ) : (
+            <ul className="adm-activity-list">
+              {communities.map((c) => (
+                <li key={c.id}>
+                  <Link to={`/c/${c.slug}`} target="_blank" className="adm-activity-link">{c.name}</Link>
+                  <span className="adm-activity-meta">{c.member_count || 0} members</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+        <div>
+          <div className="adm-activity-h">Recent threads ({threads.length})</div>
+          {threads.length === 0 ? (
+            <div className="adm-activity-empty">No threads</div>
+          ) : (
+            <ul className="adm-activity-list">
+              {threads.map((t) => (
+                <li key={t.id}>
+                  <Link to={`/forums/thread/${t.slug}`} target="_blank" className="adm-activity-link">
+                    {t.title}
+                  </Link>
+                  <span className="adm-activity-meta">
+                    {t.reply_count || 0} replies · {new Date(t.created_at).toLocaleDateString()}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+        <div>
+          <div className="adm-activity-h">Recent posts ({posts.length})</div>
+          {posts.length === 0 ? (
+            <div className="adm-activity-empty">No posts</div>
+          ) : (
+            <ul className="adm-activity-list">
+              {posts.map((p) => (
+                <li key={p.id}>
+                  {p.thread?.slug ? (
+                    <Link to={`/forums/thread/${p.thread.slug}`} target="_blank" className="adm-activity-link">
+                      {(p.body || '').replace(/\s+/g, ' ').slice(0, 70) || '(empty)'}
+                    </Link>
+                  ) : (
+                    <span>{(p.body || '').replace(/\s+/g, ' ').slice(0, 70)}</span>
+                  )}
+                  <span className="adm-activity-meta">
+                    {p.is_deleted ? 'deleted · ' : ''}{new Date(p.created_at).toLocaleDateString()}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }
 
