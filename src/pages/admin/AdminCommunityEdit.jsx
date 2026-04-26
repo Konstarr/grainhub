@@ -10,6 +10,11 @@ import {
   adminAddMember,
   adminSearchProfilesForCommunity,
 } from '../../lib/communityAdminDb.js';
+import {
+  banCommunityMember,
+  unbanCommunityMember,
+  fetchCommunityBans,
+} from '../../lib/communityDb.js';
 
 /**
  * /admin/communities/:id - manage leadership for one community.
@@ -26,6 +31,7 @@ export default function AdminCommunityEdit() {
 
   const [community, setCommunity] = useState(null);
   const [members, setMembers] = useState([]);
+  const [bans, setBans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [busyId, setBusyId] = useState(null);
   const [err, setErr] = useState(null);
@@ -42,13 +48,15 @@ export default function AdminCommunityEdit() {
 
   const load = async () => {
     setLoading(true); setErr(null);
-    const [c, m] = await Promise.all([
+    const [c, m, b] = await Promise.all([
       adminGetCommunity(id),
       adminListCommunityMembers(id),
+      fetchCommunityBans(id),
     ]);
     if (c.error) setErr(c.error.message || 'Could not load community');
     setCommunity(c.data || null);
     setMembers(m.data || []);
+    setBans(b.data || []);
     setLoading(false);
   };
 
@@ -94,11 +102,30 @@ export default function AdminCommunityEdit() {
   };
 
   const handleRemove = async (profileId, name) => {
-    if (!confirm('Remove ' + (name || 'this member') + ' from the community? This cannot be undone.')) return;
+    if (!confirm('Remove ' + (name || 'this member') + ' from the community? They can re-apply later.')) return;
     setBusyId(profileId); setErr(null);
     const { error } = await adminRemoveMember(id, profileId);
     setBusyId(null);
     if (error) { setErr(error.message || 'Could not remove member'); return; }
+    await load();
+  };
+
+  const handleBan = async (profileId, name) => {
+    const reason = prompt('Ban ' + (name || 'this member') + '?\n\nThey will be removed and blocked from re-applying or being invited until unbanned.\n\nOptional reason:', '');
+    if (reason === null) return;
+    setBusyId(profileId); setErr(null);
+    const { error } = await banCommunityMember(id, profileId, reason || '');
+    setBusyId(null);
+    if (error) { setErr(error.message || 'Could not ban member'); return; }
+    await load();
+  };
+
+  const handleUnban = async (profileId, name) => {
+    if (!confirm('Lift the ban on ' + (name || 'this person') + '?')) return;
+    setBusyId(profileId); setErr(null);
+    const { error } = await unbanCommunityMember(id, profileId);
+    setBusyId(null);
+    if (error) { setErr(error.message || 'Could not unban'); return; }
     await load();
   };
 
@@ -280,6 +307,44 @@ export default function AdminCommunityEdit() {
         )}
       </div>
 
+      {/* Bans */}
+      {bans.length > 0 && (
+        <div className="adm-card" style={{ padding: 0, marginBottom: '1rem' }}>
+          <div style={{ padding: '0.85rem 1.25rem', borderBottom: '1px solid var(--border-light, #e8d8c0)', fontSize: 11, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#a32d2d' }}>
+            Banned ({bans.length})
+          </div>
+          <table className="adm-table">
+            <tbody>
+              {bans.map((b) => {
+                const p = b.profile || {};
+                const name = p.full_name || p.username || 'Someone';
+                return (
+                  <tr key={b.id}>
+                    <td style={{ paddingLeft: '1.25rem' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                        <MemberAvatar profile={p}/>
+                        <div>
+                          <div style={{ fontWeight: 600, fontSize: 13.5 }}>{name}</div>
+                          <div style={{ fontSize: 11.5, color: 'var(--text-muted)' }}>
+                            @{p.username}
+                            {b.reason ? ' · "' + b.reason + '"' : ''}
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td style={{ textAlign: 'right', paddingRight: '1.25rem' }}>
+                      <button type="button" className="adm-btn" onClick={() => handleUnban(b.profile_id, name)} disabled={busyId === b.profile_id}>
+                        Unban
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
+
       {/* Mods */}
       <div className="adm-card" style={{ padding: 0, marginBottom: '1rem' }}>
         <div style={{ padding: '0.85rem 1.25rem', borderBottom: '1px solid var(--border-light, #e8d8c0)', fontSize: 11, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--wood-warm)' }}>
@@ -298,6 +363,7 @@ export default function AdminCommunityEdit() {
                   onDemote={() => handleSetRole(m.profile_id, 'member')}
                   onTransfer={() => handleTransfer(m.profile_id, m.profile?.full_name || m.profile?.username)}
                   onRemove={() => handleRemove(m.profile_id, m.profile?.full_name || m.profile?.username)}
+                  onBan={() => handleBan(m.profile_id, m.profile?.full_name || m.profile?.username)}
                 />
               ))}
             </tbody>
@@ -323,6 +389,7 @@ export default function AdminCommunityEdit() {
                   onPromote={() => handleSetRole(m.profile_id, 'mod')}
                   onTransfer={() => handleTransfer(m.profile_id, m.profile?.full_name || m.profile?.username)}
                   onRemove={() => handleRemove(m.profile_id, m.profile?.full_name || m.profile?.username)}
+                  onBan={() => handleBan(m.profile_id, m.profile?.full_name || m.profile?.username)}
                 />
               ))}
             </tbody>
@@ -352,7 +419,7 @@ function MemberAvatar({ profile, size = 32 }) {
   );
 }
 
-function MemberRow({ member, busy, onPromote, onDemote, onTransfer, onRemove }) {
+function MemberRow({ member, busy, onPromote, onDemote, onTransfer, onRemove, onBan }) {
   const p = member.profile || {};
   return (
     <tr>
@@ -387,8 +454,102 @@ function MemberRow({ member, busy, onPromote, onDemote, onTransfer, onRemove }) 
             </button>
           )}
           {onRemove && (
-            <button type="button" className="adm-btn danger" onClick={onRemove} disabled={busy}>
-              Remove
+            <button type="button" className="adm-btn" onClick={onRemove} disabled={busy} title="Kick — they can re-apply">
+              Kick
+            </button>
+          )}
+          {onBan && (
+            <button type="button" className="adm-btn danger" onClick={onBan} disabled={busy} title="Ban — blocks future apply/invite">
+              Ban
+            </button>
+          )}
+        </div>
+      </td>
+    </tr>
+  );
+}
+able">
+            <tbody>
+              {regular.map((m) => (
+                <MemberRow
+                  key={m.profile_id}
+                  member={m}
+                  busy={busyId === m.profile_id}
+                  onPromote={() => handleSetRole(m.profile_id, 'mod')}
+                  onTransfer={() => handleTransfer(m.profile_id, m.profile?.full_name || m.profile?.username)}
+                  onRemove={() => handleRemove(m.profile_id, m.profile?.full_name || m.profile?.username)}
+                  onBan={() => handleBan(m.profile_id, m.profile?.full_name || m.profile?.username)}
+                />
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </AdminLayout>
+  );
+}
+
+function MemberAvatar({ profile, size = 32 }) {
+  const initials = (profile?.full_name || profile?.username || '?')
+    .split(/\s+/).slice(0, 2).map((w) => w[0]).join('').toUpperCase();
+  if (profile?.avatar_url) {
+    return <img src={profile.avatar_url} alt="" style={{ width: size, height: size, borderRadius: '50%', objectFit: 'cover' }}/>;
+  }
+  return (
+    <div style={{
+      width: size, height: size, borderRadius: '50%',
+      background: 'linear-gradient(135deg, #8a5030, #5d3a1c)',
+      color: '#fff', fontSize: size * 0.38, fontWeight: 700,
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      flexShrink: 0,
+    }}>
+      {initials}
+    </div>
+  );
+}
+
+function MemberRow({ member, busy, onPromote, onDemote, onTransfer, onRemove, onBan }) {
+  const p = member.profile || {};
+  return (
+    <tr>
+      <td style={{ paddingLeft: '1.25rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+          <MemberAvatar profile={p}/>
+          <div>
+            <div style={{ fontWeight: 600, fontSize: 13.5 }}>
+              {p.full_name || p.username || 'Unknown'}
+            </div>
+            <div style={{ fontSize: 11.5, color: 'var(--text-muted)' }}>
+              @{p.username}{p.trade ? ' . ' + p.trade : ''}
+            </div>
+          </div>
+        </div>
+      </td>
+      <td style={{ textAlign: 'right', paddingRight: '1.25rem' }}>
+        <div style={{ display: 'inline-flex', gap: 6, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+          {onPromote && (
+            <button type="button" className="adm-btn" onClick={onPromote} disabled={busy}>
+              Promote to mod
+            </button>
+          )}
+          {onDemote && (
+            <button type="button" className="adm-btn" onClick={onDemote} disabled={busy}>
+              Demote to member
+            </button>
+          )}
+          {onTransfer && (
+            <button type="button" className="adm-btn primary" onClick={onTransfer} disabled={busy}>
+              Make owner
+            </button>
+          )}
+          {onRemove && (
+            <button type="button" className="adm-btn" onClick={onRemove} disabled={busy} title="Kick — they can re-apply">
+              Kick
+            </button>
+          )}
+          {onBan && (
+            <button type="button" className="adm-btn danger" onClick={onBan} disabled={busy} title="Ban — blocks future apply/invite">
+              Ban
             </button>
           )}
         </div>

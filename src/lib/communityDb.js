@@ -209,6 +209,51 @@ export async function searchProfilesToInvite(query) {
   return { data: data || [], error };
 }
 
+/* ══════════════════ Kick / Ban / Unban ══════════════════ */
+
+/** Mod / owner / admin: kick a member. They can re-apply later. */
+export async function kickCommunityMember(communityId, profileId) {
+  if (!communityId || !profileId) return { error: new Error('Missing args') };
+  const { error } = await supabase.rpc('community_kick_member', {
+    community_id_in: communityId,
+    profile_in:      profileId,
+  });
+  return { error };
+}
+
+/** Mod / owner / admin: ban a member (kick + record ban so they
+ *  can't apply or be invited again until unbanned). */
+export async function banCommunityMember(communityId, profileId, reason = '') {
+  if (!communityId || !profileId) return { error: new Error('Missing args') };
+  const { error } = await supabase.rpc('community_ban_member', {
+    community_id_in: communityId,
+    profile_in:      profileId,
+    reason_in:       reason ? String(reason).slice(0, 500) : null,
+  });
+  return { error };
+}
+
+/** Mod / owner / admin: lift a ban. */
+export async function unbanCommunityMember(communityId, profileId) {
+  if (!communityId || !profileId) return { error: new Error('Missing args') };
+  const { error } = await supabase.rpc('community_unban_member', {
+    community_id_in: communityId,
+    profile_in:      profileId,
+  });
+  return { error };
+}
+
+/** List the active bans for a community (mod / owner / admin only via RLS). */
+export async function fetchCommunityBans(communityId) {
+  if (!communityId) return { data: [], error: null };
+  const { data, error } = await supabase
+    .from('community_bans')
+    .select('id, community_id, profile_id, banned_by, reason, created_at, profile:profile_id(id, username, full_name, avatar_url, trade), banner:banned_by(id, username, full_name)')
+    .eq('community_id', communityId)
+    .order('created_at', { ascending: false });
+  return { data: data || [], error };
+}
+
 /**
  * Leave the community. Routes through a SECURITY DEFINER RPC that
  * refuses if the caller is the owner — owners must transfer ownership
@@ -426,6 +471,54 @@ export async function togglePostLike({ postId, communityId, iLiked }) {
   const { error } = await supabase
     .from('community_post_likes')
     .insert({ post_id: postId, community_id: communityId, profile_id: uid });
+  return { data: { iLiked: true }, error };
+}
+
+export async function fetchPostComments(postId) {
+  if (!postId) return { data: [], error: null };
+  const { data, error } = await supabase
+    .from('community_post_comments')
+    .select('id, post_id, author_id, body, created_at, deleted_at, author:author_id(id, username, full_name, avatar_url)')
+    .eq('post_id', postId)
+    .is('deleted_at', null)
+    .order('created_at', { ascending: true });
+  return { data: data || [], error };
+}
+
+export async function createPostComment({ postId, communityId, body }) {
+  if (!postId || !body?.trim()) {
+    return { data: null, error: new Error('Empty comment') };
+  }
+  const { data: session } = await supabase.auth.getSession();
+  const uid = session?.session?.user?.id;
+  if (!uid) return { data: null, error: new Error('Sign in to comment.') };
+  const { data, error } = await supabase
+    .from('community_post_comments')
+    .insert({ post_id: postId, community_id: communityId, author_id: uid, body: body.trim().slice(0, 4000) })
+    .select('id, post_id, author_id, body, created_at, deleted_at, author:author_id(id, username, full_name, avatar_url)')
+    .maybeSingle();
+  return { data, error };
+}
+
+export async function deletePostComment(commentId) {
+  if (!commentId) return { data: null, error: new Error('Missing comment id') };
+  const { error } = await supabase
+    .from('community_post_comments')
+    .update({ deleted_at: new Date().toISOString() })
+    .eq('id', commentId);
+  return { data: null, error };
+}
+
+export function subscribeCommunityPosts(communityId, onInsert) {
+  if (!communityId) return null;
+  const channel = supabase
+    .channel('community-feed-' + communityId)
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'community_posts', filter: 'community_id=eq.' + communityId },
+        (payload) => { if (onInsert) onInsert(payload.new); })
+    .subscribe();
+  return channel;
+}
+ });
   return { data: { iLiked: true }, error };
 }
 

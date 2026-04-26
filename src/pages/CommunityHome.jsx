@@ -18,6 +18,10 @@ import {
   searchProfilesToInvite,
   transferOwnership,
   leaveCommunity,
+  kickCommunityMember,
+  banCommunityMember,
+  unbanCommunityMember,
+  fetchCommunityBans,
   fetchCommunityMembers,
   fetchCommunityPosts,
   createCommunityPost,
@@ -56,6 +60,7 @@ export default function CommunityHome() {
   const [myRequest, setMyRequest] = useState(null);
   const [myInvitation, setMyInvitation] = useState(null);
   const [pendingRequests, setPendingRequests] = useState([]);
+  const [bans, setBans] = useState([]);
   const [members, setMembers] = useState([]);
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -85,10 +90,15 @@ export default function CommunityHome() {
     setMyInvitation(mi.data || null);
     const role = m.data?.role;
     if (role === 'mod' || role === 'owner') {
-      const { data: pr } = await fetchPendingJoinRequests(data.id);
-      setPendingRequests(pr || []);
+      const [pr, bb] = await Promise.all([
+        fetchPendingJoinRequests(data.id),
+        fetchCommunityBans(data.id),
+      ]);
+      setPendingRequests(pr.data || []);
+      setBans(bb.data || []);
     } else {
       setPendingRequests([]);
+      setBans([]);
     }
     setLoading(false);
   };
@@ -165,6 +175,32 @@ export default function CommunityHome() {
     await load();
     return true;
   };
+  const handleKick = async (profileId, name) => {
+    if (!confirm('Kick ' + (name || 'this member') + ' from the community?\n\nThey can re-apply later.')) return;
+    setBusy(true);
+    const { error } = await kickCommunityMember(community.id, profileId);
+    setBusy(false);
+    if (error) { alert(prettyMembershipError(error.message)); return; }
+    await load();
+  };
+  const handleBan = async (profileId, name) => {
+    const reason = prompt('Ban ' + (name || 'this member') + '?\n\nThey will be removed and blocked from re-applying or being invited until unbanned.\n\nOptional reason:', '');
+    if (reason === null) return; // cancelled
+    setBusy(true);
+    const { error } = await banCommunityMember(community.id, profileId, reason || '');
+    setBusy(false);
+    if (error) { alert(prettyMembershipError(error.message)); return; }
+    await load();
+  };
+  const handleUnban = async (profileId, name) => {
+    if (!confirm('Lift the ban on ' + (name || 'this person') + '?')) return;
+    setBusy(true);
+    const { error } = await unbanCommunityMember(community.id, profileId);
+    setBusy(false);
+    if (error) { alert(error.message); return; }
+    await load();
+  };
+
   const handleTransfer = async (newOwnerId) => {
     if (!community || !newOwnerId) return false;
     if (!confirm('Transfer ownership?\n\nYou will become a regular member and the new owner takes full control of the community. They can promote you back to mod or owner if they choose.')) return false;
@@ -358,12 +394,16 @@ export default function CommunityHome() {
           isOwner={isOwner}
           isMod={isMod}
           pendingRequests={pendingRequests}
+          bans={bans}
           busy={busy}
           onClose={() => setManageOpen(false)}
           onTransfer={handleTransfer}
           onInvite={handleInvite}
           onApprove={handleApprove}
           onReject={handleReject}
+          onKick={handleKick}
+          onBan={handleBan}
+          onUnban={handleUnban}
         />
       )}
     </>
@@ -445,6 +485,10 @@ function MembershipButton({
 function prettyMembershipError(message) {
   const m = String(message || '');
   if (m.includes('owner_must_transfer_first')) return 'You are the owner. Transfer ownership to another member before leaving.';
+  if (m.includes('banned_from_community')) return "You've been banned from this community.";
+  if (m.includes('invitee_banned')) return "That person is banned from this community. Lift the ban first.";
+  if (m.includes('cannot_kick_owner')) return "Owners can't be kicked. Transfer ownership first.";
+  if (m.includes('cannot_ban_owner')) return "Owners can't be banned. Transfer ownership first.";
   if (m.includes('already_member')) return 'They are already in this community.';
   if (m.includes('request_already_pending')) return 'A request is already pending for this user.';
   if (m.includes('invitation_already_pending')) return 'An invitation is already outstanding for that person.';
@@ -902,8 +946,8 @@ function PendingRequestsCard({ requests, onApprove, onReject, busy }) {
 }
 
 function ManageMembershipModal({
-  community, members, isOwner, isMod, pendingRequests, busy,
-  onClose, onTransfer, onInvite, onApprove, onReject,
+  community, members, isOwner, isMod, pendingRequests, bans, busy,
+  onClose, onTransfer, onInvite, onApprove, onReject, onKick, onBan, onUnban,
 }) {
   const [section, setSection] = useState('requests');
   const [inviteQuery, setInviteQuery] = useState('');
@@ -923,7 +967,9 @@ function ManageMembershipModal({
   const transferCandidates = members.filter((m) => m.role !== 'owner' && m.profile);
   const sections = [
     { id: 'requests', label: `Requests${pendingRequests.length ? ' · ' + pendingRequests.length : ''}` },
+    { id: 'members',  label: `Members · ${members.length}` },
     { id: 'invite',   label: 'Invite' },
+    { id: 'bans',     label: `Bans${(bans?.length || 0) ? ' · ' + bans.length : ''}` },
     ...(isOwner ? [{ id: 'transfer', label: 'Transfer ownership' }] : []),
   ];
   return (
@@ -971,6 +1017,162 @@ function ManageMembershipModal({
               })}
             </div>
           )}
+          {section === 'members' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              {members.length === 0 ? (
+                <div style={{ color: 'var(--text-muted)', fontSize: 14, padding: '1rem 0' }}>No members yet.</div>
+              ) : members.map((m) => {
+                const p = m.profile; if (!p) return null;
+                const name = p.full_name || p.username || 'Member';
+                const initials = name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase();
+                const isThisOwner = m.role === 'owner';
+                return (
+                  <div key={p.id} style={{ display: 'flex', gap: 10, padding: 10, border: '1px solid var(--border-light)', borderRadius: 8, alignItems: 'center' }}>
+                    <Link to={'/profile/' + (p.username || p.id)} className="comm-roster-avatar" style={{ flexShrink: 0 }}>
+                      {p.avatar_url ? <img src={p.avatar_url} alt="" /> : <span>{initials}</span>}
+                    </Link>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <Link to={'/profile/' + (p.username || p.id)} style={{ fontWeight: 600, fontSize: 14, color: 'var(--text-primary)', textDecoration: 'none' }}>{name}</Link>
+                      <div style={{ fontSize: 11.5, color: 'var(--text-muted)', textTransform: 'capitalize' }}>{m.role}{p.trade ? ' · ' + p.trade : ''}</div>
+                    </div>
+                    {isThisOwner ? (
+                      <span style={{ fontSize: 11.5, color: 'var(--text-muted)' }}>👑 Owner</span>
+                    ) : (
+                      <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
+                        <button type="button" onClick={() => onKick(p.id, name)} disabled={busy} className="comm-btn ghost-light" style={{ padding: '5px 12px', fontSize: 12 }}>Kick</button>
+                        <button type="button" onClick={() => onBan(p.id, name)} disabled={busy} className="comm-btn ghost-light" style={{ padding: '5px 12px', fontSize: 12, color: '#a32d2d', borderColor: '#e6c1c1' }}>Ban</button>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {section === 'bans' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              {(!bans || bans.length === 0) ? (
+                <div style={{ color: 'var(--text-muted)', fontSize: 14, padding: '1rem 0' }}>No one is banned.</div>
+              ) : bans.map((b) => {
+                const p = b.profile || {};
+                const name = p.full_name || p.username || 'Someone';
+                const initials = name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase();
+                return (
+                  <div key={b.id} style={{ display: 'flex', gap: 10, padding: 10, border: '1px solid var(--border-light)', borderRadius: 8, alignItems: 'flex-start' }}>
+                    <div className="comm-roster-avatar" style={{ flexShrink: 0 }}>
+                      {p.avatar_url ? <img src={p.avatar_url} alt="" /> : <span>{initials}</span>}
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <Link to={'/profile/' + (p.username || p.id)} style={{ fontWeight: 600, fontSize: 14, color: 'var(--text-primary)', textDecoration: 'none' }}>{name}</Link>
+                      <div style={{ fontSize: 11.5, color: 'var(--text-muted)' }}>
+                        Banned {formatRelative(b.created_at)}
+                        {b.banner?.username ? ' by ' + (b.banner.full_name || b.banner.username) : ''}
+                      </div>
+                      {b.reason && <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', marginTop: 4, lineHeight: 1.45 }}>"{b.reason}"</div>}
+                    </div>
+                    <button type="button" onClick={() => onUnban(p.id, name)} disabled={busy} className="comm-btn primary" style={{ padding: '5px 12px', fontSize: 12, flexShrink: 0 }}>Unban</button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {section === 'invite' && (
+            <div>
+              <input type="text" value={inviteQuery} onChange={(e) => setInviteQuery(e.target.value)} placeholder="Search by name or username"
+                style={{ width: '100%', padding: '10px 12px', fontSize: 14, fontFamily: 'Montserrat, sans-serif', border: '1px solid var(--border)', borderRadius: 8, outline: 'none' }}
+                autoFocus />
+              <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                {inviteQuery.trim().length < 2 ? (<div style={{ color: 'var(--text-muted)', fontSize: 13 }}>Type at least two characters to find a profile.</div>)
+                : searching ? (<div style={{ color: 'var(--text-muted)', fontSize: 13 }}>Searching...</div>)
+                : inviteResults.length === 0 ? (<div style={{ color: 'var(--text-muted)', fontSize: 13 }}>No profiles match.</div>)
+                : inviteResults.map((p) => {
+                  const name = p.full_name || p.username || 'Someone';
+                  const initials = name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase();
+                  const alreadyMember = members.some((m) => m.profile?.id === p.id);
+                  return (
+                    <div key={p.id} style={{ display: 'flex', gap: 10, padding: 8, border: '1px solid var(--border-light)', borderRadius: 8, alignItems: 'center' }}>
+                      <div className="comm-roster-avatar" style={{ flexShrink: 0 }}>
+                        {p.avatar_url ? <img src={p.avatar_url} alt="" /> : <span>{initials}</span>}
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontWeight: 600, fontSize: 14, color: 'var(--text-primary)' }}>{name}</div>
+                        {p.trade && <div style={{ fontSize: 11.5, color: 'var(--text-muted)' }}>{p.trade}</div>}
+                      </div>
+                      {alreadyMember ? (<span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Already a member</span>)
+                      : (<button type="button" onClick={async () => { const ok = await onInvite(p.id); if (ok) { setInviteQuery(''); setInviteResults([]); } }} disabled={busy} className="comm-btn primary" style={{ padding: '5px 12px', fontSize: 12 }}>Invite</button>)}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+          {section === 'transfer' && isOwner && (
+            <div>
+              <div style={{ padding: '12px 14px', background: '#FFF3DC', borderRadius: 8, color: '#8B5E08', fontSize: 13, lineHeight: 1.55, marginBottom: 12 }}>
+                <div style={{ fontWeight: 700, marginBottom: 4 }}>This is permanent.</div>
+                Transferring makes the chosen member the new <strong>owner</strong>. You become a regular <strong>member</strong> — they can promote you back to mod or owner later if they choose.
+              </div>
+              {transferCandidates.length === 0 ? (
+                <div style={{ color: 'var(--text-muted)', fontSize: 14, padding: '0.5rem 0' }}>
+                  Add at least one other member before transferring ownership.
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  {transferCandidates.map((m) => {
+                    const p = m.profile;
+                    const name = p.full_name || p.username || 'Member';
+                    const initials = name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase();
+                    return (
+                      <div key={p.id} style={{ display: 'flex', gap: 10, padding: 10, border: '1px solid var(--border-light)', borderRadius: 8, alignItems: 'center' }}>
+                        <div className="comm-roster-avatar" style={{ flexShrink: 0 }}>
+                          {p.avatar_url ? <img src={p.avatar_url} alt="" /> : <span>{initials}</span>}
+                        </div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontWeight: 600, fontSize: 14, color: 'var(--text-primary)' }}>{name}</div>
+                          <div style={{ fontSize: 11.5, color: 'var(--text-muted)', textTransform: 'capitalize' }}>{m.role}</div>
+                        </div>
+                        <button type="button" onClick={() => onTransfer(p.id)} disabled={busy} className="comm-btn primary" style={{ padding: '6px 14px', fontSize: 12, flexShrink: 0 }}>
+                          Make owner
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function formatRelative(iso) {
+  if (!iso) return '';
+  const ms = Date.now() - new Date(iso).getTime();
+  if (ms < 60 * 1000) return 'just now';
+  if (ms < 60 * 60 * 1000) return Math.floor(ms / 60000) + 'm ago';
+  if (ms < 24 * 60 * 60 * 1000) return Math.floor(ms / 3600000) + 'h ago';
+  if (ms < 7 * 24 * 60 * 60 * 1000) return Math.floor(ms / 86400000) + 'd ago';
+  return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+}
+              </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <Link to={'/profile/' + (p.username || p.id)} style={{ fontWeight: 600, fontSize: 14, color: 'var(--text-primary)', textDecoration: 'none' }}>{name}</Link>
+                      <div style={{ fontSize: 11.5, color: 'var(--text-muted)' }}>
+                        Banned {formatRelative(b.created_at)}
+                        {b.banner?.username ? ' by ' + (b.banner.full_name || b.banner.username) : ''}
+                      </div>
+                      {b.reason && <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', marginTop: 4, lineHeight: 1.45 }}>"{b.reason}"</div>}
+                    </div>
+                    <button type="button" onClick={() => onUnban(p.id, name)} disabled={busy} className="comm-btn primary" style={{ padding: '5px 12px', fontSize: 12, flexShrink: 0 }}>Unban</button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
           {section === 'invite' && (
             <div>
               <input type="text" value={inviteQuery} onChange={(e) => setInviteQuery(e.target.value)} placeholder="Search by name or username"
