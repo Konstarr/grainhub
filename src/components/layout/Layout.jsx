@@ -1,17 +1,19 @@
 import { Outlet } from 'react-router-dom';
 import Nav from './Nav.jsx';
 import Footer from './Footer.jsx';
-import SecondaryNav from './SecondaryNav.jsx';
 import ScrollToTop from '../shared/ScrollToTop.jsx';
 
+/**
+ * SecondaryNav has been retired site-wide. Each page now provides its
+ * own context-appropriate navigation (search hero, filter sidebar,
+ * cluster grid, etc.) rather than relying on a single one-size-fits-all
+ * white strip below the main nav.
+ */
 export default function Layout() {
-  // SecondaryNav decides its own visibility + contents based on the
-  // current route — it returns null on pages that shouldn't show it.
   return (
     <>
       <ScrollToTop />
       <Nav />
-      <SecondaryNav />
       <Outlet />
       <Footer />
     </>
