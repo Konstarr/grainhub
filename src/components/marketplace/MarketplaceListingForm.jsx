@@ -1,10 +1,13 @@
 import { useState } from 'react';
-import CoverImageUploader from '../admin/CoverImageUploader.jsx';
+import MultiImageUploader from './MultiImageUploader.jsx';
 
 /**
- * Shared form for both /marketplace/new (initial=null) and
- * /marketplace/edit/:id (initial=existing row). Caller decides what
- * to do with the resulting payload via onSubmit.
+ * Shared form for /marketplace/new (initial=null) and
+ * /marketplace/edit/:id (initial=existing row). Caller decides what to
+ * do with the resulting payload via onSubmit.
+ *
+ * Photos go through MultiImageUploader, which handles validation and
+ * secure upload to media/marketplace/<uid>/. Up to 15 per listing.
  */
 
 export const MARKETPLACE_CATEGORIES = [
@@ -77,12 +80,8 @@ export default function MarketplaceListingForm({
   const [currency, setCurrency]       = useState(initial?.currency || 'USD');
   const [location, setLocation]       = useState(initial?.location || '');
   const [description, setDescription] = useState(initial?.description || '');
-
-  // Cover image is the first entry in images[]; extras paste-textarea-driven.
-  const initialImages = Array.isArray(initial?.images) ? initial.images : [];
-  const [coverUrl, setCoverUrl] = useState(initialImages[0] || '');
-  const [extraUrls, setExtraUrls] = useState(
-    initialImages.slice(1).join('\n')
+  const [images, setImages]           = useState(
+    Array.isArray(initial?.images) ? initial.images : []
   );
 
   const [err, setErr] = useState(null);
@@ -100,9 +99,6 @@ export default function MarketplaceListingForm({
       return;
     }
 
-    const images = [coverUrl, ...extraUrls.split('\n').map((s) => s.trim())]
-      .filter(Boolean);
-
     const priceNum = price === '' ? null : Number(price);
     if (price !== '' && (Number.isNaN(priceNum) || priceNum < 0)) {
       setErr('Price must be a positive number, or leave blank.');
@@ -118,7 +114,7 @@ export default function MarketplaceListingForm({
       currency: currency || 'USD',
       location: location.trim(),
       description: description.trim(),
-      images,
+      images: images.slice(0, 15),
     };
 
     try {
@@ -131,31 +127,35 @@ export default function MarketplaceListingForm({
   return (
     <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
       <div style={fieldStyle}>
-        <label style={labelStyle}>Title <span style={{ color: 'var(--cinnabar)' }}>*</span></label>
+        <label style={labelStyle}>
+          Title <span style={{ color: 'var(--cinnabar)' }}>*</span>
+        </label>
         <input
           style={inputStyle}
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          placeholder='e.g. SCM Minimax FS41 Combination Jointer/Planer — 2018'
+          placeholder="e.g. SCM Minimax FS41 Combination Jointer/Planer"
           maxLength={200}
           required
         />
         <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
-          {title.length}/200 — be specific. Brand, model, year, and key specs sell faster.
+          {title.length}/200 - be specific. Brand, model, year, and key specs sell faster.
         </span>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.9rem' }}>
         <div style={fieldStyle}>
-          <label style={labelStyle}>Category <span style={{ color: 'var(--cinnabar)' }}>*</span></label>
+          <label style={labelStyle}>
+            Category <span style={{ color: 'var(--cinnabar)' }}>*</span>
+          </label>
           <select
             style={inputStyle}
             value={category}
             onChange={(e) => setCategory(e.target.value)}
             required
           >
-            <option value="">Pick a category…</option>
+            <option value="">Pick a category...</option>
             {MARKETPLACE_CATEGORIES.map((c) => (
               <option key={c} value={c}>{c}</option>
             ))}
@@ -224,7 +224,7 @@ export default function MarketplaceListingForm({
             onChange={(e) => setTrade(e.target.value)}
           >
             {MARKETPLACE_TRADES.map((t) => (
-              <option key={t || '_'} value={t}>{t || '— None —'}</option>
+              <option key={t || '_'} value={t}>{t || '- None -'}</option>
             ))}
           </select>
         </div>
@@ -236,7 +236,7 @@ export default function MarketplaceListingForm({
           style={{ ...inputStyle, minHeight: 160, resize: 'vertical', fontFamily: 'inherit' }}
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          placeholder="Year, hours, included tooling, ship-from city, condition notes, why you're selling…"
+          placeholder="Year, hours, included tooling, ship-from city, condition notes, why you're selling..."
           maxLength={4000}
         />
         <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
@@ -245,28 +245,15 @@ export default function MarketplaceListingForm({
       </div>
 
       <div style={fieldStyle}>
-        <label style={labelStyle}>Cover photo</label>
-        <CoverImageUploader
-          value={coverUrl}
-          onChange={setCoverUrl}
-          bucket="marketplace"
-          aspect="4 / 3"
+        <label style={labelStyle}>Photos</label>
+        <MultiImageUploader
+          value={images}
+          onChange={setImages}
+          max={15}
+          folder="marketplace"
         />
-        <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
-          The first image buyers see in the grid. Bright, sharp, and well-framed sells.
-        </span>
-      </div>
-
-      <div style={fieldStyle}>
-        <label style={labelStyle}>Additional photo URLs (optional)</label>
-        <textarea
-          style={{ ...inputStyle, minHeight: 80, resize: 'vertical', fontFamily: 'inherit' }}
-          value={extraUrls}
-          onChange={(e) => setExtraUrls(e.target.value)}
-          placeholder="Paste extra image URLs, one per line."
-        />
-        <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
-          Use a host like Imgur, Dropbox, or your own CDN. We&apos;ll add a multi-uploader in a later release.
+        <span style={{ fontSize: 12, color: 'var(--text-muted)', display: 'block', marginTop: 6 }}>
+          The first photo is the cover that shows in the marketplace grid. Drag to reorder, or click "Set cover".
         </span>
       </div>
 
@@ -302,7 +289,7 @@ export default function MarketplaceListingForm({
           disabled={busy}
           className="act-btn primary"
         >
-          {busy ? 'Saving…' : submitLabel}
+          {busy ? 'Saving...' : submitLabel}
         </button>
       </div>
     </form>
