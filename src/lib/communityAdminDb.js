@@ -84,6 +84,21 @@ export async function adminRemoveMember(communityId, profileId) {
 }
 
 /**
+ * List every community a single profile belongs to (site-admin only).
+ * Powers the "Communities" section on /admin/users/:id.
+ */
+export async function adminListUserCommunities(profileId) {
+  if (!profileId) return { data: [], error: new Error('Missing profile id') };
+  const { data, error } = await supabase
+    .from('community_members')
+    .select('community_id, role, joined_at, community:community_id(id, slug, name, icon_url, member_count)')
+    .eq('profile_id', profileId)
+    .order('role', { ascending: true })
+    .order('joined_at', { ascending: true });
+  return { data: data || [], error };
+}
+
+/**
  * Site-admin only: drop any profile straight into a community at
  * member-level, bypassing the apply / invite handshake. No-op if they
  * are already a member at any role.

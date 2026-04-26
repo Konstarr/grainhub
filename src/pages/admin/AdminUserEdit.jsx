@@ -11,6 +11,12 @@ import {
   removeSubscriptionPack,
   fetchUserAdminActivity,
 } from '../../lib/adminDb.js';
+import {
+  adminListUserCommunities,
+  adminListCommunities,
+  adminAddMember,
+  adminRemoveMember,
+} from '../../lib/communityAdminDb.js';
 import { useAuth } from '../../context/AuthContext.jsx';
 import {
   INDIVIDUAL_TIERS,
@@ -51,15 +57,22 @@ export default function AdminUserEdit() {
   const [form, setForm]       = useState(null);
   const [packs, setPacks]     = useState({});
   const [activity, setActivity] = useState({ communities: [], threads: [], posts: [] });
+  const [userCommunities, setUserCommunities] = useState([]);
+
+  const reloadUserCommunities = async () => {
+    const { data } = await adminListUserCommunities(id);
+    setUserCommunities(data || []);
+  };
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
       setLoading(true);
-      const [{ data, error }, packRes, act] = await Promise.all([
+      const [{ data, error }, packRes, act, uc] = await Promise.all([
         getProfile(id),
         fetchSubscriptionPacks(id),
         fetchUserAdminActivity(id, { limit: 10 }),
+        adminListUserCommunities(id),
       ]);
       if (cancelled) return;
       if (error || !data) {
@@ -70,10 +83,25 @@ export default function AdminUserEdit() {
       setForm(data);
       setPacks(packRes.data || {});
       setActivity(act);
+      setUserCommunities(uc.data || []);
       setLoading(false);
     })();
     return () => { cancelled = true; };
   }, [id]);
+
+  const handleRemoveFromCommunity = async (communityId, communityName) => {
+    if (!confirm('Remove this user from "' + communityName + '"?')) return;
+    const { error } = await adminRemoveMember(communityId, id);
+    if (error) { alert(error.message || 'Could not remove'); return; }
+    await reloadUserCommunities();
+  };
+
+  const handleAddToCommunity = async (communityId, communityName) => {
+    const { error } = await adminAddMember(communityId, id);
+    if (error) { alert(error.message || 'Could not add'); return false; }
+    await reloadUserCommunities();
+    return true;
+  };
 
   // Pack mutations — write-through to DB so there's no "save" step to
   // remember. Simple and matches the sponsor_tier row-level feel.
@@ -495,6 +523,12 @@ export default function AdminUserEdit() {
 
       </div>
 
+      <CommunitiesPanel
+        userCommunities={userCommunities}
+        onRemove={handleRemoveFromCommunity}
+        onAdd={handleAddToCommunity}
+      />
+
       <ActivityPanel activity={activity} />
 
       {/* ------------- Save ------------- */}
@@ -513,6 +547,124 @@ export default function AdminUserEdit() {
         </div>
       </div>
     </AdminLayout>
+  );
+}
+
+function CommunitiesPanel({ userCommunities, onRemove, onAdd }) {
+  const [q, setQ] = useState('');
+  const [hits, setHits] = useState([]);
+  const [busy, setBusy] = useState(false);
+
+  // Live community search.
+  useEffect(() => {
+    const term = q.trim();
+    if (term.length < 2) { setHits([]); return; }
+    let cancelled = false;
+    (async () => {
+      const { data } = await adminListCommunities({ search: term, limit: 8 });
+      if (!cancelled) setHits(data || []);
+    })();
+    return () => { cancelled = true; };
+  }, [q]);
+
+  const memberSet = new Set(userCommunities.map((m) => m.community_id));
+
+  const handleAddClick = async (c) => {
+    setBusy(true);
+    const ok = await onAdd(c.id, c.name);
+    setBusy(false);
+    if (ok) { setQ(''); setHits([]); }
+  };
+
+  return (
+    <div className="adm-card adm-activity" style={{ marginTop: 12 }}>
+      <div className="adm-activity-h" style={{ marginBottom: 10 }}>
+        Communities ({userCommunities.length})
+      </div>
+
+      {userCommunities.length === 0 ? (
+        <div className="adm-activity-empty" style={{ marginBottom: 12 }}>
+          This user is not a member of any community.
+        </div>
+      ) : (
+        <ul className="adm-activity-list" style={{ marginBottom: 12 }}>
+          {userCommunities.map((m) => {
+            const c = m.community || {};
+            return (
+              <li key={m.community_id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+                <div style={{ minWidth: 0, flex: 1 }}>
+                  <Link to={'/c/' + c.slug} target="_blank" className="adm-activity-link">
+                    {c.name || '(community)'}
+                  </Link>
+                  <span className="adm-activity-meta" style={{ textTransform: 'capitalize' }}>
+                    {m.role}{c.member_count ? ' · ' + c.member_count + ' members' : ''}
+                  </span>
+                </div>
+                <div style={{ display: 'inline-flex', gap: 6, flexShrink: 0 }}>
+                  <Link to={'/admin/communities/' + m.community_id} className="adm-btn" style={{ padding: '4px 10px', fontSize: 12 }}>
+                    Manage
+                  </Link>
+                  <button
+                    type="button"
+                    className="adm-btn danger"
+                    style={{ padding: '4px 10px', fontSize: 12 }}
+                    onClick={() => onRemove(m.community_id, c.name || 'this community')}
+                    disabled={m.role === 'owner'}
+                    title={m.role === 'owner' ? 'Transfer ownership before removing' : 'Remove user from this community'}
+                  >
+                    Remove
+                  </button>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+
+      <div style={{ borderTop: '1px solid var(--border-light, #e8d8c0)', paddingTop: 10 }}>
+        <div style={{ fontSize: 12.5, fontWeight: 700, marginBottom: '0.4rem' }}>Add to a community</div>
+        <input
+          type="text"
+          placeholder="Search communities..."
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          style={{ width: '100%', padding: '0.5rem 0.75rem', border: '1px solid var(--border)', borderRadius: 6, fontSize: 14 }}
+        />
+        {hits.length > 0 && (
+          <div style={{ marginTop: 6, border: '1px solid var(--border-light, #e8d8c0)', borderRadius: 6, overflow: 'hidden' }}>
+            {hits.map((c) => {
+              const already = memberSet.has(c.id);
+              return (
+                <button
+                  key={c.id}
+                  type="button"
+                  disabled={busy || already}
+                  onClick={() => handleAddClick(c)}
+                  style={{
+                    display: 'flex', width: '100%', alignItems: 'center', gap: '0.6rem',
+                    padding: '0.55rem 0.75rem', background: '#fff',
+                    border: 'none', borderBottom: '1px solid #f0e6d2',
+                    cursor: already ? 'not-allowed' : 'pointer',
+                    opacity: already ? 0.6 : 1,
+                    textAlign: 'left',
+                  }}
+                >
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 13.5, fontWeight: 600 }}>{c.name}</div>
+                    <div style={{ fontSize: 11.5, color: 'var(--text-muted)' }}>
+                      /c/{c.slug}{c.member_count ? ' · ' + c.member_count + ' members' : ''}
+                    </div>
+                  </div>
+                  <span style={{ fontSize: 11.5, color: already ? 'var(--text-muted)' : 'var(--wood-warm)', fontWeight: 700 }}>
+                    {already ? 'Already a member' : 'Add as member'}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
 
