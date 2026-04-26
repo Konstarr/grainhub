@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600" font-family="'Montserrat',sans-serif">
+  <defs>
+    <pattern id="w3" patternUnits="userSpaceOnUse" width="14" height="14">
+      <rect width="14" height="14" fill="#c9a47a"/>
+      <path d="M0 4 Q 7 5, 14 4" stroke="#a07d4f" stroke-width="0.5" fill="none"/>
+      <path d="M0 9 Q 7 10, 14 9" stroke="#a07d4f" stroke-width="0.4" fill="none"/>
+    </pattern>
+  </defs>
+  <rect width="900" height="600" fill="#fbf6ec"/>
+  <text x="450" y="32" font-size="20" font-weight="700" text-anchor="middle" fill="#2c1a0e">Common Mortise &amp; Tenon Variations</text>
+  <text x="450" y="52" font-size="12" text-anchor="middle" fill="#6b5340">Plan-view cross sections · stile vertical · rail horizontal</text>
+
+  <!-- 1. Through tenon -->
+  <g transform="translate(40,90)">
+    <text x="90" y="-6" font-size="13" font-weight="600" text-anchor="middle" fill="#2c1a0e">Through tenon</text>
+    <rect x="60" y="0" width="60" height="180" fill="url(#w3)" stroke="#5d3a1c"/>
+    <rect x="0" y="60" width="180" height="60" fill="url(#w3)" stroke="#5d3a1c"/>
+    <rect x="60" y="80" width="60" height="20" fill="#a47a4d" stroke="#5d3a1c"/>
+    <text x="90" y="200" font-size="10" text-anchor="middle" fill="#6b5340">Tenon visible on far face</text>
+  </g>
+
+  <!-- 2. Blind / stopped tenon -->
+  <g transform="translate(260,90)">
+    <text x="90" y="-6" font-size="13" font-weight="600" text-anchor="middle" fill="#2c1a0e">Blind (stopped)</text>
+    <rect x="60" y="0" width="60" height="180" fill="url(#w3)" stroke="#5d3a1c"/>
+    <rect x="0" y="60" width="180" height="60" fill="url(#w3)" stroke="#5d3a1c"/>
+    <rect x="60" y="80" width="40" height="20" fill="#a47a4d" stroke="#5d3a1c"/>
+    <text x="90" y="200" font-size="10" text-anchor="middle" fill="#6b5340">Hidden — most common</text>
+  </g>
+
+  <!-- 3. Haunched tenon -->
+  <g transform="translate(480,90)">
+    <text x="90" y="-6" font-size="13" font-weight="600" text-anchor="middle" fill="#2c1a0e">Haunched</text>
+    <rect x="60" y="0" width="60" height="180" fill="url(#w3)" stroke="#5d3a1c"/>
+    <rect x="0" y="40" width="180" height="80" fill="url(#w3)" stroke="#5d3a1c"/>
+    <rect x="60" y="60" width="40" height="40" fill="#a47a4d" stroke="#5d3a1c"/>
+    <rect x="60" y="40" width="40" height="20" fill="#c08a55" stroke="#5d3a1c"/>
+    <text x="90" y="200" font-size="10" text-anchor="middle" fill="#6b5340">Frame corners — fills groove</text>
+  </g>
+
+  <!-- 4. Twin tenon -->
+  <g transform="translate(700,90)">
+    <text x="90" y="-6" font-size="13" font-weight="600" text-anchor="middle" fill="#2c1a0e">Twin tenon</text>
+    <rect x="60" y="0" width="60" height="180" fill="url(#w3)" stroke="#5d3a1c"/>
+    <rect x="0" y="30" width="180" height="120" fill="url(#w3)" stroke="#5d3a1c"/>
+    <rect x="60" y="50" width="40" height="25" fill="#a47a4d" stroke="#5d3a1c"/>
+    <rect x="60" y="105" width="40" height="25" fill="#a47a4d" stroke="#5d3a1c"/>
+    <text x="90" y="200" font-size="10" text-anchor="middle" fill="#6b5340">Wide rails — splits the load</text>
+  </g>
+
+  <!-- 5. Drawbore -->
+  <g transform="translate(40,330)">
+    <text x="90" y="-6" font-size="13" font-weight="600" text-anchor="middle" fill="#2c1a0e">Drawbore</text>
+    <rect x="60" y="0" width="60" height="180" fill="url(#w3)" stroke="#5d3a1c"/>
+    <rect x="0" y="60" width="180" height="60" fill="url(#w3)" stroke="#5d3a1c"/>
+    <rect x="60" y="80" width="60" height="20" fill="#a47a4d" stroke="#5d3a1c"/>
+    <circle cx="80" cy="92" r="5" fill="#3d2615"/>
+    <circle cx="80" cy="88" r="3" fill="#9c1f1f" stroke="#3d2615"/>
+    <text x="90" y="200" font-size="10" text-anchor="middle" fill="#6b5340">Offset peg — pulls joint tight</text>
+  </g>
+
+  <!-- 6. Wedged through -->
+  <g transform="translate(260,330)">
+    <text x="90" y="-6" font-size="13" font-weight="600" text-anchor="middle" fill="#2c1a0e">Wedged through</text>
+    <rect x="60" y="0" width="60" height="180" fill="url(#w3)" stroke="#5d3a1c"/>
+    <rect x="0" y="60" width="180" height="60" fill="url(#w3)" stroke="#5d3a1c"/>
+    <rect x="60" y="80" width="60" height="20" fill="#a47a4d" stroke="#5d3a1c"/>
+    <polygon points="65,80 75,90 65,100" fill="#7a4e22"/>
+    <polygon points="115,80 105,90 115,100" fill="#7a4e22"/>
+    <text x="90" y="200" font-size="10" text-anchor="middle" fill="#6b5340">Wedges flare the tenon</text>
+  </g>
+
+  <!-- 7. Loose / floating tenon (Domino) -->
+  <g transform="translate(480,330)">
+    <text x="90" y="-6" font-size="13" font-weight="600" text-anchor="middle" fill="#2c1a0e">Loose tenon</text>
+    <rect x="60" y="0" width="60" height="180" fill="url(#w3)" stroke="#5d3a1c"/>
+    <rect x="0" y="60" width="180" height="60" fill="url(#w3)" stroke="#5d3a1c"/>
+    <!-- floating tenon between two mortises -->
+    <rect x="50" y="80" width="80" height="20" fill="#a47a4d" stroke="#5d3a1c"/>
+    <text x="90" y="200" font-size="10" text-anchor="middle" fill="#6b5340">Both pieces mortised — Festool Domino</text>
+  </g>
+
+  <!-- 8. Tusk tenon -->
+  <g transform="translate(700,330)">
+    <text x="90" y="-6" font-size="13" font-weight="600" text-anchor="middle" fill="#2c1a0e">Tusk tenon</text>
+    <rect x="60" y="0" width="60" height="180" fill="url(#w3)" stroke="#5d3a1c"/>
+    <rect x="0" y="60" width="180" height="60" fill="url(#w3)" stroke="#5d3a1c"/>
+    <rect x="60" y="80" width="80" height="20" fill="#a47a4d" stroke="#5d3a1c"/>
+    <rect x="125" y="75" width="10" height="30" fill="#7a4e22" stroke="#3d2615"/>
+    <text x="90" y="200" font-size="10" text-anchor="middle" fill="#6b5340">Knock-down workbench joint</text>
+  </g>
+
+  <text x="450" y="580" font-size="11" text-anchor="middle" fill="#6b5340" font-style="italic">
+    Diagram: GrainHub Wiki · CC BY-SA · grainhub.io · Eight of the most common variations
+  </text>
+</svg>

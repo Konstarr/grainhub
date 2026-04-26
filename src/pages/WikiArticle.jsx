@@ -14,11 +14,6 @@ function formatDate(iso) {
   } catch { return ''; }
 }
 
-/**
- * Body renderer. If the body is HTML (contains tags) render as HTML; otherwise
- * treat it as markdown and render through react-markdown. Seed content is
- * markdown (per schema: `body text not null, -- markdown`).
- */
 function ArticleBody({ body }) {
   if (!body) return null;
   const looksLikeHtml = /<\w+[^>]*>/.test(body);
@@ -64,17 +59,28 @@ export default function WikiArticle() {
     return () => { cancelled = true; };
   }, [slug]);
 
-  const title = article?.title || (loading ? 'Loading…' : 'Article not found');
+  const title = article?.title || (loading ? 'Loading...' : 'Article not found');
 
-  // Extract H2 headings from markdown body for the TOC rail
+  // Extract H2 headings for the TOC. Supports both markdown and HTML bodies.
   const tocItems = [];
   if (article?.body) {
-    const re = /^##\s+(.+?)$/gm;
-    let m;
-    while ((m = re.exec(article.body)) !== null) {
-      const label = m[1].trim();
-      const id = label.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-      tocItems.push({ label, id });
+    const looksLikeHtml = /<h2\b/i.test(article.body);
+    if (looksLikeHtml) {
+      const re = /<h2[^>]*\sid=["']([^"']+)["'][^>]*>([\s\S]*?)<\/h2>/gi;
+      let m;
+      while ((m = re.exec(article.body)) !== null) {
+        const id = m[1].trim();
+        const label = m[2].replace(/<[^>]+>/g, '').trim();
+        if (label && id) tocItems.push({ label, id });
+      }
+    } else {
+      const re = /^##\s+(.+?)$/gm;
+      let m;
+      while ((m = re.exec(article.body)) !== null) {
+        const label = m[1].trim();
+        const id = label.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+        tocItems.push({ label, id });
+      }
     }
   }
 
@@ -143,7 +149,7 @@ export default function WikiArticle() {
                     <img src={article.coverImage} alt={article.title} style={{ width: '100%', display: 'block', borderRadius: 0 }} />
                   </div>
                 ) : (
-                  <div className="infobox-img">📖</div>
+                  <div className="infobox-img">Article</div>
                 )}
                 <div className="infobox-body">
                   {article.category && <div className="infobox-row"><div className="infobox-label">Category</div><div className="infobox-value">{article.category}</div></div>}
@@ -155,17 +161,17 @@ export default function WikiArticle() {
               </aside>
             )}
 
-            {loading && <p style={{ color: 'var(--text-muted)' }}>Loading article…</p>}
+            {loading && <p style={{ color: 'var(--text-muted)' }}>Loading article...</p>}
             {!loading && !article && (
               <p style={{ color: 'var(--text-muted)' }}>
-                We couldn't find that article. <Link to="/wiki">Back to the Wiki →</Link>
+                We could not find that article. <Link to="/wiki">Back to the Wiki</Link>
               </p>
             )}
             {article && (
               article.body
                 ? <ArticleBody body={article.body} />
                 : <p style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>
-                    This article is a stub. Body content hasn't been added yet.
+                    This article is a stub. Body content has not been added yet.
                   </p>
             )}
 

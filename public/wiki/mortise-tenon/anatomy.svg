@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 460" font-family="'Montserrat',sans-serif">
+  <defs>
+    <pattern id="wood" patternUnits="userSpaceOnUse" width="20" height="20">
+      <rect width="20" height="20" fill="#c9a47a"/>
+      <path d="M0 5 Q 10 7, 20 5" stroke="#a07d4f" stroke-width="0.6" fill="none"/>
+      <path d="M0 12 Q 10 14, 20 12" stroke="#a07d4f" stroke-width="0.5" fill="none"/>
+      <path d="M0 18 Q 10 20, 20 18" stroke="#a07d4f" stroke-width="0.4" fill="none"/>
+    </pattern>
+    <pattern id="end-grain" patternUnits="userSpaceOnUse" width="6" height="6">
+      <rect width="6" height="6" fill="#a47a4d"/>
+      <circle cx="2" cy="2" r="0.8" fill="#7a5530"/>
+      <circle cx="4.5" cy="4.5" r="0.6" fill="#7a5530"/>
+    </pattern>
+  </defs>
+  <rect width="800" height="460" fill="#fbf6ec"/>
+  <text x="400" y="32" font-size="20" font-weight="700" text-anchor="middle" fill="#2c1a0e">Mortise &amp; Tenon — Anatomy</text>
+  <text x="400" y="52" font-size="12" text-anchor="middle" fill="#6b5340">Exploded view of a through-tenon joint</text>
+
+  <!-- Tenon piece (rail) on the left -->
+  <g transform="translate(60,140)">
+    <rect x="0" y="40" width="220" height="80" fill="url(#wood)" stroke="#5d3a1c" stroke-width="1.5"/>
+    <!-- tenon -->
+    <rect x="220" y="60" width="100" height="40" fill="url(#end-grain)" stroke="#5d3a1c" stroke-width="1.5"/>
+    <!-- shoulder line -->
+    <line x1="220" y1="40" x2="220" y2="120" stroke="#5d3a1c" stroke-width="2"/>
+
+    <!-- callouts -->
+    <line x1="160" y1="80" x2="160" y2="20" stroke="#8a5030" stroke-width="1"/>
+    <text x="160" y="14" font-size="11" text-anchor="middle" fill="#2c1a0e" font-weight="600">Rail (workpiece)</text>
+
+    <line x1="270" y1="80" x2="320" y2="20" stroke="#8a5030" stroke-width="1"/>
+    <text x="328" y="18" font-size="11" fill="#2c1a0e" font-weight="600">Tenon</text>
+    <text x="328" y="32" font-size="10" fill="#6b5340">End grain — projects into mortise</text>
+
+    <line x1="220" y1="120" x2="220" y2="155" stroke="#8a5030" stroke-width="1"/>
+    <text x="220" y="172" font-size="11" text-anchor="middle" fill="#2c1a0e" font-weight="600">Shoulder</text>
+    <text x="220" y="186" font-size="10" text-anchor="middle" fill="#6b5340">Bears against the stile face</text>
+
+    <line x1="270" y1="60" x2="285" y2="40" stroke="#8a5030" stroke-width="1"/>
+    <text x="290" y="38" font-size="10" fill="#2c1a0e">Cheek</text>
+
+    <!-- arrow showing joint motion -->
+    <path d="M340 80 L420 80" stroke="#9c1f1f" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+    <marker id="arr" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#9c1f1f"/>
+    </marker>
+  </g>
+
+  <!-- Mortise piece (stile) on the right -->
+  <g transform="translate(490,140)">
+    <rect x="0" y="0" width="80" height="200" fill="url(#wood)" stroke="#5d3a1c" stroke-width="1.5"/>
+    <!-- mortise hole -->
+    <rect x="0" y="80" width="80" height="40" fill="#3d2615" stroke="#2c1a0e" stroke-width="1.5"/>
+
+    <line x1="40" y1="100" x2="40" y2="20" stroke="#8a5030" stroke-width="1"/>
+    <text x="40" y="14" font-size="11" text-anchor="middle" fill="#2c1a0e" font-weight="600">Stile</text>
+
+    <line x1="80" y1="100" x2="160" y2="100" stroke="#8a5030" stroke-width="1"/>
+    <text x="170" y="98" font-size="11" fill="#2c1a0e" font-weight="600">Mortise</text>
+    <text x="170" y="112" font-size="10" fill="#6b5340">Hole that receives the tenon</text>
+
+    <line x1="0" y1="80" x2="-50" y2="80" stroke="#8a5030" stroke-width="1"/>
+    <text x="-58" y="78" font-size="10" text-anchor="end" fill="#2c1a0e">Mortise wall</text>
+
+    <line x1="0" y1="120" x2="-50" y2="120" stroke="#8a5030" stroke-width="1"/>
+    <text x="-58" y="124" font-size="10" text-anchor="end" fill="#2c1a0e">Mortise floor</text>
+  </g>
+
+  <text x="400" y="430" font-size="11" text-anchor="middle" fill="#6b5340" font-style="italic">
+    Diagram: GrainHub Wiki · CC BY-SA · grainhub.io
+  </text>
+</svg>
