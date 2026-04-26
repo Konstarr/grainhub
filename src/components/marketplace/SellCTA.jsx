@@ -8,8 +8,8 @@ export default function SellCTA() {
         <h3>{SELL_CTA.heading}</h3>
         <p>{SELL_CTA.description}</p>
         <div className="sell-cta-actions">
-          <Link to="/sponsor" className="sell-btn-primary">Post a Listing Now →</Link>
-          <Link to="/sponsor" className="sell-btn-outline">View Pricing & Plans</Link>
+          <Link to="/marketplace/new" className="sell-btn-primary">Post a Listing Now</Link>
+          <Link to="/account/subscription" className="sell-btn-outline">View Vendor Pack Pricing</Link>
         </div>
       </div>
       <div className="sell-pricing-grid">

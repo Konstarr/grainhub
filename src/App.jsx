@@ -20,6 +20,8 @@ import News from './pages/News.jsx';
 import NewsArticle from './pages/NewsArticle.jsx';
 import Marketplace from './pages/Marketplace.jsx';
 import Listing from './pages/Listing.jsx';
+import MarketplaceNew from './pages/MarketplaceNew.jsx';
+import MarketplaceEdit from './pages/MarketplaceEdit.jsx';
 import Suppliers from './pages/Suppliers.jsx';
 import SupplierProfile from './pages/SupplierProfile.jsx';
 import Signup from './pages/Signup.jsx';
@@ -35,7 +37,7 @@ import EventDetail from './pages/EventDetail.jsx';
 import Profile from './pages/Profile.jsx';
 import Messages from './pages/Messages.jsx';
 import MessageThread from './pages/MessageThread.jsx';
-// Admin pages — lazy-loaded so the TipTap editor (~210KB) and the
+// Admin pages - lazy-loaded so the TipTap editor (~210KB) and the
 // other admin-only widgets stay out of the main bundle for the 99% of
 // visitors who never see the admin panel.
 const AdminNews             = lazy(() => import('./pages/admin/AdminNews.jsx'));
@@ -57,6 +59,9 @@ const AdminForumWords       = lazy(() => import('./pages/admin/AdminForumWords.j
 const AdminForumLog         = lazy(() => import('./pages/admin/AdminForumLog.jsx'));
 const AdminForumReputation  = lazy(() => import('./pages/admin/AdminForumReputation.jsx'));
 const AdminForumBadges      = lazy(() => import('./pages/admin/AdminForumBadges.jsx'));
+const AdminMarketplace      = lazy(() => import('./pages/admin/AdminMarketplace.jsx'));
+const AdminMarketplaceEdit  = lazy(() => import('./pages/admin/AdminMarketplaceEdit.jsx'));
+const AdminMarketplaceSettings = lazy(() => import('./pages/admin/AdminMarketplaceSettings.jsx'));
 
 const AdminFallback = (
   <div style={{
@@ -68,7 +73,7 @@ const AdminFallback = (
     fontFamily: 'Montserrat, sans-serif',
     fontSize: 14,
   }}>
-    Loading admin…
+    Loading admin...
   </div>
 );
 
@@ -95,11 +100,14 @@ export default function App() {
         <Route path="/admin/events/:id"       element={adminRoute('admin', AdminEventsEdit)} />
         <Route path="/admin/jobs"             element={adminRoute('mod',   AdminJobs)} />
         <Route path="/admin/jobs/:id"         element={adminRoute('mod',   AdminJobsEdit)} />
+        <Route path="/admin/listings"         element={adminRoute('mod',   AdminMarketplace)} />
+        <Route path="/admin/listings/:id"     element={adminRoute('mod',   AdminMarketplaceEdit)} />
+        <Route path="/admin/marketplace-settings" element={adminRoute('admin', AdminMarketplaceSettings)} />
         <Route path="/admin/users"            element={adminRoute('admin', AdminUsers)} />
         <Route path="/admin/users/:id"        element={adminRoute('admin', AdminUserEdit)} />
         <Route path="/admin/sponsors"         element={adminRoute('admin', AdminSponsors)} />
         <Route path="/admin/connections"      element={adminRoute('admin', AdminConnections)} />
-        {/* Admin panel routes are admin/owner level only — moderators
+        {/* Admin panel routes are admin/owner level only - moderators
             do their work inline on /forums/thread/:slug instead. */}
         <Route path="/admin/forums"           element={adminRoute('admin', AdminForums)} />
         <Route path="/admin/forums/threads"   element={adminRoute('admin', AdminForumThreads)} />
@@ -148,6 +156,8 @@ export default function App() {
           <Route path="/news/article" element={<RequireAuth><NewsArticle /></RequireAuth>} />
           <Route path="/marketplace/listing/:slug" element={<RequireAuth><Listing /></RequireAuth>} />
           <Route path="/marketplace/listing" element={<RequireAuth><Listing /></RequireAuth>} />
+          <Route path="/marketplace/new" element={<RequireAuth><MarketplaceNew /></RequireAuth>} />
+          <Route path="/marketplace/edit/:id" element={<RequireAuth><MarketplaceEdit /></RequireAuth>} />
 
           <Route path="/suppliers/profile" element={<RequireAuth><SupplierProfile /></RequireAuth>} />
           <Route path="/profile/:handle" element={<RequireAuth><Profile /></RequireAuth>} />

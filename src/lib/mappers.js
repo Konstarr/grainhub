@@ -22,8 +22,8 @@ function initials(name = '') {
 
 function formatDollars(n) {
   if (n == null) return '';
-  if (n < 1000) return `$${n}`;
-  return `$${Math.round(n / 1000)}K`;
+  if (n < 1000) return '$' + n;
+  return '$' + Math.round(n / 1000) + 'K';
 }
 
 function daysAgo(iso) {
@@ -32,18 +32,18 @@ function daysAgo(iso) {
   const days = Math.floor(ms / 86400000);
   if (days <= 0) return 'Posted today';
   if (days === 1) return '1 day ago';
-  if (days < 7) return `${days} days ago`;
+  if (days < 7) return days + ' days ago';
   if (days < 14) return '1 week ago';
-  if (days < 30) return `${Math.floor(days / 7)} weeks ago`;
+  if (days < 30) return Math.floor(days / 7) + ' weeks ago';
   if (days < 60) return '1 month ago';
-  return `${Math.floor(days / 30)} months ago`;
+  return Math.floor(days / 30) + ' months ago';
 }
 
 // JOBS
 export function mapJobRow(row) {
   const period = row.salary_period || 'year';
-  const salaryMin = row.salary_min == null ? null : (period === 'hour' ? `$${row.salary_min}` : formatDollars(row.salary_min));
-  const salaryMax = row.salary_max == null ? null : (period === 'hour' ? `$${row.salary_max}/hr` : formatDollars(row.salary_max));
+  const salaryMin = row.salary_min == null ? null : (period === 'hour' ? '$' + row.salary_min : formatDollars(row.salary_min));
+  const salaryMax = row.salary_max == null ? null : (period === 'hour' ? '$' + row.salary_max + '/hr' : formatDollars(row.salary_max));
   const salaryNote = period === 'hour' ? 'Hourly' : 'Annual';
 
   const tags = [];
@@ -93,7 +93,7 @@ export function mapEventRow(row) {
   const fmt = (d) => d ? d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
   const sameDay = start && end && start.toDateString() === end.toDateString();
   const dateStr = start && end && (sameDay === false)
-    ? `${fmt(start)} - ${fmt(end)}`
+    ? fmt(start) + ' - ' + fmt(end)
     : fmt(start);
 
   const typeMap = {
@@ -125,10 +125,10 @@ export function mapEventRow(row) {
     categoryColor: type.color,
     date: dateStr,
     location: row.is_online ? 'Online' : (row.location || row.venue_name || ''),
-    excerpt: row.description ? row.description.slice(0, 240) + (row.description.length > 240 ? '\u2026' : '') : '',
+    excerpt: row.description ? row.description.slice(0, 240) + (row.description.length > 240 ? '…' : '') : '',
     imgGradient,
     attendees: row.is_online ? 'Online event' : 'In-person',
-    price: row.registration_url ? 'Register \u2192' : 'Details',
+    price: row.registration_url ? 'Register →' : 'Details',
     registrationUrl: row.registration_url,
     isOnline: Boolean(row.is_online),
     trade: row.trade,
@@ -169,7 +169,7 @@ export function mapWikiRow(row) {
     trade: row.trade,
     excerpt: row.excerpt,
     body: row.body,
-    readTime: row.read_time_minutes ? `${row.read_time_minutes} min read` : '',
+    readTime: row.read_time_minutes ? row.read_time_minutes + ' min read' : '',
     publishedAt: row.published_at,
     updatedAt: row.updated_at,
     coverImage: row.cover_image_url || null,
@@ -202,12 +202,15 @@ export function mapMarketplaceRow(row) {
     category: row.category,
     trade: row.trade,
     condition: row.condition,
-    price: row.price == null ? null : `$${Number(row.price).toLocaleString()}`,
+    price: row.price == null ? null : '$' + Number(row.price).toLocaleString(),
     priceNumeric: row.price,
     description: row.description,
     location: row.location,
     isSold: Boolean(row.is_sold),
+    isApproved: row.is_approved !== false,
+    sellerId: row.seller_id || null,
     images: row.images || [],
+    createdAt: row.created_at,
   };
 }
 
@@ -216,10 +219,10 @@ export function mapMarketplaceRow(row) {
 function snippet(body, max = 180) {
   if (!body) return '';
   const text = String(body)
-    .replace(/<[^>]+>/g, ' ')            // drop HTML tags
-    .replace(/!\[[^\]]*]\([^)]+\)/g, '') // markdown images
-    .replace(/\[([^\]]+)]\([^)]+\)/g, '$1') // markdown links → label
-    .replace(/[#>*_`~]+/g, ' ')          // markdown punctuation
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/!\[[^\]]*]\([^)]+\)/g, '')
+    .replace(/\[([^\]]+)]\([^)]+\)/g, '$1')
+    .replace(/[#>*_`~]+/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
   return text.length > max ? text.slice(0, max).trimEnd() + '…' : text;

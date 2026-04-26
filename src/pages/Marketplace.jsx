@@ -1,6 +1,6 @@
 import '../styles/marketplace.css';
 import { useMemo, useRef, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import CategoryHighway from '../components/marketplace/CategoryHighway.jsx';
 import FilterSidebar from '../components/marketplace/FilterSidebar.jsx';
 import ListingsArea from '../components/marketplace/ListingsArea.jsx';
@@ -15,20 +15,20 @@ const COND_LABEL = {
   'used-fair': 'Fair',
 };
 const EMOJI_BY_CAT = {
-  'CNC Machinery': '⚙️',
-  'Edgebanders': '🔧',
-  'Moulders': '🏭',
-  'Finishing': '🎨',
-  'Stationary Tools': '🪚',
-  'Combination': '🛠',
-  'Hand/Power Tools': '🔌',
-  'Panel Saws': '📐',
-  'Dust Collection': '💨',
-  'Lumber': '🪵',
-  'Sheet Goods': '📋',
-  'Hardware': '🔩',
-  'Sanders': '🧽',
-  'Tooling': '🔩',
+  'CNC Machinery': 'CNC',
+  'Edgebanders': 'EB',
+  'Moulders': 'M',
+  'Finishing': 'F',
+  'Stationary Tools': 'ST',
+  'Combination': 'C',
+  'Hand/Power Tools': 'HT',
+  'Panel Saws': 'PS',
+  'Dust Collection': 'DC',
+  'Lumber': 'LB',
+  'Sheet Goods': 'SG',
+  'Hardware': 'HW',
+  'Sanders': 'S',
+  'Tooling': 'T',
 };
 
 const DEFAULT_FILTERS = {
@@ -115,10 +115,10 @@ function toListingCard(row) {
     price: m.price || 'Contact',
     priceNumeric: m.priceNumeric,
     priceUnit: '',
-    emoji: EMOJI_BY_CAT[m.category] || '📦',
+    emoji: EMOJI_BY_CAT[m.category] || '?',
     imgClass: 'mk-img-default',
     imgStyle: { background: 'linear-gradient(135deg, #2C1A0E, #6B3F1F)' },
-    specs: m.description ? m.description.slice(0, 80) + (m.description.length > 80 ? '…' : '') : '',
+    specs: m.description ? m.description.slice(0, 80) + (m.description.length > 80 ? '...' : '') : '',
     isNew: false,
     images: m.images,
     createdAt: row.created_at,
@@ -142,14 +142,11 @@ export default function Marketplace() {
   const { data: rows } = useSupabaseList('marketplace_listings', {
     filter: (q) => {
       let out = q.eq('is_approved', true).eq('is_sold', false);
-      // Trade slug from the site-wide SecondaryNav. Marketplace rows
-      // have a `trade` string column; fall back to a title/desc search
-      // so the filter still narrows usefully on older listings.
       if (tradeSlug) {
         const tradeTerm = tradeSlug.replace(/-/g, ' ')
           .replace(/[%_]/g, (c) => '\\' + c)
           .replace(/[,()]/g, ' ');
-        out = out.or(`trade.ilike.%${tradeTerm}%,title.ilike.%${tradeTerm}%,description.ilike.%${tradeTerm}%`);
+        out = out.or('trade.ilike.%' + tradeTerm + '%,title.ilike.%' + tradeTerm + '%,description.ilike.%' + tradeTerm + '%');
       }
       return out;
     },
@@ -230,6 +227,27 @@ export default function Marketplace() {
               <div className="page-eyebrow">{MARKETPLACE_HEADER.eyebrow}</div>
               <h1 className="page-title">{MARKETPLACE_HEADER.title}</h1>
               <p className="page-subtitle">{MARKETPLACE_HEADER.subtitle}</p>
+              <div style={{ marginTop: '0.85rem', display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+                <Link
+                  to="/marketplace/new"
+                  className="search-btn"
+                  style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}
+                >
+                  + Post a listing
+                </Link>
+                <Link
+                  to="/account/subscription"
+                  style={{
+                    color: '#fff',
+                    opacity: 0.85,
+                    textDecoration: 'underline',
+                    fontSize: 14,
+                    alignSelf: 'center',
+                  }}
+                >
+                  Vendor pack pricing
+                </Link>
+              </div>
             </div>
             <div className="header-stats">
               {MARKETPLACE_HEADER.stats.map((stat) => (
@@ -278,7 +296,7 @@ export default function Marketplace() {
               <option value="Canada">Canada</option>
             </select>
             <button type="button" className="search-btn" onClick={handleSearchSubmit}>
-              Search Listings →
+              Search Listings
             </button>
           </div>
         </div>

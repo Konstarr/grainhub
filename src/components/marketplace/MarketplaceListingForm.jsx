@@ -1,0 +1,310 @@
+import { useState } from 'react';
+import CoverImageUploader from '../admin/CoverImageUploader.jsx';
+
+/**
+ * Shared form for both /marketplace/new (initial=null) and
+ * /marketplace/edit/:id (initial=existing row). Caller decides what
+ * to do with the resulting payload via onSubmit.
+ */
+
+export const MARKETPLACE_CATEGORIES = [
+  'CNC Machinery',
+  'Edgebanders',
+  'Moulders',
+  'Finishing',
+  'Stationary Tools',
+  'Combination',
+  'Hand/Power Tools',
+  'Panel Saws',
+  'Dust Collection',
+  'Lumber',
+  'Sheet Goods',
+  'Hardware',
+  'Sanders',
+  'Tooling',
+  'Misc',
+];
+
+export const MARKETPLACE_CONDITIONS = [
+  { value: 'new',            label: 'New' },
+  { value: 'used-excellent', label: 'Excellent' },
+  { value: 'used-good',      label: 'Good' },
+  { value: 'used-fair',      label: 'Fair' },
+];
+
+const MARKETPLACE_TRADES = [
+  '', 'cabinetmaker', 'millworker', 'finisher', 'woodworker',
+  'cnc-operator', 'lumber-supplier', 'shop-owner',
+];
+
+const inputStyle = {
+  width: '100%',
+  padding: '0.625rem 0.75rem',
+  border: '1px solid var(--border)',
+  borderRadius: 8,
+  fontFamily: 'inherit',
+  fontSize: 14,
+  background: 'var(--surface)',
+  color: 'var(--text-primary)',
+};
+
+const labelStyle = {
+  display: 'block',
+  fontWeight: 600,
+  fontSize: 13,
+  color: 'var(--text-primary)',
+  marginBottom: 6,
+};
+
+const fieldStyle = { marginBottom: '1.1rem' };
+
+export default function MarketplaceListingForm({
+  initial = null,
+  busy = false,
+  submitLabel = 'Publish listing',
+  onSubmit,
+  onCancel,
+  // optional admin slot rendered above submit (e.g., approval toggle)
+  adminExtras = null,
+}) {
+  const [title, setTitle]             = useState(initial?.title || '');
+  const [category, setCategory]       = useState(initial?.category || '');
+  const [trade, setTrade]             = useState(initial?.trade || '');
+  const [condition, setCondition]     = useState(initial?.condition || 'used-good');
+  const [price, setPrice]             = useState(
+    initial?.price != null ? String(initial.price) : ''
+  );
+  const [currency, setCurrency]       = useState(initial?.currency || 'USD');
+  const [location, setLocation]       = useState(initial?.location || '');
+  const [description, setDescription] = useState(initial?.description || '');
+
+  // Cover image is the first entry in images[]; extras paste-textarea-driven.
+  const initialImages = Array.isArray(initial?.images) ? initial.images : [];
+  const [coverUrl, setCoverUrl] = useState(initialImages[0] || '');
+  const [extraUrls, setExtraUrls] = useState(
+    initialImages.slice(1).join('\n')
+  );
+
+  const [err, setErr] = useState(null);
+
+  const handleSubmit = async (e) => {
+    e?.preventDefault?.();
+    setErr(null);
+
+    if (!title.trim() || title.trim().length < 5) {
+      setErr('Title must be at least 5 characters.');
+      return;
+    }
+    if (!category) {
+      setErr('Pick a category so buyers can find your listing.');
+      return;
+    }
+
+    const images = [coverUrl, ...extraUrls.split('\n').map((s) => s.trim())]
+      .filter(Boolean);
+
+    const priceNum = price === '' ? null : Number(price);
+    if (price !== '' && (Number.isNaN(priceNum) || priceNum < 0)) {
+      setErr('Price must be a positive number, or leave blank.');
+      return;
+    }
+
+    const payload = {
+      title: title.trim(),
+      category,
+      trade: trade || null,
+      condition,
+      price: priceNum,
+      currency: currency || 'USD',
+      location: location.trim(),
+      description: description.trim(),
+      images,
+    };
+
+    try {
+      await onSubmit(payload);
+    } catch (e2) {
+      setErr(e2?.message || String(e2));
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+      <div style={fieldStyle}>
+        <label style={labelStyle}>Title <span style={{ color: 'var(--cinnabar)' }}>*</span></label>
+        <input
+          style={inputStyle}
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder='e.g. SCM Minimax FS41 Combination Jointer/Planer — 2018'
+          maxLength={200}
+          required
+        />
+        <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+          {title.length}/200 — be specific. Brand, model, year, and key specs sell faster.
+        </span>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.9rem' }}>
+        <div style={fieldStyle}>
+          <label style={labelStyle}>Category <span style={{ color: 'var(--cinnabar)' }}>*</span></label>
+          <select
+            style={inputStyle}
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            required
+          >
+            <option value="">Pick a category…</option>
+            {MARKETPLACE_CATEGORIES.map((c) => (
+              <option key={c} value={c}>{c}</option>
+            ))}
+          </select>
+        </div>
+
+        <div style={fieldStyle}>
+          <label style={labelStyle}>Condition</label>
+          <select
+            style={inputStyle}
+            value={condition}
+            onChange={(e) => setCondition(e.target.value)}
+          >
+            {MARKETPLACE_CONDITIONS.map((c) => (
+              <option key={c.value} value={c.value}>{c.label}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '0.9rem' }}>
+        <div style={fieldStyle}>
+          <label style={labelStyle}>Asking price</label>
+          <input
+            style={inputStyle}
+            type="number"
+            min="0"
+            step="0.01"
+            value={price}
+            onChange={(e) => setPrice(e.target.value)}
+            placeholder="Leave blank for OBO / contact for price"
+          />
+        </div>
+        <div style={fieldStyle}>
+          <label style={labelStyle}>Currency</label>
+          <select
+            style={inputStyle}
+            value={currency}
+            onChange={(e) => setCurrency(e.target.value)}
+          >
+            <option value="USD">USD</option>
+            <option value="CAD">CAD</option>
+            <option value="EUR">EUR</option>
+            <option value="GBP">GBP</option>
+          </select>
+        </div>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.9rem' }}>
+        <div style={fieldStyle}>
+          <label style={labelStyle}>Location</label>
+          <input
+            style={inputStyle}
+            type="text"
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            placeholder="City, State or Region"
+            maxLength={120}
+          />
+        </div>
+        <div style={fieldStyle}>
+          <label style={labelStyle}>Trade focus (optional)</label>
+          <select
+            style={inputStyle}
+            value={trade || ''}
+            onChange={(e) => setTrade(e.target.value)}
+          >
+            {MARKETPLACE_TRADES.map((t) => (
+              <option key={t || '_'} value={t}>{t || '— None —'}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      <div style={fieldStyle}>
+        <label style={labelStyle}>Description</label>
+        <textarea
+          style={{ ...inputStyle, minHeight: 160, resize: 'vertical', fontFamily: 'inherit' }}
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          placeholder="Year, hours, included tooling, ship-from city, condition notes, why you're selling…"
+          maxLength={4000}
+        />
+        <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+          {description.length}/4000
+        </span>
+      </div>
+
+      <div style={fieldStyle}>
+        <label style={labelStyle}>Cover photo</label>
+        <CoverImageUploader
+          value={coverUrl}
+          onChange={setCoverUrl}
+          bucket="marketplace"
+          aspect="4 / 3"
+        />
+        <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+          The first image buyers see in the grid. Bright, sharp, and well-framed sells.
+        </span>
+      </div>
+
+      <div style={fieldStyle}>
+        <label style={labelStyle}>Additional photo URLs (optional)</label>
+        <textarea
+          style={{ ...inputStyle, minHeight: 80, resize: 'vertical', fontFamily: 'inherit' }}
+          value={extraUrls}
+          onChange={(e) => setExtraUrls(e.target.value)}
+          placeholder="Paste extra image URLs, one per line."
+        />
+        <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+          Use a host like Imgur, Dropbox, or your own CDN. We&apos;ll add a multi-uploader in a later release.
+        </span>
+      </div>
+
+      {adminExtras}
+
+      {err && (
+        <div style={{
+          padding: '0.6rem 0.8rem',
+          background: '#fff4f4',
+          color: '#9c1f1f',
+          border: '1px solid #f3c9c9',
+          borderRadius: 8,
+          marginBottom: '1rem',
+          fontSize: 13,
+        }}>
+          {err}
+        </div>
+      )}
+
+      <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+        {onCancel && (
+          <button
+            type="button"
+            onClick={onCancel}
+            disabled={busy}
+            className="act-btn"
+          >
+            Cancel
+          </button>
+        )}
+        <button
+          type="submit"
+          disabled={busy}
+          className="act-btn primary"
+        >
+          {busy ? 'Saving…' : submitLabel}
+        </button>
+      </div>
+    </form>
+  );
+}
