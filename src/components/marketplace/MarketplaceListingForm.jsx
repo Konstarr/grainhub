@@ -1,13 +1,15 @@
 import { useState } from 'react';
 import MultiImageUploader from './MultiImageUploader.jsx';
+import { geocodeZip, looksLikeZip } from '../../lib/geocode.js';
 
 /**
  * Shared form for /marketplace/new (initial=null) and
  * /marketplace/edit/:id (initial=existing row). Caller decides what to
  * do with the resulting payload via onSubmit.
  *
- * Photos go through MultiImageUploader, which handles validation and
- * secure upload to media/marketplace/<uid>/. Up to 15 per listing.
+ * The zip code is geocoded to lat/lng via Nominatim before the payload
+ * is handed to the caller, so distance filtering on the public
+ * marketplace just reads the stored coordinates and does Haversine.
  */
 
 export const MARKETPLACE_CATEGORIES = [
@@ -67,7 +69,6 @@ export default function MarketplaceListingForm({
   submitLabel = 'Publish listing',
   onSubmit,
   onCancel,
-  // optional admin slot rendered above submit (e.g., approval toggle)
   adminExtras = null,
 }) {
   const [title, setTitle]             = useState(initial?.title || '');
@@ -79,12 +80,14 @@ export default function MarketplaceListingForm({
   );
   const [currency, setCurrency]       = useState(initial?.currency || 'USD');
   const [location, setLocation]       = useState(initial?.location || '');
+  const [zipCode, setZipCode]         = useState(initial?.zip_code || initial?.zipCode || '');
   const [description, setDescription] = useState(initial?.description || '');
   const [images, setImages]           = useState(
     Array.isArray(initial?.images) ? initial.images : []
   );
 
   const [err, setErr] = useState(null);
+  const [geocoding, setGeocoding] = useState(false);
 
   const handleSubmit = async (e) => {
     e?.preventDefault?.();
@@ -98,12 +101,34 @@ export default function MarketplaceListingForm({
       setErr('Pick a category so buyers can find your listing.');
       return;
     }
+    if (!looksLikeZip(zipCode)) {
+      setErr('Zip / postal code is required so buyers can filter by distance.');
+      return;
+    }
 
     const priceNum = price === '' ? null : Number(price);
     if (price !== '' && (Number.isNaN(priceNum) || priceNum < 0)) {
       setErr('Price must be a positive number, or leave blank.');
       return;
     }
+
+    // Geocode before submit. If the zip can't be resolved we still let
+    // the listing through (just without lat/lng) so a quirky postcode
+    // doesn't block posting -- distance filters will simply skip it.
+    setGeocoding(true);
+    let coords = null;
+    try {
+      // Re-use existing coords when the seller hasn't changed the zip.
+      const initialZip = initial?.zip_code || initial?.zipCode || '';
+      if (initial && initialZip === zipCode.trim() && initial.latitude != null) {
+        coords = { lat: initial.latitude, lng: initial.longitude };
+      } else {
+        coords = await geocodeZip(zipCode);
+      }
+    } catch (_) {
+      coords = null;
+    }
+    setGeocoding(false);
 
     const payload = {
       title: title.trim(),
@@ -113,6 +138,9 @@ export default function MarketplaceListingForm({
       price: priceNum,
       currency: currency || 'USD',
       location: location.trim(),
+      zip_code: zipCode.trim(),
+      latitude: coords ? coords.lat : null,
+      longitude: coords ? coords.lng : null,
       description: description.trim(),
       images: images.slice(0, 15),
     };
@@ -204,16 +232,30 @@ export default function MarketplaceListingForm({
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.9rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.9rem' }}>
         <div style={fieldStyle}>
-          <label style={labelStyle}>Location</label>
+          <label style={labelStyle}>City / area</label>
           <input
             style={inputStyle}
             type="text"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
-            placeholder="City, State or Region"
+            placeholder="Cleveland, OH"
             maxLength={120}
+          />
+        </div>
+        <div style={fieldStyle}>
+          <label style={labelStyle}>
+            Zip / postal <span style={{ color: 'var(--cinnabar)' }}>*</span>
+          </label>
+          <input
+            style={inputStyle}
+            type="text"
+            value={zipCode}
+            onChange={(e) => setZipCode(e.target.value)}
+            placeholder="44101"
+            maxLength={12}
+            required
           />
         </div>
         <div style={fieldStyle}>
@@ -253,7 +295,7 @@ export default function MarketplaceListingForm({
           folder="marketplace"
         />
         <span style={{ fontSize: 12, color: 'var(--text-muted)', display: 'block', marginTop: 6 }}>
-          The first photo is the cover that shows in the marketplace grid. Drag to reorder, or click "Set cover".
+          The first photo is the cover. Drag to reorder, or click "Set cover".
         </span>
       </div>
 
@@ -278,7 +320,7 @@ export default function MarketplaceListingForm({
           <button
             type="button"
             onClick={onCancel}
-            disabled={busy}
+            disabled={busy || geocoding}
             className="act-btn"
           >
             Cancel
@@ -286,10 +328,10 @@ export default function MarketplaceListingForm({
         )}
         <button
           type="submit"
-          disabled={busy}
+          disabled={busy || geocoding}
           className="act-btn primary"
         >
-          {busy ? 'Saving...' : submitLabel}
+          {geocoding ? 'Looking up zip...' : busy ? 'Saving...' : submitLabel}
         </button>
       </div>
     </form>

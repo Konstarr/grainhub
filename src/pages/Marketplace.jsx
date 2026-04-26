@@ -7,6 +7,7 @@ import ListingsArea from '../components/marketplace/ListingsArea.jsx';
 import { MARKETPLACE_HEADER } from '../data/marketplaceData.js';
 import { useSupabaseList } from '../hooks/useSupabaseList.js';
 import { mapMarketplaceRow } from '../lib/mappers.js';
+import { haversineMiles } from '../lib/geocode.js';
 
 const COND_LABEL = {
   'new': 'New',
@@ -39,6 +40,10 @@ const DEFAULT_FILTERS = {
   listingTypes: [],
   locations: [],
   timeframe: '',
+  distanceZip: '',
+  distanceLat: null,
+  distanceLng: null,
+  distanceRadius: 50,
 };
 
 const HIGHWAY_PATTERN = {
@@ -123,6 +128,9 @@ function toListingCard(row) {
     images: m.images,
     createdAt: row.created_at,
     listingType: inferredType,
+    latitude: row.latitude == null ? null : Number(row.latitude),
+    longitude: row.longitude == null ? null : Number(row.longitude),
+    zipCode: row.zip_code || null,
   };
 }
 
@@ -200,6 +208,18 @@ export default function Marketplace() {
       if (tfMs && tfMs !== Infinity && l.createdAt) {
         const ageMs = Date.now() - new Date(l.createdAt).getTime();
         if (ageMs > tfMs) return false;
+      }
+      // Distance filter - only applies when the buyer has typed a zip
+      // and we successfully geocoded it. Listings without lat/lng are
+      // excluded so they don't appear as 0-mile false positives.
+      if (filters.distanceLat != null && filters.distanceLng != null) {
+        if (l.latitude == null || l.longitude == null) return false;
+        const radius = Number(filters.distanceRadius) || 50;
+        const miles = haversineMiles(
+          filters.distanceLat, filters.distanceLng,
+          l.latitude, l.longitude
+        );
+        if (miles > radius) return false;
       }
       return true;
     });

@@ -1,5 +1,5 @@
 /**
- * marketplaceAdminDb.js — admin/moderator marketplace operations.
+ * marketplaceAdminDb.js - admin/moderator marketplace operations.
  *
  * RLS already lets is_moderator() update/delete any listing, so most
  * admin actions are direct queries with the same pattern as adminDb.js.
@@ -14,17 +14,9 @@ const escapeOr   = (s) => escapeLike(s).replace(/[,()]/g, ' ');
 
 
 // ============================================================
-// Listings — list, edit, delete (mod or admin)
+// Listings - list, edit, delete (mod or admin)
 // ============================================================
 
-/**
- * Lists every listing in the system for the admin panel, with optional
- * filters. status:
- *   'all'     — everything (default)
- *   'live'    — is_approved=true, is_sold=false
- *   'sold'    — is_sold=true
- *   'pending' — is_approved=false
- */
 export async function adminListListings({
   search = '',
   status = 'all',
@@ -53,7 +45,7 @@ export async function adminListListings({
 
   if (search && search.trim()) {
     const s = escapeOr(search);
-    if (s) q = q.or(`title.ilike.%${s}%,description.ilike.%${s}%,location.ilike.%${s}%`);
+    if (s) q = q.or('title.ilike.%' + s + '%,description.ilike.%' + s + '%,location.ilike.%' + s + '%');
   }
 
   const { data, error } = await q;
@@ -73,6 +65,7 @@ export async function adminGetListing(id) {
 const ALLOWED_ADMIN_PATCH_KEYS = new Set([
   'title', 'category', 'trade', 'condition', 'price', 'currency',
   'description', 'location', 'images', 'is_sold', 'is_approved',
+  'zip_code', 'latitude', 'longitude',
 ]);
 
 function sanitizeAdminPatch(patch) {
@@ -113,7 +106,7 @@ export async function adminToggleListingApproval(id, isApproved) {
 
 
 // ============================================================
-// Pack limit settings — what each vendor tier can post per month
+// Pack limit settings - what each vendor tier can post per month
 // ============================================================
 
 export async function listMarketplacePackLimits() {

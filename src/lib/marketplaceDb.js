@@ -1,8 +1,8 @@
 /**
- * marketplaceDb.js — user-facing marketplace listing operations.
+ * marketplaceDb.js - user-facing marketplace listing operations.
  *
  * Read-side queries (browse, filter) are still inline in Marketplace.jsx
- * via useSupabaseList — this file is the write/edit/eligibility surface
+ * via useSupabaseList - this file is the write/edit/eligibility surface
  * that the new /marketplace/new and /marketplace/edit/:id pages use.
  *
  * All searches escape ILIKE wildcards and PostgREST .or() delimiters
@@ -19,18 +19,9 @@ const escapeOr = (s) =>
 
 
 // ============================================================
-// Eligibility — does this user have a vendor pack with capacity?
+// Eligibility - does this user have a vendor pack with capacity?
 // ============================================================
 
-/**
- * Returns { eligible, reason, packTierSlug, packLabel, monthlyLimit,
- *           postedThisMonth, remaining }.
- * `eligible: false` reasons:
- *   - 'not_signed_in'
- *   - 'no_vendor_pack'
- *   - 'pack_not_configured' (admin needs to add a row)
- *   - 'monthly_limit_reached'
- */
 export async function getMarketplaceEligibility() {
   const { data, error } = await supabase.rpc('marketplace_eligibility');
   if (error) {
@@ -40,7 +31,6 @@ export async function getMarketplaceEligibility() {
       error,
     };
   }
-  // Postgres set-returning functions come back as an array.
   const row = Array.isArray(data) ? data[0] : data;
   if (!row) {
     return { eligible: false, reason: 'no_response' };
@@ -50,7 +40,7 @@ export async function getMarketplaceEligibility() {
     reason: row.reason || null,
     packTierSlug: row.pack_tier_slug || null,
     packLabel: row.pack_label || null,
-    monthlyLimit: row.monthly_limit,         // null = unlimited
+    monthlyLimit: row.monthly_limit,
     postedThisMonth: row.posted_this_month ?? 0,
     remaining: row.remaining ?? 0,
   };
@@ -58,7 +48,7 @@ export async function getMarketplaceEligibility() {
 
 
 // ============================================================
-// Create — server-side validates eligibility, slugifies, inserts.
+// Create - server-side validates eligibility, slugifies, inserts.
 // ============================================================
 
 export async function createMyListing(payload) {
@@ -72,6 +62,9 @@ export async function createMyListing(payload) {
     p_location:    payload.location || '',
     p_trade:       payload.trade || '',
     p_images:      Array.isArray(payload.images) ? payload.images : [],
+    p_zip_code:    payload.zip_code || '',
+    p_latitude:    payload.latitude ?? null,
+    p_longitude:   payload.longitude ?? null,
   });
   if (error) return { data: null, error };
   const row = Array.isArray(data) ? data[0] : data;
@@ -86,6 +79,7 @@ export async function createMyListing(payload) {
 const ALLOWED_PATCH_KEYS = new Set([
   'title', 'category', 'trade', 'condition', 'price', 'currency',
   'description', 'location', 'images', 'is_sold',
+  'zip_code', 'latitude', 'longitude',
 ]);
 
 function sanitizePatch(patch) {
@@ -149,8 +143,7 @@ export async function getListingById(id) {
 
 
 // ============================================================
-// Public search (used by the search hero on /marketplace and the
-// global search). Always restricted to is_approved + not is_sold.
+// Public search
 // ============================================================
 
 export async function searchListings({
@@ -171,14 +164,14 @@ export async function searchListings({
 
   if (q && q.trim()) {
     const s = escapeOr(q);
-    if (s) qb = qb.or(`title.ilike.%${s}%,description.ilike.%${s}%`);
+    if (s) qb = qb.or('title.ilike.%' + s + '%,description.ilike.%' + s + '%');
   }
   if (category) qb = qb.eq('category', category);
   if (trade)    qb = qb.eq('trade', trade);
   if (condition) qb = qb.eq('condition', condition);
   if (location && location.trim()) {
     const s = escapeLike(location);
-    if (s) qb = qb.ilike('location', `%${s}%`);
+    if (s) qb = qb.ilike('location', '%' + s + '%');
   }
 
   const { data, error } = await qb;
