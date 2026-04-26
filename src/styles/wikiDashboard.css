@@ -15,23 +15,28 @@
   background: var(--wd-cream);
 }
 
-/* ---------- HERO ---------- */
+/* ---------- HERO ----------
+   Wiki photo backdrop with a warm gradient scrim layered on top so the
+   eyebrow / title / subtitle / search stay legible against any image.
+   The scrim is darkest on the left where copy sits and fades right so
+   the photo can breathe. Drop a different image at the same Storage
+   path to refresh the hero without redeploying. */
 .wd-hero {
   background:
-    radial-gradient(circle at 20% 0%, rgba(255,215,172,0.25) 0%, transparent 60%),
+    linear-gradient(90deg,
+      rgba(28,14,5,0.88) 0%,
+      rgba(44,26,14,0.65) 50%,
+      rgba(44,26,14,0.20) 100%),
+    linear-gradient(180deg,
+      rgba(28,14,5,0.20) 0%,
+      rgba(28,14,5,0.55) 100%),
+    url("https://ozjtreaqyxlgsmopvwif.supabase.co/storage/v1/object/public/media/wiki/wiki-hero.jpg")
+      center/cover no-repeat,
     linear-gradient(180deg, #2c1a0e 0%, #1c0f06 100%);
   color: var(--wd-cream);
   padding: 4.5rem 2rem 3.5rem;
   position: relative;
   overflow: hidden;
-}
-.wd-hero::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image:
-    repeating-linear-gradient(0deg, rgba(160,125,79,0.06) 0px, rgba(160,125,79,0.06) 1px, transparent 1px, transparent 28px);
-  pointer-events: none;
 }
 .wd-hero-inner {
   max-width: 1100px;
