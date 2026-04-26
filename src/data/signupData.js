@@ -31,7 +31,7 @@ export const SIGNUP_PERKS = [
   {
     icon: '📰',
     iconColor: 'pi-teal',
-    title: 'News & The Weekly Grain',
+    title: 'News & The Weekly Bench',
     desc: 'Original industry reporting plus a weekly newsletter with market data, forum highlights, and machinery deals.',
   },
 ];

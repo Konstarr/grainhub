@@ -133,7 +133,7 @@ export const SPONSOR_AD = {
 };
 
 export const NEWSLETTER = {
-  title: 'The Weekly Grain',
+  title: 'The Weekly Bench',
   description:
     'Industry news, forum highlights, and machinery deals — delivered every Tuesday morning.',
 };

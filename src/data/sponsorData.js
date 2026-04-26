@@ -126,7 +126,7 @@ export const ALACARTE_OPTIONS = [
     icon: '📰',
     iconBg: 'ac-icon-brown',
     title: 'Newsletter Sponsorship',
-    desc: 'Top placement in The Weekly Grain — 14,200 subscribers, 48% open rate, sent every Tuesday morning. Your logo, headline, and CTA above the fold.',
+    desc: 'Top placement in The Weekly Bench — 14,200 subscribers, 48% open rate, sent every Tuesday morning. Your logo, headline, and CTA above the fold.',
     price: '800',
     period: '/ issue',
   },

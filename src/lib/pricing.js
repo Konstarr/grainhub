@@ -250,7 +250,7 @@ export const A_LA_CARTE = [
     icon: '📰',
     price: 399,
     unit: 'per week',
-    tagline: 'Sponsor one issue of The Weekly Grain.',
+    tagline: 'Sponsor one issue of The Weekly Bench.',
     description:
       'Your logo, 2-line copy, and CTA at the top of that week\'s edition. Reaches every subscribed user on Tuesday morning.',
   },

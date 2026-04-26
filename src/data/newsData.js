@@ -113,7 +113,7 @@ export const NEWS_STORIES = [
 ];
 
 export const NEWSLETTER_SUBSCRIBE = {
-  label: 'THE WEEKLY GRAIN',
+  label: 'THE WEEKLY BENCH',
   description: 'Industry news, forum highlights, and machinery deals — delivered every Tuesday morning.',
 };
 

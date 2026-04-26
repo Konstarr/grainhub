@@ -21,7 +21,7 @@ export default function Logo({ size = 36, as = 'link', style }) {
         <path d="M15 26 L15 20 L21 20 L21 26" stroke="#A0522D" strokeWidth="1.5" fill="none" />
       </svg>
       <span className="logo-text">
-        Grain<span>Hub</span>
+        Millwork<span>.io</span>
       </span>
     </>
   );
@@ -37,5 +37,4 @@ export default function Logo({ size = 36, as = 'link', style }) {
     <Link to="/" className="logo" style={style}>
       {inner}
     </Link>
-  );
-}
+  );}

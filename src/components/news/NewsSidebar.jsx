@@ -159,7 +159,7 @@ function ForumCard() {
 function NewsletterCard() {
   return (
     <div className="newsletter-card">
-      <div className="nl-title">The Weekly Grain</div>
+      <div className="nl-title">The Weekly Bench</div>
       <div className="nl-sub">
         Industry news, forum highlights, and machinery deals — delivered every Tuesday morning.
       </div>
