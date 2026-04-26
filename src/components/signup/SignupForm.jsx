@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { supabase } from '../../lib/supabase.js';
+import { TERMS_VERSION } from '../../lib/termsVersion.js';
 import {
   ROLE_OPTIONS,
   STATE_OPTIONS,
@@ -29,7 +30,9 @@ export default function SignupForm() {
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [agreeTerms,   setAgreeTerms]   = useState(false);
+  const [agreePrivacy, setAgreePrivacy] = useState(false);
+  const [agreeRules,   setAgreeRules]   = useState(false);
 
   // Step 2 form state
   const [role, setRole] = useState('');
@@ -79,8 +82,8 @@ export default function SignupForm() {
       setAuthError('Please fill in your name, email, username, and a password of 8+ characters.');
       return;
     }
-    if (!termsAccepted) {
-      setAuthError('Please accept the Terms of Service to continue.');
+    if (!agreeTerms || !agreePrivacy || !agreeRules) {
+      setAuthError('Please accept the Terms of Service, Privacy Policy, and Community Rules to continue.');
       return;
     }
     setCurrentStep(2);
@@ -127,6 +130,8 @@ export default function SignupForm() {
           trade: shopType || null,
           location: [city, state].filter(Boolean).join(', ') || null,
           bio: role || null,
+          terms_version:     TERMS_VERSION,
+          terms_accepted_at: new Date().toISOString(),
         })
         .eq('id', data.user.id);
       if (patchErr) {
@@ -390,19 +395,43 @@ export default function SignupForm() {
                   </div>
                 </div>
 
-                <div className="signup-terms-row">
-                  <input
-                    type="checkbox"
-                    id="terms"
-                    checked={termsAccepted}
-                    onChange={(e) => setTermsAccepted(e.target.checked)}
-                  />
-                  <label htmlFor="terms">
-                    I agree to GrainHub's{' '}
-                    <a href="#">Terms of Service</a> and{' '}
-                    <a href="#">Privacy Policy</a>. I understand GrainHub is a professional
-                    community and agree to keep it that way.
-                  </label>
+                <div className="signup-terms-stack">
+                  <div className="signup-terms-row">
+                    <input
+                      type="checkbox"
+                      id="agree-terms"
+                      checked={agreeTerms}
+                      onChange={(e) => setAgreeTerms(e.target.checked)}
+                    />
+                    <label htmlFor="agree-terms">
+                      I have read and agree to the{' '}
+                      <Link to="/terms" target="_blank" rel="noreferrer">Terms of Service</Link>.
+                    </label>
+                  </div>
+                  <div className="signup-terms-row">
+                    <input
+                      type="checkbox"
+                      id="agree-privacy"
+                      checked={agreePrivacy}
+                      onChange={(e) => setAgreePrivacy(e.target.checked)}
+                    />
+                    <label htmlFor="agree-privacy">
+                      I have read and agree to the{' '}
+                      <Link to="/privacy" target="_blank" rel="noreferrer">Privacy Policy</Link>.
+                    </label>
+                  </div>
+                  <div className="signup-terms-row">
+                    <input
+                      type="checkbox"
+                      id="agree-rules"
+                      checked={agreeRules}
+                      onChange={(e) => setAgreeRules(e.target.checked)}
+                    />
+                    <label htmlFor="agree-rules">
+                      I will follow GrainHub's{' '}
+                      <Link to="/community-rules" target="_blank" rel="noreferrer">Community Rules</Link>.
+                    </label>
+                  </div>
                 </div>
 
                 {authError && (
@@ -1095,7 +1124,7 @@ export function BusinessFields({
             placeholder="(555) 123-4567"
             value={businessPhone}
             onChange={(e) => setBusinessPhone(e.target.value)}
-          />
+         />
         </div>
       </div>
       <div className="signup-field-row">

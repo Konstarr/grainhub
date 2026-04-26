@@ -39,7 +39,9 @@ const FOOTER_COLS = [
       { label: 'Advertise / Sponsor', to: '/sponsor' },
       { label: 'Media Kit', to: '/sponsor' },
       { label: 'Contact', to: '/sponsor' },
-      { label: 'Privacy Policy', to: '/' },
+      { label: 'Community Rules', to: '/community-rules' },
+      { label: 'Privacy Policy', to: '/privacy' },
+      { label: 'Terms of Service', to: '/terms' },
     ],
   },
 ];
@@ -69,10 +71,11 @@ export default function Footer() {
       </div>
 
       <div className="footer-bottom">
-        <span>© 2025 GrainHub LLC. All rights reserved.</span>
+        <span>© {new Date().getFullYear()} GrainHub LLC. All rights reserved.</span>
         <span>
-          <a href="#">Terms of Service</a> &nbsp;·&nbsp; <a href="#">Privacy</a> &nbsp;·&nbsp;{' '}
-          <a href="#">Cookie Policy</a>
+          <Link to="/terms">Terms of Service</Link> &nbsp;·&nbsp;{' '}
+          <Link to="/privacy">Privacy</Link> &nbsp;·&nbsp;{' '}
+          <Link to="/community-rules">Community Rules</Link>
         </span>
       </div>
     </footer>

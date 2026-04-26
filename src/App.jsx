@@ -38,6 +38,9 @@ import EventDetail from './pages/EventDetail.jsx';
 import Profile from './pages/Profile.jsx';
 import Messages from './pages/Messages.jsx';
 import MessageThread from './pages/MessageThread.jsx';
+import Terms from './pages/Terms.jsx';
+import Privacy from './pages/Privacy.jsx';
+import CommunityRules from './pages/CommunityRules.jsx';
 
 const AdminNews             = lazy(() => import('./pages/admin/AdminNews.jsx'));
 const AdminNewsEdit         = lazy(() => import('./pages/admin/AdminNewsEdit.jsx'));
@@ -136,6 +139,11 @@ export default function App() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/login" element={<Login />} />
+
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/community-rules" element={<CommunityRules />} />
+          <Route path="/rules" element={<Navigate to="/community-rules" replace />} />
 
           <Route path="/forums/new" element={<RequireAuth><NewThread /></RequireAuth>} />
           <Route path="/forums/rules" element={<ForumRules />} />
