@@ -33,6 +33,7 @@ export const ADMIN_SECTIONS = [
       { to: '/admin/forums/reputation', label: 'Rep gains',           icon: <IconStar />, enabled: true },
       { to: '/admin/forums/badges',     label: 'Levels & accolades',  icon: <IconStar />, enabled: true },
       { to: '/admin/users',       label: 'Users',       icon: <IconUsers />,   enabled: true  },
+      { to: '/admin/communities', label: 'Communities', icon: <IconUsers />,   enabled: true  },
       { to: '/admin/connections', label: 'Connections', icon: <IconLink />,    enabled: true  },
     ],
   },

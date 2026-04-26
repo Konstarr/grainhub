@@ -593,13 +593,4 @@
   .wiki-grid { grid-template-columns: 220px 1fr; }
   .right-col { display: none; }
 }
-@media (max-width: 768px) {
-  .wiki-grid { grid-template-columns: 1fr; gap: 1.5rem; padding: 1rem; }
-  .wiki-left-nav { position: static; }
-  .hero-title { font-size: 30px; }
-  .wiki-hero .hero-top { flex-direction: column; }
-  .hero-right { width: 100%; }
-  .hero-stats-grid { grid-template-columns: repeat(4, 1fr); }
-  .contribute-cta { grid-template-columns: 1fr; }
-  .cc-right { justify-content: flex-start; }
-}
+@media (max-width: 768px) 

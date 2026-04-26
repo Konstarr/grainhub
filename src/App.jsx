@@ -61,6 +61,8 @@ const AdminForumBadges      = lazy(() => import('./pages/admin/AdminForumBadges.
 const AdminMarketplace      = lazy(() => import('./pages/admin/AdminMarketplace.jsx'));
 const AdminMarketplaceEdit  = lazy(() => import('./pages/admin/AdminMarketplaceEdit.jsx'));
 const AdminMarketplaceSettings = lazy(() => import('./pages/admin/AdminMarketplaceSettings.jsx'));
+const AdminCommunities      = lazy(() => import('./pages/admin/AdminCommunities.jsx'));
+const AdminCommunityEdit    = lazy(() => import('./pages/admin/AdminCommunityEdit.jsx'));
 
 const AdminFallback = (
   <div style={{
@@ -104,6 +106,8 @@ export default function App() {
         <Route path="/admin/users/:id"        element={adminRoute('admin', AdminUserEdit)} />
         <Route path="/admin/sponsors"         element={adminRoute('admin', AdminSponsors)} />
         <Route path="/admin/connections"      element={adminRoute('admin', AdminConnections)} />
+        <Route path="/admin/communities"      element={adminRoute('admin', AdminCommunities)} />
+        <Route path="/admin/communities/:id"  element={adminRoute('admin', AdminCommunityEdit)} />
         <Route path="/admin/forums"           element={adminRoute('admin', AdminForums)} />
         <Route path="/admin/forums/threads"   element={adminRoute('admin', AdminForumThreads)} />
         <Route path="/admin/forums/reports"   element={adminRoute('admin', AdminForumReports)} />
