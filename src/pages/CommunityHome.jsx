@@ -5,7 +5,18 @@ import { useAuth } from '../context/AuthContext.jsx';
 import {
   fetchCommunityBySlug,
   fetchMyMembership,
-  joinCommunity,
+  fetchMyJoinRequest,
+  fetchMyInvitation,
+  fetchPendingJoinRequests,
+  requestToJoinCommunity,
+  cancelJoinRequest,
+  approveJoinRequest,
+  rejectJoinRequest,
+  acceptCommunityInvitation,
+  declineCommunityInvitation,
+  inviteToCommunity,
+  searchProfilesToInvite,
+  transferOwnership,
   leaveCommunity,
   fetchCommunityMembers,
   fetchCommunityPosts,
@@ -22,24 +33,9 @@ import { safeImageUrl } from '../lib/urlSafety.js';
 import useDocumentTitle from '../lib/useDocumentTitle.js';
 import '../styles/communities.css';
 
-/**
- * /c/:slug — community home, Facebook-group-inspired but tuned to
- * the millwork/trade palette. Layout:
- *
- *   Banner w/ icon, name, member strip, Join button
- *   Tab bar: Discussion · About · Members · Media
- *
- *   On Discussion tab:
- *     Center : composer with post-type chips · pinned posts rail ·
- *              filterable feed · each card has like/comment/pin
- *     Right  : About card · Recent media · Member preview
- *
- * Everything below the banner is member-gated.
- */
-
 const POST_TYPES = [
   { id: 'discussion',   label: 'Discussion',   icon: '💬', tint: 'tint-discussion' },
-  { id: 'question',     label: 'Question',     icon: '❓', tint: 'tint-question' },
+  { id: 'question',     label: 'Question',     icon: '❓',    tint: 'tint-question' },
   { id: 'showcase',     label: 'Showcase',     icon: '🔨', tint: 'tint-showcase' },
   { id: 'announcement', label: 'Announcement', icon: '📣', tint: 'tint-announcement' },
 ];
@@ -57,13 +53,17 @@ export default function CommunityHome() {
   const { user, isAuthed } = useAuth();
   const [community, setCommunity] = useState(null);
   const [membership, setMembership] = useState(null);
+  const [myRequest, setMyRequest] = useState(null);
+  const [myInvitation, setMyInvitation] = useState(null);
+  const [pendingRequests, setPendingRequests] = useState([]);
   const [members, setMembers] = useState([]);
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [busy, setBusy] = useState(false);
   const [tab, setTab] = useState('discussion');
-  const [filterType, setFilterType] = useState(null); // null = all
+  const [filterType, setFilterType] = useState(null);
+  const [manageOpen, setManageOpen] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -71,31 +71,111 @@ export default function CommunityHome() {
     const { data } = await fetchCommunityBySlug(slug);
     if (!data) { setNotFound(true); setLoading(false); return; }
     setCommunity(data);
-    const [m, r, p] = await Promise.all([
+    const [m, r, p, mr, mi] = await Promise.all([
       fetchMyMembership(data.id),
       fetchCommunityMembers(data.id),
       fetchCommunityPosts(data.id, { myUserId: user?.id }),
+      fetchMyJoinRequest(data.id),
+      fetchMyInvitation(data.id),
     ]);
     setMembership(m.data || null);
     setMembers(r.data || []);
     setPosts(p.data || []);
+    setMyRequest(mr.data || null);
+    setMyInvitation(mi.data || null);
+    const role = m.data?.role;
+    if (role === 'mod' || role === 'owner') {
+      const { data: pr } = await fetchPendingJoinRequests(data.id);
+      setPendingRequests(pr || []);
+    } else {
+      setPendingRequests([]);
+    }
     setLoading(false);
   };
 
   useEffect(() => { load(); /* eslint-disable-next-line */ }, [slug, user?.id]);
   useDocumentTitle(community?.name);
 
-  const handleToggleJoin = async () => {
+  const isMember = !!membership;
+  const isOwner  = membership?.role === 'owner';
+  const isMod    = membership?.role === 'mod' || isOwner;
+
+  const handleApply = async () => {
     if (!community) return;
     setBusy(true);
-    if (membership) await leaveCommunity(community.id);
-    else            await joinCommunity(community.id);
+    const { error } = await requestToJoinCommunity(community.id);
     setBusy(false);
-    load();
+    if (error) { alert(prettyMembershipError(error.message)); return; }
+    await load();
+  };
+  const handleCancelMyRequest = async () => {
+    if (!myRequest) return;
+    setBusy(true);
+    const { error } = await cancelJoinRequest(myRequest.id);
+    setBusy(false);
+    if (error) { alert(error.message); return; }
+    await load();
+  };
+  const handleAcceptInvite = async () => {
+    if (!myInvitation) return;
+    setBusy(true);
+    const { error } = await acceptCommunityInvitation(myInvitation.id);
+    setBusy(false);
+    if (error) { alert(error.message); return; }
+    await load();
+  };
+  const handleDeclineInvite = async () => {
+    if (!myInvitation) return;
+    setBusy(true);
+    const { error } = await declineCommunityInvitation(myInvitation.id);
+    setBusy(false);
+    if (error) { alert(error.message); return; }
+    await load();
+  };
+  const handleLeave = async () => {
+    if (!community || !isMember) return;
+    if (isOwner) { setManageOpen(true); return; }
+    if (!confirm('Leave this community? You can request to rejoin later.')) return;
+    setBusy(true);
+    const { error } = await leaveCommunity(community.id);
+    setBusy(false);
+    if (error) { alert(prettyMembershipError(error.message)); return; }
+    await load();
   };
 
-  const isMember = !!membership;
-  const isMod = membership?.role === 'mod' || membership?.role === 'owner';
+  const handleApprove = async (requestId) => {
+    setBusy(true);
+    const { error } = await approveJoinRequest(requestId);
+    setBusy(false);
+    if (error) { alert(error.message); return; }
+    await load();
+  };
+  const handleReject = async (requestId) => {
+    setBusy(true);
+    const { error } = await rejectJoinRequest(requestId);
+    setBusy(false);
+    if (error) { alert(error.message); return; }
+    await load();
+  };
+  const handleInvite = async (profileId) => {
+    setBusy(true);
+    const { error } = await inviteToCommunity(community.id, profileId);
+    setBusy(false);
+    if (error) { alert(prettyMembershipError(error.message)); return false; }
+    await load();
+    return true;
+  };
+  const handleTransfer = async (newOwnerId) => {
+    if (!community || !newOwnerId) return false;
+    if (!confirm('Transfer ownership? You will be demoted to moderator and the new owner takes full control.')) return false;
+    setBusy(true);
+    const { error } = await transferOwnership(community.id, newOwnerId);
+    setBusy(false);
+    if (error) { alert(error.message); return false; }
+    await load();
+    setManageOpen(false);
+    return true;
+  };
 
   const handleCreatePost = async ({ body, imageUrl, postType }) => {
     if (!community?.id) return { ok: false };
@@ -125,7 +205,6 @@ export default function CommunityHome() {
     setPosts((prev) => prev.map((p) => (p.id === post.id ? { ...p, is_pinned: next } : p)));
     const { error } = await setPostPinned(post.id, next);
     if (error) {
-      // revert on error
       setPosts((prev) => prev.map((p) => (p.id === post.id ? { ...p, is_pinned: !next } : p)));
       alert(error.message);
     }
@@ -145,7 +224,7 @@ export default function CommunityHome() {
     return (
       <>
         <PageBack backTo="/communities" backLabel="Back to Communities" />
-        <div className="comm-wrap"><div className="comm-empty">Loading…</div></div>
+        <div className="comm-wrap"><div className="comm-empty">Loading...</div></div>
       </>
     );
   }
@@ -162,7 +241,6 @@ export default function CommunityHome() {
         ]}
       />
 
-      {/* ── HERO / BANNER ── */}
       <div
         className="comm-banner comm-banner-soft"
         style={{
@@ -193,22 +271,25 @@ export default function CommunityHome() {
           </div>
           <div className="comm-home-actions">
             {isAuthed ? (
-              <button
-                type="button"
-                onClick={handleToggleJoin}
-                disabled={busy}
-                className={'comm-btn ' + (membership ? 'ghost-light' : 'primary')}
-              >
-                {busy ? '…' : membership ? (membership.role === 'owner' ? 'Owner ▾' : 'Joined ✓') : '+ Join group'}
-              </button>
+              <MembershipButton
+                membership={membership}
+                myRequest={myRequest}
+                myInvitation={myInvitation}
+                busy={busy}
+                onApply={handleApply}
+                onCancelRequest={handleCancelMyRequest}
+                onAcceptInvite={handleAcceptInvite}
+                onDeclineInvite={handleDeclineInvite}
+                onLeave={handleLeave}
+                onOpenManage={() => setManageOpen(true)}
+              />
             ) : (
-              <Link to="/login" className="comm-btn primary">Sign in to join</Link>
+              <Link to="/login" className="comm-btn primary">Sign in to request access</Link>
             )}
           </div>
         </div>
       </div>
 
-      {/* ── TAB BAR ── */}
       <div className="comm-tabs">
         <div className="comm-tabs-inner">
           {TABS.map((t) => (
@@ -224,7 +305,6 @@ export default function CommunityHome() {
         </div>
       </div>
 
-      {/* ── TAB CONTENT ── */}
       <div className="comm-feed-wrap">
         <div className="comm-feed-main">
           {tab === 'discussion' && (
@@ -242,11 +322,15 @@ export default function CommunityHome() {
               onLike={handleLike}
               onDelete={handleDeletePost}
               onPin={handlePin}
-              onJoin={handleToggleJoin}
+              myRequest={myRequest}
+              myInvitation={myInvitation}
+              onApply={handleApply}
+              onCancelRequest={handleCancelMyRequest}
+              onAcceptInvite={handleAcceptInvite}
+              onDeclineInvite={handleDeclineInvite}
               busy={busy}
             />
           )}
-
           {tab === 'about' && <AboutTab community={community} />}
           {tab === 'members' && <MembersTab members={members} />}
           {tab === 'media' && <MediaTab posts={posts} />}
@@ -254,35 +338,174 @@ export default function CommunityHome() {
 
         <aside className="comm-chat-side">
           <AboutCard community={community} />
+          {isMod && (
+            <PendingRequestsCard
+              requests={pendingRequests}
+              onApprove={handleApprove}
+              onReject={handleReject}
+              busy={busy}
+            />
+          )}
           <RecentMediaCard posts={posts} onSeeAll={() => setTab('media')} />
           <MemberPreviewCard members={members} onSeeAll={() => setTab('members')} />
         </aside>
       </div>
+
+      {manageOpen && (
+        <ManageMembershipModal
+          community={community}
+          members={members}
+          isOwner={isOwner}
+          isMod={isMod}
+          pendingRequests={pendingRequests}
+          busy={busy}
+          onClose={() => setManageOpen(false)}
+          onTransfer={handleTransfer}
+          onInvite={handleInvite}
+          onApprove={handleApprove}
+          onReject={handleReject}
+        />
+      )}
     </>
   );
 }
 
-/* ══════════════════ Discussion tab ══════════════════ */
+function MembershipButton({
+  membership, myRequest, myInvitation, busy,
+  onApply, onCancelRequest, onAcceptInvite, onDeclineInvite, onLeave, onOpenManage,
+}) {
+  const role = membership?.role;
+  if (myInvitation) {
+    return (
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        <button type="button" className="comm-btn primary" onClick={onAcceptInvite} disabled={busy}>
+          {busy ? '...' : 'Accept invite'}
+        </button>
+        <button type="button" className="comm-btn ghost-light" onClick={onDeclineInvite} disabled={busy}>
+          Decline
+        </button>
+      </div>
+    );
+  }
+  if (role === 'owner') {
+    return (
+      <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+        <span
+          className="comm-btn ghost-light"
+          style={{ pointerEvents: 'none', cursor: 'default', display: 'inline-flex', alignItems: 'center', gap: 6 }}
+          aria-label="You are the owner of this community"
+        >
+          <span style={{ fontSize: 13 }}>👑</span>
+          Owner
+        </span>
+        <button type="button" className="comm-btn primary" onClick={onOpenManage} disabled={busy}>
+          Manage
+        </button>
+      </div>
+    );
+  }
+  if (role === 'mod') {
+    return (
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        <button type="button" className="comm-btn ghost-light" onClick={onOpenManage} disabled={busy} title="Approve requests, invite people">
+          Manage
+        </button>
+        <button type="button" className="comm-btn ghost-light" onClick={onLeave} disabled={busy}>
+          Joined ✓
+        </button>
+      </div>
+    );
+  }
+  if (role === 'member') {
+    return (
+      <button type="button" className="comm-btn ghost-light" onClick={onLeave} disabled={busy} title="Click to leave">
+        {busy ? '...' : 'Joined ✓'}
+      </button>
+    );
+  }
+  if (myRequest) {
+    return (
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        <span className="comm-btn ghost-light" style={{ pointerEvents: 'none', cursor: 'default' }}>
+          Request pending
+        </span>
+        <button type="button" className="comm-btn ghost-light" onClick={onCancelRequest} disabled={busy}>
+          Cancel
+        </button>
+      </div>
+    );
+  }
+  return (
+    <button type="button" className="comm-btn primary" onClick={onApply} disabled={busy}>
+      {busy ? '...' : 'Request to join'}
+    </button>
+  );
+}
+
+function prettyMembershipError(message) {
+  const m = String(message || '');
+  if (m.includes('owner_must_transfer_first')) return 'You are the owner. Transfer ownership to another member before leaving.';
+  if (m.includes('already_member')) return 'They are already in this community.';
+  if (m.includes('request_already_pending')) return 'A request is already pending for this user.';
+  if (m.includes('invitation_already_pending')) return 'An invitation is already outstanding for that person.';
+  if (m.includes('cannot_invite_self')) return "You can't invite yourself.";
+  if (m.includes('forbidden')) return "You don't have permission to do that.";
+  return m;
+}
+
 function DiscussionTab({
   community, posts, members, isMember, isAuthed, isMod, currentUserId,
-  filterType, setFilterType, onCreate, onLike, onDelete, onPin, onJoin, busy,
+  filterType, setFilterType, onCreate, onLike, onDelete, onPin,
+  myRequest, myInvitation, onApply, onCancelRequest, onAcceptInvite, onDeclineInvite, busy,
 }) {
   const pinned   = useMemo(() => posts.filter((p) => p.is_pinned), [posts]);
   const regular  = useMemo(() => posts.filter((p) => !p.is_pinned), [posts]);
   const filtered = filterType ? regular.filter((p) => p.post_type === filterType) : regular;
 
   if (!isMember) {
+    if (!isAuthed) {
+      return (
+        <div className="comm-gate comm-gate-card">
+          <div className="comm-gate-title">Members only</div>
+          <div className="comm-gate-sub">Sign in and request access to see posts.</div>
+          <Link to="/login" className="comm-btn primary">Sign in</Link>
+        </div>
+      );
+    }
+    if (myInvitation) {
+      return (
+        <div className="comm-gate comm-gate-card">
+          <div className="comm-gate-title">You've been invited</div>
+          <div className="comm-gate-sub">A community moderator has invited you to join.</div>
+          <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
+            <button type="button" className="comm-btn primary" onClick={onAcceptInvite} disabled={busy}>
+              {busy ? '...' : 'Accept invite'}
+            </button>
+            <button type="button" className="comm-btn ghost-light" onClick={onDeclineInvite} disabled={busy}>
+              Decline
+            </button>
+          </div>
+        </div>
+      );
+    }
+    if (myRequest) {
+      return (
+        <div className="comm-gate comm-gate-card">
+          <div className="comm-gate-title">Request sent</div>
+          <div className="comm-gate-sub">A moderator will review your request shortly. You'll see posts as soon as you're approved.</div>
+          <button type="button" className="comm-btn ghost-light" onClick={onCancelRequest} disabled={busy}>
+            Cancel request
+          </button>
+        </div>
+      );
+    }
     return (
       <div className="comm-gate comm-gate-card">
-        <div className="comm-gate-title">Join to see posts</div>
-        <div className="comm-gate-sub">Posts in this community are visible to members only.</div>
-        {isAuthed ? (
-          <button type="button" className="comm-btn primary" onClick={onJoin} disabled={busy}>
-            {busy ? 'Joining…' : 'Join community'}
-          </button>
-        ) : (
-          <Link to="/login" className="comm-btn primary">Sign in</Link>
-        )}
+        <div className="comm-gate-title">Members only</div>
+        <div className="comm-gate-sub">Posts here are visible to members. Request access and a moderator will review.</div>
+        <button type="button" className="comm-btn primary" onClick={onApply} disabled={busy}>
+          {busy ? '...' : 'Request to join'}
+        </button>
       </div>
     );
   }
@@ -290,80 +513,41 @@ function DiscussionTab({
   return (
     <>
       <PostComposer onSubmit={onCreate} />
-
-      {/* Filter chips — All + one per post type */}
       <div className="comm-filter-row">
-        <button
-          type="button"
-          className={'comm-filter-chip ' + (!filterType ? 'active' : '')}
-          onClick={() => setFilterType(null)}
-        >
-          All
-        </button>
+        <button type="button" className={'comm-filter-chip ' + (!filterType ? 'active' : '')} onClick={() => setFilterType(null)}>All</button>
         {POST_TYPES.map((t) => (
-          <button
-            key={t.id}
-            type="button"
-            className={'comm-filter-chip ' + (filterType === t.id ? 'active' : '')}
-            onClick={() => setFilterType(t.id)}
-          >
-            <span style={{ marginRight: 5 }}>{t.icon}</span>
-            {t.label}
+          <button key={t.id} type="button" className={'comm-filter-chip ' + (filterType === t.id ? 'active' : '')} onClick={() => setFilterType(t.id)}>
+            <span style={{ marginRight: 5 }}>{t.icon}</span>{t.label}
           </button>
         ))}
       </div>
-
-      {/* Pinned */}
       {pinned.length > 0 && !filterType && (
         <div className="comm-pinned-group">
           <div className="comm-section-ribbon">📌 Pinned</div>
           {pinned.map((post) => (
-            <PostCard
-              key={post.id}
-              post={post}
-              community={community}
-              currentUserId={currentUserId}
-              canModerate={isMod}
-              onLike={onLike}
-              onDelete={onDelete}
-              onPin={onPin}
-            />
+            <PostCard key={post.id} post={post} community={community} currentUserId={currentUserId} canModerate={isMod} onLike={onLike} onDelete={onDelete} onPin={onPin} />
           ))}
         </div>
       )}
-
-      {/* Regular feed */}
       {filtered.length === 0 ? (
         <div className="comm-empty" style={{ marginTop: 12 }}>
           {filterType ? `No ${TYPE_MAP[filterType].label.toLowerCase()} posts yet.` : 'No posts yet. Be the first to write something.'}
         </div>
       ) : (
         filtered.map((post) => (
-          <PostCard
-            key={post.id}
-            post={post}
-            community={community}
-            currentUserId={currentUserId}
-            canModerate={isMod}
-            onLike={onLike}
-            onDelete={onDelete}
-            onPin={onPin}
-          />
+          <PostCard key={post.id} post={post} community={community} currentUserId={currentUserId} canModerate={isMod} onLike={onLike} onDelete={onDelete} onPin={onPin} />
         ))
       )}
     </>
   );
 }
 
-/* ══════════════════ About / Members / Media tabs ══════════════════ */
 function AboutTab({ community }) {
   return (
     <div className="post-card" style={{ padding: '1.2rem 1.35rem' }}>
-      <h3 style={{ margin: 0, fontFamily: 'Montserrat, sans-serif', fontSize: 16, fontWeight: 700 }}>
-        About this community
-      </h3>
+      <h3 style={{ margin: 0, fontFamily: 'Montserrat, sans-serif', fontSize: 16, fontWeight: 700 }}>About this community</h3>
       <div style={{ color: 'var(--text-secondary)', fontSize: 14, lineHeight: 1.6, marginTop: 10 }}>
-        {community.description || 'The founder hasn\'t written a description yet.'}
+        {community.description || "The founder hasn't written a description yet."}
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 10, marginTop: 16 }}>
         <FactChip label="Members"   value={(community.member_count || 0).toLocaleString()} />
@@ -376,18 +560,9 @@ function AboutTab({ community }) {
 }
 function FactChip({ label, value }) {
   return (
-    <div style={{
-      padding: '10px 12px',
-      background: '#FDFBF5',
-      border: '1px solid var(--border-light)',
-      borderRadius: 10,
-    }}>
-      <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: 1.4, textTransform: 'uppercase', color: 'var(--text-muted)' }}>
-        {label}
-      </div>
-      <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 16, fontWeight: 700, color: 'var(--text-primary)', marginTop: 2 }}>
-        {value}
-      </div>
+    <div style={{ padding: '10px 12px', background: '#FDFBF5', border: '1px solid var(--border-light)', borderRadius: 10 }}>
+      <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: 1.4, textTransform: 'uppercase', color: 'var(--text-muted)' }}>{label}</div>
+      <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 16, fontWeight: 700, color: 'var(--text-primary)', marginTop: 2 }}>{value}</div>
     </div>
   );
 }
@@ -407,27 +582,20 @@ function MembersTab({ members }) {
 
 function MediaTab({ posts }) {
   const imgs = posts.filter((p) => p.image_url && !p.deleted_at);
-  if (imgs.length === 0) {
-    return <div className="comm-empty">No images posted yet.</div>;
-  }
+  if (imgs.length === 0) return <div className="comm-empty">No images posted yet.</div>;
   return (
     <div className="comm-media-grid">
-      {imgs.map((p) => (
-        <img key={p.id} src={p.image_url} alt="" className="comm-media-tile" loading="lazy" />
-      ))}
+      {imgs.map((p) => (<img key={p.id} src={p.image_url} alt="" className="comm-media-tile" loading="lazy" />))}
     </div>
   );
 }
 
-/* ══════════════════ Sidebar cards ══════════════════ */
 function AboutCard({ community }) {
   return (
     <div className="comm-side-card">
       <div className="comm-chat-side-title">About</div>
       <div style={{ padding: '0.85rem 1rem', fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.55 }}>
-        {community.description
-          ? (community.description.length > 160 ? community.description.slice(0, 160) + '…' : community.description)
-          : 'Founder hasn\'t written a description yet.'}
+        {community.description ? (community.description.length > 160 ? community.description.slice(0, 160) + '...' : community.description) : "Founder hasn't written a description yet."}
         <div style={{ marginTop: 10, display: 'grid', gap: 6 }}>
           <SideFact label="Public"  value="Anyone can see posts" />
           <SideFact label="Founded" value={new Date(community.created_at).toLocaleDateString(undefined, { month: 'long', year: 'numeric' })} />
@@ -451,14 +619,10 @@ function RecentMediaCard({ posts, onSeeAll }) {
     <div className="comm-side-card">
       <div className="comm-chat-side-title" style={{ display: 'flex', justifyContent: 'space-between' }}>
         <span>Recent media</span>
-        <button type="button" onClick={onSeeAll} style={{ border: 0, background: 'transparent', cursor: 'pointer', fontSize: 11.5, color: 'var(--wood-warm)', fontWeight: 600 }}>
-          See all
-        </button>
+        <button type="button" onClick={onSeeAll} style={{ border: 0, background: 'transparent', cursor: 'pointer', fontSize: 11.5, color: 'var(--wood-warm)', fontWeight: 600 }}>See all</button>
       </div>
       <div className="comm-side-media">
-        {imgs.map((p) => (
-          <img key={p.id} src={p.image_url} alt="" loading="lazy" />
-        ))}
+        {imgs.map((p) => (<img key={p.id} src={p.image_url} alt="" loading="lazy" />))}
       </div>
     </div>
   );
@@ -469,9 +633,7 @@ function MemberPreviewCard({ members, onSeeAll }) {
     <div className="comm-side-card">
       <div className="comm-chat-side-title" style={{ display: 'flex', justifyContent: 'space-between' }}>
         <span>Members <span className="comm-chat-side-count">{members.length}</span></span>
-        <button type="button" onClick={onSeeAll} style={{ border: 0, background: 'transparent', cursor: 'pointer', fontSize: 11.5, color: 'var(--wood-warm)', fontWeight: 600 }}>
-          See all
-        </button>
+        <button type="button" onClick={onSeeAll} style={{ border: 0, background: 'transparent', cursor: 'pointer', fontSize: 11.5, color: 'var(--wood-warm)', fontWeight: 600 }}>See all</button>
       </div>
       <div className="comm-members" style={{ maxHeight: 260 }}>
         {members.slice(0, 8).map((m) => {
@@ -485,9 +647,7 @@ function MemberPreviewCard({ members, onSeeAll }) {
               </div>
               <div className="comm-roster-text">
                 <div className="comm-roster-name">{name}</div>
-                {m.role !== 'member' && (
-                  <div className="comm-roster-trade" style={{ color: 'var(--wood-warm)' }}>{m.role}</div>
-                )}
+                {m.role !== 'member' && (<div className="comm-roster-trade" style={{ color: 'var(--wood-warm)' }}>{m.role}</div>)}
               </div>
             </Link>
           );
@@ -497,23 +657,17 @@ function MemberPreviewCard({ members, onSeeAll }) {
   );
 }
 
-/* ══════════════════ Avatar chip for header strip ══════════════════ */
 function AvatarChip({ profile }) {
   if (!profile) return null;
   const name = profile.full_name || profile.username || '?';
   const initials = name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase();
   return (
-    <Link
-      to={'/profile/' + (profile.username || profile.id)}
-      className="comm-avatar-chip"
-      title={name}
-    >
+    <Link to={'/profile/' + (profile.username || profile.id)} className="comm-avatar-chip" title={name}>
       {profile.avatar_url ? <img src={profile.avatar_url} alt="" /> : <span>{initials}</span>}
     </Link>
   );
 }
 
-/* ══════════════════ Composer ══════════════════ */
 function PostComposer({ onSubmit }) {
   const [body, setBody]   = useState('');
   const [imageUrl, setUrl] = useState('');
@@ -521,63 +675,36 @@ function PostComposer({ onSubmit }) {
   const [postType, setPostType] = useState('discussion');
   const [sending, setSending] = useState(false);
   const [err, setErr] = useState(null);
-
   const submit = async (e) => {
     e?.preventDefault();
     if (!body.trim() || sending) return;
-    setSending(true);
-    setErr(null);
+    setSending(true); setErr(null);
     const res = await onSubmit({ body, imageUrl: imageUrl.trim() || null, postType });
     setSending(false);
     if (!res.ok) { setErr(res.error || 'Could not post.'); return; }
     setBody(''); setUrl(''); setShowUrl(false); setPostType('discussion');
   };
-
   return (
     <div className="post-composer">
       <form onSubmit={submit} style={{ display: 'grid', gap: 10 }}>
-        <textarea
-          value={body}
-          onChange={(e) => setBody(e.target.value)}
-          placeholder="Share something with the community…"
-          rows={3}
-          className="post-composer-input"
-          maxLength={8000}
-        />
+        <textarea value={body} onChange={(e) => setBody(e.target.value)} placeholder="Share something with the community..." rows={3} className="post-composer-input" maxLength={8000} />
         {showUrl && (
-          <input
-            type="url"
-            value={imageUrl}
-            onChange={(e) => setUrl(e.target.value)}
-            placeholder="Paste an image URL (https://…)"
-            className="post-composer-url"
-          />
+          <input type="url" value={imageUrl} onChange={(e) => setUrl(e.target.value)} placeholder="Paste an image URL (https://...)" className="post-composer-url" />
         )}
         <div className="comm-type-chips" role="radiogroup" aria-label="Post type">
           {POST_TYPES.map((t) => (
-            <button
-              key={t.id}
-              type="button"
-              role="radio"
-              aria-checked={postType === t.id}
-              onClick={() => setPostType(t.id)}
-              className={'comm-type-chip ' + t.tint + ' ' + (postType === t.id ? 'active' : '')}
-            >
+            <button key={t.id} type="button" role="radio" aria-checked={postType === t.id} onClick={() => setPostType(t.id)} className={'comm-type-chip ' + t.tint + ' ' + (postType === t.id ? 'active' : '')}>
               <span style={{ marginRight: 6 }}>{t.icon}</span>{t.label}
             </button>
           ))}
         </div>
         {err && <div className="comm-chat-err">{err}</div>}
         <div className="post-composer-actions">
-          <button
-            type="button"
-            className="post-composer-ghost"
-            onClick={() => setShowUrl((v) => !v)}
-          >
+          <button type="button" className="post-composer-ghost" onClick={() => setShowUrl((v) => !v)}>
             {showUrl ? '✕ Remove image' : '📷 Add image'}
           </button>
           <button type="submit" className="comm-btn primary" disabled={!body.trim() || sending}>
-            {sending ? 'Posting…' : 'Post'}
+            {sending ? 'Posting...' : 'Post'}
           </button>
         </div>
       </form>
@@ -585,7 +712,6 @@ function PostComposer({ onSubmit }) {
   );
 }
 
-/* ══════════════════ Post card ══════════════════ */
 function PostCard({ post, community, currentUserId, canModerate, onLike, onDelete, onPin }) {
   const [showComments, setShowComments] = useState(false);
   const [comments, setComments] = useState(null);
@@ -594,7 +720,6 @@ function PostCard({ post, community, currentUserId, canModerate, onLike, onDelet
   const initials = (name || '??').split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase();
   const isOwnPost = post.author_id === currentUserId;
   const type = TYPE_MAP[post.post_type] || TYPE_MAP.discussion;
-
   const openComments = async () => {
     const next = !showComments;
     setShowComments(next);
@@ -617,7 +742,6 @@ function PostCard({ post, community, currentUserId, canModerate, onLike, onDelet
     setComments((prev) => (prev || []).filter((c) => c.id !== commentId));
     post.comment_count = Math.max(0, (post.comment_count || 0) - 1);
   };
-
   return (
     <article className={'post-card ' + (post.is_pinned ? 'post-card-pinned' : '')}>
       <div className="post-card-typebar">
@@ -631,9 +755,7 @@ function PostCard({ post, community, currentUserId, canModerate, onLike, onDelet
           {author.avatar_url ? <img src={author.avatar_url} alt="" /> : <span>{initials}</span>}
         </Link>
         <div className="post-card-head-text">
-          <Link to={author.username ? '/profile/' + author.username : '/forums'} className="post-card-author">
-            {name}
-          </Link>
+          <Link to={author.username ? '/profile/' + author.username : '/forums'} className="post-card-author">{name}</Link>
           <div className="post-card-ts" title={new Date(post.created_at).toLocaleString()}>
             {formatRelative(post.created_at)}
             {author.trade && <> · <span style={{ color: 'var(--wood-warm)' }}>{author.trade}</span></>}
@@ -650,15 +772,12 @@ function PostCard({ post, community, currentUserId, canModerate, onLike, onDelet
           </div>
         )}
       </header>
-
       <div className="post-card-body">{post.body}</div>
       {post.image_url && <img src={post.image_url} alt="" className="post-card-image" loading="lazy" />}
-
       <div className="post-card-counts">
         {post.like_count > 0 && <span><span className="post-heart">❤</span> {post.like_count}</span>}
         {post.comment_count > 0 && <span>{post.comment_count} {post.comment_count === 1 ? 'comment' : 'comments'}</span>}
       </div>
-
       <div className="post-card-actions">
         <button type="button" onClick={() => onLike(post)} className={'post-action-btn ' + (post.iLiked ? 'liked' : '')}>
           <span className="post-action-icon">{post.iLiked ? '❤' : '♡'}</span>
@@ -669,23 +788,11 @@ function PostCard({ post, community, currentUserId, canModerate, onLike, onDelet
           Comment
         </button>
       </div>
-
       {showComments && (
         <div className="post-comments">
-          {comments === null ? (
-            <div className="post-comments-empty">Loading…</div>
-          ) : comments.length === 0 ? (
-            <div className="post-comments-empty">No comments yet — be first.</div>
-          ) : (
-            comments.map((c) => (
-              <Comment
-                key={c.id}
-                c={c}
-                canDelete={c.author_id === currentUserId || canModerate}
-                onDelete={handleCommentDelete}
-              />
-            ))
-          )}
+          {comments === null ? (<div className="post-comments-empty">Loading...</div>)
+           : comments.length === 0 ? (<div className="post-comments-empty">No comments yet — be first.</div>)
+           : (comments.map((c) => (<Comment key={c.id} c={c} canDelete={c.author_id === currentUserId || canModerate} onDelete={handleCommentDelete} />)))}
           <CommentComposer onReply={handleReply} />
         </div>
       )}
@@ -707,12 +814,7 @@ function Comment({ c, canDelete, onDelete }) {
         <div className="post-comment-body">{c.body}</div>
         <div className="post-comment-meta">
           <span>{formatRelative(c.created_at)}</span>
-          {canDelete && (
-            <>
-              <span>·</span>
-              <button type="button" onClick={() => onDelete(c.id)} className="post-comment-delete">Delete</button>
-            </>
-          )}
+          {canDelete && (<><span>·</span><button type="button" onClick={() => onDelete(c.id)} className="post-comment-delete">Delete</button></>)}
         </div>
       </div>
     </div>
@@ -734,21 +836,13 @@ function CommentComposer({ onReply }) {
   };
   return (
     <form onSubmit={submit} className="post-comment-compose">
-      <input
-        type="text"
-        value={body}
-        onChange={(e) => setBody(e.target.value)}
-        placeholder="Write a comment…"
-        className="post-comment-compose-input"
-        maxLength={4000}
-        onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submit(); } }}
-      />
+      <input type="text" value={body} onChange={(e) => setBody(e.target.value)} placeholder="Write a comment..." className="post-comment-compose-input" maxLength={4000}
+        onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submit(); } }} />
       {err && <div className="comm-chat-err" style={{ marginTop: 6 }}>{err}</div>}
     </form>
   );
 }
 
-/* ══════════════════ Member roster ══════════════════ */
 function RosterGroup({ label, rows }) {
   return (
     <div className="comm-roster-group">
@@ -773,7 +867,175 @@ function RosterGroup({ label, rows }) {
   );
 }
 
-/* ══════════════════ Helpers ══════════════════ */
+function PendingRequestsCard({ requests, onApprove, onReject, busy }) {
+  if (!requests || requests.length === 0) return null;
+  return (
+    <div className="comm-side-card">
+      <div className="comm-chat-side-title" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <span>Pending requests <span className="comm-chat-side-count">{requests.length}</span></span>
+      </div>
+      <div style={{ padding: '0.5rem 0.75rem', display: 'flex', flexDirection: 'column', gap: 10, maxHeight: 360, overflowY: 'auto' }}>
+        {requests.map((r) => {
+          const p = r.profile || {};
+          const name = p.full_name || p.username || 'Someone';
+          const initials = name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase();
+          return (
+            <div key={r.id} style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+              <Link to={'/profile/' + (p.username || p.id)} className="comm-roster-avatar" style={{ flexShrink: 0 }}>
+                {p.avatar_url ? <img src={p.avatar_url} alt="" /> : <span>{initials}</span>}
+              </Link>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <Link to={'/profile/' + (p.username || p.id)} style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 13, color: 'var(--text-primary)', fontWeight: 600, textDecoration: 'none' }}>{name}</Link>
+                {p.trade && <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{p.trade}</div>}
+                {r.message && (<div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 4, lineHeight: 1.4 }}>"{r.message}"</div>)}
+                <div style={{ display: 'flex', gap: 6, marginTop: 6 }}>
+                  <button type="button" onClick={() => onApprove(r.id)} disabled={busy} className="comm-btn primary" style={{ padding: '4px 10px', fontSize: 11.5 }}>Approve</button>
+                  <button type="button" onClick={() => onReject(r.id)} disabled={busy} className="comm-btn ghost-light" style={{ padding: '4px 10px', fontSize: 11.5 }}>Reject</button>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function ManageMembershipModal({
+  community, members, isOwner, isMod, pendingRequests, busy,
+  onClose, onTransfer, onInvite, onApprove, onReject,
+}) {
+  const [section, setSection] = useState('requests');
+  const [inviteQuery, setInviteQuery] = useState('');
+  const [inviteResults, setInviteResults] = useState([]);
+  const [searching, setSearching] = useState(false);
+  useEffect(() => {
+    const q = inviteQuery.trim();
+    if (q.length < 2) { setInviteResults([]); return; }
+    let cancelled = false;
+    setSearching(true);
+    const t = setTimeout(async () => {
+      const { data } = await searchProfilesToInvite(q);
+      if (!cancelled) { setInviteResults(data || []); setSearching(false); }
+    }, 250);
+    return () => { cancelled = true; clearTimeout(t); };
+  }, [inviteQuery]);
+  const transferCandidates = members.filter((m) => m.role !== 'owner' && m.profile);
+  const sections = [
+    { id: 'requests', label: `Requests${pendingRequests.length ? ' · ' + pendingRequests.length : ''}` },
+    { id: 'invite',   label: 'Invite' },
+    ...(isOwner ? [{ id: 'transfer', label: 'Transfer ownership' }] : []),
+  ];
+  return (
+    <div role="dialog" aria-modal="true" aria-label="Manage membership"
+      style={{ position: 'fixed', inset: 0, background: 'rgba(20, 12, 6, 0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: '1rem' }}
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+    >
+      <div style={{ background: 'var(--white)', borderRadius: 14, width: 'min(640px, 100%)', maxHeight: '90vh', display: 'flex', flexDirection: 'column', boxShadow: '0 20px 50px rgba(0,0,0,0.35)', overflow: 'hidden' }}>
+        <div style={{ padding: '1rem 1.25rem', borderBottom: '1px solid var(--border-light)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1.4, textTransform: 'uppercase', color: 'var(--wood-warm)' }}>Manage</div>
+            <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 18, fontWeight: 700, color: 'var(--text-primary)' }}>{community.name}</div>
+          </div>
+          <button type="button" onClick={onClose} style={{ border: 0, background: 'transparent', cursor: 'pointer', fontSize: 22, color: 'var(--text-muted)', lineHeight: 1 }} aria-label="Close">×</button>
+        </div>
+        <div style={{ display: 'flex', gap: 4, padding: '0.75rem 1.25rem 0', borderBottom: '1px solid var(--border-light)', flexWrap: 'wrap' }}>
+          {sections.map((s) => (
+            <button key={s.id} type="button" onClick={() => setSection(s.id)} className={'comm-tab ' + (section === s.id ? 'active' : '')} style={{ padding: '8px 14px', fontSize: 13 }}>{s.label}</button>
+          ))}
+        </div>
+        <div style={{ padding: '1rem 1.25rem', overflowY: 'auto', flex: 1 }}>
+          {section === 'requests' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {pendingRequests.length === 0 ? (<div style={{ color: 'var(--text-muted)', fontSize: 14, padding: '1rem 0' }}>No pending requests right now.</div>)
+              : pendingRequests.map((r) => {
+                const p = r.profile || {};
+                const name = p.full_name || p.username || 'Someone';
+                const initials = name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase();
+                return (
+                  <div key={r.id} style={{ display: 'flex', gap: 10, padding: 12, border: '1px solid var(--border-light)', borderRadius: 10 }}>
+                    <Link to={'/profile/' + (p.username || p.id)} className="comm-roster-avatar" style={{ flexShrink: 0 }}>
+                      {p.avatar_url ? <img src={p.avatar_url} alt="" /> : <span>{initials}</span>}
+                    </Link>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <Link to={'/profile/' + (p.username || p.id)} style={{ fontWeight: 600, color: 'var(--text-primary)', textDecoration: 'none', fontSize: 14 }}>{name}</Link>
+                      {p.trade && <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>{p.trade}</div>}
+                      {r.message && (<div style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 6, lineHeight: 1.5 }}>"{r.message}"</div>)}
+                    </div>
+                    <div style={{ display: 'flex', gap: 6, alignSelf: 'center' }}>
+                      <button type="button" onClick={() => onApprove(r.id)} disabled={busy} className="comm-btn primary" style={{ padding: '6px 14px', fontSize: 12 }}>Approve</button>
+                      <button type="button" onClick={() => onReject(r.id)} disabled={busy} className="comm-btn ghost-light" style={{ padding: '6px 14px', fontSize: 12 }}>Reject</button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+          {section === 'invite' && (
+            <div>
+              <input type="text" value={inviteQuery} onChange={(e) => setInviteQuery(e.target.value)} placeholder="Search by name or username"
+                style={{ width: '100%', padding: '10px 12px', fontSize: 14, fontFamily: 'Montserrat, sans-serif', border: '1px solid var(--border)', borderRadius: 8, outline: 'none' }}
+                autoFocus />
+              <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                {inviteQuery.trim().length < 2 ? (<div style={{ color: 'var(--text-muted)', fontSize: 13 }}>Type at least two characters to find a profile.</div>)
+                : searching ? (<div style={{ color: 'var(--text-muted)', fontSize: 13 }}>Searching...</div>)
+                : inviteResults.length === 0 ? (<div style={{ color: 'var(--text-muted)', fontSize: 13 }}>No profiles match.</div>)
+                : inviteResults.map((p) => {
+                  const name = p.full_name || p.username || 'Someone';
+                  const initials = name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase();
+                  const alreadyMember = members.some((m) => m.profile?.id === p.id);
+                  return (
+                    <div key={p.id} style={{ display: 'flex', gap: 10, padding: 8, border: '1px solid var(--border-light)', borderRadius: 8, alignItems: 'center' }}>
+                      <div className="comm-roster-avatar" style={{ flexShrink: 0 }}>
+                        {p.avatar_url ? <img src={p.avatar_url} alt="" /> : <span>{initials}</span>}
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontWeight: 600, fontSize: 14, color: 'var(--text-primary)' }}>{name}</div>
+                        {p.trade && <div style={{ fontSize: 11.5, color: 'var(--text-muted)' }}>{p.trade}</div>}
+                      </div>
+                      {alreadyMember ? (<span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Already a member</span>)
+                      : (<button type="button" onClick={async () => { const ok = await onInvite(p.id); if (ok) { setInviteQuery(''); setInviteResults([]); } }} disabled={busy} className="comm-btn primary" style={{ padding: '5px 12px', fontSize: 12 }}>Invite</button>)}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+          {section === 'transfer' && isOwner && (
+            <div>
+              <div style={{ padding: '12px 14px', background: '#FFF3DC', borderRadius: 8, color: '#8B5E08', fontSize: 13, lineHeight: 1.5, marginBottom: 12 }}>
+                Transferring makes the chosen member the new owner. You'll be demoted to <strong>moderator</strong>. You will not be able to take ownership back without the new owner transferring it to you.
+              </div>
+              {transferCandidates.length === 0 ? (<div style={{ color: 'var(--text-muted)', fontSize: 14 }}>Add at least one other member before transferring ownership.</div>)
+              : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  {transferCandidates.map((m) => {
+                    const p = m.profile;
+                    const name = p.full_name || p.username || 'Member';
+                    const initials = name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase();
+                    return (
+                      <div key={p.id} style={{ display: 'flex', gap: 10, padding: 10, border: '1px solid var(--border-light)', borderRadius: 8, alignItems: 'center' }}>
+                        <div className="comm-roster-avatar" style={{ flexShrink: 0 }}>
+                          {p.avatar_url ? <img src={p.avatar_url} alt="" /> : <span>{initials}</span>}
+                        </div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontWeight: 600, fontSize: 14, color: 'var(--text-primary)' }}>{name}</div>
+                          <div style={{ fontSize: 11.5, color: 'var(--text-muted)' }}>{m.role}</div>
+                        </div>
+                        <button type="button" onClick={() => onTransfer(p.id)} disabled={busy} className="comm-btn primary" style={{ padding: '6px 14px', fontSize: 12 }}>Make owner</button>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function formatRelative(iso) {
   if (!iso) return '';
   const ms = Date.now() - new Date(iso).getTime();
