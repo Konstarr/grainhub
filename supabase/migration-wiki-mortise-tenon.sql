@@ -13,7 +13,7 @@
 
 insert into public.wiki_articles (
   slug, title, category, trade, excerpt, body,
-  cover_image_url, read_time_minutes, published_at, updated_at
+  cover_image_url, read_time_minutes, is_published, published_at, updated_at
 ) values (
   'mortise-and-tenon-joinery',
   'Mortise and Tenon Joinery',
@@ -435,6 +435,7 @@ your CAD package and parametrize it for your stock.</p>
 ',
   '/wiki/mortise-tenon/cover.svg',
   14,
+  true,
   now(),
   now()
 )
@@ -446,4 +447,6 @@ on conflict (slug) do update set
   body              = excluded.body,
   cover_image_url   = excluded.cover_image_url,
   read_time_minutes = excluded.read_time_minutes,
+  is_published      = true,
+  published_at      = coalesce(public.wiki_articles.published_at, now()),
   updated_at        = now();
