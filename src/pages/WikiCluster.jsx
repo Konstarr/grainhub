@@ -1,21 +1,26 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useSearchParams } from 'react-router-dom';
 import PageBack from '../components/shared/PageBack.jsx';
 import { supabase } from '../lib/supabase.js';
 import { mapWikiRow } from '../lib/mappers.js';
-import { CLUSTERS, clusterBySlug, topicSlug } from '../data/wikiTaxonomy.js';
+import { CLUSTERS, clusterBySlug } from '../data/wikiTaxonomy.js';
 import '../styles/wikiDashboard.css';
 
 /**
- * /wiki/cluster/:slug - the sub-page for one of the 18 fields.
+ * /wiki/cluster/:slug - master/detail field page.
  *
- * Shows the cluster's full sub-topic structure. Each sub-topic gets
- * its own row with article count and the articles it contains. Filter
- * the parent /wiki dashboard by clicking through.
+ * Left rail: full sub-topic list with article counts. Click any to filter.
+ * Right pane: articles for the selected sub-topic (or "All in this field"
+ * by default). Zero scroll to see the whole structure of the cluster.
+ *
+ * Selected sub-topic persists in the URL as ?topic=Slug so links and
+ * back button work cleanly.
  */
 export default function WikiCluster() {
   const { slug } = useParams();
+  const [search, setSearch] = useSearchParams();
   const cluster = clusterBySlug(slug);
+  const activeTopic = search.get('topic') || '';
 
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -37,30 +42,43 @@ export default function WikiCluster() {
     return () => { cancelled = true; };
   }, []);
 
-  // Articles in this cluster — exact category match or heuristic fallback
+  // Articles in this whole cluster
   const inCluster = useMemo(() => {
     if (!cluster) return [];
     return articles.filter((a) => {
       const cat = (a.category || '').trim();
       if (cat === cluster.key || cat.toLowerCase() === cluster.key.toLowerCase()) return true;
-      // Heuristic: any sub-topic regex matches the article body
       return cluster.subtopics.some((sub) =>
         sub.match.test((a.title || '') + ' ' + (a.excerpt || ''))
       );
     });
   }, [articles, cluster]);
 
-  // For each sub-topic, the articles that belong to it
-  const articlesBySubtopic = useMemo(() => {
+  // Article counts per sub-topic
+  const subtopicCounts = useMemo(() => {
     if (!cluster) return {};
-    const map = {};
+    const out = {};
     cluster.subtopics.forEach((sub) => {
-      map[sub.name] = inCluster.filter((a) =>
+      out[sub.name] = inCluster.filter((a) =>
         sub.match.test((a.title || '') + ' ' + (a.excerpt || ''))
-      );
+      ).length;
     });
-    return map;
+    return out;
   }, [cluster, inCluster]);
+
+  // Currently visible articles based on selected sub-topic
+  const visibleArticles = useMemo(() => {
+    if (!cluster) return [];
+    if (!activeTopic) return inCluster;
+    const sub = cluster.subtopics.find((s) => s.name === activeTopic);
+    if (!sub) return inCluster;
+    return inCluster.filter((a) => sub.match.test((a.title || '') + ' ' + (a.excerpt || '')));
+  }, [cluster, inCluster, activeTopic]);
+
+  const selectTopic = (topicName) => {
+    if (topicName) setSearch({ topic: topicName });
+    else setSearch({});
+  };
 
   if (!cluster) {
     return (
@@ -68,12 +86,13 @@ export default function WikiCluster() {
         <PageBack backTo="/wiki" backLabel="Back to Wiki" />
         <div style={{ maxWidth: 720, margin: '3rem auto', padding: '0 2rem' }}>
           <h1>Field not found</h1>
-          <p>The encyclopedia field you&apos;re looking for doesn&apos;t exist.</p>
           <Link to="/wiki">Back to the encyclopedia</Link>
         </div>
       </div>
     );
   }
+
+  const titleSuffix = activeTopic ? ' — ' + activeTopic : '';
 
   return (
     <div className="wiki-dash">
@@ -83,107 +102,110 @@ export default function WikiCluster() {
         crumbs={[
           { label: 'Home', to: '/' },
           { label: 'Wiki', to: '/wiki' },
-          { label: cluster.key },
+          { label: cluster.key, to: '/wiki/cluster/' + cluster.slug },
+          ...(activeTopic ? [{ label: activeTopic }] : []),
         ]}
       />
 
-      {/* Cluster hero */}
-      <section
-        className="wd-cluster-hero"
-        style={{
-          background: 'linear-gradient(135deg, ' + cluster.accent + ' 0%, #1c0f06 100%)',
-        }}
-      >
-        <div className="wd-cluster-hero-inner">
-          <div className="wd-cluster-hero-icon">{cluster.icon}</div>
-          <div>
-            <div className="wd-hero-eyebrow">Encyclopedia field</div>
-            <h1 className="wd-cluster-hero-title">{cluster.key}</h1>
-            <p className="wd-cluster-hero-sub">{cluster.longDesc || cluster.desc}</p>
-            <div className="wd-cluster-hero-stats">
-              <div>
-                <div className="wd-stat-num">{inCluster.length}</div>
-                <div className="wd-stat-label">{inCluster.length === 1 ? 'article' : 'articles'}</div>
-              </div>
-              <div>
-                <div className="wd-stat-num">{cluster.subtopics.length}</div>
-                <div className="wd-stat-label">sub-topics</div>
-              </div>
+      {/* Compact cluster banner */}
+      <section className="wd-cluster-banner" style={{ '--accent': cluster.accent }}>
+        <div className="wd-cluster-banner-inner">
+          <div className="wd-cluster-banner-id">
+            <div className="wd-cluster-banner-icon">{cluster.icon}</div>
+            <div className="wd-cluster-banner-text">
+              <div className="wd-hero-eyebrow" style={{ marginBottom: 2 }}>Encyclopedia field</div>
+              <h1 className="wd-cluster-banner-title">{cluster.key}{titleSuffix}</h1>
+              <p className="wd-cluster-banner-sub">{cluster.desc}</p>
             </div>
           </div>
+          <div className="wd-cluster-banner-stats">
+            <div><strong>{inCluster.length}</strong> articles</div>
+            <div><strong>{cluster.subtopics.length}</strong> sub-topics</div>
+          </div>
+        </div>
+
+        {/* Inline jump to other fields */}
+        <div className="wd-cluster-banner-jump">
+          {CLUSTERS.filter((c) => c.slug !== cluster.slug).map((c) => (
+            <Link key={c.slug} to={'/wiki/cluster/' + c.slug} className="wd-cluster-pill" style={{ '--accent': c.accent }}>
+              {c.key}
+            </Link>
+          ))}
         </div>
       </section>
 
-      {/* Quick jump nav across all 18 fields */}
-      <nav className="wd-cluster-jump" aria-label="Other fields">
-        <span className="wd-cluster-jump-label">Other fields:</span>
-        {CLUSTERS.filter((c) => c.slug !== cluster.slug).map((c) => (
-          <Link
-            key={c.slug}
-            to={'/wiki/cluster/' + c.slug}
-            className="wd-cluster-jump-link"
-            style={{ '--accent': c.accent }}
+      {/* MASTER/DETAIL */}
+      <section className="wd-md">
+        <aside className="wd-md-rail">
+          <div className="wd-md-rail-header">Sub-topics</div>
+          <button
+            type="button"
+            className={'wd-md-item' + (activeTopic === '' ? ' active' : '')}
+            onClick={() => selectTopic('')}
           >
-            <span className="wd-cluster-jump-icon">{c.icon}</span>
-            {c.key}
-          </Link>
-        ))}
-      </nav>
+            <span className="wd-md-item-name">All in this field</span>
+            <span className="wd-md-item-count">{inCluster.length}</span>
+          </button>
+          {cluster.subtopics.map((sub) => {
+            const n = subtopicCounts[sub.name] || 0;
+            return (
+              <button
+                key={sub.name}
+                type="button"
+                className={'wd-md-item' + (activeTopic === sub.name ? ' active' : '')}
+                onClick={() => selectTopic(sub.name)}
+              >
+                <span className="wd-md-item-name">{sub.name}</span>
+                <span className="wd-md-item-count">{n}</span>
+              </button>
+            );
+          })}
+        </aside>
 
-      {/* Sub-topic sections */}
-      <section className="wd-section">
-        {loading && <p style={{ color: 'var(--text-muted)' }}>Loading articles...</p>}
-        {!loading && cluster.subtopics.map((sub) => {
-          const articlesInSub = articlesBySubtopic[sub.name] || [];
-          return (
-            <article
-              className="wd-subtopic-section"
-              key={sub.name}
-              style={{ '--accent': cluster.accent }}
-              id={topicSlug(sub.name)}
-            >
-              <header className="wd-subtopic-section-head">
-                <div>
-                  <h2 className="wd-subtopic-section-title">{sub.name}</h2>
-                  <div className="wd-subtopic-section-meta">
-                    {articlesInSub.length} {articlesInSub.length === 1 ? 'article' : 'articles'}
-                  </div>
-                </div>
-                <Link to={'/forums/new?category=wiki-edits'} className="wd-subtopic-section-cta">
-                  + Suggest an article
-                </Link>
-              </header>
+        <div className="wd-md-pane">
+          <div className="wd-md-pane-head">
+            <h2 className="wd-md-pane-title">
+              {activeTopic || 'All in ' + cluster.key}
+            </h2>
+            <Link to="/forums/new?category=wiki-edits" className="wd-btn-primary" style={{ fontSize: 12.5, padding: '0.4rem 0.85rem' }}>
+              + Suggest an article
+            </Link>
+          </div>
 
-              {articlesInSub.length === 0 ? (
-                <div className="wd-subtopic-empty">
-                  No articles in <strong>{sub.name}</strong> yet. This sub-topic is part of the {cluster.key} field
-                  and is open for contribution.
-                </div>
-              ) : (
-                <div className="wd-subtopic-articles">
-                  {articlesInSub.map((a) => (
-                    <Link to={'/wiki/article/' + a.slug} key={a.id} className="wd-subtopic-article">
-                      {a.coverImage && (
-                        <div className="wd-subtopic-article-img" style={{ backgroundImage: 'url(' + a.coverImage + ')' }}/>
-                      )}
-                      <div className="wd-subtopic-article-body">
-                        <div className="wd-subtopic-article-title">{a.title}</div>
-                        {a.excerpt && (
-                          <div className="wd-subtopic-article-excerpt">
-                            {a.excerpt.length > 160 ? a.excerpt.slice(0, 160) + '...' : a.excerpt}
-                          </div>
-                        )}
-                        <div className="wd-subtopic-article-meta">
-                          {a.readTime && <span>{a.readTime}</span>}
-                        </div>
+          {loading ? (
+            <p style={{ color: 'var(--wd-muted)' }}>Loading articles...</p>
+          ) : visibleArticles.length === 0 ? (
+            <div className="wd-md-empty">
+              <div className="wd-md-empty-title">No articles {activeTopic ? 'in ' + activeTopic : 'yet in ' + cluster.key}</div>
+              <p>This {activeTopic ? 'sub-topic' : 'field'} is open for contribution. Working pros get bylines and a public reviewer credit.</p>
+              <Link to="/forums/new?category=wiki-edits" className="wd-btn-primary">
+                Propose the first article
+              </Link>
+            </div>
+          ) : (
+            <div className="wd-md-articles">
+              {visibleArticles.map((a) => (
+                <Link to={'/wiki/article/' + a.slug} key={a.id} className="wd-md-article">
+                  {a.coverImage && (
+                    <div className="wd-md-article-img" style={{ backgroundImage: 'url(' + a.coverImage + ')' }}/>
+                  )}
+                  <div className="wd-md-article-body">
+                    <div className="wd-md-article-cat">{a.category}</div>
+                    <div className="wd-md-article-title">{a.title}</div>
+                    {a.excerpt && (
+                      <div className="wd-md-article-excerpt">
+                        {a.excerpt.length > 160 ? a.excerpt.slice(0, 160) + '...' : a.excerpt}
                       </div>
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </article>
-          );
-        })}
+                    )}
+                    <div className="wd-md-article-meta">
+                      {a.readTime && <span>{a.readTime}</span>}
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
       </section>
     </div>
   );
