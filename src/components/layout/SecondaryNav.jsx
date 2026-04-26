@@ -35,11 +35,6 @@ const NEWS_CATEGORIES = [
   'Business & Trends', 'Events', 'Community',
 ];
 
-const WIKI_CATEGORIES = [
-  'Cabinet Making', 'Finishing', 'Joinery',
-  'Machines', 'Species', 'Business',
-];
-
 const EVENT_TYPES = [
   { label: 'Trade Shows',  value: 'trade-show' },
   { label: 'Conferences',  value: 'conference' },
@@ -89,8 +84,12 @@ function resolveConfig(pathname) {
   if (pathname === '/suppliers')    return { mode: 'pills', param: 'category', items: SUPPLIER_CATEGORY_PILLS };
   if (pathname === '/marketplace')  return { mode: 'trade' };
   if (pathname === '/news')         return { mode: 'pills', param: 'category', items: NEWS_CATEGORIES.map((v) => ({ label: v, value: v })) };
-  if (pathname === '/wiki')         return { mode: 'pills', param: 'category', items: WIKI_CATEGORIES.map((v) => ({ label: v, value: v })) };
   if (pathname === '/events')       return { mode: 'pills', param: 'type',     items: EVENT_TYPES };
+  // Wiki has its own internal navigation (search bar, 18-cluster grid,
+  // and master/detail cluster pages), so the SecondaryNav strip is
+  // hidden on /wiki and /wiki/cluster/* to avoid duplicate / stale
+  // navigation that doesn't match the real taxonomy.
+  if (pathname === '/wiki' || pathname.startsWith('/wiki/cluster')) return null;
   return null;
 }
 
