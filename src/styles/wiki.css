@@ -159,13 +159,19 @@
   font-weight: 600;
 }
 
-/* ---------- Two-column layout ---------- */
+/* ---------- Three-column layout ----------
+   Center column gets ~50% more horizontal room than the original
+   1200px / 240+1fr+280 setup. We do this in two ways:
+     - bump the wrap max-width from 1200 -> 1440px (adds 240px)
+     - trim the side columns slightly (220 / 260 instead of 240 / 280)
+   minmax(0, 1fr) on the center prevents long content (wide tables,
+   code blocks, images) from overflowing the column. */
 .wiki-grid {
-  max-width: 1200px;
+  max-width: 1440px;
   margin: 0 auto;
   padding: 2rem;
   display: grid;
-  grid-template-columns: 240px 1fr 280px;
+  grid-template-columns: 220px minmax(0, 1fr) 260px;
   gap: 2.25rem;
   align-items: flex-start;
 }
