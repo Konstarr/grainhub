@@ -84,6 +84,22 @@ export async function adminRemoveMember(communityId, profileId) {
 }
 
 /**
+ * Site-admin only: drop any profile straight into a community at
+ * member-level, bypassing the apply / invite handshake. No-op if they
+ * are already a member at any role.
+ */
+export async function adminAddMember(communityId, profileId) {
+  if (!communityId || !profileId) {
+    return { error: new Error('Missing community id or profile id') };
+  }
+  const { error } = await supabase.rpc('admin_add_community_member', {
+    community_id_in: communityId,
+    profile_in:      profileId,
+  });
+  return { error };
+}
+
+/**
  * Search profiles for the "promote to owner" picker in the admin UI.
  */
 export async function adminSearchProfilesForCommunity(query, { limit = 12 } = {}) {

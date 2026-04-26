@@ -7,6 +7,7 @@ import {
   adminSetCommunityOwner,
   adminSetMemberRole,
   adminRemoveMember,
+  adminAddMember,
   adminSearchProfilesForCommunity,
 } from '../../lib/communityAdminDb.js';
 
@@ -34,6 +35,11 @@ export default function AdminCommunityEdit() {
   const [ownerHits, setOwnerHits] = useState([]);
   const [ownerBusy, setOwnerBusy] = useState(false);
 
+  // Search state for the "add member" picker
+  const [addQ, setAddQ] = useState('');
+  const [addHits, setAddHits] = useState([]);
+  const [addBusy, setAddBusy] = useState(false);
+
   const load = async () => {
     setLoading(true); setErr(null);
     const [c, m] = await Promise.all([
@@ -59,6 +65,18 @@ export default function AdminCommunityEdit() {
     })();
     return () => { cancelled = true; };
   }, [ownerQ]);
+
+  // Live profile search for the add-member picker
+  useEffect(() => {
+    const q = addQ.trim();
+    if (q.length < 2) { setAddHits([]); return; }
+    let cancelled = false;
+    (async () => {
+      const { data } = await adminSearchProfilesForCommunity(q);
+      if (!cancelled) setAddHits(data || []);
+    })();
+    return () => { cancelled = true; };
+  }, [addQ]);
 
   const owner = useMemo(
     () => members.find((m) => m.role === 'owner') || null,
@@ -100,6 +118,20 @@ export default function AdminCommunityEdit() {
     setOwnerBusy(false);
     if (error) { setErr(error.message || 'Could not install owner'); return; }
     setOwnerQ(''); setOwnerHits([]);
+    await load();
+  };
+
+  const handleAddMember = async (profile) => {
+    const alreadyMember = members.some((m) => m.profile_id === profile.id);
+    if (alreadyMember) {
+      setErr((profile.full_name || profile.username) + ' is already in this community.');
+      return;
+    }
+    setAddBusy(true); setErr(null);
+    const { error } = await adminAddMember(id, profile.id);
+    setAddBusy(false);
+    if (error) { setErr(error.message || 'Could not add member'); return; }
+    setAddQ(''); setAddHits([]);
     await load();
   };
 
@@ -198,6 +230,56 @@ export default function AdminCommunityEdit() {
         </div>
       </div>
 
+      {/* Add a member */}
+      <div className="adm-card" style={{ padding: '1.25rem 1.5rem', marginBottom: '1rem' }}>
+        <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--wood-warm)', marginBottom: '0.5rem' }}>
+          Add a member
+        </div>
+        <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
+          Search any GrainHub profile and add them to this community at member-level.
+          They skip the apply / invite handshake — useful for fixing things or seeding a new community.
+        </div>
+        <input
+          type="text"
+          placeholder="Search by username or full name..."
+          value={addQ}
+          onChange={(e) => setAddQ(e.target.value)}
+          style={{ width: '100%', padding: '0.5rem 0.75rem', border: '1px solid var(--border)', borderRadius: 6, fontSize: 14 }}
+        />
+        {addHits.length > 0 && (
+          <div style={{ marginTop: 6, border: '1px solid var(--border-light, #e8d8c0)', borderRadius: 6, overflow: 'hidden' }}>
+            {addHits.map((p) => {
+              const alreadyMember = members.some((m) => m.profile_id === p.id);
+              return (
+                <button
+                  key={p.id}
+                  type="button"
+                  disabled={addBusy || alreadyMember}
+                  onClick={() => handleAddMember(p)}
+                  style={{
+                    display: 'flex', width: '100%', alignItems: 'center', gap: '0.6rem',
+                    padding: '0.55rem 0.75rem', background: '#fff',
+                    border: 'none', borderBottom: '1px solid #f0e6d2',
+                    cursor: alreadyMember ? 'not-allowed' : 'pointer',
+                    opacity: alreadyMember ? 0.6 : 1,
+                    textAlign: 'left',
+                  }}
+                >
+                  <MemberAvatar profile={p} size={28}/>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 13.5, fontWeight: 600 }}>{p.full_name || p.username}</div>
+                    <div style={{ fontSize: 11.5, color: 'var(--text-muted)' }}>@{p.username}</div>
+                  </div>
+                  <span style={{ fontSize: 11.5, color: alreadyMember ? 'var(--text-muted)' : 'var(--wood-warm)', fontWeight: 700 }}>
+                    {alreadyMember ? 'Already a member' : 'Add as member'}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
       {/* Mods */}
       <div className="adm-card" style={{ padding: 0, marginBottom: '1rem' }}>
         <div style={{ padding: '0.85rem 1.25rem', borderBottom: '1px solid var(--border-light, #e8d8c0)', fontSize: 11, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--wood-warm)' }}>
@@ -216,6 +298,105 @@ export default function AdminCommunityEdit() {
                   onDemote={() => handleSetRole(m.profile_id, 'member')}
                   onTransfer={() => handleTransfer(m.profile_id, m.profile?.full_name || m.profile?.username)}
                   onRemove={() => handleRemove(m.profile_id, m.profile?.full_name || m.profile?.username)}
+                />
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+
+      {/* Regular members */}
+      <div className="adm-card" style={{ padding: 0 }}>
+        <div style={{ padding: '0.85rem 1.25rem', borderBottom: '1px solid var(--border-light, #e8d8c0)', fontSize: 11, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--wood-warm)' }}>
+          Members ({regular.length})
+        </div>
+        {regular.length === 0 ? (
+          <div style={{ padding: '1rem 1.25rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>No regular members.</div>
+        ) : (
+          <table className="adm-table">
+            <tbody>
+              {regular.map((m) => (
+                <MemberRow
+                  key={m.profile_id}
+                  member={m}
+                  busy={busyId === m.profile_id}
+                  onPromote={() => handleSetRole(m.profile_id, 'mod')}
+                  onTransfer={() => handleTransfer(m.profile_id, m.profile?.full_name || m.profile?.username)}
+                  onRemove={() => handleRemove(m.profile_id, m.profile?.full_name || m.profile?.username)}
+                />
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </AdminLayout>
+  );
+}
+
+function MemberAvatar({ profile, size = 32 }) {
+  const initials = (profile?.full_name || profile?.username || '?')
+    .split(/\s+/).slice(0, 2).map((w) => w[0]).join('').toUpperCase();
+  if (profile?.avatar_url) {
+    return <img src={profile.avatar_url} alt="" style={{ width: size, height: size, borderRadius: '50%', objectFit: 'cover' }}/>;
+  }
+  return (
+    <div style={{
+      width: size, height: size, borderRadius: '50%',
+      background: 'linear-gradient(135deg, #8a5030, #5d3a1c)',
+      color: '#fff', fontSize: size * 0.38, fontWeight: 700,
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      flexShrink: 0,
+    }}>
+      {initials}
+    </div>
+  );
+}
+
+function MemberRow({ member, busy, onPromote, onDemote, onTransfer, onRemove }) {
+  const p = member.profile || {};
+  return (
+    <tr>
+      <td style={{ paddingLeft: '1.25rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+          <MemberAvatar profile={p}/>
+          <div>
+            <div style={{ fontWeight: 600, fontSize: 13.5 }}>
+              {p.full_name || p.username || 'Unknown'}
+            </div>
+            <div style={{ fontSize: 11.5, color: 'var(--text-muted)' }}>
+              @{p.username}{p.trade ? ' . ' + p.trade : ''}
+            </div>
+          </div>
+        </div>
+      </td>
+      <td style={{ textAlign: 'right', paddingRight: '1.25rem' }}>
+        <div style={{ display: 'inline-flex', gap: 6, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+          {onPromote && (
+            <button type="button" className="adm-btn" onClick={onPromote} disabled={busy}>
+              Promote to mod
+            </button>
+          )}
+          {onDemote && (
+            <button type="button" className="adm-btn" onClick={onDemote} disabled={busy}>
+              Demote to member
+            </button>
+          )}
+          {onTransfer && (
+            <button type="button" className="adm-btn primary" onClick={onTransfer} disabled={busy}>
+              Make owner
+            </button>
+          )}
+          {onRemove && (
+            <button type="button" className="adm-btn danger" onClick={onRemove} disabled={busy}>
+              Remove
+            </button>
+          )}
+        </div>
+      </td>
+    </tr>
+  );
+}
+e(m.profile_id, m.profile?.full_name || m.profile?.username)}
                 />
               ))}
             </tbody>
