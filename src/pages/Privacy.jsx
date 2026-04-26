@@ -394,10 +394,6 @@ export default function Privacy() {
           </p>
         </section>
 
-        <p className="legal-friendly">
-          We're a small operation. We can't always promise instant turnaround, but
-          we do promise to take privacy questions seriously and to act in good faith.
-        </p>
       </main>
     </div>
   );

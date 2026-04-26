@@ -175,9 +175,6 @@ export default function CommunityRules() {
           </p>
         </section>
 
-        <p className="legal-friendly">
-          The short version: be useful, be honest, be kind. The shop runs better that way.
-        </p>
       </main>
     </div>
   );
