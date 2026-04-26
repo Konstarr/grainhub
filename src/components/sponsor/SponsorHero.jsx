@@ -18,7 +18,7 @@ export default function SponsorHero() {
   return (
     <div className="sponsor-hero">
       <div className="sponsor-hero-inner">
-        <div className="sponsor-hero-eyebrow">GrainHub Sponsorship</div>
+        <div className="sponsor-hero-eyebrow">Millwork.io Sponsorship</div>
         <h1>
           Reach the people who<br />
           <em>buy what you sell.</em>

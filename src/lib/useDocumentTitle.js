@@ -11,7 +11,7 @@ import { useEffect } from 'react';
  *
  * Pass null/undefined while data loads to keep the current title.
  */
-const SUFFIX = ' · GrainHub';
+const SUFFIX = ' · Millwork.io';
 
 export default function useDocumentTitle(title) {
   useEffect(() => {

@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 
 /**
- * The GrainHub logo mark + wordmark.
+ * The Millwork.io logo mark + wordmark.
  * Accepts a `size` prop (SVG pixel size) so the footer can render it smaller.
  */
 export default function Logo({ size = 36, as = 'link', style }) {

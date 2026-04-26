@@ -23,7 +23,7 @@ export function safeLinkUrl(raw) {
   if (!raw) return null;
   let str = String(raw).trim();
   if (!str) return null;
-  // Bare-domain support: "grainhub.com" → "https://grainhub.com"
+  // Bare-domain support: "millwork.io" → "https://millwork.io"
   if (/^[\w-]+(\.[\w-]+)+(\/.*)?$/i.test(str)) {
     str = 'https://' + str;
   }

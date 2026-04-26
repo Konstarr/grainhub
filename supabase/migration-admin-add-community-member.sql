@@ -2,7 +2,7 @@
 -- migration-admin-add-community-member.sql
 --
 -- Adds the admin "Add a member" surface area: a SECURITY DEFINER
--- RPC that lets a site admin (is_admin() = true) drop any GrainHub
+-- RPC that lets a site admin (is_admin() = true) drop any Millwork.io
 -- profile straight into a community at member-level, bypassing the
 -- normal apply / invite handshake.
 --

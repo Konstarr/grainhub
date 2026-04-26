@@ -31,7 +31,7 @@ export default function TradeCategoriesTiles() {
             <div className="home-section-eyebrow">Explore</div>
             <h2 className="home-section-title">Browse by trade.</h2>
             <p className="home-section-sub">
-              Jump into the corner of GrainHub that matches what you build.
+              Jump into the corner of Millwork.io that matches what you build.
             </p>
           </div>
         </div>

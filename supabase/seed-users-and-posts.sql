@@ -1,5 +1,5 @@
 -- ============================================================
--- GrainHub DEMO USERS + FORUM POSTS
+-- Millwork.io DEMO USERS + FORUM POSTS
 -- Creates 20 demo auth users (with profiles) and seeds 2–5 forum
 -- posts per existing thread, authored by those demo profiles.
 --
@@ -7,7 +7,7 @@
 -- Safe to re-run: skips users whose email already exists and
 -- skips threads that already have posts.
 --
--- All demo users use the email domain @grainhub.example so they
+-- All demo users use the email domain @millwork.io.example so they
 -- are easy to find and delete later. The password is set but the
 -- accounts are not meant to be used for real login.
 -- ============================================================
@@ -18,26 +18,26 @@
 do $$
 declare
   emails text[] := array[
-    'anna.carpenter@grainhub.example',
-    'bill.builder@grainhub.example',
-    'carlos.mendez@grainhub.example',
-    'dana.whitfield@grainhub.example',
-    'evan.park@grainhub.example',
-    'farah.ng@grainhub.example',
-    'grant.sullivan@grainhub.example',
-    'hana.takeda@grainhub.example',
-    'ivan.petrov@grainhub.example',
-    'julia.ortega@grainhub.example',
-    'kwame.adebayo@grainhub.example',
-    'lena.fischer@grainhub.example',
-    'marco.ruiz@grainhub.example',
-    'nadia.chen@grainhub.example',
-    'oscar.bennett@grainhub.example',
-    'priya.shah@grainhub.example',
-    'quentin.fox@grainhub.example',
-    'ruth.alvarado@grainhub.example',
-    'samir.khouri@grainhub.example',
-    'tessa.moreau@grainhub.example'
+    'anna.carpenter@millwork.io.example',
+    'bill.builder@millwork.io.example',
+    'carlos.mendez@millwork.io.example',
+    'dana.whitfield@millwork.io.example',
+    'evan.park@millwork.io.example',
+    'farah.ng@millwork.io.example',
+    'grant.sullivan@millwork.io.example',
+    'hana.takeda@millwork.io.example',
+    'ivan.petrov@millwork.io.example',
+    'julia.ortega@millwork.io.example',
+    'kwame.adebayo@millwork.io.example',
+    'lena.fischer@millwork.io.example',
+    'marco.ruiz@millwork.io.example',
+    'nadia.chen@millwork.io.example',
+    'oscar.bennett@millwork.io.example',
+    'priya.shah@millwork.io.example',
+    'quentin.fox@millwork.io.example',
+    'ruth.alvarado@millwork.io.example',
+    'samir.khouri@millwork.io.example',
+    'tessa.moreau@millwork.io.example'
   ];
   usernames text[] := array[
     'anna_carpenter','bill_builder','carlos_mendez','dana_whitfield','evan_park',
@@ -122,7 +122,7 @@ begin
       'authenticated',
       'authenticated',
       emails[i],
-      crypt('grainhub-demo-password', gen_salt('bf')),
+      crypt('millwork.io-demo-password', gen_salt('bf')),
       now(),
       '{"provider":"email","providers":["email"]}'::jsonb,
       jsonb_build_object('full_name', fullnames[i]),
@@ -184,7 +184,7 @@ begin
     into author_pool
     from public.profiles p
     join auth.users u on u.id = p.id
-   where u.email like '%@grainhub.example';
+   where u.email like '%@millwork.io.example';
 
   if author_pool is null or array_length(author_pool, 1) = 0 then
     raise notice 'No demo profiles found. Run the user seeding block above first.';
@@ -212,13 +212,13 @@ end $$;
 
 -- ============================================================
 -- Summary after running this file:
---   auth.users:        +20 demo accounts (@grainhub.example)
+--   auth.users:        +20 demo accounts (@millwork.io.example)
 --   profiles:          +20 rows (auto-created by trigger, updated here)
 --   forum_posts:       ~40–100 rows (2–5 per existing thread)
 -- The bump_thread_on_post trigger will also update
 -- forum_threads.reply_count and last_reply_at automatically.
 --
 -- To wipe the demo data later:
---   delete from auth.users where email like '%@grainhub.example';
+--   delete from auth.users where email like '%@millwork.io.example';
 -- (cascades will clean up profiles and posts.)
 -- ============================================================

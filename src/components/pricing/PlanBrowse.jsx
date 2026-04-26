@@ -105,7 +105,7 @@ export default function PlanBrowse({
           carte one-offs whenever you have something to promote.
         </FaqItem>
         <FaqItem q="Can I switch between an individual and business account?">
-          Yes — email <a href="mailto:support@grainhub.io">support@grainhub.io</a>{' '}
+          Yes — email <a href="mailto:support@millwork.io.io">support@millwork.io.io</a>{' '}
           and we'll convert your account within one business day.
         </FaqItem>
         <FaqItem q="What happens when I hit a cap?">
@@ -135,7 +135,7 @@ function LockedBanner({ requires, what }) {
         </strong>{' '}
         You can see what's available, but you'll need to switch your account
         type to subscribe.{' '}
-        <a href="mailto:support@grainhub.io?subject=Switch%20account%20type">
+        <a href="mailto:support@millwork.io.io?subject=Switch%20account%20type">
           Email us to switch →
         </a>
       </div>
@@ -284,7 +284,7 @@ function PlanCta({
     );
   }
   if (contactSales) {
-    return <a href="mailto:sales@grainhub.io" className="tier-cta">Contact sales</a>;
+    return <a href="mailto:sales@millwork.io.io" className="tier-cta">Contact sales</a>;
   }
   if (staged) {
     return (
@@ -389,7 +389,7 @@ function MembershipStrip({ tiers, locked = false, currentMembershipId }) {
                 Business account required
               </button>
             ) : t.priceMonthly === null ? (
-              <a href="mailto:sales@grainhub.io" className="mb-cta">Contact sales</a>
+              <a href="mailto:sales@millwork.io.io" className="mb-cta">Contact sales</a>
             ) : staged ? (
               <button
                 type="button"

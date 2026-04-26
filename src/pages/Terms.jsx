@@ -3,7 +3,7 @@ import useDocumentTitle from '../lib/useDocumentTitle.js';
 import '../styles/legal.css';
 
 /**
- * /terms - GrainHub LLC Terms of Service.
+ * /terms - Millwork.io LLC Terms of Service.
  * Florida governing law. Bump TERMS_VERSION when substance changes.
  */
 export default function Terms() {
@@ -15,7 +15,7 @@ export default function Terms() {
           <div className="legal-eyebrow">Legal</div>
           <h1>Terms of Service</h1>
           <p className="legal-sub">
-            These Terms of Service constitute a binding agreement between you and GrainHub LLC.
+            These Terms of Service constitute a binding agreement between you and Millwork.io LLC.
             Please read them in their entirety before using the Service.
           </p>
           <div className="legal-meta">
@@ -81,8 +81,8 @@ export default function Terms() {
             terms shall have the meanings set forth below:
           </p>
           <ul>
-            <li><strong>"Company,"</strong> "GrainHub," "we," "us," or "our" means GrainHub LLC, a Florida limited liability company, and its officers, members, employees, contractors, agents, successors, and permitted assigns.</li>
-            <li><strong>"Service"</strong> means the GrainHub website, mobile interfaces, application programming interfaces, related applications, and all features, content, and functionality made available by the Company under the GrainHub brand.</li>
+            <li><strong>"Company,"</strong> "Millwork.io," "we," "us," or "our" means Millwork.io LLC, a Florida limited liability company, and its officers, members, employees, contractors, agents, successors, and permitted assigns.</li>
+            <li><strong>"Service"</strong> means the Millwork.io website, mobile interfaces, application programming interfaces, related applications, and all features, content, and functionality made available by the Company under the Millwork.io brand.</li>
             <li><strong>"User,"</strong> "you," or "your" means any individual or legal entity that accesses or uses the Service.</li>
             <li><strong>"Account"</strong> means a registered user record on the Service.</li>
             <li><strong>"User Content"</strong> means any text, images, audio, video, code, files, links, profile information, communications, listings, postings, comments, ratings, reviews, or other materials submitted, uploaded, transmitted, or otherwise made available by a User through the Service, including direct messages.</li>
@@ -385,7 +385,7 @@ export default function Terms() {
             shall remain the exclusive property of the Company and its licensors. Except for the
             limited license expressly granted in Section 4, no rights are granted to you, by
             implication, estoppel, or otherwise, in or to the Service or Company Content. The
-            "GrainHub" name, logo, and all related marks are trademarks of the Company. You shall
+            "Millwork.io" name, logo, and all related marks are trademarks of the Company. You shall
             not use the Company's trademarks except as expressly authorized in writing.
           </p>
         </section>
@@ -396,7 +396,7 @@ export default function Terms() {
             <strong>14.1 Notice.</strong> The Company complies with the Digital Millennium
             Copyright Act, 17 U.S.C. § 512 ("DMCA"). A copyright owner who believes that User
             Content infringes its copyright may submit a notice to{' '}
-            <a href="mailto:support@grainhub.com">support@grainhub.com</a> with the subject line
+            <a href="mailto:support@millwork.io">support@millwork.io</a> with the subject line
             "DMCA Notice" containing all elements required by 17 U.S.C. § 512(c)(3).
           </p>
           <p>
@@ -704,7 +704,7 @@ export default function Terms() {
           <h2>37. Notices</h2>
           <p>
             <strong>37.1 Notices to the Company.</strong> Legal notices to the Company shall be
-            sent to <a href="mailto:support@grainhub.com">support@grainhub.com</a> with the
+            sent to <a href="mailto:support@millwork.io">support@millwork.io</a> with the
             subject line "Legal Notice." Notice shall be deemed given upon delivery.
           </p>
           <p>
@@ -748,9 +748,9 @@ export default function Terms() {
         <section id="s41">
           <h2>41. Contact Information</h2>
           <p>
-            <strong>GrainHub LLC</strong><br />
+            <strong>Millwork.io LLC</strong><br />
             Florida, United States<br />
-            Email: <a href="mailto:support@grainhub.com">support@grainhub.com</a>
+            Email: <a href="mailto:support@millwork.io">support@millwork.io</a>
           </p>
         </section>
       </main>

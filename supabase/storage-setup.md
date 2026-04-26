@@ -1,4 +1,4 @@
-# GrainHub Image Uploads — Supabase Storage Setup
+# Millwork.io Image Uploads — Supabase Storage Setup
 
 Every image on the site now reads from a URL column in a Supabase table. You upload an image to a public Storage bucket, copy its public URL, and paste that URL into the right column. The site picks it up on the next page load.
 

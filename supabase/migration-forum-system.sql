@@ -1,5 +1,5 @@
 -- ============================================================
--- GrainHub Forum System Migration
+-- Millwork.io Forum System Migration
 -- Adds: upvotes, reports, reputation, badges, quote references
 -- Run this AFTER schema.sql (it references existing tables).
 -- Safe to run multiple times (all statements are idempotent).

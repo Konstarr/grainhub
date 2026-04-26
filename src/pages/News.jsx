@@ -29,7 +29,7 @@ function toUi(row) {
   const m = mapNewsRow(row);
   const h = hash(m.slug);
   const kickerColor = KICKER_COLORS[h % KICKER_COLORS.length];
-  const authorInitials = m.sourceUrl ? 'SY' : 'GH';
+  const authorInitials = m.sourceUrl ? 'SY' : 'MW';
   return {
     id: m.id,
     slug: m.slug,
@@ -41,7 +41,7 @@ function toUi(row) {
     readTime: '4 min read',
     title: m.title,
     excerpt: m.excerpt || '',
-    author: { initials: authorInitials, name: m.sourceUrl ? 'Syndicated' : 'GrainHub Staff' },
+    author: { initials: authorInitials, name: m.sourceUrl ? 'Syndicated' : 'Millwork.io Staff' },
   };
 }
 

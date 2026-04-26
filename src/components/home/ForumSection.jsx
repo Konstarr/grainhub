@@ -13,7 +13,7 @@ export default function ForumSection() {
 
   const posts = rows.map((r) => {
     const t = mapThreadRow(r);
-    const initials = (t.title || '??').split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase() || 'GH';
+    const initials = (t.title || '??').split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase() || 'MW';
     const s = t.slug || '';
     let h = 0;
     for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;

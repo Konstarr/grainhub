@@ -15,7 +15,7 @@
  * The blocklist below is intentionally short and conservative — slurs
  * and explicit content. Add to it as moderators flag terms. For a
  * profanity dictionary the size of "fuck" / "shit", we don't auto-
- * block since GrainHub is an adult professional community where mild
+ * block since Millwork.io is an adult professional community where mild
  * profanity in context (frustration, stories from the shop floor)
  * is fine. Moderators can still remove anything inappropriate.
  *
@@ -134,7 +134,7 @@ export function filterError(text) {
   const result = checkText(text);
   if (result.ok) return null;
   return (
-    'Your post contains language we don\'t allow on GrainHub. ' +
+    'Your post contains language we don\'t allow on Millwork.io. ' +
     'Please remove it and try again.'
   );
 }

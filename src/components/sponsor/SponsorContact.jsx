@@ -53,8 +53,8 @@ export default function SponsorContact() {
               <div>
                 <div className="sponsor-cd-title">Email Us</div>
                 <div className="sponsor-cd-text">
-                  <a className="sponsor-cd-link" href="mailto:sponsors@grainhub.com">
-                    sponsors@grainhub.com
+                  <a className="sponsor-cd-link" href="mailto:sponsors@millwork.io">
+                    sponsors@millwork.io
                   </a>
                   <br />
                   We respond within one business day.

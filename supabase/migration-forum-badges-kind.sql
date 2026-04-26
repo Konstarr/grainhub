@@ -54,7 +54,7 @@ values
   ('level-contributor','Contributor','Posting and helping out regularly.',       '🔨', 'bronze',   'level', 'reputation', 50,   2),
   ('level-trusted',    'Trusted',    'Consistently constructive across topics.', '🛠',  'silver',   'level', 'reputation', 250,  3),
   ('level-respected',  'Respected',  'Recognized voice in the community.',       '⭐',  'gold',     'level', 'reputation', 1000, 4),
-  ('level-veteran',    'Veteran',    'Long-standing pillar of GrainHub.',        '🏛',  'platinum', 'level', 'reputation', 2500, 5)
+  ('level-veteran',    'Veteran',    'Long-standing pillar of Millwork.io.',        '🏛',  'platinum', 'level', 'reputation', 2500, 5)
 on conflict (id) do nothing;
 
 -- 5) Make sure the existing reputation-* badges sort below the

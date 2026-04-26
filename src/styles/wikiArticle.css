@@ -1,5 +1,5 @@
 /* ============================================================
-   Wiki article — GrainHub wood + cream palette, Wikipedia structure.
+   Wiki article — Millwork.io wood + cream palette, Wikipedia structure.
    Uses global design tokens: --wood-*, --text-*, --border*.
    ============================================================ */
 
@@ -318,7 +318,7 @@
   margin: 2rem 0;
 }
 
-/* Infobox (Wikipedia-style, GrainHub theme) */
+/* Infobox (Wikipedia-style, Millwork.io theme) */
 .infobox {
   float: right;
   width: 280px;

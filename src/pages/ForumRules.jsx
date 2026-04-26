@@ -19,16 +19,16 @@ export default function ForumRules() {
       <div className="rules-wrap">
         <header className="rules-header">
           <div className="rules-eyebrow">Community standards</div>
-          <h1 className="rules-title">GrainHub Forum Rules &amp; Code of Conduct</h1>
+          <h1 className="rules-title">Millwork.io Forum Rules &amp; Code of Conduct</h1>
           <p className="rules-effective">Effective {EFFECTIVE_DATE}</p>
         </header>
 
         <div className="rules-card">
           <p className="rules-lead">
-            By posting, replying, or otherwise participating in any GrainHub
+            By posting, replying, or otherwise participating in any Millwork.io
             community space (including forums, communities, comments, profile
             content, and direct messages — collectively, the &ldquo;Forum&rdquo;),
-            you agree to these Rules and to the GrainHub Terms of Service.
+            you agree to these Rules and to the Millwork.io Terms of Service.
             These Rules supplement, and do not replace, the Terms of Service.
             If anything below conflicts with the Terms of Service, the Terms
             of Service control.
@@ -37,7 +37,7 @@ export default function ForumRules() {
           <Section n="1." title="Acceptance of these Rules">
             <p>
               Your use of the Forum constitutes acceptance of these Rules.
-              GrainHub may revise these Rules at any time without prior notice.
+              Millwork.io may revise these Rules at any time without prior notice.
               Continued use after changes are posted means you accept the
               revised Rules. If you do not agree to any part of the Rules,
               do not use the Forum.
@@ -47,7 +47,7 @@ export default function ForumRules() {
           <Section n="2." title="Account responsibility">
             <p>
               You are responsible for all activity on your account. Keep your
-              login credentials secure and notify GrainHub immediately if you
+              login credentials secure and notify Millwork.io immediately if you
               suspect unauthorized access. You may not share, sell, or transfer
               your account, and you may not create multiple accounts to evade
               moderation, manipulate votes or reputation, or appear as different
@@ -93,7 +93,7 @@ export default function ForumRules() {
               </li>
               <li>
                 <strong>Off-topic promotion.</strong> Self-promotion outside
-                permitted channels. GrainHub offers a paid sponsorship program
+                permitted channels. Millwork.io offers a paid sponsorship program
                 for advertising; promotional posts in regular forum threads
                 may be removed.
               </li>
@@ -120,10 +120,10 @@ export default function ForumRules() {
             </ul>
           </Section>
 
-          <Section n="4." title="User-generated content; license to GrainHub">
+          <Section n="4." title="User-generated content; license to Millwork.io">
             <p>
               You retain ownership of the content you post. By posting on the
-              Forum, you grant GrainHub a worldwide, non-exclusive, royalty-free,
+              Forum, you grant Millwork.io a worldwide, non-exclusive, royalty-free,
               transferable, sub-licensable license to host, store, reproduce,
               modify (for example, for moderation, formatting, or display),
               create derivative works of, distribute, and publicly display
@@ -139,7 +139,7 @@ export default function ForumRules() {
 
           <Section n="5." title="Enforcement and disciplinary action">
             <p>
-              GrainHub moderators, administrators, and the platform owner may,
+              Millwork.io moderators, administrators, and the platform owner may,
               at their sole discretion and without prior notice, take any of
               the following actions against accounts or content that violate
               these Rules, the Terms of Service, or applicable law:
@@ -184,7 +184,7 @@ export default function ForumRules() {
             <p>
               Severity of action depends on the nature of the violation, the
               user&rsquo;s history, harm to other users or the community, and
-              GrainHub&rsquo;s legal obligations. A single severe violation
+              Millwork.io&rsquo;s legal obligations. A single severe violation
               (for example, threats of violence, doxxing, or content involving
               minors) may result in immediate permanent ban without prior
               warning. <strong>No refund</strong> of any subscription, sponsorship,
@@ -207,7 +207,7 @@ export default function ForumRules() {
             <p>
               If your account has been actioned and you believe it was in
               error, you may appeal once per action by contacting{' '}
-              <a href="mailto:appeals@grainhub.io">appeals@grainhub.io</a>{' '}
+              <a href="mailto:appeals@millwork.io.io">appeals@millwork.io.io</a>{' '}
               within fourteen (14) days of the action. Include your username,
               the action taken, and the basis for appeal. Decisions on appeal
               are final.
@@ -218,12 +218,12 @@ export default function ForumRules() {
             <p>
               The Forum is provided &ldquo;as is&rdquo; and &ldquo;as
               available&rdquo; without warranties of any kind, express or
-              implied. GrainHub does not endorse, verify, or guarantee the
+              implied. Millwork.io does not endorse, verify, or guarantee the
               accuracy, completeness, or usefulness of user-generated content.
               Reliance on any information posted is solely at your own risk.
             </p>
             <p>
-              To the maximum extent permitted by law, GrainHub, its officers,
+              To the maximum extent permitted by law, Millwork.io, its officers,
               directors, employees, and contractors shall not be liable for
               any indirect, incidental, special, consequential, or punitive
               damages, including loss of profits, data, business opportunities,
@@ -234,7 +234,7 @@ export default function ForumRules() {
 
           <Section n="9." title="Indemnification">
             <p>
-              You agree to indemnify and hold harmless GrainHub and its
+              You agree to indemnify and hold harmless Millwork.io and its
               affiliates from any claims, damages, losses, liabilities, costs,
               or expenses (including reasonable attorneys&rsquo; fees) arising
               from your content, your violation of these Rules, your violation
@@ -245,7 +245,7 @@ export default function ForumRules() {
 
           <Section n="10." title="Changes to these Rules">
             <p>
-              GrainHub reserves the right to modify these Rules at any time.
+              Millwork.io reserves the right to modify these Rules at any time.
               The current version is always available at this URL. Material
               changes will be noted via a banner on the Forums page or via
               email to registered users. Your continued participation after
@@ -257,7 +257,7 @@ export default function ForumRules() {
             <p>
               Moderation questions, abuse reports outside the in-app reporting
               flow, DMCA notices, and law-enforcement requests may be sent to{' '}
-              <a href="mailto:legal@grainhub.io">legal@grainhub.io</a>.
+              <a href="mailto:legal@millwork.io.io">legal@millwork.io.io</a>.
             </p>
           </Section>
 

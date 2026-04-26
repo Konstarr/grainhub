@@ -135,7 +135,7 @@ export default function WikiArticle() {
           {article?.excerpt && <p className="article-tagline">{article.excerpt}</p>}
 
           <div className="article-meta-bar">
-            <div className="meta-item">From <strong>GrainHub Wiki</strong>, the community knowledge base</div>
+            <div className="meta-item">From <strong>Millwork.io Wiki</strong>, the community knowledge base</div>
             {article?.updatedAt && <div className="meta-item">Last updated {formatDate(article.updatedAt)}</div>}
             {article?.readTime && <div className="meta-item">{article.readTime}</div>}
           </div>

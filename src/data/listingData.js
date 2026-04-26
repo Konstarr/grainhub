@@ -104,7 +104,7 @@ export const SELLER = {
   avatar: 'PW',
   name: 'Precision Woodcraft LLC',
   badges: [
-    { label: '✓ GrainHub Verified', class: 'sb-verified' },
+    { label: '✓ Millwork.io Verified', class: 'sb-verified' },
     { label: '🏭 Shop Account', class: 'sb-shop' },
   ],
   location: '📍 Seattle, WA · Member since 2022',
@@ -121,7 +121,7 @@ export const PRICE_INFO = {
   note: 'OBO · Seller open to reasonable offers',
   financing: '💰 Financing available — seller will consider 50% down with 12-month terms for qualified buyers',
   checks: [
-    '✓ GrainHub Verified Seller',
+    '✓ Millwork.io Verified Seller',
     '✓ Inspection encouraged — machine currently running',
     '✓ Full service records available',
     '✓ Seller responds within 4 hours avg.',
@@ -144,7 +144,7 @@ export const SAFETY_TIPS = [
   '✓ Always inspect before purchase or send a trusted representative',
   '✓ Request full service records and verify serial numbers',
   '✓ Never wire money before seeing the machine in person',
-  '✓ GrainHub Verified sellers have confirmed business identity',
+  '✓ Millwork.io Verified sellers have confirmed business identity',
 ];
 
 export const SIMILAR_LISTINGS = [

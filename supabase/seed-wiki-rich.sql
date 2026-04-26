@@ -1,5 +1,5 @@
 -- =============================================================
--- GrainHub Wiki — rich guide content.
+-- Millwork.io Wiki — rich guide content.
 -- Run this in the Supabase SQL editor. Safe to re-run: it upserts
 -- by slug so it won't create duplicates, it updates in place.
 -- =============================================================

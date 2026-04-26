@@ -24,7 +24,7 @@ export const WIKI_CATEGORY_TABS = [
 export const FEATURED_ARTICLE = {
   category: 'Joinery & Construction',
   title: 'Frameless Cabinet Construction — The Definitive Guide',
-  excerpt: 'Everything about the European 32mm system — box structure, joinery methods, hardware, installation in out-of-square openings, finishing, and full AWI/KCMA standards coverage. The most-read article on GrainHub.',
+  excerpt: 'Everything about the European 32mm system — box structure, joinery methods, hardware, installation in out-of-square openings, finishing, and full AWI/KCMA standards coverage. The most-read article on Millwork.io.',
   rating: 4.8,
   ratingCount: 312,
   monthlyViews: '18,400',

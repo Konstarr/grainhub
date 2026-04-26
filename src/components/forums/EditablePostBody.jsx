@@ -39,7 +39,7 @@ export default function EditablePostBody({ post, canEdit, onUpdate }) {
       return;
     }
     if (!checkText(draft).ok) {
-      setErr('Your edit contains language we don\'t allow on GrainHub.');
+      setErr('Your edit contains language we don\'t allow on Millwork.io.');
       return;
     }
     setBusy(true);

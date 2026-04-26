@@ -46,10 +46,10 @@ export default function AdminLayout({ title, subtitle, actions, children }) {
     <div className="adm-shell">
       <aside className="adm-aside">
         <div className="adm-brand">
-          <div className="adm-brand-badge">GH</div>
+          <div className="adm-brand-badge">MW</div>
           <div>
             <div className="adm-brand-title">Admin</div>
-            <div className="adm-brand-sub">GrainHub</div>
+            <div className="adm-brand-sub">Millwork.io</div>
           </div>
         </div>
 

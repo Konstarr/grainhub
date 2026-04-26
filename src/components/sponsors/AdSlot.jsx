@@ -213,7 +213,7 @@ export function SponsorSidebar() {
         <div className="ad-label">Sponsored by</div>
         <Link to="/sponsor" className="ad-sidebar ad-sidebar-empty">
           <div className="ad-empty-title">This space is open</div>
-          <div className="ad-empty-sub">Reach the GrainHub community.</div>
+          <div className="ad-empty-sub">Reach the Millwork.io community.</div>
           <span className="ad-empty-cta">Become a sponsor →</span>
         </Link>
       </div>

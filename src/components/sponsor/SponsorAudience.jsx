@@ -12,7 +12,7 @@ export default function SponsorAudience() {
               Not hobbyists. <em>Professionals.</em>
             </h2>
             <p className="sponsor-section-sub">
-              GrainHub members are working tradespeople with real purchasing authority — they're
+              Millwork.io members are working tradespeople with real purchasing authority — they're
               buying edge banders, specifying hinges, choosing coatings, ordering lumber by the
               unit, and hiring for their shops. Your ad reaches them mid-research, not mid-scroll.
             </p>

@@ -78,7 +78,7 @@ export default function MarketplaceNew() {
       <div style={{ maxWidth: 880, margin: '0 auto', padding: '1rem 1.25rem 4rem' }}>
         <header style={{ marginBottom: '1.5rem' }}>
           <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--wood-warm)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-            Sell on GrainHub
+            Sell on Millwork.io
           </div>
           <h1 style={{ margin: '0.3rem 0', fontSize: 28 }}>Post a marketplace listing</h1>
           <p style={{ color: 'var(--text-muted)', maxWidth: 640 }}>
@@ -92,7 +92,7 @@ export default function MarketplaceNew() {
           <div className="rs-card" style={{ padding: '1.5rem', textAlign: 'center' }}>
             <h2 style={{ marginTop: 0 }}>Sign in to post</h2>
             <p style={{ color: 'var(--text-muted)' }}>
-              You need a GrainHub account with an active Vendor pack to post listings.
+              You need a Millwork.io account with an active Vendor pack to post listings.
             </p>
             <div style={{ display: 'flex', gap: 10, justifyContent: 'center', marginTop: '1rem' }}>
               <Link to="/login" className="act-btn primary">Sign in</Link>

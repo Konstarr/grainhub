@@ -35,7 +35,7 @@ const FOOTER_COLS = [
   {
     heading: 'Company',
     links: [
-      { label: 'About GrainHub', to: '/' },
+      { label: 'About Millwork.io', to: '/' },
       { label: 'Advertise / Sponsor', to: '/sponsor' },
       { label: 'Media Kit', to: '/sponsor' },
       { label: 'Contact', to: '/sponsor' },
@@ -71,7 +71,7 @@ export default function Footer() {
       </div>
 
       <div className="footer-bottom">
-        <span>© {new Date().getFullYear()} GrainHub LLC. All rights reserved.</span>
+        <span>© {new Date().getFullYear()} Millwork.io LLC. All rights reserved.</span>
         <span>
           <Link to="/terms">Terms of Service</Link> &nbsp;·&nbsp;{' '}
           <Link to="/privacy">Privacy</Link> &nbsp;·&nbsp;{' '}

@@ -11,7 +11,7 @@ export default function WikiHero({ searchQuery = '', onSearchChange, onSearchSub
         <div className="hero-inner">
           <div className="hero-top">
             <div className="hero-left">
-              <div className="hero-eyebrow">GrainHub Industry Wiki</div>
+              <div className="hero-eyebrow">Millwork.io Industry Wiki</div>
               <h1 className="hero-title">The trade's <em>knowledge base.</em> Written by the pros.</h1>
               <p className="hero-sub">
                 Community-written articles covering every aspect of millwork and cabinet work — construction methods, species profiles, machine operation and more.

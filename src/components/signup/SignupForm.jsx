@@ -176,7 +176,7 @@ export default function SignupForm() {
             <div className="signup-form-body">
               <div className="signup-form-header">
                 <div className="signup-free-badge">✓ Free to join</div>
-                <h2>How will you use GrainHub?</h2>
+                <h2>How will you use Millwork.io?</h2>
                 <p>Pick the type that fits best. You can always upgrade your plan later.</p>
               </div>
 
@@ -428,7 +428,7 @@ export default function SignupForm() {
                       onChange={(e) => setAgreeRules(e.target.checked)}
                     />
                     <label htmlFor="agree-rules">
-                      I will follow GrainHub's{' '}
+                      I will follow Millwork.io's{' '}
                       <Link to="/community-rules" target="_blank" rel="noreferrer">Community Rules</Link>.
                     </label>
                   </div>
@@ -589,7 +589,7 @@ export default function SignupForm() {
                 </div>
 
                 <div className="signup-field">
-                  <label className="signup-field-label">How did you hear about GrainHub?</label>
+                  <label className="signup-field-label">How did you hear about Millwork.io?</label>
                   <select
                     className="signup-field-select"
                     value={referral}
@@ -647,7 +647,7 @@ export default function SignupForm() {
           <div className="signup-step-container active">
             <div className="signup-success-state show">
               <div className="signup-success-icon">🎉</div>
-              <div className="signup-success-title">Welcome to GrainHub!</div>
+              <div className="signup-success-title">Welcome to Millwork.io!</div>
               <div className="signup-success-sub">
                 Your account is ready. Check your email (
                 <strong>{email || 'your email'}</strong>) to verify, then you're in.

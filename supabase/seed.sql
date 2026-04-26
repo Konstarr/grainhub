@@ -1,5 +1,5 @@
 -- ============================================================
--- GrainHub seed data - generated from src/data/*.js
+-- Millwork.io seed data - generated from src/data/*.js
 -- Run AFTER schema.sql. Safe to re-run.
 -- ============================================================
 
@@ -28,10 +28,10 @@ insert into public.forum_categories (id, group_id, name, description, icon, icon
   ('standards-codes', 'running-shop', 'Standards, Codes & Legal', 'AWI, KCMA, CARB, OSHA, contracts, warranty, liability, licensing, and compliance questions', '📋', 'red', 'safety-standards', 12),
   ('safety-dust', 'running-shop', 'Safety & Dust Control', 'OSHA compliance, dust collection systems, respiratory protection, wood dust limits, fire suppression, and shop safety programs', '🛡', 'teal', 'safety-standards', 13),
   ('sales-marketing', 'running-shop', 'Sales, Marketing & Growth', 'Finding clients, working with designers and architects, portfolio building, online presence, referrals, and scaling up', '📈', 'gray', 'business-estimating', 14),
-  ('introductions', 'community', 'Introductions', 'New to GrainHub? Introduce yourself, your shop, and your specialty. The community loves meeting new members.', '👋', 'teal', null, 15),
+  ('introductions', 'community', 'Introductions', 'New to Millwork.io? Introduce yourself, your shop, and your specialty. The community loves meeting new members.', '👋', 'teal', null, 15),
   ('show-tell', 'community', 'Show & Tell — Project Showcase', 'Share your best work — finished kitchens, architectural millwork, custom pieces. Inspiration and feedback welcome.', '📸', 'amber', null, 16),
   ('industry-news', 'community', 'Industry News & Discussion', 'React to industry news, market changes, new products, and anything happening in the trade', '📰', 'blue', null, 17),
-  ('site-feedback', 'community', 'Site Feedback & Suggestions', 'Ideas for improving GrainHub — new features, forum categories, wiki topics, or anything else. We read everything.', '💬', 'gray', null, 18)
+  ('site-feedback', 'community', 'Site Feedback & Suggestions', 'Ideas for improving Millwork.io — new features, forum categories, wiki topics, or anything else. We read everything.', '💬', 'gray', null, 18)
 on conflict (id) do update set group_id = excluded.group_id, name = excluded.name, description = excluded.description, icon = excluded.icon, icon_color = excluded.icon_color, trade = excluded.trade, display_order = excluded.display_order;
 
 -- suppliers

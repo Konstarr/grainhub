@@ -49,14 +49,14 @@ function findCategoryMeta(id) {
 function authorDisplay(author) {
   if (!author) {
     return {
-      handle: 'community', name: 'Community', initials: 'GH',
+      handle: 'community', name: 'Community', initials: 'MW',
       trade: '', reputation: 0, location: '', postCount: 0,
       joinDate: null, avatarUrl: null, isVerified: false,
     };
   }
   const name = author.full_name || author.username || 'Member';
   const handle = author.username || 'member';
-  const initials = name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase() || 'GH';
+  const initials = name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase() || 'MW';
   return {
     handle, name, initials,
     trade:      author.trade      || '',
@@ -441,7 +441,7 @@ export default function ForumThread() {
     // Client-side word-filter gate. Logs the attempt to filter_violations.
     if (!checkText(replyBody).ok) {
       // eslint-disable-next-line no-alert
-      alert('Your reply contains language we don\'t allow on GrainHub. Please remove it and try again.');
+      alert('Your reply contains language we don\'t allow on Millwork.io. Please remove it and try again.');
       logFilterViolation('post', replyBody).catch(() => {});
       return;
     }

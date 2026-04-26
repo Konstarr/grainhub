@@ -26,7 +26,7 @@ export const AUDIENCE_STATS = [
   { num: '68%', label: 'Are shop owners or operations managers with direct purchasing authority' },
   { num: '$2.4M', label: 'Average annual revenue of member shops — not weekend hobbyists' },
   { num: '8.2×', label: 'Average monthly sessions per member — they come back every week' },
-  { num: '94%', label: 'Say GrainHub influences their purchasing and supplier decisions' },
+  { num: '94%', label: 'Say Millwork.io influences their purchasing and supplier decisions' },
 ];
 
 export const DEMO_DATA = {
@@ -82,7 +82,7 @@ export const PRICING_PACKAGES = [
     name: 'Full Presence',
     price: '2,400',
     period: '/ month',
-    desc: 'Sitewide visibility — your brand appears throughout GrainHub wherever your target audience is active.',
+    desc: 'Sitewide visibility — your brand appears throughout Millwork.io wherever your target audience is active.',
     features: [
       { text: 'Homepage sponsor strip placement', included: true },
       { text: 'Featured sidebar ad — all pages', included: true },
@@ -111,7 +111,7 @@ export const PRICING_PACKAGES = [
       { text: 'Up to 3 sponsored forum categories', included: true },
       { text: 'Featured supplier profile — editorial format', included: true },
       { text: 'Sponsored content article (1/month)', included: true },
-      { text: 'Event sponsorship (GrainHub Meetups)', included: true },
+      { text: 'Event sponsorship (Millwork.io Meetups)', included: true },
       { text: '"Presented by" on 1 wiki category', included: true },
       { text: 'Weekly analytics + dedicated account manager', included: true },
       { text: 'Co-branded webinar or training event', included: true },
@@ -150,7 +150,7 @@ export const ALACARTE_OPTIONS = [
     icon: '🏠',
     iconBg: 'ac-icon-amber',
     title: 'Homepage Featured Ad',
-    desc: 'Right-rail featured ad block on the GrainHub homepage — above the job board, seen by every member on login. 180×320px, linked to your destination.',
+    desc: 'Right-rail featured ad block on the Millwork.io homepage — above the job board, seen by every member on login. 180×320px, linked to your destination.',
     price: '1,200',
     period: '/ month',
   },
@@ -158,7 +158,7 @@ export const ALACARTE_OPTIONS = [
     icon: '📅',
     iconBg: 'ac-icon-purple',
     title: 'Event Sponsorship',
-    desc: 'Sponsor a GrainHub community meetup in a city of your choice — logo on all event communications, 5-minute product demo slot, and branded drink tickets.',
+    desc: 'Sponsor a Millwork.io community meetup in a city of your choice — logo on all event communications, 5-minute product demo slot, and branded drink tickets.',
     price: '800',
     period: '/ event',
   },
@@ -213,14 +213,14 @@ export const FAQS = [
   },
   {
     q: 'What ad formats do you accept?',
-    a: 'We accept standard display (PNG, JPG, GIF), and we can build custom native units in-house to match GrainHub\'s design. Specs included in the media kit.',
+    a: 'We accept standard display (PNG, JPG, GIF), and we can build custom native units in-house to match Millwork.io\'s design. Specs included in the media kit.',
   },
   {
     q: 'Do you offer performance guarantees?',
     a: 'We guarantee impression minimums on all placements. If we fall short, we extend your campaign at no charge. All campaigns include full analytics access.',
   },
   {
-    q: 'Can I sponsor a GrainHub Meetup in my region?',
+    q: 'Can I sponsor a Millwork.io Meetup in my region?',
     a: 'Yes — meetup sponsorships include logo placement, a 5-minute product demo slot, and pre/post event email mentions. Contact us for available cities and dates.',
   },
 ];

@@ -45,13 +45,13 @@ export default function SponsorEligibilityBanner() {
       ? (
         <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
           <Link to={'/profile/' + (profile.username || '')} className="sp-banner-primary">Manage media</Link>
-          <a href="mailto:sponsor@grainhub.io" className="sp-banner-secondary">Contact us</a>
+          <a href="mailto:sponsor@millwork.io.io" className="sp-banner-secondary">Contact us</a>
         </div>
       )
       : (
         <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
           <a href="#packages" className="sp-banner-primary">See packages</a>
-          <a href="mailto:sponsor@grainhub.io" className="sp-banner-secondary">Contact us</a>
+          <a href="mailto:sponsor@millwork.io.io" className="sp-banner-secondary">Contact us</a>
         </div>
       );
   }

@@ -271,7 +271,7 @@ export default function AccountSubscription() {
             lineHeight: 1.5,
           }}>
             Need to cancel or downgrade?{' '}
-            <a href="mailto:support@grainhub.io" style={{ color: 'var(--wood-warm)' }}>
+            <a href="mailto:support@millwork.io.io" style={{ color: 'var(--wood-warm)' }}>
               Email us
             </a>{' '}
             and we'll handle it within one business day.

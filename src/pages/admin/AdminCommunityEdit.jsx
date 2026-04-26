@@ -22,7 +22,7 @@ import {
  * Site admins can:
  *   - Promote / demote any member between member <-> mod
  *   - Transfer ownership to any existing member (or install a new
- *     owner from any GrainHub profile via the search picker)
+ *     owner from any Millwork.io profile via the search picker)
  *   - Remove a member (except the owner, who must be transferred first)
  */
 export default function AdminCommunityEdit() {
@@ -220,7 +220,7 @@ export default function AdminCommunityEdit() {
         <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--border-light, #e8d8c0)' }}>
           <div style={{ fontSize: 12.5, fontWeight: 700, marginBottom: '0.4rem' }}>Install a new owner</div>
           <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
-            Search any GrainHub member. They will be added to the community at owner-level if they are not already a member; the current owner will be demoted to mod.
+            Search any Millwork.io member. They will be added to the community at owner-level if they are not already a member; the current owner will be demoted to mod.
           </div>
           <input
             type="text"
@@ -263,7 +263,7 @@ export default function AdminCommunityEdit() {
           Add a member
         </div>
         <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
-          Search any GrainHub profile and add them to this community at member-level.
+          Search any Millwork.io profile and add them to this community at member-level.
           They skip the apply / invite handshake — useful for fixing things or seeding a new community.
         </div>
         <input

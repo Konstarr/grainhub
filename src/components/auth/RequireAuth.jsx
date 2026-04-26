@@ -73,7 +73,7 @@ export default function RequireAuth({ children }) {
                   Pull up a stool. The shop's open inside.
                 </h2>
                 <p style={{ maxWidth: '460px', margin: '0 auto', lineHeight: 1.6 }}>
-                  GrainHub is built by woodworkers, for woodworkers — a home
+                  Millwork.io is built by woodworkers, for woodworkers — a home
                   for the questions you'd ask the old-timer at the next bench,
                   the tips you'd share over coffee, and the wins worth showing
                   off. Thousands of millwork pros already hang out here every

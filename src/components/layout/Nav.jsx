@@ -105,7 +105,7 @@ export default function Nav() {
             <circle cx="7" cy="7" r="5.5" stroke="rgba(255,255,255,0.4)" strokeWidth="1.5" />
             <path d="M11 11 L14 14" stroke="rgba(255,255,255,0.4)" strokeWidth="1.5" strokeLinecap="round" />
           </svg>
-          <input type="text" placeholder="Search GrainHub..." />
+          <input type="text" placeholder="Search Millwork.io..." />
         </div>
 
         {isAuthed ? (

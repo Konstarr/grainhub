@@ -48,7 +48,7 @@ export default function Login() {
             <div className="signup-form-body">
               <div className="signup-form-header">
                 <div className="signup-free-badge">🔒 Welcome Back</div>
-                <h2>Log in to GrainHub</h2>
+                <h2>Log in to Millwork.io</h2>
                 <p>Pick up where you left off.</p>
               </div>
 
@@ -125,7 +125,7 @@ export default function Login() {
                     marginTop: '0.25rem',
                   }}
                 >
-                  New to GrainHub?{' '}
+                  New to Millwork.io?{' '}
                   <Link to="/signup" style={{ color: 'var(--wood-warm)', fontWeight: 600 }}>
                     Create a free account
                   </Link>

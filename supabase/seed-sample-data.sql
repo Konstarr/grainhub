@@ -1,5 +1,5 @@
 -- ============================================================
--- GrainHub SAMPLE DATA — 20 records per major table
+-- Millwork.io SAMPLE DATA — 20 records per major table
 -- Run AFTER schema.sql and seed.sql. Safe to re-run (idempotent).
 -- All author_id / seller_id / claimed_by left NULL (profiles FK
 -- to auth.users, so real users must post/own content).

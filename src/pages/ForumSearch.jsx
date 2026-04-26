@@ -35,7 +35,7 @@ function toItem(row, threadVisits) {
   const t = mapThreadRow(row);
   const h = hashSlug(t.slug || t.title || '');
   const cat = CAT_COLORS[h % CAT_COLORS.length];
-  const initials = (t.title || '??').split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase() || 'GH';
+  const initials = (t.title || '??').split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase() || 'MW';
   const badges = [];
   if (t.isPinned) badges.push({ label: '📌 Pinned', className: 'tb-pinned' });
   if (t.isSolved) badges.push({ label: '✓ Solved', className: 'tb-solved' });

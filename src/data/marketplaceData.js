@@ -4,7 +4,7 @@
  */
 
 export const MARKETPLACE_HEADER = {
-  eyebrow: 'GrainHub Marketplace',
+  eyebrow: 'Millwork.io Marketplace',
   title: 'Buy & Sell Anything\nin the Trade',
   subtitle: 'Machinery, lumber, sheet goods, hardware, finishing supplies, tooling, box trucks, shop equipment, and surplus — all from verified millwork and cabinet professionals.',
   stats: [

@@ -426,7 +426,7 @@ your CAD package and parametrize it for your stock.</p>
 
 <div class="wa-reviewers">
   <div class="wa-reviewers-label">✓ Editor reviewed · last revised April 2026</div>
-  This article has been reviewed by the GrainHub editorial team for accuracy and completeness.
+  This article has been reviewed by the Millwork.io editorial team for accuracy and completeness.
   Pro contributors: stand by — the verified-pro reviewer system opens in May. To suggest a
   correction or a regional-tradition variation, use the
   <a href="/forums/new?category=wiki-edits">Wiki edits</a> forum or the <em>Edit this article</em>

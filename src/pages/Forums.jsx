@@ -80,7 +80,7 @@ function toActivityItem(row) {
   if (t.isSolved) badges.push({ label: '✓ Solved', className: 'tb-solved' });
   if (t.isLocked) badges.push({ label: '🔒 Locked', className: 'tb-locked' });
   if (t.viewCount > 500 && t.isPinned === false) badges.push({ label: '🔥 Hot', className: 'tb-hot' });
-  const initials = (t.title || '??').split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase() || 'GH';
+  const initials = (t.title || '??').split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase() || 'MW';
   return {
     id: t.id,
     slug: t.slug,

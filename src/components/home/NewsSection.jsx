@@ -56,7 +56,7 @@ export default function NewsSection() {
           <div className="news-featured-title">{featured.title}</div>
           <p className="news-featured-excerpt">{featured.excerpt}</p>
           <div className="news-featured-meta">
-            <strong>{featured.category || 'GrainHub'}</strong> &nbsp;&middot;&nbsp; {featured.date}
+            <strong>{featured.category || 'Millwork.io'}</strong> &nbsp;&middot;&nbsp; {featured.date}
           </div>
         </div>
       </Link>

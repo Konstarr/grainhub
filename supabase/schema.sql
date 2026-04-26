@@ -1,5 +1,5 @@
 -- ============================================================
--- GrainHub — Supabase schema
+-- Millwork.io — Supabase schema
 -- ============================================================
 -- Paste this whole file into Supabase Studio → SQL Editor → New query
 -- and Run. Safe to re-run (uses create if not exists / drop policy if exists).

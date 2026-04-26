@@ -18,7 +18,7 @@ export default function CommunityRules() {
           <div className="legal-eyebrow">Community</div>
           <h1>Community Rules</h1>
           <p className="legal-sub">
-            How we keep GrainHub useful, respectful, and worth coming back to.
+            How we keep Millwork.io useful, respectful, and worth coming back to.
           </p>
           <div className="legal-meta">
             <span>Effective: April 26, 2026</span>
@@ -32,7 +32,7 @@ export default function CommunityRules() {
         <section>
           <h2>The spirit of the place</h2>
           <p>
-            GrainHub is a working-professionals community for woodworking, millwork,
+            Millwork.io is a working-professionals community for woodworking, millwork,
             cabinet, and adjacent trades. Treat the place like a busy shop floor:
             people are here to learn, to do business, and to swap stories — not to
             argue politics, not to spam, and not to pick fights. We're trade-friendly
@@ -42,7 +42,7 @@ export default function CommunityRules() {
             These rules are part of our <Link to="/terms">Terms of Service</Link>.
             Breaking them can get a post removed, a thread locked, or an account
             suspended. The mods' decision is final, but you can always appeal by
-            emailing <a href="mailto:support@grainhub.com">support@grainhub.com</a>.
+            emailing <a href="mailto:support@millwork.io">support@millwork.io</a>.
           </p>
         </section>
 
@@ -76,7 +76,7 @@ export default function CommunityRules() {
             <li>No bait-and-switch listings, no fake "sold" relistings to bump posts.</li>
             <li>If you're a supplier or shop, claim your business profile rather than running it from a personal account.</li>
             <li>No multi-level-marketing recruitment.</li>
-            <li>GrainHub doesn't process payments. Don't ask people to wire money to a "verification address," and don't fall for it when someone else does.</li>
+            <li>Millwork.io doesn't process payments. Don't ask people to wire money to a "verification address," and don't fall for it when someone else does.</li>
           </ul>
         </section>
 
@@ -144,7 +144,7 @@ export default function CommunityRules() {
             <li>Use the report button on a post or member. That's the fastest path.</li>
             <li>Mods may remove content, lock threads, or suspend accounts. We try to give a reason.</li>
             <li>Bans for repeat or severe violations may be permanent. Trying to ban-evade with a new account doesn't end well.</li>
-            <li>If you think a moderation call was wrong, appeal by emailing <a href="mailto:support@grainhub.com">support@grainhub.com</a>. We act in good faith and are happy to take another look.</li>
+            <li>If you think a moderation call was wrong, appeal by emailing <a href="mailto:support@millwork.io">support@millwork.io</a>. We act in good faith and are happy to take another look.</li>
           </ul>
         </section>
 
