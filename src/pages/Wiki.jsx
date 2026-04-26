@@ -4,52 +4,143 @@ import { supabase } from '../lib/supabase.js';
 import { mapWikiRow } from '../lib/mappers.js';
 import '../styles/wikiDashboard.css';
 
-/**
- * The /wiki dashboard. Designed to feel like the front page of a real
- * encyclopedia: featured article hero, topic clusters, recently updated,
- * "did you know" facts, and a clear contribution CTA.
- *
- * The featured article is whichever published article was most recently
- * updated -- the seed migration sets the Mortise & Tenon article's
- * updated_at to now() when it runs, so it leads the page until something
- * newer ships.
- */
-
-// Eight canonical topic clusters. Each renders a card on the dashboard
-// even if the database has zero matching articles yet -- a great
-// encyclopedia is bigger than its current contents, and showing the
-// scaffolding signals scope to the reader.
 const CLUSTERS = [
-  { key: 'Joinery',          icon: 'JN',
-    desc: 'Mortise & tenon, dovetails, dadoes, finger joints, and every named joint with diagrams and proportions.' },
-  { key: 'Finishing',        icon: 'FN',
-    desc: 'Schedules, products, application techniques, troubleshooting blush and orange peel.' },
-  { key: 'Machinery',        icon: 'MC',
-    desc: 'Tablesaws, jointers, planers, CNC, edgebanders. Setup, tuning, safety, lifecycle.' },
-  { key: 'Wood Species',     icon: 'SP',
-    desc: 'Janka, density, color, workability and finish-receptivity for every commercial species.' },
-  { key: 'Hand Tools',       icon: 'HT',
-    desc: 'Planes, chisels, saws, marking and measuring. Sharpening and tuning each one.' },
-  { key: 'Hardware',         icon: 'HW',
-    desc: 'Hinges, slides, fasteners, knobs, locks. Selection, installation, common failures.' },
-  { key: 'Techniques',       icon: 'TQ',
-    desc: 'Bending, veneering, kiln-drying, milling, bookmatching, repair, restoration.' },
-  { key: 'Shop & Business',  icon: 'SB',
-    desc: 'Pricing, contracts, dust collection, layout, OSHA, insurance, taxes, hiring.' },
+  {
+    key: 'Joinery',
+    icon: 'JN',
+    accent: '#8a5030',
+    desc: 'Every named joint, with diagrams, proportions, and the trade-offs between them.',
+    subtopics: [
+      { name: 'Mortise & Tenon',         match: /mortise|tenon/i },
+      { name: 'Dovetails',               match: /dovetail/i },
+      { name: 'Dadoes & Rabbets',        match: /dado|rabbet|groove/i },
+      { name: 'Finger & Box Joints',     match: /finger|box joint/i },
+      { name: 'Miters & Splines',        match: /miter|spline|biscuit/i },
+      { name: 'Loose Tenon (Domino)',    match: /loose tenon|domino|floating/i },
+      { name: 'Specialty & Decorative',  match: /scarf|lap|bridle|tusk|specialty/i },
+    ],
+  },
+  {
+    key: 'Finishing',
+    icon: 'FN',
+    accent: '#9c5e30',
+    desc: 'Stain, dye, topcoat, schedule, and every application method, plus troubleshooting.',
+    subtopics: [
+      { name: 'Stains & Dyes',           match: /stain|dye|aniline|pigment/i },
+      { name: 'Lacquer & Pre-Cat',       match: /lacquer|pre-?cat/i },
+      { name: 'Polyurethane',            match: /poly(urethane)?/i },
+      { name: 'Oil Finishes',            match: /(tung|linseed|danish|hardwax|oil finish)/i },
+      { name: 'Shellac & French Polish', match: /shellac|french polish/i },
+      { name: 'Application Methods',     match: /spray|hvlp|brush|wipe|application/i },
+      { name: 'Schedules & Recipes',     match: /finish(ing)? schedule|recipe/i },
+      { name: 'Troubleshooting',         match: /blush|orange peel|fish eye|defect/i },
+    ],
+  },
+  {
+    key: 'Machinery',
+    icon: 'MC',
+    accent: '#5d3a1c',
+    desc: 'Setup, tuning, safety, and lifecycle of every piece of stationary and CNC equipment.',
+    subtopics: [
+      { name: 'Tablesaws',               match: /tablesaw|table saw/i },
+      { name: 'Jointers & Planers',      match: /jointer|planer/i },
+      { name: 'Bandsaws',                match: /bandsaw|band saw/i },
+      { name: 'Routers & CNC',           match: /router|cnc/i },
+      { name: 'Edgebanders',             match: /edgeband/i },
+      { name: 'Sanders',                 match: /sander|sanding/i },
+      { name: 'Dust Collection',         match: /dust|collection|extract/i },
+      { name: 'Specialty Machinery',     match: /moulder|shaper|tenoner|specialty machine/i },
+    ],
+  },
+  {
+    key: 'Wood Species',
+    icon: 'SP',
+    accent: '#7a5530',
+    desc: 'Janka, density, color, workability, finish-receptivity for every commercial species.',
+    subtopics: [
+      { name: 'Domestic Hardwoods',      match: /(white oak|red oak|maple|cherry|walnut|ash|hickory|birch|poplar|domestic hardwood)/i },
+      { name: 'Imported Hardwoods',      match: /(mahogany|teak|sapele|wenge|purpleheart|bubinga|imported hardwood|tropical)/i },
+      { name: 'Softwoods',               match: /(pine|fir|cedar|spruce|softwood)/i },
+      { name: 'Manufactured Panels',     match: /(plywood|mdf|particleboard|osb|hdf|panel)/i },
+      { name: 'Veneer & Burl',           match: /veneer|burl|figured/i },
+      { name: 'Sustainability & Sourcing', match: /(fsc|sustainability|sourcing|cites)/i },
+    ],
+  },
+  {
+    key: 'Hand Tools',
+    icon: 'HT',
+    accent: '#6b3d23',
+    desc: 'Planes, chisels, saws, marking, sharpening - buy, tune, sharpen, use.',
+    subtopics: [
+      { name: 'Bench & Block Planes',    match: /bench plane|block plane|smoother|jack plane|jointer plane/i },
+      { name: 'Specialty Planes',        match: /shoulder|router plane|rabbet|plough|moulding plane|specialty plane/i },
+      { name: 'Chisels',                 match: /chisel/i },
+      { name: 'Saws',                    match: /(handsaw|backsaw|dovetail saw|tenon saw|saw)/i },
+      { name: 'Marking & Measuring',     match: /(marking|gauge|square|caliper|rule|measuring)/i },
+      { name: 'Sharpening',              match: /sharpen|stone|honing|grinding/i },
+      { name: 'Workholding',             match: /vise|holdfast|clamp|workholding/i },
+    ],
+  },
+  {
+    key: 'Hardware',
+    icon: 'HW',
+    accent: '#8a4a3a',
+    desc: 'Hinges, slides, fasteners, knobs, locks - selection, installation, failure modes.',
+    subtopics: [
+      { name: 'Hinges',                  match: /hinge|euro|butt hinge|barrel/i },
+      { name: 'Drawer Slides',           match: /drawer slide|undermount|ball bearing/i },
+      { name: 'Knobs & Pulls',           match: /knob|pull|handle/i },
+      { name: 'Locks & Latches',         match: /lock|latch|catch/i },
+      { name: 'Fasteners',               match: /screw|nail|bolt|fastener/i },
+      { name: 'Connectors',              match: /(cam lock|knockdown|connector|biscuit)/i },
+      { name: 'Specialty Hardware',      match: /specialty hardware|leveler|caster/i },
+    ],
+  },
+  {
+    key: 'Techniques',
+    icon: 'TQ',
+    accent: '#4a6b30',
+    desc: 'The processes that turn lumber into furniture: bending, veneering, carving, repair.',
+    subtopics: [
+      { name: 'Bending (Steam & Lam.)',  match: /bend(ing)?|steam|lamination/i },
+      { name: 'Veneering & Inlay',       match: /veneer|inlay|marquetry|parquetry/i },
+      { name: 'Carving',                 match: /carving|chip carving|relief/i },
+      { name: 'Turning',                 match: /turning|lathe|spindle|bowl/i },
+      { name: 'Drying & Milling',        match: /(drying|kiln|milling|dimensioning)/i },
+      { name: 'Repair & Restoration',    match: /repair|restoration|conservation/i },
+      { name: 'Wood Movement',           match: /wood movement|seasonal|expansion|shrinkage/i },
+    ],
+  },
+  {
+    key: 'Shop & Business',
+    icon: 'SB',
+    accent: '#3a4a82',
+    desc: 'The non-woodworking parts of the trade: pricing, layout, safety, taxes, hiring.',
+    subtopics: [
+      { name: 'Shop Layout & Design',    match: /shop layout|workshop design|workflow/i },
+      { name: 'Pricing & Estimating',    match: /pricing|estimat|quote|bid/i },
+      { name: 'Contracts & Customers',   match: /contract|customer|client/i },
+      { name: 'Safety & OSHA',           match: /safety|osha|ppe|injury/i },
+      { name: 'Insurance & Taxes',       match: /insurance|tax|liability/i },
+      { name: 'Marketing & Sales',       match: /marketing|sales|lead/i },
+      { name: 'Hiring & Apprentices',    match: /hiring|apprentice|employee/i },
+    ],
+  },
 ];
 
-// Did-you-know facts. These are seeded here for the launch demo --
-// later this becomes a "fun_facts" table that admins can edit and
-// readers can swap into articles via a one-click excerpt.
+function topicSlug(s) {
+  return encodeURIComponent(s);
+}
+
 const DID_YOU_KNOW = [
-  '...mortise and tenon joints have been found in Egyptian tomb furniture from 2,700 BCE — and they were already pegged for permanence.',
-  '...white oak floats in salt water and sinks in fresh water? Its closed-cell structure traps almost no air.',
-  '...Janka hardness is measured by pressing a 0.444"-diameter steel ball halfway into a board and recording the pounds-force required.',
-  '...the original Stanley #4 smoothing plane has been produced almost continuously since 1869, with only minor changes to the frog and lateral lever.',
-  '...hide glue is reversible with steam — which is why 18th-century furniture can be repaired but most modern PVA-glued furniture can not.',
-  '...board-foot is a volume measure: 144 cubic inches of nominal lumber, regardless of the actual surfaced dimensions.',
-  '...Festool produced its first Domino DF 500 in 2007; before that, "loose tenons" were either router-cut or biscuit-joined.',
-  '...the rule of thumb that tenon thickness equals 1/3 of stock thickness comes from the European cabinetmaking tradition. Japanese furniture runs closer to 1/2.',
+  'Mortise and tenon joints have been found in Egyptian tomb furniture from 2,700 BCE - and they were already pegged for permanence.',
+  'White oak floats in salt water and sinks in fresh water? Its closed-cell structure traps almost no air.',
+  'Janka hardness is measured by pressing a 0.444-inch-diameter steel ball halfway into a board and recording the pounds-force required.',
+  'The original Stanley #4 smoothing plane has been produced almost continuously since 1869, with only minor changes to the frog and lateral lever.',
+  'Hide glue is reversible with steam - which is why 18th-century furniture can be repaired but most modern PVA-glued furniture can not.',
+  'Board-foot is a volume measure: 144 cubic inches of nominal lumber, regardless of the actual surfaced dimensions.',
+  'Festool produced its first Domino DF 500 in 2007; before that, "loose tenons" were either router-cut or biscuit-joined.',
+  'The rule of thumb that tenon thickness equals 1/3 of stock thickness comes from the European cabinetmaking tradition. Japanese furniture runs closer to 1/2.',
 ];
 
 function pickRandom(arr, n = 3) {
@@ -62,13 +153,6 @@ function pickRandom(arr, n = 3) {
     out.push(arr[i]);
   }
   return out;
-}
-
-function formatDate(iso) {
-  if (!iso) return '';
-  try {
-    return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-  } catch { return ''; }
 }
 
 function relativeTime(iso) {
@@ -107,18 +191,14 @@ export default function Wiki() {
     return () => { cancelled = true; };
   }, []);
 
-  // Featured = the most-recently-updated article. After the
-  // mortise-and-tenon seed migration runs, that's our flagship.
   const featured = articles[0] || null;
   const recentlyUpdated = articles.slice(0, 8);
 
-  // Articles grouped by cluster
   const articlesByCluster = useMemo(() => {
     const map = {};
     for (const c of CLUSTERS) map[c.key] = [];
     articles.forEach((a) => {
       const cat = (a.category || '').trim();
-      // Match cluster by exact category or by case-insensitive contains
       let placed = false;
       for (const c of CLUSTERS) {
         if (cat === c.key || cat.toLowerCase() === c.key.toLowerCase()) {
@@ -128,7 +208,6 @@ export default function Wiki() {
         }
       }
       if (!placed) {
-        // Heuristic fallback for variant category names
         const lc = cat.toLowerCase();
         if (/joinery|joint/.test(lc)) map['Joinery'].push(a);
         else if (/finish/.test(lc)) map['Finishing'].push(a);
@@ -143,7 +222,6 @@ export default function Wiki() {
     return map;
   }, [articles]);
 
-  // Live search dropdown — filters as you type
   useEffect(() => {
     const q = searchQuery.trim().toLowerCase();
     if (q.length < 2) { setSearchResults([]); return; }
@@ -157,20 +235,18 @@ export default function Wiki() {
   const fact = useMemo(() => DID_YOU_KNOW[Math.floor(Math.random() * DID_YOU_KNOW.length)], []);
   const otherFacts = useMemo(() => pickRandom(DID_YOU_KNOW, 3), []);
 
-  // Stats strip
   const totalArticles = articles.length;
   const reviewedCount = articles.filter((a) => a.body && a.body.length > 1000).length;
-  const downloadCount = 6; // placeholder — eventually a count from a downloads table
+  const downloadCount = 6;
 
   return (
     <div className="wiki-dash">
-      {/* ---------- HERO ---------- */}
       <section className="wd-hero">
         <div className="wd-hero-inner">
           <div className="wd-hero-eyebrow">GrainHub Encyclopedia</div>
           <h1 className="wd-hero-title">The reference for everyone who works wood.</h1>
           <p className="wd-hero-sub">
-            Joinery, machinery, finishes, lumber, hardware, technique, shop and business —
+            Joinery, machinery, finishes, lumber, hardware, technique, shop and business -
             written by working pros, reviewed for accuracy, and free to read.
           </p>
 
@@ -181,7 +257,7 @@ export default function Wiki() {
             </svg>
             <input
               type="text"
-              placeholder="Search 200+ articles — joints, species, finishes, tools..."
+              placeholder="Search 200+ articles - joints, species, finishes, tools..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -223,7 +299,6 @@ export default function Wiki() {
         </div>
       </section>
 
-      {/* ---------- FEATURED ARTICLE ---------- */}
       {featured && (
         <section className="wd-section">
           <div className="wd-section-head">
@@ -245,62 +320,144 @@ export default function Wiki() {
               <p className="wd-feature-excerpt">{featured.excerpt}</p>
               <div className="wd-feature-meta">
                 {featured.readTime && <span>{featured.readTime}</span>}
-                {featured.readTime && <span className="wd-dot">·</span>}
+                {featured.readTime && <span className="wd-dot">.</span>}
                 <span>Updated {relativeTime(featured.updatedAtRaw || featured.updatedAt)}</span>
-                <span className="wd-dot">·</span>
+                <span className="wd-dot">.</span>
                 <span className="wd-feature-verified">Editor-reviewed</span>
               </div>
-              <span className="wd-feature-cta">Read article →</span>
+              <span className="wd-feature-cta">Read article</span>
             </div>
           </Link>
         </section>
       )}
 
-      {/* ---------- TOPIC CLUSTERS ---------- */}
-      <section className="wd-section">
-        <div className="wd-section-head">
-          <div>
-            <div className="wd-section-eyebrow">Browse the encyclopedia</div>
-            <h2 className="wd-section-title">By topic cluster</h2>
-            <p className="wd-section-desc">Eight clusters, hundreds of articles. Pick a thread and pull.</p>
+      <section className="wd-library">
+        <div className="wd-library-inner">
+          <div className="wd-section-head">
+            <div>
+              <div className="wd-section-eyebrow">The library</div>
+              <h2 className="wd-section-title">Browse the entire encyclopedia at a glance</h2>
+              <p className="wd-section-desc">
+                Eight major fields, fifty-six sub-topics, every article one click away. No
+                drilling required - the full structure is laid out below.
+              </p>
+            </div>
           </div>
-        </div>
-        <div className="wd-clusters">
+
+          <nav className="wd-cluster-bar" aria-label="Cluster navigation">
+            {CLUSTERS.map((c) => {
+              const count = (articlesByCluster[c.key] || []).length;
+              return (
+                <a
+                  key={c.key}
+                  href={'#cluster-' + c.key.toLowerCase().replace(/[^a-z]+/g, '-')}
+                  className="wd-cluster-bar-item"
+                  style={{ '--accent': c.accent }}
+                >
+                  <span className="wd-cluster-bar-icon">{c.icon}</span>
+                  <span className="wd-cluster-bar-label">{c.key}</span>
+                  <span className="wd-cluster-bar-count">{count}</span>
+                </a>
+              );
+            })}
+          </nav>
+
           {CLUSTERS.map((c) => {
             const list = articlesByCluster[c.key] || [];
+            const featuredCards = list.slice(0, 3);
+            const subtopicCounts = c.subtopics.map((sub) => {
+              const n = list.filter((a) =>
+                sub.match.test((a.title || '') + ' ' + (a.excerpt || ''))
+              ).length;
+              return { ...sub, count: n };
+            });
             return (
-              <div className="wd-cluster" key={c.key}>
-                <div className="wd-cluster-head">
-                  <div className="wd-cluster-icon">{c.icon}</div>
-                  <div>
-                    <div className="wd-cluster-name">{c.key}</div>
-                    <div className="wd-cluster-count">
-                      {list.length === 0 ? 'Coming soon' : list.length + ' article' + (list.length === 1 ? '' : 's')}
+              <article
+                className="wd-portal"
+                key={c.key}
+                id={'cluster-' + c.key.toLowerCase().replace(/[^a-z]+/g, '-')}
+                style={{ '--accent': c.accent }}
+              >
+                <header className="wd-portal-head">
+                  <div className="wd-portal-id">
+                    <span className="wd-portal-icon">{c.icon}</span>
+                    <div>
+                      <h3 className="wd-portal-title">{c.key}</h3>
+                      <p className="wd-portal-desc">{c.desc}</p>
                     </div>
                   </div>
-                </div>
-                <p className="wd-cluster-desc">{c.desc}</p>
-                {list.length > 0 && (
-                  <ul className="wd-cluster-list">
-                    {list.slice(0, 4).map((a) => (
-                      <li key={a.id}>
-                        <Link to={'/wiki/article/' + a.slug}>{a.title}</Link>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-                {list.length === 0 && (
-                  <div className="wd-cluster-empty">
-                    Help us build this cluster — <Link to="/forums/new?category=wiki-edits">propose an article</Link>
+                  <div className="wd-portal-meta">
+                    <div className="wd-portal-stat">
+                      <div className="wd-portal-stat-num">{list.length}</div>
+                      <div className="wd-portal-stat-label">{list.length === 1 ? 'article' : 'articles'}</div>
+                    </div>
+                    <div className="wd-portal-stat">
+                      <div className="wd-portal-stat-num">{c.subtopics.length}</div>
+                      <div className="wd-portal-stat-label">sub-topics</div>
+                    </div>
                   </div>
-                )}
-              </div>
+                </header>
+
+                <div className="wd-portal-body">
+                  <div className="wd-subtopics">
+                    {subtopicCounts.map((sub) => (
+                      <Link
+                        key={sub.name}
+                        to={'/wiki?cluster=' + topicSlug(c.key) + '&topic=' + topicSlug(sub.name)}
+                        className={'wd-subtopic' + (sub.count > 0 ? ' has-articles' : '')}
+                      >
+                        <span className="wd-subtopic-name">{sub.name}</span>
+                        <span className="wd-subtopic-count">{sub.count}</span>
+                      </Link>
+                    ))}
+                  </div>
+
+                  {featuredCards.length > 0 && (
+                    <div className="wd-portal-featured">
+                      <div className="wd-portal-featured-label">In this cluster</div>
+                      <div className="wd-portal-featured-grid">
+                        {featuredCards.map((a) => (
+                          <Link
+                            key={a.id}
+                            to={'/wiki/article/' + a.slug}
+                            className="wd-portal-card"
+                          >
+                            {a.coverImage && (
+                              <div className="wd-portal-card-img" style={{ backgroundImage: 'url(' + a.coverImage + ')' }}/>
+                            )}
+                            <div className="wd-portal-card-body">
+                              <div className="wd-portal-card-cat">{a.category}</div>
+                              <div className="wd-portal-card-title">{a.title}</div>
+                              {a.excerpt && (
+                                <div className="wd-portal-card-excerpt">
+                                  {a.excerpt.length > 120 ? a.excerpt.slice(0, 120) + '...' : a.excerpt}
+                                </div>
+                              )}
+                            </div>
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {featuredCards.length === 0 && (
+                    <div className="wd-portal-empty">
+                      <div className="wd-portal-empty-title">This cluster is being built.</div>
+                      <div className="wd-portal-empty-text">
+                        Working pros - the {c.subtopics.length} sub-topics above are open for
+                        contribution. Bylines, reviewer credit, reputation gains all wait.
+                      </div>
+                      <Link to="/forums/new?category=wiki-edits" className="wd-btn-primary" style={{ marginTop: '0.6rem' }}>
+                        Propose an article in {c.key}
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              </article>
             );
           })}
         </div>
       </section>
 
-      {/* ---------- RECENT + DID YOU KNOW ---------- */}
       <section className="wd-section wd-two-col">
         <div className="wd-recent">
           <div className="wd-section-head">
@@ -312,7 +469,7 @@ export default function Wiki() {
           {loading && <p style={{ color: 'var(--text-muted)' }}>Loading...</p>}
           {!loading && recentlyUpdated.length === 0 && (
             <p style={{ color: 'var(--text-muted)' }}>
-              No published articles yet — the encyclopedia is just getting started.
+              No published articles yet - the encyclopedia is just getting started.
             </p>
           )}
           <ul className="wd-recent-list">
@@ -328,7 +485,7 @@ export default function Wiki() {
                   )}
                   <div className="wd-recent-meta">
                     {a.readTime && <span>{a.readTime}</span>}
-                    {a.readTime && <span className="wd-dot">·</span>}
+                    {a.readTime && <span className="wd-dot">.</span>}
                     <span>Updated {relativeTime(a.updatedAtRaw || a.updatedAt)}</span>
                   </div>
                 </Link>
@@ -353,7 +510,7 @@ export default function Wiki() {
             <div className="wd-card-eyebrow" style={{ color: '#ffd7ac' }}>Help build it</div>
             <h3 className="wd-card-title">200 more articles needed</h3>
             <p className="wd-card-text">
-              The encyclopedia covers eight topic clusters. We&apos;re aiming for 200&ndash;300
+              The encyclopedia covers eight topic clusters. We&apos;re aiming for 200-300
               articles across all of them by the end of the year. Working pros get bylines,
               reputation, and a public reviewer credit on every article they help shape.
             </p>
@@ -378,7 +535,6 @@ export default function Wiki() {
         </aside>
       </section>
 
-      {/* ---------- FOOTER CTA ---------- */}
       <section className="wd-cta-band">
         <div className="wd-cta-inner">
           <div>

@@ -573,3 +573,321 @@
   .wd-cta-band { padding: 2.5rem 1.25rem; }
   .wd-cta-title { font-size: 24px; }
 }
+
+/* ============================================================
+   THE LIBRARY — replacement for the old cluster-card grid.
+   Shows the entire taxonomy on one page so the reader can see
+   the scope of the encyclopedia without drilling into anything.
+   ============================================================ */
+
+.wd-library {
+  background: linear-gradient(180deg, #fbf6ec 0%, #f5ecda 100%);
+  padding: 3.5rem 0 1rem;
+  margin-top: 0.5rem;
+}
+.wd-library-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+/* Sticky cluster bar — visual table of contents */
+.wd-cluster-bar {
+  position: sticky;
+  top: 16px;
+  z-index: 5;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1.5rem 0 2.5rem;
+  padding: 0.6rem 0.75rem;
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--wd-rule);
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(44,26,14,0.06);
+}
+.wd-cluster-bar-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.85rem;
+  border-radius: 999px;
+  background: var(--wd-cream);
+  border: 1px solid var(--wd-rule);
+  text-decoration: none;
+  color: var(--wd-dark);
+  font-size: 13px;
+  font-weight: 600;
+  transition: background 120ms, border-color 120ms, color 120ms;
+}
+.wd-cluster-bar-item:hover {
+  background: var(--accent, var(--wd-warm));
+  border-color: var(--accent, var(--wd-warm));
+  color: #fff;
+}
+.wd-cluster-bar-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
+  background: var(--accent, var(--wd-warm));
+  color: #fff;
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.wd-cluster-bar-item:hover .wd-cluster-bar-icon { background: rgba(255,255,255,0.25); }
+.wd-cluster-bar-count {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--wd-muted);
+  background: rgba(0,0,0,0.04);
+  padding: 1px 7px;
+  border-radius: 999px;
+  min-width: 18px;
+  text-align: center;
+}
+.wd-cluster-bar-item:hover .wd-cluster-bar-count {
+  color: rgba(255,255,255,0.95);
+  background: rgba(255,255,255,0.18);
+}
+
+/* Portal sections — one per cluster */
+.wd-portal {
+  background: #fff;
+  border: 1px solid var(--wd-rule);
+  border-radius: 16px;
+  padding: 1.75rem 1.85rem 1.5rem;
+  margin-bottom: 1.5rem;
+  scroll-margin-top: 90px;
+  border-left: 5px solid var(--accent, var(--wd-warm));
+  transition: box-shadow 200ms;
+}
+.wd-portal:hover {
+  box-shadow: 0 4px 20px rgba(44,26,14,0.08);
+}
+
+.wd-portal-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1.5rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #f0e6d2;
+}
+.wd-portal-id { display: flex; gap: 0.95rem; align-items: flex-start; }
+.wd-portal-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  background: var(--accent, var(--wd-warm));
+  color: #fff;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.wd-portal-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--wd-dark);
+  margin: 0 0 0.3rem;
+  line-height: 1.15;
+}
+.wd-portal-desc {
+  font-size: 14px;
+  color: var(--wd-muted);
+  margin: 0;
+  line-height: 1.45;
+  max-width: 600px;
+}
+.wd-portal-meta {
+  display: flex;
+  gap: 1.25rem;
+  flex-shrink: 0;
+}
+.wd-portal-stat-num {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--accent, var(--wd-warm));
+  line-height: 1;
+}
+.wd-portal-stat-label {
+  font-size: 11px;
+  color: var(--wd-muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+/* Sub-topic grid — every sub-topic visible at once */
+.wd-subtopics {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+.wd-subtopic {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 0.85rem;
+  background: var(--wd-cream);
+  border: 1px solid #ece0c8;
+  border-radius: 8px;
+  text-decoration: none;
+  color: var(--wd-mid);
+  font-size: 13.5px;
+  font-weight: 500;
+  transition: all 120ms;
+  gap: 0.5rem;
+  min-width: 0;
+}
+.wd-subtopic:hover {
+  background: #fff;
+  border-color: var(--accent, var(--wd-warm));
+  color: var(--wd-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(44,26,14,0.06);
+}
+.wd-subtopic.has-articles {
+  background: #fff;
+  border-color: var(--accent, var(--wd-warm));
+  color: var(--wd-dark);
+  font-weight: 600;
+}
+.wd-subtopic-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.wd-subtopic-count {
+  font-size: 11px;
+  font-weight: 700;
+  background: rgba(0,0,0,0.06);
+  color: var(--wd-muted);
+  padding: 2px 7px;
+  border-radius: 999px;
+  flex-shrink: 0;
+  min-width: 20px;
+  text-align: center;
+}
+.wd-subtopic.has-articles .wd-subtopic-count {
+  background: var(--accent, var(--wd-warm));
+  color: #fff;
+}
+
+/* Featured articles within the portal */
+.wd-portal-featured {
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px dashed #e8d8c0;
+}
+.wd-portal-featured-label {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--wd-muted);
+  margin-bottom: 0.75rem;
+}
+.wd-portal-featured-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 0.85rem;
+}
+.wd-portal-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--wd-cream);
+  border: 1px solid #ece0c8;
+  border-radius: 10px;
+  text-decoration: none;
+  color: inherit;
+  overflow: hidden;
+  transition: transform 140ms, box-shadow 140ms, border-color 140ms;
+}
+.wd-portal-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(44,26,14,0.12);
+  border-color: var(--accent, var(--wd-warm));
+}
+.wd-portal-card-img {
+  height: 110px;
+  background: linear-gradient(135deg, #3d2615, #1c0f06) center/cover;
+}
+.wd-portal-card-body { padding: 0.85rem 1rem 1rem; }
+.wd-portal-card-cat {
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent, var(--wd-warm));
+  margin-bottom: 0.3rem;
+}
+.wd-portal-card-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 15.5px;
+  font-weight: 700;
+  color: var(--wd-dark);
+  margin-bottom: 0.4rem;
+  line-height: 1.25;
+}
+.wd-portal-card-excerpt {
+  font-size: 12.5px;
+  line-height: 1.4;
+  color: var(--wd-muted);
+}
+
+.wd-portal-empty {
+  margin-top: 1rem;
+  padding: 1rem 1.25rem;
+  background: var(--wd-cream);
+  border: 1px dashed #d9c8a8;
+  border-radius: 10px;
+}
+.wd-portal-empty-title {
+  font-weight: 700;
+  color: var(--wd-dark);
+  font-size: 14px;
+  margin-bottom: 0.3rem;
+}
+.wd-portal-empty-text {
+  font-size: 13px;
+  color: var(--wd-muted);
+  line-height: 1.45;
+  max-width: 580px;
+}
+
+/* Responsive */
+@media (max-width: 720px) {
+  .wd-library { padding: 2.5rem 0; }
+  .wd-library-inner { padding: 0 1.25rem; }
+  .wd-portal { padding: 1.25rem 1.25rem 1rem; }
+  .wd-portal-head { flex-direction: column; gap: 0.75rem; }
+  .wd-portal-meta { gap: 1rem; }
+  .wd-portal-title { font-size: 20px; }
+  .wd-cluster-bar { gap: 0.35rem; padding: 0.5rem; }
+  .wd-cluster-bar-item { font-size: 12px; padding: 0.3rem 0.65rem; }
+}
+}
+  .wd-library-inner { padding: 0 1.25rem; }
+  .wd-portal { padding: 1.25rem 1.25rem 1rem; }
+  .wd-portal-head { flex-direction: column; gap: 0.75rem; }
+  .wd-portal-meta { gap: 1rem; }
+  .wd-portal-title { font-size: 20px; }
+  .wd-cluster-bar { gap: 0.35rem; padding: 0.5rem; }
+  .wd-cluster-bar-item { font-size: 12px; padding: 0.3rem 0.65rem; }
+}
