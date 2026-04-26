@@ -882,12 +882,3 @@
   .wd-cluster-bar { gap: 0.35rem; padding: 0.5rem; }
   .wd-cluster-bar-item { font-size: 12px; padding: 0.3rem 0.65rem; }
 }
-}
-  .wd-library-inner { padding: 0 1.25rem; }
-  .wd-portal { padding: 1.25rem 1.25rem 1rem; }
-  .wd-portal-head { flex-direction: column; gap: 0.75rem; }
-  .wd-portal-meta { gap: 1rem; }
-  .wd-portal-title { font-size: 20px; }
-  .wd-cluster-bar { gap: 0.35rem; padding: 0.5rem; }
-  .wd-cluster-bar-item { font-size: 12px; padding: 0.3rem 0.65rem; }
-}
