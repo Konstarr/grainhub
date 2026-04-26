@@ -156,28 +156,17 @@
 .filter-col {
   position: fixed;
   top: 80px;
-  /* Anchoring top + bottom (instead of top + fixed height) gives the
-     sidebar the maximum possible vertical reach -- it always extends
-     all the way from just under the nav down to 16px above the
-     viewport bottom. */
   bottom: 16px;
   left: max(2.5rem, calc(50vw - 690px + 2.5rem));
   width: 260px;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
   z-index: 10;
 }
 .filter-card {
-  /* flex: 1 1 0 + min-height: 0 is the canonical "let the flex child
-     scroll its overflow" recipe. Without min-height: 0 the child
-     refuses to shrink below its content height and overflow never
-     engages -- which is what caused the bottom cutoff. overflow-y:
-     scroll keeps the bar always visible so it's obvious the card
-     scrolls when content exceeds the available height. */
-  flex: 1 1 0;
-  min-height: 0;
-  overflow-y: scroll;
+  height: 100%;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-gutter: stable;
 }
@@ -185,22 +174,20 @@
 .filter-card::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.18); border-radius: 4px; }
 .filter-card::-webkit-scrollbar-track { background: transparent; }
 
-/* Mobile / narrow: stack the sidebar above the listings instead of
-   floating it. Fixed positioning would obscure content on small
-   screens. */
+/* Narrow / mobile: drop fixed positioning so the sidebar stacks
+   above the listings instead of floating off-screen. */
 @media (max-width: 900px) {
   .filter-col {
     position: static;
     width: auto;
-    max-height: none;
+    bottom: auto;
     left: auto;
   }
   .filter-card {
-    max-height: none;
+    height: auto;
     overflow: visible;
   }
 }
-.filter-card { background: var(--white); border: 1px solid var(--border); border-radius: 12px; }
 .filter-header { background: var(--wood-dark); padding: 0.75rem 1.25rem; font-family: 'Montserrat', sans-serif; font-size: 15px; color: var(--wood-cream); display: flex; align-items: center; justify-content: space-between; }
 .filter-clear { font-family: 'Montserrat', sans-serif; font-size: 12px; color: var(--wood-light); cursor: pointer; font-weight: 400; }
 .filter-body { padding: 1rem 1.25rem; }
