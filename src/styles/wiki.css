@@ -62,7 +62,6 @@
   margin: 0 0 1.5rem;
 }
 
-/* Search bar matches other GrainHub inputs */
 .wiki-search {
   display: flex;
   align-items: center;
@@ -125,7 +124,6 @@
 }
 .search-sug:hover { color: var(--wood-mid); text-decoration: underline; }
 
-/* Stats block on the right */
 .hero-right { flex-shrink: 0; }
 .hero-stats-grid {
   display: grid;
@@ -159,13 +157,6 @@
   font-weight: 600;
 }
 
-/* ---------- Three-column layout ----------
-   Center column gets ~50% more horizontal room than the original
-   1200px / 240+1fr+280 setup. We do this in two ways:
-     - bump the wrap max-width from 1200 -> 1440px (adds 240px)
-     - trim the side columns slightly (220 / 260 instead of 240 / 280)
-   minmax(0, 1fr) on the center prevents long content (wide tables,
-   code blocks, images) from overflowing the column. */
 .wiki-grid {
   max-width: 1440px;
   margin: 0 auto;
@@ -176,7 +167,6 @@
   align-items: flex-start;
 }
 
-/* ---------- Left nav ---------- */
 .wiki-left-nav {
   position: sticky;
   top: 1rem;
@@ -258,7 +248,6 @@
   font-style: italic;
 }
 
-/* ---------- Main content ---------- */
 .wiki-content { min-width: 0; }
 
 .wiki-content .section-header {
@@ -287,7 +276,6 @@
   font-weight: 600;
 }
 
-/* Featured article — prominent cream card */
 .featured-article {
   display: block;
   text-decoration: none;
@@ -349,7 +337,6 @@
   font-size: 11px;
 }
 
-/* ---------- Article list (text-first rows) ---------- */
 .articles-grid {
   display: flex;
   flex-direction: column;
@@ -391,9 +378,9 @@
 }
 .article-card:hover .ac-title { color: var(--wood-warm); }
 .ac-body > div:not(.ac-cat):not(.ac-title):not(.ac-footer) {
-  font-family: 'Montserrat', sans-serif \!important;
-  color: var(--text-secondary) \!important;
-  font-size: 13.5px \!important;
+  font-family: 'Montserrat', sans-serif !important;
+  color: var(--text-secondary) !important;
+  font-size: 13.5px !important;
 }
 .ac-footer {
   font-family: 'Montserrat', sans-serif;
@@ -406,7 +393,6 @@
 }
 .ac-badge { display: none; }
 
-/* ---------- Contribute CTA ---------- */
 .contribute-cta {
   margin-top: 2.5rem;
   padding: 1.75rem 2rem;
@@ -471,7 +457,6 @@
   font-weight: 600;
 }
 
-/* ---------- Right sidebar — scrolls with the page ---------- */
 .right-col {
   display: flex;
   flex-direction: column;
@@ -588,9 +573,17 @@
 }
 .sp-btn:hover { background: var(--wood-mid); }
 
-/* ---------- Responsive ---------- */
 @media (max-width: 1024px) {
   .wiki-grid { grid-template-columns: 220px 1fr; }
   .right-col { display: none; }
 }
-@media (max-width: 768px) 
+@media (max-width: 768px) {
+  .wiki-grid { grid-template-columns: 1fr; gap: 1.5rem; padding: 1rem; }
+  .wiki-left-nav { position: static; }
+  .hero-title { font-size: 30px; }
+  .wiki-hero .hero-top { flex-direction: column; }
+  .hero-right { width: 100%; }
+  .hero-stats-grid { grid-template-columns: repeat(4, 1fr); }
+  .contribute-cta { grid-template-columns: 1fr; }
+  .cc-right { justify-content: flex-start; }
+}

@@ -141,18 +141,6 @@
 .mk-wrap { max-width: 1380px; margin: 0 auto; padding: 2.5rem; display: grid; grid-template-columns: 260px 1fr; gap: 2.5rem; align-items: start; }
 
 /* ── FILTER SIDEBAR ── */
-/* Filter column: position: fixed so it stays anchored at the top of
-   the viewport regardless of page scroll. The grid still reserves
-   the 260px first column in .mk-wrap so the listings render to the
-   right of where the fixed sidebar visually sits.
-
-   The left offset uses max() so the sidebar tracks the centered
-   .mk-wrap on wide screens and falls back to the page's 2.5rem
-   padding on narrower viewports. 690px = half of .mk-wrap's
-   max-width (1380px). 2.5rem matches .mk-wrap's left padding.
-
-   The inner .filter-card scrolls so very tall filter content stays
-   reachable without leaving the pinned position. */
 .filter-col {
   position: fixed;
   top: 80px;
@@ -174,8 +162,6 @@
 .filter-card::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.18); border-radius: 4px; }
 .filter-card::-webkit-scrollbar-track { background: transparent; }
 
-/* Narrow / mobile: drop fixed positioning so the sidebar stacks
-   above the listings instead of floating off-screen. */
 @media (max-width: 900px) {
   .filter-col {
     position: static;
@@ -376,4 +362,28 @@
 footer { background: var(--wood-dark); margin-top: 4rem; padding: 3rem 2.5rem 2rem; }
 .footer-grid { max-width: 1380px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr; gap: 3rem; padding-bottom: 2.5rem; border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 1.5rem; }
 .footer-brand p { font-size: 13px; color: #7A6858; line-height: 1.7; margin-top: 0.75rem; max-width: 280px; }
-.footer-col h4 { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.2px; color: var(
+.footer-col h4 { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.2px; color: var(--wood-light); margin-bottom: 1rem; }
+.footer-col a { display: block; font-size: 13px; color: #7A6858; padding: 3px 0; transition: color 0.12s; cursor: pointer; }
+.footer-col a:hover { color: var(--wood-cream); }
+.footer-bottom { max-width: 1380px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #5A4838; flex-wrap: wrap; gap: 0.5rem; }
+.footer-bottom a { color: #7A6858; }
+
+/* List view (added for grid/list toggle) */
+.listings-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 2rem; }
+.listings-list .listing-card { flex-direction: row; }
+.listings-list .card-img-area { width: 220px; height: auto; min-height: 140px; flex-shrink: 0; }
+.listings-list .card-content { flex: 1; padding: 1rem 1.25rem; }
+.listings-list .card-title { font-size: 16px; }
+.listings-list .card-specs { margin-bottom: 6px; }
+
+/* Responsive: list view collapses to column on narrow screens */
+@media (max-width: 720px) {
+  .listings-list .listing-card { flex-direction: column; }
+  .listings-list .card-img-area { width: 100%; height: 155px; }
+}
+
+/* Filter clear all hover */
+.filter-clear:hover { text-decoration: underline; }
+
+/* View toggle buttons responsive to active state */
+.view-btn { cursor: pointer; }

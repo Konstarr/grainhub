@@ -168,4 +168,12 @@ export default function SecondaryNav() {
             tabIndex={0}
             onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick(it.value); } }}
           >
-    
+            {it.label}
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  return null;
+}
