@@ -1,4 +1,5 @@
 import { FILTER_OPTIONS } from '../../data/marketplaceData.js';
+import PriceRangeSlider from './PriceRangeSlider.jsx';
 
 export default function FilterSidebar({ filters, onFilterChange, onClearAll }) {
   const conds = filters.conditions || [];
@@ -12,11 +13,6 @@ export default function FilterSidebar({ filters, onFilterChange, onClearAll }) {
       ? current.filter((c) => c !== value)
       : [...current, value];
     onFilterChange({ ...filters, [key]: updated });
-  };
-
-  const setPrice = (key, v) => {
-    const clean = (v || '').replace(/[^0-9]/g, '');
-    onFilterChange({ ...filters, [key]: clean });
   };
 
   const setTimeframe = (value) => {
@@ -52,25 +48,14 @@ export default function FilterSidebar({ filters, onFilterChange, onClearAll }) {
 
           <div className="filter-section">
             <div className="filter-label">Price Range</div>
-            <div className="price-range">
-              <input
-                className="price-input"
-                type="text"
-                inputMode="numeric"
-                placeholder="Min $"
-                value={filters.priceMin || ''}
-                onChange={(e) => setPrice('priceMin', e.target.value)}
-              />
-              <span className="price-sep">—</span>
-              <input
-                className="price-input"
-                type="text"
-                inputMode="numeric"
-                placeholder="Max $"
-                value={filters.priceMax || ''}
-                onChange={(e) => setPrice('priceMax', e.target.value)}
-              />
-            </div>
+            <PriceRangeSlider
+              minValue={filters.priceMin}
+              maxValue={filters.priceMax}
+              onChange={(p) => onFilterChange({ ...filters, ...p })}
+              floor={0}
+              ceiling={100000}
+              step={250}
+            />
           </div>
 
           <div className="filter-section">
