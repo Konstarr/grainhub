@@ -167,7 +167,7 @@ export default function CommunityHome() {
   };
   const handleTransfer = async (newOwnerId) => {
     if (!community || !newOwnerId) return false;
-    if (!confirm('Transfer ownership? You will be demoted to moderator and the new owner takes full control.')) return false;
+    if (!confirm('Transfer ownership?\n\nYou will become a regular member and the new owner takes full control of the community. They can promote you back to mod or owner if they choose.')) return false;
     setBusy(true);
     const { error } = await transferOwnership(community.id, newOwnerId);
     setBusy(false);
@@ -931,7 +931,7 @@ function ManageMembershipModal({
       style={{ position: 'fixed', inset: 0, background: 'rgba(20, 12, 6, 0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: '1rem' }}
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
-      <div style={{ background: 'var(--white)', borderRadius: 14, width: 'min(640px, 100%)', maxHeight: '90vh', display: 'flex', flexDirection: 'column', boxShadow: '0 20px 50px rgba(0,0,0,0.35)', overflow: 'hidden' }}>
+      <div style={{ background: 'var(--white)', borderRadius: 14, width: 'min(720px, 100%)', maxHeight: '90vh', display: 'flex', flexDirection: 'column', boxShadow: '0 20px 50px rgba(0,0,0,0.35)', overflow: 'hidden' }}>
         <div style={{ padding: '1rem 1.25rem', borderBottom: '1px solid var(--border-light)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
             <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1.4, textTransform: 'uppercase', color: 'var(--wood-warm)' }}>Manage</div>
@@ -1003,11 +1003,15 @@ function ManageMembershipModal({
           )}
           {section === 'transfer' && isOwner && (
             <div>
-              <div style={{ padding: '12px 14px', background: '#FFF3DC', borderRadius: 8, color: '#8B5E08', fontSize: 13, lineHeight: 1.5, marginBottom: 12 }}>
-                Transferring makes the chosen member the new owner. You'll be demoted to <strong>moderator</strong>. You will not be able to take ownership back without the new owner transferring it to you.
+              <div style={{ padding: '12px 14px', background: '#FFF3DC', borderRadius: 8, color: '#8B5E08', fontSize: 13, lineHeight: 1.55, marginBottom: 12 }}>
+                <div style={{ fontWeight: 700, marginBottom: 4 }}>This is permanent.</div>
+                Transferring makes the chosen member the new <strong>owner</strong>. You become a regular <strong>member</strong> — they can promote you back to mod or owner later if they choose.
               </div>
-              {transferCandidates.length === 0 ? (<div style={{ color: 'var(--text-muted)', fontSize: 14 }}>Add at least one other member before transferring ownership.</div>)
-              : (
+              {transferCandidates.length === 0 ? (
+                <div style={{ color: 'var(--text-muted)', fontSize: 14, padding: '0.5rem 0' }}>
+                  Add at least one other member before transferring ownership.
+                </div>
+              ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                   {transferCandidates.map((m) => {
                     const p = m.profile;
@@ -1020,9 +1024,11 @@ function ManageMembershipModal({
                         </div>
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{ fontWeight: 600, fontSize: 14, color: 'var(--text-primary)' }}>{name}</div>
-                          <div style={{ fontSize: 11.5, color: 'var(--text-muted)' }}>{m.role}</div>
+                          <div style={{ fontSize: 11.5, color: 'var(--text-muted)', textTransform: 'capitalize' }}>{m.role}</div>
                         </div>
-                        <button type="button" onClick={() => onTransfer(p.id)} disabled={busy} className="comm-btn primary" style={{ padding: '6px 14px', fontSize: 12 }}>Make owner</button>
+                        <button type="button" onClick={() => onTransfer(p.id)} disabled={busy} className="comm-btn primary" style={{ padding: '6px 14px', fontSize: 12, flexShrink: 0 }}>
+                          Make owner
+                        </button>
                       </div>
                     );
                   })}
@@ -1040,6 +1046,11 @@ function formatRelative(iso) {
   if (!iso) return '';
   const ms = Date.now() - new Date(iso).getTime();
   if (ms < 60 * 1000) return 'just now';
+  if (ms < 60 * 60 * 1000) return Math.floor(ms / 60000) + 'm ago';
+  if (ms < 24 * 60 * 60 * 1000) return Math.floor(ms / 3600000) + 'h ago';
+  if (ms < 7 * 24 * 60 * 60 * 1000) return Math.floor(ms / 86400000) + 'd ago';
+  return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+}
   if (ms < 60 * 60 * 1000) return Math.floor(ms / 60000) + 'm ago';
   if (ms < 24 * 60 * 60 * 1000) return Math.floor(ms / 3600000) + 'h ago';
   if (ms < 7 * 24 * 60 * 60 * 1000) return Math.floor(ms / 86400000) + 'd ago';
