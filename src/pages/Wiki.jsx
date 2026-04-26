@@ -2,265 +2,20 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase.js';
 import { mapWikiRow } from '../lib/mappers.js';
+import { CLUSTERS, TOTAL_SUBTOPICS } from '../data/wikiTaxonomy.js';
 import '../styles/wikiDashboard.css';
 
-const CLUSTERS = [
-  {
-    key: 'Timber & Milling', icon: 'TM', accent: '#5a7a5a',
-    desc: 'From the standing tree to the surfaced board.',
-    subtopics: [
-      { name: 'Forestry & Silviculture',     match: /(forestry|silviculture|stand|harvest cycle)/i },
-      { name: 'Harvesting & Logging',        match: /(logging|harvest|fell|skid|bucking)/i },
-      { name: 'Sawmilling',                  match: /(sawmill|band mill|circular mill|porta?-?mill|wood-?mizer)/i },
-      { name: 'Lumber Grading',              match: /(grading|nhla|select|fas|s2s|s4s|grade rules)/i },
-      { name: 'Air & Kiln Drying',           match: /(air dr|kiln|dehumidif|drying schedule|moisture content)/i },
-      { name: 'Lumber Yards & Suppliers',    match: /(lumber yard|wholesale|hardwood dealer|distributor)/i },
-      { name: 'Reclaimed & Salvaged',        match: /(reclaim|salvag|barn wood|urban lumber|deconstructed)/i },
-      { name: 'Specialty & Figured Stock',   match: /(figured|curly|quilted|spalted|exotic)/i },
-    ],
-  },
-  {
-    key: 'Wood Species', icon: 'SP', accent: '#7a5530',
-    desc: 'Janka, density, color, workability for every commercial species.',
-    subtopics: [
-      { name: 'Domestic Hardwoods',          match: /(white oak|red oak|maple|cherry|walnut|ash|hickory|birch|poplar|domestic hardwood)/i },
-      { name: 'Imported Hardwoods',          match: /(mahogany|teak|sapele|wenge|purpleheart|bubinga|tropical|imported hardwood)/i },
-      { name: 'Softwoods',                   match: /(pine|fir|cedar|spruce|hemlock|softwood)/i },
-      { name: 'Manufactured Panels',         match: /(plywood|mdf|particleboard|osb|hdf|panel)/i },
-      { name: 'Veneer & Burl',               match: /(veneer|burl|figured slice|crotchwood)/i },
-      { name: 'Sustainability & CITES',      match: /(fsc|sustainability|cites|endangered)/i },
-      { name: 'Comparison & Selection',      match: /(species comparison|wood selection)/i },
-    ],
-  },
-  {
-    key: 'Joinery', icon: 'JN', accent: '#8a5030',
-    desc: 'Every named joint, with diagrams and proportions.',
-    subtopics: [
-      { name: 'Mortise & Tenon',             match: /mortise|tenon/i },
-      { name: 'Dovetails',                   match: /dovetail/i },
-      { name: 'Dadoes & Rabbets',            match: /dado|rabbet|groove/i },
-      { name: 'Finger & Box Joints',         match: /finger|box joint/i },
-      { name: 'Miters & Splines',            match: /miter|spline|biscuit/i },
-      { name: 'Loose Tenon (Domino)',        match: /loose tenon|domino|floating/i },
-      { name: 'Specialty & Decorative',      match: /scarf|lap|bridle|tusk|specialty joint/i },
-    ],
-  },
-  {
-    key: 'Finishing', icon: 'FN', accent: '#9c5e30',
-    desc: 'Stain, dye, topcoat, schedule, and troubleshooting.',
-    subtopics: [
-      { name: 'Stains & Dyes',               match: /stain|dye|aniline|pigment/i },
-      { name: 'Lacquer & Pre-Cat',           match: /lacquer|pre-?cat/i },
-      { name: 'Polyurethane',                match: /poly(urethane)?/i },
-      { name: 'Oil Finishes',                match: /(tung|linseed|danish|hardwax|oil finish)/i },
-      { name: 'Shellac & French Polish',     match: /shellac|french polish/i },
-      { name: 'Application Methods',         match: /spray|hvlp|brush|wipe|application/i },
-      { name: 'Schedules & Recipes',         match: /finish(ing)? schedule|recipe/i },
-      { name: 'Troubleshooting',             match: /blush|orange peel|fish eye|defect/i },
-    ],
-  },
-  {
-    key: 'Hand Tools', icon: 'HT', accent: '#6b3d23',
-    desc: 'Planes, chisels, saws, marking, sharpening.',
-    subtopics: [
-      { name: 'Bench & Block Planes',        match: /bench plane|block plane|smoother|jack plane|jointer plane/i },
-      { name: 'Specialty Planes',            match: /shoulder plane|router plane|moulding plane|specialty plane/i },
-      { name: 'Chisels',                     match: /chisel/i },
-      { name: 'Hand Saws',                   match: /(handsaw|backsaw|dovetail saw|tenon saw)/i },
-      { name: 'Marking & Measuring',         match: /(marking|gauge|square|caliper|rule|measuring)/i },
-      { name: 'Sharpening',                  match: /sharpen|stone|honing|grinding/i },
-      { name: 'Workholding',                 match: /vise|holdfast|clamp|workholding/i },
-    ],
-  },
-  {
-    key: 'Power Tools', icon: 'PT', accent: '#8c5a30',
-    desc: 'Handheld electric and cordless tools.',
-    subtopics: [
-      { name: 'Routers',                     match: /(handheld router|trim router|plunge router)/i },
-      { name: 'Drills & Drivers',            match: /(drill|driver|impact|cordless drill)/i },
-      { name: 'Random Orbit Sanders',        match: /(random orbit|ros|finishing sander)/i },
-      { name: 'Track Saws',                  match: /(track saw|plunge saw|festool ts)/i },
-      { name: 'Biscuit & Domino',            match: /(biscuit joiner|domino|festool df)/i },
-      { name: 'Pocket-Hole Tools',           match: /(pocket hole|kreg|pocket screw)/i },
-      { name: 'Multi-Tools & Rotary',        match: /(oscillating tool|dremel|rotary tool|multi-?tool)/i },
-    ],
-  },
-  {
-    key: 'Stationary Machinery', icon: 'MC', accent: '#5d3a1c',
-    desc: 'Setup, tuning, safety, and lifecycle.',
-    subtopics: [
-      { name: 'Tablesaws',                   match: /tablesaw|table saw/i },
-      { name: 'Jointers & Planers',          match: /jointer|planer/i },
-      { name: 'Bandsaws',                    match: /bandsaw|band saw/i },
-      { name: 'Drill Presses',               match: /drill press/i },
-      { name: 'Mortisers',                   match: /mortiser|hollow chisel/i },
-      { name: 'Edgebanders',                 match: /edgeband/i },
-      { name: 'Stationary Sanders',          match: /(wide belt|drum sander|edge sander|stroke sander)/i },
-      { name: 'Dust Collection',             match: /dust|collection|cyclone|extract/i },
-    ],
-  },
-  {
-    key: 'CNC & Digital', icon: 'CN', accent: '#3a4a82',
-    desc: 'Software, post-processing, machines, robotics.',
-    subtopics: [
-      { name: 'CAD Software',                match: /(autocad|fusion 360|sketchup|cabinet vision|microvellum|cad)/i },
-      { name: 'CAM & Toolpathing',           match: /(cam|toolpath|aspire|vcarve|cabinetparts)/i },
-      { name: 'CNC Machines',                match: /(cnc machine|cnc router|laguna swift|biesse rover|shopbot|axyz|onsrud)/i },
-      { name: 'Cutting Strategies',          match: /(cutting strateg|nesting|optimization|chip load)/i },
-      { name: 'Post-Processors',             match: /(post.?processor|gcode|machine controller)/i },
-      { name: 'CNC Tooling',                 match: /(end mill|compression bit|spoilboard|cnc bit)/i },
-      { name: 'Industrial Robotics',         match: /(robotic|6-axis|industrial automation)/i },
-    ],
-  },
-  {
-    key: 'Hardware & Adhesives', icon: 'HW', accent: '#8a4a3a',
-    desc: 'Hinges, slides, fasteners, glues, adhesives.',
-    subtopics: [
-      { name: 'Hinges',                      match: /hinge|euro|butt hinge|barrel/i },
-      { name: 'Drawer Slides',               match: /drawer slide|undermount|ball bearing/i },
-      { name: 'Knobs, Pulls & Locks',        match: /knob|pull|handle|lock|latch/i },
-      { name: 'Fasteners & Connectors',      match: /screw|nail|bolt|fastener|cam lock|knockdown/i },
-      { name: 'Wood Glues',                  match: /(pva|titebond|wood glue|aliphatic|polyurethane glue)/i },
-      { name: 'Hide & Specialty Glues',      match: /(hide glue|epoxy|cyanoacrylate|ca glue|hot melt)/i },
-      { name: 'Specialty Hardware',          match: /(specialty hardware|leveler|caster|magnet)/i },
-    ],
-  },
-  {
-    key: 'Techniques', icon: 'TQ', accent: '#4a6b30',
-    desc: 'Bending, veneering, repair, glue-up, layout.',
-    subtopics: [
-      { name: 'Bending (Steam & Lam.)',      match: /bend(ing)?|steam|lamination/i },
-      { name: 'Veneering & Inlay',           match: /veneer|inlay|marquetry|parquetry/i },
-      { name: 'Repair & Restoration',        match: /repair|restoration|conservation/i },
-      { name: 'Wood Movement',               match: /wood movement|seasonal|expansion|shrinkage/i },
-      { name: 'Surface Prep & Sanding',      match: /(surface prep|sanding sequence|grit progression)/i },
-      { name: 'Glue-up & Clamping',          match: /(glue.?up|clamping|cauls|panel glue)/i },
-      { name: 'Layout & Marking',            match: /(layout|story stick|marking out)/i },
-    ],
-  },
-  {
-    key: 'Cabinetmaking & Millwork', icon: 'CM', accent: '#a06030',
-    desc: 'Production cabinetry and architectural millwork.',
-    subtopics: [
-      { name: 'Frameless (Euro) Cabinets',   match: /(frameless|32mm|european cabinet)/i },
-      { name: 'Face-Frame Cabinets',         match: /(face.?frame|inset|partial overlay|full overlay)/i },
-      { name: 'Architectural Millwork',      match: /(architectural millwork|panel|wainscot|crown|moulding|trim)/i },
-      { name: 'Doors',                       match: /(cabinet door|raised panel|shaker door|mdf door|slab door)/i },
-      { name: 'Drawers & Boxes',             match: /(drawer box|drawer construction|baltic birch box)/i },
-      { name: 'Countertops & Tops',          match: /(countertop|stone top|butcher block top|laminate top)/i },
-      { name: 'Closets & Storage',           match: /(closet system|wardrobe|murphy bed|built-?in)/i },
-    ],
-  },
-  {
-    key: 'Furniture Making', icon: 'FM', accent: '#825a3a',
-    desc: 'Studio and custom furniture, every form.',
-    subtopics: [
-      { name: 'Tables & Desks',              match: /(table|desk|trestle|pedestal table)/i },
-      { name: 'Chairs & Seating',            match: /(chair|seat|windsor|bench|stool|sofa)/i },
-      { name: 'Casework & Cabinets',         match: /(case piece|chest of drawers|sideboard|hutch|armoire)/i },
-      { name: 'Beds & Bedroom',              match: /(bed frame|headboard|four-?poster|bedroom set)/i },
-      { name: 'Studio Furniture',            match: /(studio furniture|krenov|maloof|nakashima|art furniture)/i },
-      { name: 'Reproduction Work',           match: /(reproduction|period piece|antique reproduction)/i },
-      { name: 'Outdoor Furniture',           match: /(outdoor furniture|adirondack|teak garden|patio)/i },
-    ],
-  },
-  {
-    key: 'Boat Building & Marine', icon: 'BM', accent: '#3a6a82',
-    desc: 'Marine carpentry, hulls, spars, restoration.',
-    subtopics: [
-      { name: 'Plank-on-Frame',              match: /(plank.?on.?frame|carvel|lapstrake|clinker)/i },
-      { name: 'Plywood Construction',        match: /(stitch.?and.?glue|plywood boat|sheet plywood hull)/i },
-      { name: 'Cold-Molded',                 match: /(cold.?molded|cold molding|epoxy laminated hull)/i },
-      { name: 'Strip Planking',              match: /(strip plank|strip-?built|cedar strip)/i },
-      { name: 'Spars & Rigging',             match: /(spar|mast|gaff|rigging|boom)/i },
-      { name: 'Marine Finishes',             match: /(marine finish|spar varnish|two-?part urethane|awlgrip)/i },
-      { name: 'Restoration & Repair',        match: /(boat restoration|marine repair|hull repair)/i },
-    ],
-  },
-  {
-    key: 'Lutherie & Instruments', icon: 'LU', accent: '#6a4a82',
-    desc: 'Stringed instrument making, setup, tonewoods.',
-    subtopics: [
-      { name: 'Acoustic Guitars',            match: /(acoustic guitar|dreadnought|om|jumbo|parlor|martin|gibson)/i },
-      { name: 'Electric Guitars',            match: /(electric guitar|telecaster|stratocaster|les paul|solid body)/i },
-      { name: 'Violin Family',               match: /(violin|viola|cello|stradivari|guarneri)/i },
-      { name: 'Mandolins & Banjos',          match: /(mandolin|banjo|bouzouki|ukulele)/i },
-      { name: 'Tonewoods',                   match: /(tonewood|spruce top|rosewood back|ebony fingerboard|sitka)/i },
-      { name: 'Setup & Repair',              match: /(luthier setup|fret level|nut|saddle|setup)/i },
-      { name: 'Hide Glue & Hot Glue',        match: /(hide glue|hot glue|reversible joint|liquid hide)/i },
-    ],
-  },
-  {
-    key: 'Specialty Disciplines', icon: 'SD', accent: '#3a8270',
-    desc: 'Turning, carving, cooperage, timber framing.',
-    subtopics: [
-      { name: 'Spindle Turning',             match: /(spindle turn|chisel turn|skew chisel)/i },
-      { name: 'Bowl & Hollow Turning',       match: /(bowl turn|hollow turn|hollow form)/i },
-      { name: 'Segmented Turning',           match: /(segmented turn|segment ring)/i },
-      { name: 'Relief & Chip Carving',       match: /(relief carving|chip carving|incised)/i },
-      { name: 'Sculpture & 3D Carving',      match: /(sculpture|3d carve|figure carving)/i },
-      { name: 'Cooperage (Barrels)',         match: /(cooper|barrel|cask|stave)/i },
-      { name: 'Timber Framing',              match: /(timber frame|post and beam|bent assembly)/i },
-    ],
-  },
-  {
-    key: 'History & Schools', icon: 'HS', accent: '#824a4a',
-    desc: 'Periods, regional traditions, master craftsmen.',
-    subtopics: [
-      { name: 'Shaker',                      match: /(shaker furniture|shaker style|hancock)/i },
-      { name: 'American Federal & Empire',   match: /(federal|empire|hepplewhite|sheraton|duncan phyfe)/i },
-      { name: 'Arts & Crafts / Mission',     match: /(arts and crafts|mission style|stickley|morris)/i },
-      { name: 'Greene & Greene',             match: /(greene.{0,3}greene|gamble house|cloud lift)/i },
-      { name: 'Mid-Century Modern',          match: /(mid.?century|eames|wegner|panton|saarinen|nelson)/i },
-      { name: 'Scandinavian Design',         match: /(scandinavian|danish modern|finn juhl|hans wegner)/i },
-      { name: 'Japanese Joinery',            match: /(japanese joinery|kanawa|sashimono|kumiko)/i },
-      { name: 'Master Craftsmen',            match: /(krenov|maloof|nakashima|esherick|maker biography)/i },
-    ],
-  },
-  {
-    key: 'Industry & Brands', icon: 'IB', accent: '#82723a',
-    desc: 'The companies that supply the trade.',
-    subtopics: [
-      { name: 'Equipment Manufacturers',     match: /(festool|sawstop|powermatic|grizzly|laguna|jet|delta|biesse|scm|martin)/i },
-      { name: 'Hardware Brands',             match: /(blum|grass|hettich|salice|hafele|rockler|knape vogt)/i },
-      { name: 'Finish & Adhesive Brands',    match: /(general finishes|sherwin williams|target coatings|titebond|gorilla glue|m\.l\. campbell)/i },
-      { name: 'Software Vendors',            match: /(microvellum|cabinet vision|autodesk|vectric|ecabinet)/i },
-      { name: 'Distributors & Suppliers',    match: /(rockler|woodcraft|highland woodworking|lee valley|woodpeckers)/i },
-      { name: 'Furniture Manufacturers',     match: /(stickley furniture|herman miller|knoll|thomasville)/i },
-      { name: 'Trade Associations',          match: /(awi|kcma|wmma|nhla|nwfa|trade association)/i },
-    ],
-  },
-  {
-    key: 'Shop & Business', icon: 'SB', accent: '#3a4a82',
-    desc: 'Layout, pricing, contracts, safety, taxes.',
-    subtopics: [
-      { name: 'Shop Layout & Design',        match: /shop layout|workshop design|workflow/i },
-      { name: 'Dust Collection Design',      match: /(dust collection|cyclone sizing|cfm|ducting)/i },
-      { name: 'Pricing & Estimating',        match: /pricing|estimat|quote|bid/i },
-      { name: 'Contracts & Customers',       match: /contract|customer|client/i },
-      { name: 'Safety & OSHA',               match: /safety|osha|ppe|injury/i },
-      { name: 'Insurance & Taxes',           match: /insurance|tax|liability/i },
-      { name: 'Marketing & Sales',           match: /marketing|sales|lead/i },
-      { name: 'Hiring & Apprentices',        match: /hiring|apprentice|employee/i },
-    ],
-  },
-];
-
-function topicSlug(s) {
-  return encodeURIComponent(s);
-}
-
 const DID_YOU_KNOW = [
-  'Mortise and tenon joints have been found in Egyptian tomb furniture from 2,700 BCE - and they were already pegged for permanence.',
+  'Mortise and tenon joints have been found in Egyptian tomb furniture from 2,700 BCE.',
   'White oak floats in salt water and sinks in fresh water? Its closed-cell structure traps almost no air.',
-  'Janka hardness is measured by pressing a 0.444-inch-diameter steel ball halfway into a board and recording the pounds-force required.',
-  'The original Stanley #4 smoothing plane has been produced almost continuously since 1869, with only minor changes to the frog and lateral lever.',
-  'Hide glue is reversible with steam - which is why 18th-century furniture can be repaired but most modern PVA-glued furniture can not.',
-  'Board-foot is a volume measure: 144 cubic inches of nominal lumber, regardless of the actual surfaced dimensions.',
-  'Festool produced its first Domino DF 500 in 2007; before that, "loose tenons" were either router-cut or biscuit-joined.',
-  'The rule of thumb that tenon thickness equals 1/3 of stock thickness comes from the European cabinetmaking tradition. Japanese furniture runs closer to 1/2.',
-  'The Sitka spruce used for guitar tops grows almost exclusively in a narrow strip along the Pacific Northwest coast - the same trees historically used for aircraft propellers.',
-  'A standard wine barrel uses 32 staves of American or French oak, hand-shaped and toasted over an open fire. The toast level is what gives the wine its vanilla and caramel notes.',
+  'Janka hardness is measured by pressing a 0.444-inch steel ball halfway into a board.',
+  'The Stanley #4 smoothing plane has been produced almost continuously since 1869.',
+  'Hide glue is reversible with steam - antique furniture can be repaired but PVA-glued furniture often cannot.',
+  'Board-foot is a volume measure: 144 cubic inches of nominal lumber.',
+  'Festool released its first Domino DF 500 in 2007; before that, "loose tenons" meant router-cut or biscuits.',
+  'European tradition runs tenon thickness at 1/3 stock; Japanese furniture runs closer to 1/2.',
+  'Sitka spruce - guitar tops and historic aircraft propellers - grows in a narrow strip along the Pacific Northwest.',
+  'A wine barrel uses 32 staves of oak, hand-shaped and toasted over an open fire to give wine its vanilla notes.',
 ];
 
 function pickRandom(arr, n = 3) {
@@ -269,8 +24,7 @@ function pickRandom(arr, n = 3) {
   while (out.length < Math.min(n, arr.length)) {
     const i = Math.floor(Math.random() * arr.length);
     if (used.has(i)) continue;
-    used.add(i);
-    out.push(arr[i]);
+    used.add(i); out.push(arr[i]);
   }
   return out;
 }
@@ -322,9 +76,7 @@ export default function Wiki() {
       let placed = false;
       for (const c of CLUSTERS) {
         if (cat === c.key || cat.toLowerCase() === c.key.toLowerCase()) {
-          map[c.key].push(a);
-          placed = true;
-          break;
+          map[c.key].push(a); placed = true; break;
         }
       }
       if (!placed) {
@@ -367,7 +119,6 @@ export default function Wiki() {
 
   const totalArticles = articles.length;
   const reviewedCount = articles.filter((a) => a.body && a.body.length > 1000).length;
-  const totalSubtopics = CLUSTERS.reduce((n, c) => n + c.subtopics.length, 0);
 
   return (
     <div className="wiki-dash">
@@ -376,7 +127,7 @@ export default function Wiki() {
           <div className="wd-hero-eyebrow">GrainHub Encyclopedia</div>
           <h1 className="wd-hero-title">The reference for everyone who works wood.</h1>
           <p className="wd-hero-sub">
-            From standing tree to finished piece - {CLUSTERS.length} fields, {totalSubtopics} sub-topics,
+            From standing tree to finished piece - {CLUSTERS.length} fields, {TOTAL_SUBTOPICS} sub-topics,
             written by working pros and free to read.
           </p>
 
@@ -418,7 +169,7 @@ export default function Wiki() {
               <div className="wd-stat-label">Major fields</div>
             </div>
             <div className="wd-stat">
-              <div className="wd-stat-num">{totalSubtopics}</div>
+              <div className="wd-stat-num">{TOTAL_SUBTOPICS}</div>
               <div className="wd-stat-label">Sub-topics</div>
             </div>
             <div className="wd-stat">
@@ -429,7 +180,7 @@ export default function Wiki() {
         </div>
       </section>
 
-      {/* FEATURED ROW: 3 most recent articles, side by side */}
+      {/* FEATURED ROW */}
       {featuredArticles.length > 0 && (
         <section className="wd-section">
           <div className="wd-section-head">
@@ -469,15 +220,14 @@ export default function Wiki() {
         </section>
       )}
 
-      {/* THE LIBRARY: 18 compact cluster cards in a tight grid */}
+      {/* COMPACT CLUSTER GRID — click any card to open the cluster sub-page */}
       <section className="wd-section">
         <div className="wd-section-head">
           <div>
             <div className="wd-section-eyebrow">The library</div>
-            <h2 className="wd-section-title">Browse the entire encyclopedia</h2>
+            <h2 className="wd-section-title">Browse the encyclopedia</h2>
             <p className="wd-section-desc">
-              {CLUSTERS.length} fields, {totalSubtopics} sub-topics, all visible at once. Click any
-              sub-topic to see the articles in it.
+              {CLUSTERS.length} fields, {TOTAL_SUBTOPICS} sub-topics. Click any field to drill into its sub-topics and articles.
             </p>
           </div>
         </div>
@@ -486,7 +236,12 @@ export default function Wiki() {
           {CLUSTERS.map((c) => {
             const list = articlesByCluster[c.key] || [];
             return (
-              <div className="wd-card-cluster" key={c.key} style={{ '--accent': c.accent }}>
+              <Link
+                to={'/wiki/cluster/' + c.slug}
+                className="wd-card-cluster"
+                key={c.key}
+                style={{ '--accent': c.accent }}
+              >
                 <div className="wd-card-cluster-head">
                   <span className="wd-card-cluster-icon">{c.icon}</span>
                   <div className="wd-card-cluster-id">
@@ -497,26 +252,10 @@ export default function Wiki() {
                   </div>
                 </div>
                 <p className="wd-card-cluster-desc">{c.desc}</p>
-                <div className="wd-card-cluster-topics">
-                  {c.subtopics.map((sub, idx) => {
-                    const n = list.filter((a) =>
-                      sub.match.test((a.title || '') + ' ' + (a.excerpt || ''))
-                    ).length;
-                    return (
-                      <span key={sub.name}>
-                        {idx > 0 && <span className="wd-topic-sep">.</span>}
-                        <Link
-                          to={'/wiki?cluster=' + topicSlug(c.key) + '&topic=' + topicSlug(sub.name)}
-                          className={'wd-topic-link' + (n > 0 ? ' has' : '')}
-                        >
-                          {sub.name}
-                          {n > 0 && <span className="wd-topic-n"> {n}</span>}
-                        </Link>
-                      </span>
-                    );
-                  })}
+                <div className="wd-card-cluster-cta">
+                  Explore {c.key} <span aria-hidden="true">&rarr;</span>
                 </div>
-              </div>
+              </Link>
             );
           })}
         </div>

@@ -1069,3 +1069,231 @@
   border-radius: 999px;
   vertical-align: 1px;
 }
+
+/* ============================================================
+   CLUSTER SUB-PAGE — /wiki/cluster/:slug
+   ============================================================ */
+
+/* Compact cluster card on the /wiki dashboard now ends in a CTA row */
+.wd-card-cluster-cta {
+  margin-top: auto;
+  padding-top: 0.6rem;
+  border-top: 1px solid #f0e6d2;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--accent, var(--wd-warm));
+  letter-spacing: 0.02em;
+}
+.wd-card-cluster:hover .wd-card-cluster-cta { text-decoration: underline; }
+
+/* Cluster hero (per-cluster page header) */
+.wd-cluster-hero {
+  color: var(--wd-cream);
+  padding: 3.5rem 2rem 2.5rem;
+}
+.wd-cluster-hero-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 80px minmax(0, 1fr);
+  gap: 1.5rem;
+  align-items: start;
+}
+.wd-cluster-hero-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.18);
+  border: 1px solid rgba(255,255,255,0.28);
+  color: #fff;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.wd-cluster-hero-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 38px;
+  font-weight: 700;
+  line-height: 1.1;
+  margin: 0.25rem 0 0.65rem;
+  color: var(--wd-cream);
+}
+.wd-cluster-hero-sub {
+  font-size: 16px;
+  line-height: 1.5;
+  color: rgba(251,246,236,0.85);
+  margin: 0 0 1.25rem;
+  max-width: 760px;
+}
+.wd-cluster-hero-stats {
+  display: flex;
+  gap: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255,215,172,0.22);
+  max-width: 380px;
+}
+.wd-cluster-hero-stats .wd-stat-num { color: #ffd7ac; }
+.wd-cluster-hero-stats .wd-stat-label { color: rgba(251,246,236,0.75); }
+
+/* Quick-jump nav across all 18 fields (sub-page) */
+.wd-cluster-jump {
+  max-width: 1280px;
+  margin: 1.25rem auto 0;
+  padding: 0.85rem 2rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  font-size: 13px;
+}
+.wd-cluster-jump-label {
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--wd-muted);
+  margin-right: 0.5rem;
+}
+.wd-cluster-jump-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.32rem 0.7rem;
+  border-radius: 999px;
+  background: #fff;
+  border: 1px solid var(--wd-rule);
+  text-decoration: none;
+  color: var(--wd-mid);
+  font-size: 12.5px;
+  font-weight: 600;
+  transition: background 100ms, border-color 100ms, color 100ms;
+}
+.wd-cluster-jump-link:hover {
+  background: var(--accent, var(--wd-warm));
+  border-color: var(--accent, var(--wd-warm));
+  color: #fff;
+}
+.wd-cluster-jump-icon {
+  width: 18px; height: 18px;
+  border-radius: 4px;
+  background: var(--accent, var(--wd-warm));
+  color: #fff;
+  font-size: 9px;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.wd-cluster-jump-link:hover .wd-cluster-jump-icon {
+  background: rgba(255,255,255,0.25);
+}
+
+/* Sub-topic section blocks */
+.wd-subtopic-section {
+  background: #fff;
+  border: 1px solid var(--wd-rule);
+  border-left: 4px solid var(--accent, var(--wd-warm));
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem 1.5rem;
+  margin-bottom: 1rem;
+  scroll-margin-top: 80px;
+}
+.wd-subtopic-section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid #f0e6d2;
+  flex-wrap: wrap;
+}
+.wd-subtopic-section-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--wd-dark);
+  margin: 0 0 0.2rem;
+}
+.wd-subtopic-section-meta {
+  font-size: 12px;
+  color: var(--wd-muted);
+  letter-spacing: 0.04em;
+}
+.wd-subtopic-section-cta {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--accent, var(--wd-warm));
+  text-decoration: none;
+  white-space: nowrap;
+}
+.wd-subtopic-section-cta:hover { text-decoration: underline; }
+
+.wd-subtopic-empty {
+  font-size: 13.5px;
+  color: var(--wd-muted);
+  font-style: italic;
+  padding: 0.6rem 0;
+}
+
+.wd-subtopic-articles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 0.85rem;
+}
+.wd-subtopic-article {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap: 0.75rem;
+  background: var(--wd-cream);
+  border: 1px solid #ece0c8;
+  border-radius: 10px;
+  text-decoration: none;
+  color: inherit;
+  overflow: hidden;
+  transition: transform 120ms, box-shadow 120ms, border-color 120ms;
+}
+.wd-subtopic-article:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(44,26,14,0.1);
+  border-color: var(--accent, var(--wd-warm));
+}
+.wd-subtopic-article-img {
+  background: linear-gradient(135deg,#3d2615,#1c0f06) center/cover;
+  min-height: 100px;
+}
+.wd-subtopic-article-body {
+  padding: 0.7rem 0.85rem 0.7rem 0;
+  min-width: 0;
+}
+.wd-subtopic-article-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--wd-dark);
+  margin-bottom: 0.3rem;
+  line-height: 1.25;
+}
+.wd-subtopic-article-excerpt {
+  font-size: 12.5px;
+  line-height: 1.4;
+  color: var(--wd-muted);
+}
+.wd-subtopic-article-meta {
+  font-size: 11px;
+  color: var(--wd-muted);
+  margin-top: 0.35rem;
+}
+
+@media (max-width: 720px) {
+  .wd-cluster-hero { padding: 2.5rem 1.25rem 1.75rem; }
+  .wd-cluster-hero-inner { grid-template-columns: 1fr; }
+  .wd-cluster-hero-icon { width: 56px; height: 56px; font-size: 18px; }
+  .wd-cluster-hero-title { font-size: 28px; }
+  .wd-cluster-jump { padding: 0.85rem 1.25rem; }
+  .wd-subtopic-section { padding: 1rem 1.25rem 1.25rem; }
+}

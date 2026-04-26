@@ -16,6 +16,7 @@ import Jobs from './pages/Jobs.jsx';
 import JobDetail from './pages/JobDetail.jsx';
 import Wiki from './pages/Wiki.jsx';
 import WikiArticle from './pages/WikiArticle.jsx';
+import WikiCluster from './pages/WikiCluster.jsx';
 import News from './pages/News.jsx';
 import NewsArticle from './pages/NewsArticle.jsx';
 import Marketplace from './pages/Marketplace.jsx';
@@ -37,9 +38,7 @@ import EventDetail from './pages/EventDetail.jsx';
 import Profile from './pages/Profile.jsx';
 import Messages from './pages/Messages.jsx';
 import MessageThread from './pages/MessageThread.jsx';
-// Admin pages - lazy-loaded so the TipTap editor (~210KB) and the
-// other admin-only widgets stay out of the main bundle for the 99% of
-// visitors who never see the admin panel.
+
 const AdminNews             = lazy(() => import('./pages/admin/AdminNews.jsx'));
 const AdminNewsEdit         = lazy(() => import('./pages/admin/AdminNewsEdit.jsx'));
 const AdminNewsReports      = lazy(() => import('./pages/admin/AdminNewsReports.jsx'));
@@ -77,8 +76,6 @@ const AdminFallback = (
   </div>
 );
 
-// Helper: every admin route shares the same Suspense boundary so the
-// chunk loads once and re-uses across nav.
 const adminRoute = (level, Component) => (
   <RequireStaff level={level}>
     <Suspense fallback={AdminFallback}>
@@ -107,8 +104,6 @@ export default function App() {
         <Route path="/admin/users/:id"        element={adminRoute('admin', AdminUserEdit)} />
         <Route path="/admin/sponsors"         element={adminRoute('admin', AdminSponsors)} />
         <Route path="/admin/connections"      element={adminRoute('admin', AdminConnections)} />
-        {/* Admin panel routes are admin/owner level only - moderators
-            do their work inline on /forums/thread/:slug instead. */}
         <Route path="/admin/forums"           element={adminRoute('admin', AdminForums)} />
         <Route path="/admin/forums/threads"   element={adminRoute('admin', AdminForumThreads)} />
         <Route path="/admin/forums/reports"   element={adminRoute('admin', AdminForumReports)} />
@@ -132,9 +127,6 @@ export default function App() {
           <Route path="/communities/new" element={<RequireAuth><CommunityNew /></RequireAuth>} />
           <Route path="/c/:slug" element={<CommunityHome />} />
           <Route path="/sponsor" element={<Sponsor />} />
-          {/* /pricing folded into /account/subscription. Keep as a
-              redirect so old links / bookmarks / search results still
-              land in the right place. */}
           <Route path="/pricing" element={<Navigate to="/account/subscription" replace />} />
           <Route path="/account/subscription" element={<AccountSubscription />} />
           <Route path="/signup" element={<Signup />} />
@@ -151,6 +143,7 @@ export default function App() {
 
           <Route path="/wiki/article/:slug" element={<RequireAuth><WikiArticle /></RequireAuth>} />
           <Route path="/wiki/article" element={<RequireAuth><WikiArticle /></RequireAuth>} />
+          <Route path="/wiki/cluster/:slug" element={<WikiCluster />} />
 
           <Route path="/news/article/:slug" element={<RequireAuth><NewsArticle /></RequireAuth>} />
           <Route path="/news/article" element={<RequireAuth><NewsArticle /></RequireAuth>} />
