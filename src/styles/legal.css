@@ -54,30 +54,41 @@
 }
 
 .legal-body {
-  max-width: 880px;
+  max-width: 1280px;
   margin: 0 auto;
   padding: 2.5rem 2rem 4rem;
   display: grid;
-  grid-template-columns: 220px minmax(0, 1fr);
-  gap: 2.25rem;
+  grid-template-columns: 240px minmax(0, 1fr);
+  column-gap: 2.5rem;
+  row-gap: 0;
   align-items: start;
 }
 
-/* Pin the TOC to column 1, send everything else (sections, the
-   trailing friendly paragraph) into column 2 so they don't
-   alternate-flow back into the sidebar slot. */
-.legal-body > .legal-toc { grid-column: 1; }
+/* Pin the TOC to column 1 and span the full grid height so all
+   sections stack tightly in column 2 instead of inheriting per-row
+   gaps from the grid layout. */
+.legal-body > .legal-toc {
+  grid-column: 1;
+  grid-row: 1 / -1;
+}
 .legal-body > section,
-.legal-body > p { grid-column: 2; }
+.legal-body > p {
+  grid-column: 2;
+}
 
-@media (max-width: 880px) {
+@media (max-width: 960px) {
   .legal-body {
     grid-template-columns: 1fr;
     padding: 1.5rem 1.25rem 3rem;
   }
+  .legal-body > .legal-toc {
+    grid-row: auto;
+  }
   .legal-body > .legal-toc,
   .legal-body > section,
-  .legal-body > p { grid-column: 1; }
+  .legal-body > p {
+    grid-column: 1;
+  }
 }
 
 .legal-toc {
