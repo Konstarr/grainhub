@@ -156,26 +156,30 @@
 .filter-col {
   position: fixed;
   top: 80px;
+  /* Anchoring top + bottom (instead of top + fixed height) gives the
+     sidebar the maximum possible vertical reach -- it always extends
+     all the way from just under the nav down to 16px above the
+     viewport bottom. */
+  bottom: 16px;
   left: max(2.5rem, calc(50vw - 690px + 2.5rem));
   width: 260px;
-  /* Fixed-pixel height (not max-height) gives the inner flex child a
-     concrete height to flex against. Capped at viewport-minus-100px
-     so the bottom never sits below the fold. */
-  height: calc(100vh - 100px);
   display: flex;
   flex-direction: column;
   gap: 1rem;
   z-index: 10;
 }
 .filter-card {
-  /* flex: 1 1 0  + min-height: 0  is the canonical "let the flex child
+  /* flex: 1 1 0 + min-height: 0 is the canonical "let the flex child
      scroll its overflow" recipe. Without min-height: 0 the child
-     refuses to shrink below its content height and overflow:auto
-     never engages, which is what was causing the bottom cutoff. */
+     refuses to shrink below its content height and overflow never
+     engages -- which is what caused the bottom cutoff. overflow-y:
+     scroll keeps the bar always visible so it's obvious the card
+     scrolls when content exceeds the available height. */
   flex: 1 1 0;
   min-height: 0;
-  overflow-y: auto;
+  overflow-y: scroll;
   scrollbar-width: thin;
+  scrollbar-gutter: stable;
 }
 .filter-card::-webkit-scrollbar { width: 6px; }
 .filter-card::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.18); border-radius: 4px; }
