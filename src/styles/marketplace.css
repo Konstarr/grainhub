@@ -141,23 +141,17 @@
 .mk-wrap { max-width: 1380px; margin: 0 auto; padding: 2.5rem; display: grid; grid-template-columns: 260px 1fr; gap: 2.5rem; align-items: start; }
 
 /* ── FILTER SIDEBAR ── */
+/* Filter column: flows naturally with the page so every section is
+   reachable by page scroll. We previously tried position:sticky with
+   an internal scroll, but the combination clips at certain viewport
+   heights across browsers. Letting the page own the scroll is more
+   predictable and means the filter card itself is never cut off. */
 .filter-col {
-  position: sticky;
-  top: 80px;
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  /* When the filter card is taller than the visible viewport (all
-     sections expanded), let the column scroll internally so the
-     bottom sections (Location, Posted Within) stay reachable instead
-     of being cut off below the fold. 96px = 80px sticky top + a bit
-     of breathing room from the page edge. */
-  max-height: calc(100vh - 96px);
-  overflow-y: auto;
-  scrollbar-width: thin;
+  align-self: start;
 }
-.filter-col::-webkit-scrollbar { width: 6px; }
-.filter-col::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.18); border-radius: 4px; }
 .filter-card { background: var(--white); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
 .filter-header { background: var(--wood-dark); padding: 0.75rem 1.25rem; font-family: 'Montserrat', sans-serif; font-size: 15px; color: var(--wood-cream); display: flex; align-items: center; justify-content: space-between; }
 .filter-clear { font-family: 'Montserrat', sans-serif; font-size: 12px; color: var(--wood-light); cursor: pointer; font-weight: 400; }
