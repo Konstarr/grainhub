@@ -47,12 +47,23 @@ export default function AdminJobs() {
     setBusyId(null);
   };
 
+  const [kindTab, setKindTab] = useState('hiring'); // 'hiring' | 'seeking' | 'all'
+
   const counts = useMemo(() => ({
     total: rows.length,
+    hiring:  rows.filter((r) => (r.kind || 'hiring') === 'hiring').length,
+    seeking: rows.filter((r) => r.kind === 'seeking').length,
     approved: rows.filter((r) => r.is_approved).length,
     drafts: rows.filter((r) => !r.is_approved).length,
     filled: rows.filter((r) => r.is_filled).length,
+    totalViews:  rows.reduce((a, r) => a + (r.view_count  || 0), 0),
+    totalClicks: rows.reduce((a, r) => a + (r.click_count || 0), 0),
   }), [rows]);
+
+  const visible = useMemo(() => {
+    if (kindTab === 'all') return rows;
+    return rows.filter((r) => (r.kind || 'hiring') === kindTab);
+  }, [rows, kindTab]);
 
   return (
     <AdminLayout
@@ -62,6 +73,37 @@ export default function AdminJobs() {
         : `${counts.total} total · ${counts.approved} approved · ${counts.drafts} draft · ${counts.filled} filled`}
       actions={<Link to="/admin/jobs/new" className="adm-btn primary">+ Post a job</Link>}
     >
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 12, marginBottom: 16 }}>
+        <KpiTile label="Hiring"  value={counts.hiring} />
+        <KpiTile label="For hire" value={counts.seeking} />
+        <KpiTile label="Approved" value={counts.approved} accent="green" />
+        <KpiTile label="Drafts"   value={counts.drafts}   accent="amber" />
+        <KpiTile label="Total views"  value={counts.totalViews} />
+        <KpiTile label="Total clicks" value={counts.totalClicks} />
+      </div>
+
+      <div style={{ display: 'inline-flex', background: '#F5EAD6', borderRadius: 8, padding: 3, gap: 2, marginBottom: 16 }}>
+        {[
+          { v: 'hiring',  label: `Hiring (${counts.hiring})` },
+          { v: 'seeking', label: `For Hire (${counts.seeking})` },
+          { v: 'all',     label: `All (${counts.total})` },
+        ].map((opt) => (
+          <button
+            key={opt.v}
+            type="button"
+            onClick={() => setKindTab(opt.v)}
+            style={{
+              padding: '6px 14px', border: 0, borderRadius: 6,
+              background: kindTab === opt.v ? '#fff' : 'transparent',
+              color: kindTab === opt.v ? '#2C1A0E' : '#6B3F1F',
+              fontWeight: 600, fontSize: 13, cursor: 'pointer', font: 'inherit',
+            }}
+          >
+            {opt.label}
+          </button>
+        ))}
+      </div>
+
       <div className="adm-card" style={{ padding: '1rem 1.25rem' }}>
         <div className="adm-search">
           <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
@@ -101,15 +143,17 @@ export default function AdminJobs() {
             <thead>
               <tr>
                 <th>Title / Company</th>
-                <th style={{ width: 120 }}>Status</th>
-                <th style={{ width: 120 }}>Type</th>
-                <th style={{ width: 150 }}>Location</th>
-                <th style={{ width: 130 }}>Posted</th>
-                <th style={{ width: 260, textAlign: 'right' }}>Actions</th>
+                <th style={{ width: 90 }}>Kind</th>
+                <th style={{ width: 110 }}>Status</th>
+                <th style={{ width: 110 }}>Type</th>
+                <th style={{ width: 70, textAlign: 'right' }}>Views</th>
+                <th style={{ width: 70, textAlign: 'right' }}>Clicks</th>
+                <th style={{ width: 110 }}>Posted</th>
+                <th style={{ width: 240, textAlign: 'right' }}>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {rows.map((r) => {
+              {visible.map((r) => {
                 const posted = r.posted_at
                   ? new Date(r.posted_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })
                   : '—';
@@ -118,8 +162,13 @@ export default function AdminJobs() {
                     <td>
                       <div className="adm-row-title">
                         <strong>{r.title}</strong>
-                        <span>{r.company}</span>
+                        <span>{r.company}{r.location ? ' · ' + r.location : ''}</span>
                       </div>
+                    </td>
+                    <td>
+                      <span className={'adm-pill ' + ((r.kind || 'hiring') === 'seeking' ? 'adm-pill-blue' : 'adm-pill-brown')}>
+                        {(r.kind || 'hiring') === 'seeking' ? 'For Hire' : 'Hiring'}
+                      </span>
                     </td>
                     <td>
                       {r.is_filled ? (
@@ -133,7 +182,12 @@ export default function AdminJobs() {
                     <td style={{ color: 'var(--text-secondary)', textTransform: 'capitalize' }}>
                       {(r.employment_type || '—').replace('-', ' ')}
                     </td>
-                    <td style={{ color: 'var(--text-muted)', fontSize: 12.5 }}>{r.location || '—'}</td>
+                    <td style={{ textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>
+                      {(r.view_count || 0).toLocaleString()}
+                    </td>
+                    <td style={{ textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>
+                      {(r.click_count || 0).toLocaleString()}
+                    </td>
                     <td style={{ color: 'var(--text-muted)', fontSize: 12.5 }}>{posted}</td>
                     <td style={{ textAlign: 'right' }}>
                       <div style={{ display: 'inline-flex', gap: 6, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
@@ -159,5 +213,25 @@ export default function AdminJobs() {
         )}
       </div>
     </AdminLayout>
+  );
+}
+
+function KpiTile({ label, value, accent }) {
+  const palette = accent === 'green' ? { bg: '#DDEFD3', fg: '#2E6F2E' }
+                : accent === 'amber' ? { bg: '#F5EAD6', fg: '#6B3F1F' }
+                : { bg: '#fff', fg: '#1c1c1c' };
+  return (
+    <div style={{
+      background: palette.bg,
+      color: palette.fg,
+      border: '1px solid var(--border-light, #EDD9B0)',
+      borderRadius: 10,
+      padding: '12px 14px',
+    }}>
+      <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.6, textTransform: 'uppercase', opacity: 0.7 }}>{label}</div>
+      <div style={{ fontSize: 24, fontWeight: 700, marginTop: 2, fontVariantNumeric: 'tabular-nums' }}>
+        {(value || 0).toLocaleString()}
+      </div>
+    </div>
   );
 }

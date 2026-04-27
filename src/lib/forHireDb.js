@@ -57,6 +57,18 @@ export async function closeMyForHire() {
   return { error };
 }
 
+/** Bump view counter for a job/listing. Self-views are filtered server-side. */
+export async function recordJobView(jobId) {
+  if (!jobId) return;
+  await supabase.rpc('record_job_view', { job_id_in: jobId });
+}
+
+/** Bump click counter when someone hits Apply/Contact. */
+export async function recordJobClick(jobId) {
+  if (!jobId) return;
+  await supabase.rpc('record_job_click', { job_id_in: jobId });
+}
+
 /** Upload a PDF resume to media/resumes/<uid>/<uuid>.pdf and return public URL. */
 export async function uploadResume(file) {
   if (!file) return { data: null, error: new Error('No file selected') };

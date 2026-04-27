@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { recordJobView, recordJobClick } from '../lib/forHireDb.js';
 import { Link, useParams } from 'react-router-dom';
 import PageBack from '../components/shared/PageBack.jsx';
 import { supabase } from '../lib/supabase.js';
@@ -49,7 +50,7 @@ function daysSince(iso) {
  */
 export default function JobDetail() {
   const { id } = useParams();
-  const { isAuthed } = useAuth();
+  const { isAuthed, user, isStaff } = useAuth();
   const [job, setJob] = useState(null);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState(null);
@@ -69,9 +70,18 @@ export default function JobDetail() {
       if (error) { setErr(error); setLoading(false); return; }
       setJob(data);
       setLoading(false);
+      // Record a view (server skips self-views).
+      if (data?.id) recordJobView(data.id);
     })();
     return () => { cancelled = true; };
   }, [id]);
+
+  const onApplyClick = () => {
+    if (job?.id) recordJobClick(job.id);
+  };
+
+  const isOwner = !!user?.id && job?.author_id === user.id;
+  const showStats = isOwner || isStaff;
 
   if (loading) {
     return (
@@ -111,7 +121,7 @@ export default function JobDetail() {
       try { host = new URL(applyUrl).hostname.replace(/^www\./, ''); }
       catch { host = ''; }
       return (
-        <a href={applyUrl} target="_blank" rel="noopener noreferrer" className="jd-apply-btn">
+        <a href={applyUrl} target="_blank" rel="noopener noreferrer" className="jd-apply-btn" onClick={onApplyClick}>
           {host ? 'Apply on ' + host + ' →' : 'Apply →'}
         </a>
       );
@@ -119,7 +129,7 @@ export default function JobDetail() {
     if (applyEmail) {
       const subject = encodeURIComponent('Application: ' + (job.title || ''));
       return (
-        <a href={'mailto:' + applyEmail + '?subject=' + subject} className="jd-apply-btn">
+        <a href={'mailto:' + applyEmail + '?subject=' + subject} className="jd-apply-btn" onClick={onApplyClick}>
           Apply via email →
         </a>
       );
@@ -176,6 +186,35 @@ export default function JobDetail() {
         .jd-stat-label { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: 2px; }
         .jd-stat-value { font-family: var(--font-display); font-size: 1.25rem; color: var(--text-primary); }
       `}</style>
+
+      {showStats && (
+        <div style={{
+          maxWidth: 1040, margin: '0 auto', padding: '12px 1.25rem 0',
+        }}>
+          <div style={{
+            display: 'flex', flexWrap: 'wrap', gap: 16, alignItems: 'center',
+            background: '#FFF8EE',
+            border: '1px solid var(--border-light, #EDD9B0)',
+            borderRadius: 10,
+            padding: '12px 16px',
+          }}>
+            <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: 0.6, textTransform: 'uppercase', color: 'var(--wood-warm, #6B3F1F)' }}>
+              {isOwner ? 'Your listing' : 'Admin view'}
+            </div>
+            <div style={{ display: 'flex', gap: 22 }}>
+              <Stat label="Views" value={job.view_count || 0} />
+              <Stat label="Clicks" value={job.click_count || 0} />
+              <Stat
+                label="Click rate"
+                value={(job.view_count || 0) > 0 ? Math.round(((job.click_count || 0) / job.view_count) * 100) + '%' : '—'}
+              />
+            </div>
+            <div style={{ marginLeft: 'auto', fontSize: 12, color: 'var(--text-muted)' }}>
+              Self-views aren't counted. Stats update on each refresh.
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="jd-wrap">
         <div>
@@ -254,5 +293,16 @@ export default function JobDetail() {
         </aside>
       </div>
     </>
+  );
+}
+
+function Stat({ label, value }) {
+  return (
+    <div>
+      <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.4, textTransform: 'uppercase', color: 'var(--text-muted, #9A7B5C)' }}>{label}</div>
+      <div style={{ fontSize: 20, fontWeight: 700, marginTop: 1, fontVariantNumeric: 'tabular-nums', color: '#2C1A0E' }}>
+        {typeof value === 'number' ? value.toLocaleString() : value}
+      </div>
+    </div>
   );
 }

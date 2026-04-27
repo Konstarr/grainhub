@@ -236,7 +236,7 @@ export async function deleteEvent(id) {
 export async function listJobs({ search = '', limit = 200 } = {}) {
   let q = supabase
     .from('jobs')
-    .select('id, title, company, location, employment_type, salary_min, salary_max, salary_period, trade, is_approved, is_filled, posted_at, expires_at, author_id')
+    .select('id, title, company, location, employment_type, salary_min, salary_max, salary_period, trade, is_approved, is_filled, posted_at, expires_at, author_id, kind, view_count, click_count')
     .order('posted_at', { ascending: false })
     .limit(limit);
   if (search && search.trim()) {
