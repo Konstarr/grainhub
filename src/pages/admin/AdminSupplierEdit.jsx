@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import AdminLayout from '../../components/admin/AdminLayout.jsx';
 import { fetchSupplierById, adminUpdateSupplier } from '../../lib/supplierClaimsDb.js';
 
 export default function AdminSupplierEdit() {
@@ -72,19 +73,34 @@ export default function AdminSupplierEdit() {
     load();
   };
 
-  if (loading) return <div className="admin-page"><div>Loading…</div></div>;
-  if (!supplier) return <div className="admin-page"><div>Supplier not found.</div></div>;
+  if (loading) {
+    return (
+      <AdminLayout title="Edit supplier" subtitle="Loading…">
+        <div>Loading…</div>
+      </AdminLayout>
+    );
+  }
+  if (!supplier) {
+    return (
+      <AdminLayout title="Supplier not found" subtitle="That row doesn't exist or was deleted">
+        <Link to="/admin/suppliers">← Back to all suppliers</Link>
+      </AdminLayout>
+    );
+  }
 
   return (
-    <div className="admin-page">
-      <div style={{ marginBottom: 12 }}>
-        <Link to="/admin/suppliers">← All suppliers</Link>
-      </div>
-      <h1>Edit {supplier.name}</h1>
-      <div style={{ marginBottom: 8, fontSize: 13, color: 'var(--text-muted)' }}>
-        Public profile: <Link to={`/suppliers/${form.slug}`}>/suppliers/{form.slug}</Link>
-        {supplier.claimed_by ? <> · Claimed by user <code>{supplier.claimed_by}</code></> : ' · Unclaimed'}
-      </div>
+    <AdminLayout
+      title={`Edit ${supplier.name}`}
+      subtitle={(
+        <>
+          <Link to={`/suppliers/${form.slug}`} target="_blank" rel="noreferrer">/suppliers/{form.slug} ↗</Link>
+          {supplier.claimed_by ? ' · Claimed' : ' · Unclaimed'}
+        </>
+      )}
+      actions={(
+        <Link to="/admin/suppliers" className="claim-btn ghost">← All suppliers</Link>
+      )}
+    >
 
       <form onSubmit={save} style={{ display: 'grid', gap: 12, maxWidth: 720 }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
@@ -138,6 +154,6 @@ export default function AdminSupplierEdit() {
           </button>
         </div>
       </form>
-    </div>
+    </AdminLayout>
   );
 }

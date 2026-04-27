@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import AdminLayout from '../../components/admin/AdminLayout.jsx';
 import {
   fetchPendingSupplierClaims,
   approveSupplierClaim,
@@ -40,13 +41,13 @@ export default function AdminSupplierClaims() {
   };
 
   return (
-    <div className="admin-page">
-      <h1>Supplier Claims</h1>
-      <p style={{ color: 'var(--text-muted)', marginTop: -8 }}>
-        Pending business-ownership claims. Claims with a matching email
-        domain auto-approve; everything else lands here.
-      </p>
-
+    <AdminLayout
+      title="Supplier claims"
+      subtitle="Pending business-ownership claims. Email-domain matches auto-approve; everything else lands here."
+      actions={(
+        <Link to="/admin/suppliers" className="claim-btn ghost">All suppliers</Link>
+      )}
+    >
       {loading && <div>Loading…</div>}
       {err && <div className="comm-chat-err">{err}</div>}
       {!loading && rows.length === 0 && (
@@ -107,6 +108,6 @@ export default function AdminSupplierClaims() {
           ))}
         </div>
       )}
-    </div>
+    </AdminLayout>
   );
 }
