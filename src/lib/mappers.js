@@ -141,6 +141,7 @@ export function mapSupplierRow(row) {
   return {
     id: row.id,
     slug: row.slug,
+    kind: row.kind || 'vendor',
     name: row.name,
     category: row.category,
     trade: row.trade,

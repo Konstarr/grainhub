@@ -12,21 +12,35 @@ import { mapSupplierRow } from '../lib/mappers.js';
 import { SponsorSidebar } from '../components/sponsors/AdSlot.jsx';
 
 export default function Suppliers() {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const navCategory = searchParams.get('category') || '';
+  const kindParam   = searchParams.get('kind') === 'manufacturer' ? 'manufacturer' : 'vendor';
 
   const [activeCategory, setActiveCategory] = useState('');
   const [view, setView] = useState('list'); // 'list' | 'map'
+  const [kind, setKind] = useState(kindParam);
 
   // Mirror the secondary-nav ?category= into the in-page active category.
   useEffect(() => {
     setActiveCategory(navCategory);
   }, [navCategory]);
 
+  // Keep ?kind= URL param + state in sync so links can deep-link a tab.
+  useEffect(() => { setKind(kindParam); }, [kindParam]);
+
+  const switchKind = (next) => {
+    const params = new URLSearchParams(searchParams);
+    if (next === 'vendor') params.delete('kind');
+    else params.set('kind', next);
+    setSearchParams(params, { replace: true });
+    setKind(next);
+  };
+
   const { data: rows } = useSupabaseList('suppliers', {
-    filter: (q) => q.eq('is_approved', true),
+    filter: (q) => q.eq('is_approved', true).eq('kind', kind),
     order: { column: 'rating', ascending: false },
     limit: 100,
+    deps: [kind],
   });
   const liveSuppliers = rows.map((r) => {
     const m = mapSupplierRow(r);
@@ -55,9 +69,17 @@ export default function Suppliers() {
         <div className="header-inner">
           <div className="header-top">
             <div>
-              <div className="page-eyebrow">{SUPPLIERS_HEADER.eyebrow}</div>
-              <h1 className="page-title">{SUPPLIERS_HEADER.title}</h1>
-              <p className="page-subtitle">{SUPPLIERS_HEADER.subtitle}</p>
+              <div className="page-eyebrow">
+                {kind === 'manufacturer' ? 'MANUFACTURERS' : SUPPLIERS_HEADER.eyebrow}
+              </div>
+              <h1 className="page-title">
+                {kind === 'manufacturer' ? 'Millwork shops & cabinet makers' : SUPPLIERS_HEADER.title}
+              </h1>
+              <p className="page-subtitle">
+                {kind === 'manufacturer'
+                  ? 'Find local custom millwork shops, cabinet makers, finishers, and installers.'
+                  : SUPPLIERS_HEADER.subtitle}
+              </p>
             </div>
             <div className="header-stats">
               {SUPPLIERS_HEADER.stats.map((stat) => (
@@ -69,13 +91,40 @@ export default function Suppliers() {
             </div>
           </div>
 
+          {/* Vendor / Manufacturer toggle */}
+          <div className="kind-tabs" role="tablist" aria-label="Directory">
+            <button
+              type="button"
+              role="tab"
+              aria-selected={kind === 'vendor'}
+              className={'kind-tab' + (kind === 'vendor' ? ' active' : '')}
+              onClick={() => switchKind('vendor')}
+            >
+              Vendors
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={kind === 'manufacturer'}
+              className={'kind-tab' + (kind === 'manufacturer' ? ' active' : '')}
+              onClick={() => switchKind('manufacturer')}
+            >
+              Manufacturers
+            </button>
+          </div>
+
           <div className="search-hero">
             <div className="search-input-wrap">
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                 <circle cx="7" cy="7" r="5.5" stroke="#9A7B5C" strokeWidth="1.5" />
                 <path d="M11 11 L14 14" stroke="#9A7B5C" strokeWidth="1.5" strokeLinecap="round" />
               </svg>
-              <input type="text" placeholder="Search for hardware, lumber, CNC suppliers..." />
+              <input
+                type="text"
+                placeholder={kind === 'manufacturer'
+                  ? 'Search cabinet shops, millwork, installers near you…'
+                  : 'Search for hardware, lumber, CNC suppliers…'}
+              />
             </div>
             <select className="search-select">
               <option>All Categories</option>
@@ -83,7 +132,9 @@ export default function Suppliers() {
                 <option key={cat.id}>{cat.name}</option>
               ))}
             </select>
-            <button className="search-btn">Search Suppliers →</button>
+            <button className="search-btn">
+              {kind === 'manufacturer' ? 'Search Manufacturers →' : 'Search Suppliers →'}
+            </button>
           </div>
         </div>
       </div>

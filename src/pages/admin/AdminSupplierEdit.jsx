@@ -20,6 +20,7 @@ export default function AdminSupplierEdit() {
     setForm({
       name:          data?.name          || '',
       slug:          data?.slug          || '',
+      kind:          data?.kind          || 'vendor',
       category:      data?.category      || '',
       trade:         data?.trade         || '',
       logo_initials: data?.logo_initials || '',
@@ -48,6 +49,7 @@ export default function AdminSupplierEdit() {
     const patch = {
       name: form.name,
       slug: form.slug,
+      kind: form.kind,
       category: form.category,
       trade: form.trade,
       logo_initials: form.logo_initials,
@@ -88,6 +90,13 @@ export default function AdminSupplierEdit() {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
           <label className="claim-field"><span>Name</span><input value={form.name} onChange={(e) => set('name', e.target.value)} /></label>
           <label className="claim-field"><span>Slug</span><input value={form.slug} onChange={(e) => set('slug', e.target.value)} /></label>
+          <label className="claim-field">
+            <span>Kind</span>
+            <select value={form.kind} onChange={(e) => set('kind', e.target.value)}>
+              <option value="vendor">Vendor</option>
+              <option value="manufacturer">Manufacturer</option>
+            </select>
+          </label>
           <label className="claim-field"><span>Category</span><input value={form.category} onChange={(e) => set('category', e.target.value)} /></label>
           <label className="claim-field"><span>Trade</span><input value={form.trade} onChange={(e) => set('trade', e.target.value)} /></label>
           <label className="claim-field"><span>Logo initials (fallback)</span><input maxLength={4} value={form.logo_initials} onChange={(e) => set('logo_initials', e.target.value)} /></label>
