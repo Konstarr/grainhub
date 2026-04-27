@@ -3,14 +3,16 @@ import { updateMySupplier } from '../../lib/supplierClaimsDb.js';
 
 /** Owner-only edit modal for a claimed supplier. */
 export default function EditMySupplierModal({ supplier, onClose, onSaved }) {
-  const [logoUrl, setLogoUrl]   = useState(supplier?.logo_url || '');
-  const [description, setDesc]  = useState(supplier?.description || '');
-  const [website, setWebsite]   = useState(supplier?.website || '');
-  const [phone, setPhone]       = useState(supplier?.phone || '');
-  const [email, setEmail]       = useState(supplier?.email || '');
-  const [address, setAddress]   = useState(supplier?.address || '');
-  const [saving, setSaving]     = useState(false);
-  const [err, setErr]           = useState('');
+  const [logoUrl, setLogoUrl]     = useState(supplier?.logo_url || '');
+  const [bannerUrl, setBannerUrl] = useState(supplier?.banner_url || '');
+  const [description, setDesc]    = useState(supplier?.description || '');
+  const [website, setWebsite]     = useState(supplier?.website || '');
+  const [phone, setPhone]         = useState(supplier?.phone || '');
+  const [email, setEmail]         = useState(supplier?.email || '');
+  const [address, setAddress]     = useState(supplier?.address || '');
+  const [hours, setHours]         = useState(supplier?.hours || '');
+  const [saving, setSaving]       = useState(false);
+  const [err, setErr]             = useState('');
 
   if (!supplier) return null;
 
@@ -19,11 +21,13 @@ export default function EditMySupplierModal({ supplier, onClose, onSaved }) {
     setSaving(true); setErr('');
     const { error } = await updateMySupplier(supplier.id, {
       logo_url:    logoUrl,
+      banner_url:  bannerUrl,
       description,
       website,
       phone,
       email,
       address,
+      hours,
     });
     setSaving(false);
     if (error) { setErr(error.message || 'Could not save changes.'); return; }
@@ -42,6 +46,10 @@ export default function EditMySupplierModal({ supplier, onClose, onSaved }) {
           <label className="claim-field">
             <span>Logo URL</span>
             <input value={logoUrl} onChange={(e) => setLogoUrl(e.target.value)} placeholder="https://…" />
+          </label>
+          <label className="claim-field">
+            <span>Banner URL</span>
+            <input value={bannerUrl} onChange={(e) => setBannerUrl(e.target.value)} placeholder="https://…" />
           </label>
           <label className="claim-field">
             <span>Description</span>
@@ -64,6 +72,10 @@ export default function EditMySupplierModal({ supplier, onClose, onSaved }) {
           <label className="claim-field">
             <span>Address</span>
             <input value={address} onChange={(e) => setAddress(e.target.value)} />
+          </label>
+          <label className="claim-field">
+            <span>Hours</span>
+            <input value={hours} onChange={(e) => setHours(e.target.value)} placeholder="Mon–Fri 9am–6pm ET" />
           </label>
 
           {err && <div className="claim-error">{err}</div>}

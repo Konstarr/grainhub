@@ -54,6 +54,8 @@ const AdminUsers            = lazy(() => import('./pages/admin/AdminUsers.jsx'))
 const AdminUserEdit         = lazy(() => import('./pages/admin/AdminUserEdit.jsx'));
 const AdminSponsors         = lazy(() => import('./pages/admin/AdminSponsors.jsx'));
 const AdminSupplierClaims   = lazy(() => import('./pages/admin/AdminSupplierClaims.jsx'));
+const AdminSuppliers        = lazy(() => import('./pages/admin/AdminSuppliers.jsx'));
+const AdminSupplierEdit     = lazy(() => import('./pages/admin/AdminSupplierEdit.jsx'));
 const AdminConnections      = lazy(() => import('./pages/admin/AdminConnections.jsx'));
 const AdminForums           = lazy(() => import('./pages/admin/AdminForums.jsx'));
 const AdminForumThreads     = lazy(() => import('./pages/admin/AdminForumThreads.jsx'));
@@ -110,6 +112,8 @@ export default function App() {
         <Route path="/admin/users/:id"        element={adminRoute('admin', AdminUserEdit)} />
         <Route path="/admin/sponsors"         element={adminRoute('admin', AdminSponsors)} />
         <Route path="/admin/supplier-claims"  element={adminRoute('admin', AdminSupplierClaims)} />
+        <Route path="/admin/suppliers"        element={adminRoute('admin', AdminSuppliers)} />
+        <Route path="/admin/suppliers/:id"    element={adminRoute('admin', AdminSupplierEdit)} />
         <Route path="/admin/connections"      element={adminRoute('admin', AdminConnections)} />
         <Route path="/admin/communities"      element={adminRoute('admin', AdminCommunities)} />
         <Route path="/admin/communities/:id"  element={adminRoute('admin', AdminCommunityEdit)} />

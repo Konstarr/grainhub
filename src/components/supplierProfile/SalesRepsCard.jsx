@@ -1,6 +1,8 @@
 import { SALES_REPS } from '../../data/supplierProfileData.js';
 
-export default function SalesRepsCard() {
+// supplier prop accepted for forward-compat; sales reps still pulled
+// from the static demo data until we wire a supplier_sales_reps table.
+export default function SalesRepsCard({ supplier }) { // eslint-disable-line no-unused-vars
   return (
     <div className="sc">
       <div className="sc-head">👤 Find Your Sales Rep</div>

@@ -1,101 +1,105 @@
-import '../styles/supplierProfile.css';
+import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import ClaimSection from '../components/suppliers/ClaimSection.jsx';
+import '../styles/supplierProfile.css';
 import HeroSection from '../components/supplierProfile/HeroSection.jsx';
 import AboutCard from '../components/supplierProfile/AboutCard.jsx';
 import ReviewsCard from '../components/supplierProfile/ReviewsCard.jsx';
 import ContactCard from '../components/supplierProfile/ContactCard.jsx';
 import SalesRepsCard from '../components/supplierProfile/SalesRepsCard.jsx';
+import ClaimSection from '../components/suppliers/ClaimSection.jsx';
 import PageBack from '../components/shared/PageBack.jsx';
+import { fetchSupplierBySlug } from '../lib/supplierClaimsDb.js';
 import { DOWNLOADS, RELATED_ARTICLES, SIMILAR_SUPPLIERS, SUPPLIER_HERO } from '../data/supplierProfileData.js';
 
 export default function SupplierProfile() {
   const { slug } = useParams();
+  const [supplier, setSupplier] = useState(null);
+  const [loading, setLoading]   = useState(!!slug);
+
+  useEffect(() => {
+    if (!slug) { setSupplier(null); setLoading(false); return; }
+    let cancelled = false;
+    setLoading(true);
+    fetchSupplierBySlug(slug).then(({ data }) => {
+      if (!cancelled) { setSupplier(data || null); setLoading(false); }
+    });
+    return () => { cancelled = true; };
+  }, [slug]);
+
+  // If loading or no row, fall through to the static demo state so the
+  // page never blanks. The ClaimSection only shows when supplier exists.
+  const display = supplier || null;
+
   return (
     <>
-      {/* BREADCRUMB */}
       <PageBack
         backTo="/suppliers"
         backLabel="Back to Suppliers"
         crumbs={[
           { label: 'Home', to: '/' },
           { label: 'Suppliers', to: '/suppliers' },
-          { label: SUPPLIER_HERO.name },
+          { label: display?.name || SUPPLIER_HERO.name },
         ]}
       />
 
-      {/* HERO */}
-      <HeroSection />
+      <HeroSection supplier={display} />
 
-      {/* CLAIM / OWNER CARD — only renders when route has a slug + DB row exists */}
-      {slug && (
+      {slug && display && (
         <div className="wrap" style={{ marginTop: 16 }}>
           <ClaimSection slug={slug} />
         </div>
       )}
 
-      {/* CONTENT */}
+      {slug && !loading && !display && (
+        <div className="wrap" style={{ marginTop: 16, padding: '16px 18px', background: '#FBE2E2', border: '1px solid #F1B5B5', borderRadius: 8 }}>
+          Supplier not found. <Link to="/suppliers">Browse all suppliers →</Link>
+        </div>
+      )}
+
       <div className="wrap">
         <div>
-          <AboutCard />
-
-          <ReviewsCard />
-
-          {/* DOWNLOADS */}
-          <div className="card">
-            <div className="ch">
-              <span className="ch-title">Downloads & Resources</span>
-            </div>
-            {DOWNLOADS.map((item, idx) => (
-              <div key={idx} className="dl">
-                <div className="dl-icon">{item.icon}</div>
-                <div style={{ flex: 1 }}>
-                  <div className="dl-name">{item.name}</div>
-                  <div className="dl-meta">{item.meta}</div>
-                </div>
-                <span className="dl-cta">↓ Download</span>
-              </div>
-            ))}
-          </div>
+          <AboutCard supplier={display} />
+          <ReviewsCard supplier={display} />
+          <SalesRepsCard supplier={display} />
         </div>
 
-        {/* SIDEBAR */}
-        <aside className="right">
-          <ContactCard />
-          <SalesRepsCard />
+        <aside>
+          <ContactCard supplier={display} />
 
-          {/* RELATED WIKI */}
-          <div className="sc">
-            <div className="sc-head">📖 Related Wiki Articles</div>
-            <div className="sc-body">
-              {RELATED_ARTICLES.map((article) => (
-                <Link key={article} to="/wiki/article" className="wiki-row" style={{ textDecoration: 'none', color: 'inherit' }}>
-                  → {article}
-                </Link>
+          <div className="card" style={{ marginTop: 16 }}>
+            <div className="card-header"><strong>Downloads</strong></div>
+            <div className="card-body">
+              {DOWNLOADS.map((d) => (
+                <div key={d.label} className="dl-row">
+                  <span>📄 {d.label}</span>
+                  <span style={{ color: 'var(--text-muted)', fontSize: 12 }}>{d.size}</span>
+                </div>
               ))}
             </div>
           </div>
 
-          {/* SIMILAR SUPPLIERS */}
-          <div className="sc">
-            <div className="sc-head">🏢 Similar Suppliers</div>
-            <div className="sc-body">
-              {SIMILAR_SUPPLIERS.map((supplier) => (
-                <Link key={supplier.name} to="/suppliers/profile" className="sim-row" style={{ textDecoration: 'none', color: 'inherit' }}>
-                  <div
-                    className="sim-logo"
-                    style={{
-                      background: 'linear-gradient(135deg, #6B3F1F, #A0522D)',
-                      color: 'white',
-                    }}
-                  >
-                    {supplier.logo}
-                  </div>
+          <div className="card" style={{ marginTop: 16 }}>
+            <div className="card-header"><strong>Related articles</strong></div>
+            <div className="card-body">
+              {RELATED_ARTICLES.map((a) => (
+                <div key={a.title} className="rel-row">
+                  <div style={{ fontWeight: 600 }}>{a.title}</div>
+                  <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{a.meta}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="card" style={{ marginTop: 16 }}>
+            <div className="card-header"><strong>Similar suppliers</strong></div>
+            <div className="card-body">
+              {SIMILAR_SUPPLIERS.map((s) => (
+                <Link key={s.name} to="/suppliers" className="sim-row" style={{ textDecoration: 'none', color: 'inherit' }}>
+                  <div className="sim-logo">{s.logo}</div>
                   <div>
-                    <div className="sim-name">{supplier.name}</div>
-                    <div className="sim-cat">{supplier.category}</div>
+                    <div className="sim-name">{s.name}</div>
+                    <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{s.category}</div>
                   </div>
-                  <span className="sim-rating">{supplier.rating}</span>
                 </Link>
               ))}
             </div>

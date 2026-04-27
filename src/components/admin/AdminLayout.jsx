@@ -20,6 +20,7 @@ export const ADMIN_SECTIONS = [
       { to: '/admin/listings', label: 'Listings',  icon: <IconTag />,      enabled: true  },
       { to: '/admin/marketplace-settings', label: 'Listing limits', icon: <IconTag />, enabled: true },
       { to: '/admin/sponsors', label: 'Sponsors',  icon: <IconStar />,     enabled: true  },
+      { to: '/admin/suppliers',       label: 'Suppliers',       icon: <IconStar />, enabled: true },
       { to: '/admin/supplier-claims', label: 'Supplier claims', icon: <IconStar />, enabled: true },
     ],
   },
