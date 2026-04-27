@@ -368,8 +368,3 @@ export default function Forums() {
     </>
   );
 }
-        </aside>
-      </div>
-    </>
-  );
-}
