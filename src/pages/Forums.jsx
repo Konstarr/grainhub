@@ -230,6 +230,7 @@ export default function Forums() {
     return [
       { label: 'Total posts',   value: counters.postsTotal.toLocaleString() },
       { label: 'Total threads', value: counters.threadsTotal.toLocaleString() },
+      { label: 'Total views',   value: (counters.viewsTotal || 0).toLocaleString() },
       { label: 'Members',       value: counters.membersTotal.toLocaleString() },
       { label: 'Posts today',   value: counters.postsToday.toLocaleString(), isHighlight: true },
     ];

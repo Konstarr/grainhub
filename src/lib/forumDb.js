@@ -566,10 +566,12 @@ export async function fetchMyPostThreads(userId, limit = 50) {
 // ------------------------------------------------------------
 
 export async function fetchForumCounters() {
-  const [tr, pr, mr] = await Promise.all([
+  const [tr, pr, mr, vr] = await Promise.all([
     supabase.from('forum_threads').select('id', { count: 'exact', head: true }),
     supabase.from('forum_posts').select('id', { count: 'exact', head: true }),
     supabase.from('profiles').select('id', { count: 'exact', head: true }),
+    // view_count lives on each thread; pull just that column and sum client-side.
+    supabase.from('forum_threads').select('view_count'),
   ]);
   const since = new Date();
   since.setHours(0, 0, 0, 0);
@@ -577,11 +579,13 @@ export async function fetchForumCounters() {
     .from('forum_posts')
     .select('id', { count: 'exact', head: true })
     .gte('created_at', since.toISOString());
+  const viewsTotal = (vr.data || []).reduce((sum, row) => sum + (row.view_count || 0), 0);
   return {
     threadsTotal: tr.count || 0,
     postsTotal: pr.count || 0,
     membersTotal: mr.count || 0,
     postsToday: postsToday || 0,
+    viewsTotal,
   };
 }
 
@@ -628,6 +632,7 @@ export async function fetchCategoryCounters(threadVisits = {}, markAllReadAt = n
     const lastActivityMs = lastActivityIso ? new Date(lastActivityIso).getTime() : 0;
     if (baselineMs && lastActivityMs <= baselineMs) {
       // Anything older than the user's "Mark all read" click is read.
+      byCat.set(t.category_id, entry);
       byCat.set(t.category_id, entry);
       return;
     }
