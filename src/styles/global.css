@@ -79,7 +79,7 @@ nav.site-nav {
   padding: 0 2.5rem;
   display: flex;
   align-items: center;
-  height: 64px;
+  height: 84px;
   position: sticky;
   top: 0;
   z-index: 200;
@@ -96,6 +96,7 @@ nav.site-nav {
 }
 
 .logo svg { width: 36px; height: 36px; }
+.logo img { height: 64px; width: auto; max-width: none; display: block; }
 
 .logo-text {
   font-family: 'Montserrat', sans-serif;
@@ -1544,7 +1545,4 @@ nav.site-nav {
 .machine-thumb {
   width: 64px;
   height: 50px;
-  background: var(--wood-cream);
-  border: 1px solid var(--border);
-  flex-shrink: 0;
-}
+  background: 
