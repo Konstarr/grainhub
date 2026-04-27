@@ -38,7 +38,7 @@ export default function SupplierTable({ activeCategory = '', suppliers }) {
           visible.map((supplier) => (
             <Link
               key={supplier.name}
-              to="/suppliers/profile"
+              to={supplier.slug ? `/suppliers/${supplier.slug}` : '/suppliers/profile'}
               className="supplier-row"
             >
               {supplier.logoUrl ? (

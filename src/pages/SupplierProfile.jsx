@@ -1,5 +1,6 @@
 import '../styles/supplierProfile.css';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
+import ClaimSection from '../components/suppliers/ClaimSection.jsx';
 import HeroSection from '../components/supplierProfile/HeroSection.jsx';
 import AboutCard from '../components/supplierProfile/AboutCard.jsx';
 import ReviewsCard from '../components/supplierProfile/ReviewsCard.jsx';
@@ -9,6 +10,7 @@ import PageBack from '../components/shared/PageBack.jsx';
 import { DOWNLOADS, RELATED_ARTICLES, SIMILAR_SUPPLIERS, SUPPLIER_HERO } from '../data/supplierProfileData.js';
 
 export default function SupplierProfile() {
+  const { slug } = useParams();
   return (
     <>
       {/* BREADCRUMB */}
@@ -24,6 +26,13 @@ export default function SupplierProfile() {
 
       {/* HERO */}
       <HeroSection />
+
+      {/* CLAIM / OWNER CARD — only renders when route has a slug + DB row exists */}
+      {slug && (
+        <div className="wrap" style={{ marginTop: 16 }}>
+          <ClaimSection slug={slug} />
+        </div>
+      )}
 
       {/* CONTENT */}
       <div className="wrap">
