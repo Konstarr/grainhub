@@ -19,6 +19,7 @@ import {
   setMemberRole,
   transferOwnership,
   updateCommunitySettings,
+  uploadCommunityImage,
   leaveCommunity,
   kickCommunityMember,
   banCommunityMember,
@@ -1411,4 +1412,6 @@ function formatRelative(iso) {
   if (ms < 24 * 60 * 60 * 1000) return Math.floor(ms / 3600000) + 'h ago';
   if (ms < 7 * 24 * 60 * 60 * 1000) return Math.floor(ms / 86400000) + 'd ago';
   return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+}
+, year: 'numeric' });
 }
