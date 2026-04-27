@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import { AuthProvider } from './context/AuthContext.jsx';
 import RequireAuth from './components/auth/RequireAuth.jsx';
 import RequireStaff from './components/auth/RequireStaff.jsx';
@@ -98,6 +99,7 @@ export default function App() {
   return (
     <AuthProvider>
       <Analytics />
+      <SpeedInsights />
       <Routes>
         <Route path="/admin"                  element={adminRoute('admin', AdminNews)} />
         <Route path="/admin/dashboard"        element={adminRoute('owner', AdminOwnerDashboard)} />
