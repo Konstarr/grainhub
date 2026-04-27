@@ -644,6 +644,3 @@ export async function fetchCategoryCounters(threadVisits = {}, markAllReadAt = n
   });
   return byCat;
 }
- });
-  return byCat;
-}
