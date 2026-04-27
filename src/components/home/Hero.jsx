@@ -18,6 +18,8 @@ export default function Hero() {
         src={HERO_IMAGE_URL}
         alt=""
         aria-hidden="true"
+        width={1920}
+        height={720}
         fetchpriority="high"
         decoding="async"
         loading="eager"

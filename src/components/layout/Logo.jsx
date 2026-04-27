@@ -19,10 +19,16 @@ function logoSrc(size) {
 }
 
 export default function Logo({ size = 56, as = 'link', style }) {
+  // Source PNG is 1616x238 → aspect ratio ~6.79. Provide explicit
+  // width/height so the browser reserves space (no CLS).
+  const renderH = size;
+  const renderW = Math.round(renderH * (1616 / 238));
   const inner = (
     <img
       src={logoSrc(size)}
       alt="Millwork.io"
+      width={renderW}
+      height={renderH}
       loading="eager"
       fetchpriority="high"
       decoding="async"
