@@ -1964,3 +1964,102 @@ nav.site-nav {
   text-decoration: none;
 }
 .kind-col-allbtn:hover { filter: brightness(1.08); }
+
+/* Suppliers page wrapper — halve the right sponsor column.
+   Doubled selector raises specificity above suppliers.css. */
+.main-wrap.suppliers-wrap.suppliers-wrap {
+  grid-template-columns: 1fr 180px;
+  gap: 1.5rem;
+}
+@media (max-width: 900px) {
+  .main-wrap.suppliers-wrap.suppliers-wrap {
+    grid-template-columns: 1fr;
+  }
+  .main-wrap.suppliers-wrap .right-col { display: none; }
+}
+
+/* Polished hero on /suppliers */
+.page-header.gh-hero {
+  background:
+    radial-gradient(ellipse at 80% 0%, rgba(189,131,76,0.22), transparent 60%),
+    radial-gradient(ellipse at 0% 100%, rgba(99,55,18,0.35), transparent 55%),
+    linear-gradient(180deg, #1F1208 0%, #2C1A0E 60%, #3A2615 100%);
+  padding: 4rem 2.5rem 3rem;
+  position: relative;
+  overflow: hidden;
+}
+.page-header.gh-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      rgba(255,255,255,0.012) 0 2px,
+      transparent 2px 36px
+    );
+  pointer-events: none;
+}
+.page-header.gh-hero .page-eyebrow {
+  letter-spacing: 2.5px;
+  font-weight: 700;
+  font-size: 11px;
+  color: #E0A02B;
+}
+.page-header.gh-hero .page-title {
+  font-size: clamp(28px, 4.2vw, 44px);
+  line-height: 1.05;
+  letter-spacing: -0.5px;
+  margin-top: 6px;
+  color: #FBF4E8;
+}
+.page-header.gh-hero .page-subtitle {
+  margin-top: 10px;
+  font-size: 16px;
+  line-height: 1.45;
+  color: rgba(251,244,232,0.78);
+  max-width: 60ch;
+}
+
+/* Category explainer cards on landing */
+.kind-intro {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+@media (max-width: 900px) {
+  .kind-intro { grid-template-columns: 1fr; }
+}
+.kind-intro-card {
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  gap: 12px;
+  align-items: start;
+  background: #FFF8EE;
+  border: 1px solid var(--border-light, #EDD9B0);
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+.kind-intro-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #2C1A0E, #6B3F1F);
+  color: #fff;
+  font-size: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.kind-intro-h {
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--wood-warm, #6B3F1F);
+}
+.kind-intro-card p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: #4A2E15;
+}

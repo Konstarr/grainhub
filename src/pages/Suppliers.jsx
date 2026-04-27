@@ -214,8 +214,30 @@ export default function Suppliers() {
 
       {/* LANDING: two columns */}
       {isLanding ? (
-        <div className="main-wrap">
+        <div className="main-wrap suppliers-wrap">
           <div>
+            <div className="kind-intro">
+              <div className="kind-intro-card">
+                <div className="kind-intro-icon">🛠️</div>
+                <div>
+                  <div className="kind-intro-h">Vendors</div>
+                  <p>
+                    Hardware, lumber, panel goods, abrasives, finishes, CNC tooling, and shop equipment —
+                    the parts and tools that keep your shop running.
+                  </p>
+                </div>
+              </div>
+              <div className="kind-intro-card">
+                <div className="kind-intro-icon">🪵</div>
+                <div>
+                  <div className="kind-intro-h">Manufacturers</div>
+                  <p>
+                    Custom millwork shops, cabinet makers, finishers, and installers —
+                    the trade businesses near you who actually build the work.
+                  </p>
+                </div>
+              </div>
+            </div>
             <div className="kind-split">
               <PreviewColumn
                 eyebrow="VENDORS"
@@ -241,7 +263,7 @@ export default function Suppliers() {
         </div>
       ) : (
         // FOCUSED: existing list / map view
-        <div className="main-wrap">
+        <div className="main-wrap suppliers-wrap">
           <div>
             <div className="view-switch-row">
               <div className="view-switch-label">
