@@ -1413,5 +1413,3 @@ function formatRelative(iso) {
   if (ms < 7 * 24 * 60 * 60 * 1000) return Math.floor(ms / 86400000) + 'd ago';
   return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
 }
-, year: 'numeric' });
-}
