@@ -294,7 +294,8 @@ export async function uploadCommunityImage(file, { communityId, purpose = 'misc'
   const folder = communityId ? `communities/${communityId}/${purpose}` : `communities/_user/${uid}/${purpose}`;
   const path = `${folder}/${id}.${ext}`;
 
-  const { error: upErr } = await supabase
+  // 30-second timeout so a hung upload never freezes the UI.
+  const uploadP = supabase
     .storage
     .from('media')
     .upload(path, file, {
@@ -302,7 +303,26 @@ export async function uploadCommunityImage(file, { communityId, purpose = 'misc'
       upsert: false,
       contentType: file.type,
     });
-  if (upErr) return { data: null, error: upErr };
+  const timeoutP = new Promise((resolve) =>
+    setTimeout(() => resolve({ error: new Error('Upload timed out after 30 seconds.') }), 30000)
+  );
+  let result;
+  try {
+    result = await Promise.race([uploadP, timeoutP]);
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error('[uploadCommunityImage] threw:', e);
+    return { data: null, error: e instanceof Error ? e : new Error(String(e)) };
+  }
+  const upErr = result?.error;
+  if (upErr) {
+    // eslint-disable-next-line no-console
+    console.error('[uploadCommunityImage] storage error:', upErr);
+    const msg = upErr.message
+      || upErr.error
+      || (typeof upErr === 'string' ? upErr : 'Upload failed. Check storage policies.');
+    return { data: null, error: new Error(msg) };
+  }
 
   const { data: pub } = supabase.storage.from('media').getPublicUrl(path);
   return { data: { url: pub?.publicUrl || null, path }, error: null };
@@ -562,20 +582,10 @@ export async function createPostComment({ postId, communityId, body }) {
 }
 
 export async function deletePostComment(commentId) {
-  if (!commentId) return { data: null, error: new Error('Missing comment id') };
+  if (!commentId) return { error: new Error('Missing comment id') };
   const { error } = await supabase
     .from('community_post_comments')
     .update({ deleted_at: new Date().toISOString() })
     .eq('id', commentId);
-  return { data: null, error };
-}
-
-export function subscribeCommunityPosts(communityId, onInsert) {
-  if (!communityId) return null;
-  const channel = supabase
-    .channel('community-feed-' + communityId)
-    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'community_posts', filter: 'community_id=eq.' + communityId },
-        (payload) => { if (onInsert) onInsert(payload.new); })
-    .subscribe();
-  return channel;
+  return { error };
 }
