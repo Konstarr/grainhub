@@ -97,7 +97,7 @@ nav.site-nav {
 
 .logo svg { width: 36px; height: 36px; }
 /* Source logo is 1616×238 (≈6.8:1 wide). Height 28 → width ≈190px. */
-.logo img { height: 7px; width: auto; max-width: none; display: block; }
+.logo img { height: 36px; width: auto; max-width: none; display: block; }
 
 .logo-text {
   font-family: 'Montserrat', sans-serif;
