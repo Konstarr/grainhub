@@ -79,7 +79,7 @@ nav.site-nav {
   padding: 0 2.5rem;
   display: flex;
   align-items: center;
-  height: 50px;
+  height: 64px;
   position: sticky;
   top: 0;
   z-index: 200;
@@ -96,7 +96,8 @@ nav.site-nav {
 }
 
 .logo svg { width: 36px; height: 36px; }
-.logo img { height: 20px; width: auto; max-width: none; display: block; }
+/* Source logo is 1616×238 (≈6.8:1 wide). Height 28 → width ≈190px. */
+.logo img { height: 28px; width: auto; max-width: none; display: block; }
 
 .logo-text {
   font-family: 'Montserrat', sans-serif;
@@ -1540,9 +1541,4 @@ nav.site-nav {
   cursor: pointer;
   transition: background 0.12s;
 }
-.machine-item:last-child { border-bottom: none; }
-
-.machine-thumb {
-  width: 64px;
-  height: 50px;
-  background: 
+.machine-item:last-child { border-b
