@@ -266,6 +266,49 @@ export async function leaveCommunity(communityId) {
 }
 
 /**
+ * Upload a single image to the `media` Storage bucket under
+ * `communities/<communityId>/<purpose>/<uuid>.<ext>` and return the
+ * public URL. Used by the icon/banner pickers in the Manage modal
+ * and by the post composer's "Add image" button.
+ *
+ * Caller is responsible for showing progress/errors. We do basic
+ * size + mime gate; the bucket policy enforces the rest.
+ */
+export async function uploadCommunityImage(file, { communityId, purpose = 'misc' } = {}) {
+  if (!file) return { data: null, error: new Error('No file selected') };
+  const okTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+  if (!okTypes.includes(file.type)) {
+    return { data: null, error: new Error('File must be a JPG, PNG, WebP, or GIF image.') };
+  }
+  if (file.size > 8 * 1024 * 1024) {
+    return { data: null, error: new Error('Image must be 8 MB or smaller.') };
+  }
+  const { data: session } = await supabase.auth.getSession();
+  const uid = session?.session?.user?.id;
+  if (!uid) return { data: null, error: new Error('Sign in to upload images.') };
+
+  const ext = (file.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg';
+  const id = (typeof crypto !== 'undefined' && crypto.randomUUID)
+    ? crypto.randomUUID()
+    : `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+  const folder = communityId ? `communities/${communityId}/${purpose}` : `communities/_user/${uid}/${purpose}`;
+  const path = `${folder}/${id}.${ext}`;
+
+  const { error: upErr } = await supabase
+    .storage
+    .from('media')
+    .upload(path, file, {
+      cacheControl: '3600',
+      upsert: false,
+      contentType: file.type,
+    });
+  if (upErr) return { data: null, error: upErr };
+
+  const { data: pub } = supabase.storage.from('media').getPublicUrl(path);
+  return { data: { url: pub?.publicUrl || null, path }, error: null };
+}
+
+/**
  * Mod / owner / admin: edit a community's name, description, icon,
  * banner, and visibility. Pass undefined or null for any field you
  * don't want to change.

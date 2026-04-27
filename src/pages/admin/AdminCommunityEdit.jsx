@@ -111,10 +111,18 @@ export default function AdminCommunityEdit() {
   };
 
   const handleBan = async (profileId, name) => {
-    const reason = prompt('Ban ' + (name || 'this member') + '?\n\nThey will be removed and blocked from re-applying or being invited until unbanned.\n\nOptional reason:', '');
+    const reason = prompt(
+      'Ban ' + (name || 'this member') + '?\n\nA reason is REQUIRED. It will appear in the ban log.\n\nReason:',
+      ''
+    );
     if (reason === null) return;
+    const trimmed = (reason || '').trim();
+    if (trimmed.length < 5) {
+      setErr('Please enter a ban reason (at least 5 characters).');
+      return;
+    }
     setBusyId(profileId); setErr(null);
-    const { error } = await banCommunityMember(id, profileId, reason || '');
+    const { error } = await banCommunityMember(id, profileId, trimmed);
     setBusyId(null);
     if (error) { setErr(error.message || 'Could not ban member'); return; }
     await load();
@@ -459,7 +467,8 @@ function MemberRow({ member, busy, onPromote, onDemote, onTransfer, onRemove, on
             </button>
           )}
           {onBan && (
-            <button type="button" className="adm-btn danger" onClick={onBan} disabled={busy} title="Ban — blocks future apply/invite">
+            <button type="button" className="adm-btn danger" onClick={onBan} disabled={busy} title=
+"Ban — blocks future apply/invite">
               Ban
             </button>
           )}

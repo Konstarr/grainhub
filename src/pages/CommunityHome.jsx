@@ -16,6 +16,7 @@ import {
   declineCommunityInvitation,
   inviteToCommunity,
   searchProfilesToInvite,
+  setMemberRole,
   transferOwnership,
   updateCommunitySettings,
   leaveCommunity,
@@ -185,10 +186,18 @@ export default function CommunityHome() {
     await load();
   };
   const handleBan = async (profileId, name) => {
-    const reason = prompt('Ban ' + (name || 'this member') + '?\n\nThey will be removed and blocked from re-applying or being invited until unbanned.\n\nOptional reason:', '');
+    const reason = prompt(
+      'Ban ' + (name || 'this member') + '?\n\nA reason is REQUIRED — it will appear in the ban log so other moderators understand the action.\n\nReason:',
+      ''
+    );
     if (reason === null) return; // cancelled
+    const trimmed = (reason || '').trim();
+    if (trimmed.length < 5) {
+      alert('Please enter a ban reason (at least 5 characters). The reason is recorded in the ban log.');
+      return;
+    }
     setBusy(true);
-    const { error } = await banCommunityMember(community.id, profileId, reason || '');
+    const { error } = await banCommunityMember(community.id, profileId, trimmed);
     setBusy(false);
     if (error) { alert(prettyMembershipError(error.message)); return; }
     await load();
@@ -199,6 +208,17 @@ export default function CommunityHome() {
     const { error } = await unbanCommunityMember(community.id, profileId);
     setBusy(false);
     if (error) { alert(error.message); return; }
+    await load();
+  };
+
+  const handleSetRole = async (profileId, newRole, name) => {
+    if (!community) return;
+    const verb = newRole === 'mod' ? 'Promote ' + (name || 'this member') + ' to moderator?' : 'Demote ' + (name || 'this mod') + ' to regular member?';
+    if (!confirm(verb)) return;
+    setBusy(true);
+    const { error } = await setMemberRole(community.id, profileId, newRole);
+    setBusy(false);
+    if (error) { alert(prettyMembershipError(error.message)); return; }
     await load();
   };
 
@@ -356,6 +376,7 @@ export default function CommunityHome() {
         <div className="comm-feed-main">
           {tab === 'discussion' && (
             <DiscussionTab
+              communityId={community?.id}
               community={community}
               posts={posts}
               members={members}
@@ -415,6 +436,7 @@ export default function CommunityHome() {
           onKick={handleKick}
           onBan={handleBan}
           onUnban={handleUnban}
+          onSetRole={handleSetRole}
           onSaveSettings={handleSaveSettings}
         />
       )}
@@ -510,6 +532,7 @@ function prettyMembershipError(message) {
 }
 
 function DiscussionTab({
+  communityId,
   community, posts, members, isMember, isAuthed, isMod, currentUserId,
   filterType, setFilterType, onCreate, onLike, onDelete, onPin,
   myRequest, myInvitation, onApply, onCancelRequest, onAcceptInvite, onDeclineInvite, busy,
@@ -568,7 +591,7 @@ function DiscussionTab({
 
   return (
     <>
-      <PostComposer onSubmit={onCreate} />
+      <PostComposer onSubmit={onCreate} communityId={communityId} />
       <div className="comm-filter-row">
         <button type="button" className={'comm-filter-chip ' + (!filterType ? 'active' : '')} onClick={() => setFilterType(null)}>All</button>
         {POST_TYPES.map((t) => (
@@ -724,28 +747,67 @@ function AvatarChip({ profile }) {
   );
 }
 
-function PostComposer({ onSubmit }) {
+function PostComposer({ onSubmit, communityId }) {
   const [body, setBody]   = useState('');
-  const [imageUrl, setUrl] = useState('');
-  const [showUrl, setShowUrl] = useState(false);
+  const [imageUrl, setImageUrl] = useState('');
   const [postType, setPostType] = useState('discussion');
   const [sending, setSending] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [err, setErr] = useState(null);
+
   const submit = async (e) => {
     e?.preventDefault();
     if (!body.trim() || sending) return;
     setSending(true); setErr(null);
-    const res = await onSubmit({ body, imageUrl: imageUrl.trim() || null, postType });
+    const res = await onSubmit({ body, imageUrl: imageUrl || null, postType });
     setSending(false);
     if (!res.ok) { setErr(res.error || 'Could not post.'); return; }
-    setBody(''); setUrl(''); setShowUrl(false); setPostType('discussion');
+    setBody(''); setImageUrl(''); setPostType('discussion');
   };
+
+  const handlePickImage = async (e) => {
+    const f = e.target.files?.[0];
+    e.target.value = '';
+    if (!f) return;
+    setUploading(true); setErr(null);
+    const { data, error } = await uploadCommunityImage(f, { communityId, purpose: 'posts' });
+    setUploading(false);
+    if (error) { setErr(error.message || 'Upload failed'); return; }
+    if (data?.url) setImageUrl(data.url);
+  };
+
   return (
     <div className="post-composer">
       <form onSubmit={submit} style={{ display: 'grid', gap: 10 }}>
-        <textarea value={body} onChange={(e) => setBody(e.target.value)} placeholder="Share something with the community..." rows={3} className="post-composer-input" maxLength={8000} />
-        {showUrl && (
-          <input type="url" value={imageUrl} onChange={(e) => setUrl(e.target.value)} placeholder="Paste an image URL (https://...)" className="post-composer-url" />
+        <textarea
+          value={body}
+          onChange={(e) => setBody(e.target.value)}
+          placeholder="Share something with the community..."
+          rows={3}
+          className="post-composer-input"
+          maxLength={8000}
+        />
+        {imageUrl && (
+          <div style={{ position: 'relative', display: 'inline-block', maxWidth: 320 }}>
+            <img
+              src={safeImageUrl(imageUrl) || ''}
+              alt=""
+              style={{ maxWidth: 320, maxHeight: 200, borderRadius: 8, border: '1px solid var(--border-light)', display: 'block' }}
+            />
+            <button
+              type="button"
+              onClick={() => setImageUrl('')}
+              style={{
+                position: 'absolute', top: 6, right: 6,
+                background: 'rgba(0,0,0,0.65)', color: '#fff', border: 0,
+                width: 24, height: 24, borderRadius: 12, cursor: 'pointer',
+                fontSize: 14, lineHeight: 1,
+              }}
+              aria-label="Remove image"
+            >
+              ×
+            </button>
+          </div>
         )}
         <div className="comm-type-chips" role="radiogroup" aria-label="Post type">
           {POST_TYPES.map((t) => (
@@ -756,10 +818,20 @@ function PostComposer({ onSubmit }) {
         </div>
         {err && <div className="comm-chat-err">{err}</div>}
         <div className="post-composer-actions">
-          <button type="button" className="post-composer-ghost" onClick={() => setShowUrl((v) => !v)}>
-            {showUrl ? '✕ Remove image' : '📷 Add image'}
-          </button>
-          <button type="submit" className="comm-btn primary" disabled={!body.trim() || sending}>
+          <label
+            className="post-composer-ghost"
+            style={{ cursor: uploading ? 'wait' : 'pointer', display: 'inline-block' }}
+          >
+            {uploading ? 'Uploading…' : imageUrl ? '📷 Replace image' : '📷 Add image'}
+            <input
+              type="file"
+              accept="image/png,image/jpeg,image/webp,image/gif"
+              disabled={uploading}
+              onChange={handlePickImage}
+              style={{ display: 'none' }}
+            />
+          </label>
+          <button type="submit" className="comm-btn primary" disabled={!body.trim() || sending || uploading}>
             {sending ? 'Posting...' : 'Post'}
           </button>
         </div>
@@ -959,7 +1031,7 @@ function PendingRequestsCard({ requests, onApprove, onReject, busy }) {
 
 function ManageMembershipModal({
   community, members, isOwner, isMod, pendingRequests, bans, busy,
-  onClose, onTransfer, onInvite, onApprove, onReject, onKick, onBan, onUnban, onSaveSettings,
+  onClose, onTransfer, onInvite, onApprove, onReject, onKick, onBan, onUnban, onSetRole, onSaveSettings,
 }) {
   const [section, setSection] = useState('settings');
   const [inviteQuery, setInviteQuery] = useState('');
@@ -1055,7 +1127,17 @@ function ManageMembershipModal({
                     {isThisOwner ? (
                       <span style={{ fontSize: 11.5, color: 'var(--text-muted)' }}>👑 Owner</span>
                     ) : (
-                      <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
+                      <div style={{ display: 'flex', gap: 6, flexShrink: 0, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                        {isOwner && m.role === 'member' && (
+                          <button type="button" onClick={() => onSetRole(p.id, 'mod', name)} disabled={busy} className="comm-btn ghost-light" style={{ padding: '5px 12px', fontSize: 12 }}>
+                            Promote to mod
+                          </button>
+                        )}
+                        {isOwner && m.role === 'mod' && (
+                          <button type="button" onClick={() => onSetRole(p.id, 'member', name)} disabled={busy} className="comm-btn ghost-light" style={{ padding: '5px 12px', fontSize: 12 }}>
+                            Demote to member
+                          </button>
+                        )}
                         <button type="button" onClick={() => onKick(p.id, name)} disabled={busy} className="comm-btn ghost-light" style={{ padding: '5px 12px', fontSize: 12 }}>Kick</button>
                         <button type="button" onClick={() => onBan(p.id, name)} disabled={busy} className="comm-btn ghost-light" style={{ padding: '5px 12px', fontSize: 12, color: '#a32d2d', borderColor: '#e6c1c1' }}>Ban</button>
                       </div>
@@ -1172,6 +1254,9 @@ function SettingsForm({ community, busy, onSave }) {
   const [bannerUrl, setBannerUrl] = useState(community.banner_url || '');
   const [isPublic, setIsPublic] = useState(!!community.is_public);
   const [savedNote, setSavedNote] = useState('');
+  const [uploadingIcon, setUploadingIcon] = useState(false);
+  const [uploadingBanner, setUploadingBanner] = useState(false);
+  const [uploadErr, setUploadErr] = useState('');
 
   const dirty =
     name.trim() !== (community.name || '').trim() ||
@@ -1206,24 +1291,95 @@ function SettingsForm({ community, busy, onSave }) {
         <input id="cm-set-name" type="text" value={name} onChange={(e) => setName(e.target.value)} maxLength={80} style={inputStyle} />
       </div>
       <div>
-        <label style={labelStyle} htmlFor="cm-set-desc">About</label>
+        <label style={labelStyle} htmlFor="cm-set-desc">About</
+label>
         <textarea id="cm-set-desc" value={description} onChange={(e) => setDescription(e.target.value)} rows={5} maxLength={4000} style={{ ...inputStyle, resize: 'vertical', minHeight: 96, fontFamily: 'Montserrat, sans-serif' }} placeholder="Tell new members what this community is about." />
         <div style={{ fontSize: 11.5, color: 'var(--text-muted)', marginTop: 4 }}>{description.length}/4000</div>
       </div>
+
       <div>
-        <label style={labelStyle} htmlFor="cm-set-icon">Icon image URL</label>
-        <input id="cm-set-icon" type="url" value={iconUrl} onChange={(e) => setIconUrl(e.target.value)} placeholder="https://..." style={inputStyle} />
-        <div style={{ fontSize: 11.5, color: 'var(--text-muted)', marginTop: 4 }}>Square image works best.</div>
-        {iconUrl && (
-          <div style={{ marginTop: 8 }}>
-            <img src={safeImageUrl(iconUrl) || ''} alt="" style={{ width: 56, height: 56, borderRadius: 10, objectFit: 'cover', border: '1px solid var(--border-light)' }} />
+        <label style={labelStyle}>Icon image</label>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          {iconUrl ? (
+            <img src={safeImageUrl(iconUrl) || ''} alt="" style={{ width: 56, height: 56, borderRadius: 10, objectFit: 'cover', border: '1px solid var(--border-light)', flexShrink: 0 }} />
+          ) : (
+            <div style={{ width: 56, height: 56, borderRadius: 10, background: 'var(--wood-cream)', border: '1px dashed var(--border)', flexShrink: 0 }} />
+          )}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4, flex: 1 }}>
+            <label className="comm-btn ghost-light" style={{ padding: '7px 14px', fontSize: 13, cursor: uploadingIcon ? 'wait' : 'pointer', display: 'inline-block', textAlign: 'center', width: 'fit-content' }}>
+              {uploadingIcon ? 'Uploading...' : iconUrl ? 'Replace icon' : 'Upload icon'}
+              <input
+                type="file"
+                accept="image/png,image/jpeg,image/webp,image/gif"
+                disabled={uploadingIcon}
+                onChange={async (e) => {
+                  const f = e.target.files?.[0];
+                  e.target.value = '';
+                  if (!f) return;
+                  setUploadingIcon(true); setUploadErr('');
+                  const { data, error } = await uploadCommunityImage(f, { communityId: community.id, purpose: 'icon' });
+                  setUploadingIcon(false);
+                  if (error) { setUploadErr(error.message || 'Upload failed'); return; }
+                  if (data?.url) setIconUrl(data.url);
+                }}
+                style={{ display: 'none' }}
+              />
+            </label>
+            {iconUrl && (
+              <button type="button" onClick={() => setIconUrl('')} className="comm-btn ghost-light" style={{ padding: '4px 10px', fontSize: 11.5, width: 'fit-content' }}>
+                Remove
+              </button>
+            )}
           </div>
+        </div>
+        <div style={{ fontSize: 11.5, color: 'var(--text-muted)', marginTop: 6 }}>
+          Square image works best. PNG, JPG, WebP, or GIF up to 8 MB.
+        </div>
+      </div>
+
+      <div>
+        <label style={labelStyle}>Banner image</label>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+          {bannerUrl ? (
+            <img src={safeImageUrl(bannerUrl) || ''} alt="" style={{ width: 200, height: 64, borderRadius: 8, objectFit: 'cover', border: '1px solid var(--border-light)' }} />
+          ) : (
+            <div style={{ width: 200, height: 64, borderRadius: 8, background: 'var(--wood-cream)', border: '1px dashed var(--border)' }} />
+          )}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+            <label className="comm-btn ghost-light" style={{ padding: '7px 14px', fontSize: 13, cursor: uploadingBanner ? 'wait' : 'pointer', display: 'inline-block', textAlign: 'center', width: 'fit-content' }}>
+              {uploadingBanner ? 'Uploading...' : bannerUrl ? 'Replace banner' : 'Upload banner'}
+              <input
+                type="file"
+                accept="image/png,image/jpeg,image/webp,image/gif"
+                disabled={uploadingBanner}
+                onChange={async (e) => {
+                  const f = e.target.files?.[0];
+                  e.target.value = '';
+                  if (!f) return;
+                  setUploadingBanner(true); setUploadErr('');
+                  const { data, error } = await uploadCommunityImage(f, { communityId: community.id, purpose: 'banner' });
+                  setUploadingBanner(false);
+                  if (error) { setUploadErr(error.message || 'Upload failed'); return; }
+                  if (data?.url) setBannerUrl(data.url);
+                }}
+                style={{ display: 'none' }}
+              />
+            </label>
+            {bannerUrl && (
+              <button type="button" onClick={() => setBannerUrl('')} className="comm-btn ghost-light" style={{ padding: '4px 10px', fontSize: 11.5, width: 'fit-content' }}>
+                Remove
+              </button>
+            )}
+          </div>
+        </div>
+        <div style={{ fontSize: 11.5, color: 'var(--text-muted)', marginTop: 6 }}>
+          Wide image, ideally 1600×400 or similar. Up to 8 MB.
+        </div>
+        {uploadErr && (
+          <div style={{ marginTop: 6, fontSize: 12.5, color: '#a32d2d' }}>{uploadErr}</div>
         )}
       </div>
-      <div>
-        <label style={labelStyle} htmlFor="cm-set-banner">Banner image URL</label>
-        <input id="cm-set-banner" type="url" value={bannerUrl} onChange={(e) => setBannerUrl(e.target.value)} placeholder="https://..." style={inputStyle} />
-      </div>
+
       <div style={{ padding: 12, border: '1px solid var(--border-light)', borderRadius: 10, background: '#FDFBF5' }}>
         <label style={{ display: 'flex', alignItems: 'flex-start', gap: 10, cursor: 'pointer' }}>
           <input type="checkbox" checked={isPublic} onChange={(e) => setIsPublic(e.target.checked)} style={{ marginTop: 3, accentColor: 'var(--wood-warm)' }} />
@@ -1235,6 +1391,7 @@ function SettingsForm({ community, busy, onSave }) {
           </div>
         </label>
       </div>
+
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 4 }}>
         <button type="submit" className="comm-btn primary" disabled={!dirty || busy} style={{ padding: '8px 16px' }}>
           {busy ? 'Saving...' : 'Save changes'}
