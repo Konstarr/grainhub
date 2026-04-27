@@ -14,6 +14,7 @@ import ForumSearch from './pages/ForumSearch.jsx';
 import ForumTopic from './pages/ForumTopic.jsx';
 import Jobs from './pages/Jobs.jsx';
 import JobDetail from './pages/JobDetail.jsx';
+import ForHireNew from './pages/ForHireNew.jsx';
 import Wiki from './pages/Wiki.jsx';
 import WikiArticle from './pages/WikiArticle.jsx';
 import WikiCluster from './pages/WikiCluster.jsx';
@@ -129,6 +130,7 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/forums" element={<Forums />} />
           <Route path="/jobs" element={<Jobs />} />
+          <Route path="/jobs/for-hire/new" element={<RequireAuth><ForHireNew /></RequireAuth>} />
           <Route path="/jobs/:id" element={<RequireAuth><JobDetail /></RequireAuth>} />
           <Route path="/wiki" element={<Wiki />} />
           <Route path="/news" element={<News />} />

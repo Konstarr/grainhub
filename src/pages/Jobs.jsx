@@ -1,5 +1,6 @@
-import { useMemo, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
+import { fetchForHireListings } from '../lib/forHireDb.js';
 import '../styles/jobs.css';
 import JobsPageHeader from '../components/jobs/JobsPageHeader.jsx';
 import JobsSearchHero from '../components/jobs/JobsSearchHero.jsx';
@@ -159,9 +160,10 @@ function rolePillsWithCounts(rows, pills) {
 }
 
 export default function Jobs() {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   // The site-wide SecondaryNav on /jobs uses ?role=<keyword>.
   const navRoleKeyword = searchParams.get('role') || '';
+  const kindParam = searchParams.get('kind') === 'seeking' ? 'seeking' : 'hiring';
 
   const [activeRole, setActiveRole] = useState('All Roles');
   const [keyword, setKeyword]       = useState('');
@@ -172,7 +174,7 @@ export default function Jobs() {
 
   const { data: rows } = useSupabaseList('jobs', {
     filter: (q) => {
-      let out = q.eq('is_approved', true).eq('is_filled', false);
+      let out = q.eq('is_approved', true).eq('is_filled', false).eq('kind', 'hiring');
       // Role keyword from the site-wide SecondaryNav (?role=cabinet%20maker
       // etc.) — loose match against title + description.
       if (navRoleKeyword) {
@@ -309,10 +311,48 @@ export default function Jobs() {
 
   const liveJobs = sortedRows.map(mapJobRow);
 
+  const switchKind = (next) => {
+    const p = new URLSearchParams(searchParams);
+    if (next === 'hiring') p.delete('kind'); else p.set('kind', next);
+    setSearchParams(p, { replace: true });
+  };
+
   return (
     <>
       <JobsPageHeader data={JOBS_PAGE_HEADER} />
 
+      <div style={{ background: '#FBF4E8', borderBottom: '1px solid var(--border-light)' }}>
+        <div style={{ maxWidth: 1380, margin: '0 auto', padding: '12px 2.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+          <div className="kind-tabs" style={{ background: 'rgba(0,0,0,0.06)' }}>
+            <button
+              type="button"
+              className={'kind-tab' + (kindParam === 'hiring' ? ' active' : '')}
+              onClick={() => switchKind('hiring')}
+              style={{ color: kindParam === 'hiring' ? '#2C1A0E' : '#6B3F1F' }}
+            >
+              Jobs
+            </button>
+            <button
+              type="button"
+              className={'kind-tab' + (kindParam === 'seeking' ? ' active' : '')}
+              onClick={() => switchKind('seeking')}
+              style={{ color: kindParam === 'seeking' ? '#2C1A0E' : '#6B3F1F' }}
+            >
+              For Hire
+            </button>
+          </div>
+          {kindParam === 'seeking' ? (
+            <Link to="/jobs/for-hire/new" className="claim-btn primary">+ Post yourself</Link>
+          ) : (
+            <Link to="/jobs/post" className="claim-btn primary">+ Post a job</Link>
+          )}
+        </div>
+      </div>
+
+      {kindParam === 'seeking' ? (
+        <ForHirePanel />
+      ) : (
+        <>
       <JobsSearchHero
         keyword={keyword}
         onKeywordChange={setKeyword}
@@ -339,6 +379,87 @@ export default function Jobs() {
         />
         <JobsSidebar postJobCta={POST_JOB_CTA} talentCta={TALENT_CTA} />
       </div>
+        </>
+      )}
     </>
+  );
+}
+
+/** Render the For Hire list for the seeking tab. */
+function ForHirePanel() {
+  const [rows, setRows] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { data } = await fetchForHireListings({ limit: 100 });
+      if (!cancelled) { setRows(data || []); setLoading(false); }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  return (
+    <div className="wrap" style={{ padding: '20px 2.5rem 32px', maxWidth: 1380, margin: '0 auto' }}>
+      <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+        <div>
+          <h2 style={{ margin: 0 }}>People available for hire</h2>
+          <p style={{ color: 'var(--text-muted)', marginTop: 4, fontSize: 13 }}>
+            Workers who are open to new opportunities. Click to see specialties, experience, and resume.
+          </p>
+        </div>
+        <Link to="/jobs/for-hire/new" className="claim-btn primary">+ Post yourself</Link>
+      </div>
+      {loading ? <div>Loading…</div> : (
+        rows.length === 0 ? (
+          <div style={{ padding: 32, color: 'var(--text-muted)', textAlign: 'center', background: '#FFF8EE', border: '1px solid var(--border-light)', borderRadius: 10 }}>
+            No one is listed for hire yet. Be the first.
+          </div>
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 14 }}>
+            {rows.map((r) => {
+              const initials = (r.author?.full_name || r.author?.username || '??').split(/\s+/).slice(0,2).map((w) => w[0]).join('').toUpperCase();
+              const rate = r.hourly_rate_min && r.hourly_rate_max
+                ? `$${r.hourly_rate_min}–${r.hourly_rate_max}/hr`
+                : r.hourly_rate_min ? `$${r.hourly_rate_min}+/hr` : null;
+              return (
+                <div key={r.id} className="card" style={{ padding: 14 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+                    {r.author?.avatar_url
+                      ? <img src={r.author.avatar_url} alt="" style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover' }} />
+                      : <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'linear-gradient(135deg, #2C1A0E, #6B3F1F)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 13 }}>{initials}</div>}
+                    <div style={{ minWidth: 0, flex: 1 }}>
+                      <div style={{ fontWeight: 600 }}>{r.author?.full_name || r.author?.username || 'Worker'}</div>
+                      {r.location && <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{r.location}</div>}
+                    </div>
+                  </div>
+                  <div style={{ fontWeight: 600, marginBottom: 6 }}>{r.title}</div>
+                  <div style={{ fontSize: 13, color: '#444', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                    {r.description}
+                  </div>
+                  <div style={{ marginTop: 8, display: 'flex', flexWrap: 'wrap', gap: 6, fontSize: 12 }}>
+                    {r.trade && <span style={{ padding: '2px 8px', background: '#F5EAD6', borderRadius: 999, color: '#6B3F1F', fontWeight: 600 }}>{r.trade}</span>}
+                    {r.years_experience != null && <span style={{ padding: '2px 8px', background: '#F0E7FA', borderRadius: 999, color: '#5E2E8F', fontWeight: 600 }}>{r.years_experience} yrs</span>}
+                    {rate && <span style={{ padding: '2px 8px', background: '#DDEFD3', borderRadius: 999, color: '#2E6F2E', fontWeight: 600 }}>{rate}</span>}
+                  </div>
+                  <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
+                    {r.resume_url && (
+                      <a href={r.resume_url} target="_blank" rel="noreferrer" className="claim-btn ghost" style={{ flex: 1, textAlign: 'center', padding: '6px 10px', fontSize: 12 }}>
+                        📄 Resume
+                      </a>
+                    )}
+                    {r.apply_email && (
+                      <a href={`mailto:${r.apply_email}?subject=${encodeURIComponent('Re: ' + r.title)}`} className="claim-btn primary" style={{ flex: 1, textAlign: 'center', padding: '6px 10px', fontSize: 12 }}>
+                        Contact
+                      </a>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )
+      )}
+    </div>
   );
 }
