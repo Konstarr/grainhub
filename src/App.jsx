@@ -1,8 +1,10 @@
 import { lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { Analytics } from '@vercel/analytics/react';
-import { SpeedInsights } from '@vercel/speed-insights/react';
 import { AuthProvider } from './context/AuthContext.jsx';
+// Lazy-load Vercel telemetry so it never competes with the user's
+// first interactions for main-thread time.
+const Analytics     = lazy(() => import('@vercel/analytics/react').then((m) => ({ default: m.Analytics })));
+const SpeedInsights = lazy(() => import('@vercel/speed-insights/react').then((m) => ({ default: m.SpeedInsights })));
 import RequireAuth from './components/auth/RequireAuth.jsx';
 import RequireStaff from './components/auth/RequireStaff.jsx';
 import Layout from './components/layout/Layout.jsx';
@@ -98,8 +100,10 @@ const adminRoute = (level, Component) => (
 export default function App() {
   return (
     <AuthProvider>
-      <Analytics />
-      <SpeedInsights />
+      <Suspense fallback={null}>
+        <Analytics />
+        <SpeedInsights />
+      </Suspense>
       <Routes>
         <Route path="/admin"                  element={adminRoute('admin', AdminNews)} />
         <Route path="/admin/dashboard"        element={adminRoute('owner', AdminOwnerDashboard)} />

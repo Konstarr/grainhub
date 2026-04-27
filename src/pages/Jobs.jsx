@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useDeferredValue, useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { fetchForHireListings } from '../lib/forHireDb.js';
 import '../styles/jobs.css';
@@ -400,6 +400,10 @@ function ForHirePanel() {
   const [maxRate, setMaxRate]       = useState('');
   const [locQuery, setLocQuery]     = useState('');
   const [keyword, setKeyword]       = useState('');
+  // Deferred copies so typing keeps the input snappy; the heavy
+  // filter pass runs at lower priority.
+  const dKeyword = useDeferredValue(keyword);
+  const dLocQuery = useDeferredValue(locQuery);
 
   useEffect(() => {
     let cancelled = false;
@@ -418,20 +422,23 @@ function ForHirePanel() {
   };
 
   const filtered = useMemo(() => {
+    const kw = dKeyword.trim().toLowerCase();
+    const lq = dLocQuery.trim().toLowerCase();
+    const minY = minYears === '' ? null : Number(minYears);
+    const maxR = maxRate === '' ? null : Number(maxRate);
     return rows.filter((r) => {
       if (trades.size > 0 && !trades.has(r.trade)) return false;
       if (empTypes.size > 0 && !empTypes.has(r.employment_type)) return false;
-      if (minYears !== '' && (r.years_experience ?? 0) < Number(minYears)) return false;
-      if (maxRate !== '' && r.hourly_rate_min != null && r.hourly_rate_min > Number(maxRate)) return false;
-      if (locQuery.trim() && !(r.location || '').toLowerCase().includes(locQuery.trim().toLowerCase())) return false;
-      if (keyword.trim()) {
-        const k = keyword.trim().toLowerCase();
+      if (minY != null && (r.years_experience ?? 0) < minY) return false;
+      if (maxR != null && r.hourly_rate_min != null && r.hourly_rate_min > maxR) return false;
+      if (lq && !(r.location || '').toLowerCase().includes(lq)) return false;
+      if (kw) {
         const hay = `${r.title || ''} ${r.description || ''}`.toLowerCase();
-        if (!hay.includes(k)) return false;
+        if (!hay.includes(kw)) return false;
       }
       return true;
     });
-  }, [rows, trades, empTypes, minYears, maxRate, locQuery, keyword]);
+  }, [rows, trades, empTypes, minYears, maxRate, dLocQuery, dKeyword]);
 
   const clearAll = () => {
     setTrades(new Set());
