@@ -617,22 +617,22 @@ export async function searchForumThreads(q, { limit = 50 } = {}) {
 export async function fetchCategoryCounters(threadVisits = {}, markAllReadAt = null) {
   const { data: threads } = await supabase
     .from('forum_threads')
-    .select('id, category_id, reply_count, created_at, last_reply_at');
+    .select('id, category_id, reply_count, view_count, created_at, last_reply_at');
 
   const fallbackCutoff = Date.now() - NEW_FALLBACK_DAYS * 24 * 60 * 60 * 1000;
   const baselineMs = markAllReadAt ? new Date(markAllReadAt).getTime() : 0;
   const byCat = new Map();
   (threads || []).forEach((t) => {
     if (!t.category_id) return;
-    const entry = byCat.get(t.category_id) || { threads: 0, posts: 0, newCount: 0 };
+    const entry = byCat.get(t.category_id) || { threads: 0, posts: 0, views: 0, newCount: 0 };
     entry.threads += 1;
     entry.posts += (t.reply_count || 0) + 1;
+    entry.views += (t.view_count || 0);
 
     const lastActivityIso = t.last_reply_at || t.created_at;
     const lastActivityMs = lastActivityIso ? new Date(lastActivityIso).getTime() : 0;
     if (baselineMs && lastActivityMs <= baselineMs) {
       // Anything older than the user's "Mark all read" click is read.
-      byCat.set(t.category_id, entry);
       byCat.set(t.category_id, entry);
       return;
     }
@@ -642,5 +642,8 @@ export async function fetchCategoryCounters(threadVisits = {}, markAllReadAt = n
 
     byCat.set(t.category_id, entry);
   });
+  return byCat;
+}
+ });
   return byCat;
 }

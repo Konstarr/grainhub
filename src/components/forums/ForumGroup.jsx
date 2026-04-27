@@ -73,6 +73,20 @@ export default function ForumGroup({ group }) {
                 <div className="cat-stat-num">{cat.threads.toLocaleString()}</div>
                 <div className="cat-stat-label">Threads</div>
               </div>
+              <div className="cat-stat">
+                <div className="cat-stat-num">{(cat.views || 0).toLocaleString()}</div>
+                <div className="cat-stat-label">Views</div>
+              </div>
+            </div>
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}
+t-num">{(cat.views || 0).toLocaleString()}</div>
+                <div className="cat-stat-label">Views</div>
+              </div>
             </div>
           </Link>
         ))}

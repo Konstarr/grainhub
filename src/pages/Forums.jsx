@@ -274,11 +274,12 @@ export default function Forums() {
             ...c,
             threads: live.threads,
             posts: live.posts,
+            views: live.views || 0,
             newCount,
             isNew: newCount > 0,
           };
         }
-        return { ...c, threads: 0, posts: 0, newCount: 0, isNew: false };
+        return { ...c, threads: 0, posts: 0, views: 0, newCount: 0, isNew: false };
       });
       return {
         ...g,
@@ -362,6 +363,11 @@ export default function Forums() {
           <ForumGuidelines guidelines={FORUM_GUIDELINES} />
           <ThreadLegend items={THREAD_LEGEND} />
           <SponsorMulti />
+        </aside>
+      </div>
+    </>
+  );
+}
         </aside>
       </div>
     </>
