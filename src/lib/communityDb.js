@@ -275,6 +275,8 @@ export async function leaveCommunity(communityId) {
  * size + mime gate; the bucket policy enforces the rest.
  */
 export async function uploadCommunityImage(file, { communityId, purpose = 'misc' } = {}) {
+  /* eslint-disable no-console */
+  console.log('[uploadCommunityImage] start', { name: file?.name, type: file?.type, size: file?.size, communityId, purpose });
   if (!file) return { data: null, error: new Error('No file selected') };
   const okTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
   if (!okTypes.includes(file.type)) {
@@ -283,8 +285,10 @@ export async function uploadCommunityImage(file, { communityId, purpose = 'misc'
   if (file.size > 8 * 1024 * 1024) {
     return { data: null, error: new Error('Image must be 8 MB or smaller.') };
   }
-  const { data: session } = await supabase.auth.getSession();
+  const { data: session, error: sessErr } = await supabase.auth.getSession();
+  if (sessErr) console.error('[uploadCommunityImage] session error:', sessErr);
   const uid = session?.session?.user?.id;
+  console.log('[uploadCommunityImage] uid:', uid || '(none)');
   if (!uid) return { data: null, error: new Error('Sign in to upload images.') };
 
   const ext = (file.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg';
@@ -293,8 +297,9 @@ export async function uploadCommunityImage(file, { communityId, purpose = 'misc'
     : `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
   const folder = communityId ? `communities/${communityId}/${purpose}` : `communities/_user/${uid}/${purpose}`;
   const path = `${folder}/${id}.${ext}`;
+  console.log('[uploadCommunityImage] path:', path);
 
-  // 30-second timeout so a hung upload never freezes the UI.
+  // 15-second timeout so a hung upload never freezes the UI.
   const uploadP = supabase
     .storage
     .from('media')
@@ -304,20 +309,19 @@ export async function uploadCommunityImage(file, { communityId, purpose = 'misc'
       contentType: file.type,
     });
   const timeoutP = new Promise((resolve) =>
-    setTimeout(() => resolve({ error: new Error('Upload timed out after 30 seconds.') }), 30000)
+    setTimeout(() => resolve({ error: new Error('Upload timed out after 15s. Bucket "media" may not exist or RLS is blocking.') }), 15000)
   );
   let result;
   try {
     result = await Promise.race([uploadP, timeoutP]);
   } catch (e) {
-    // eslint-disable-next-line no-console
     console.error('[uploadCommunityImage] threw:', e);
     return { data: null, error: e instanceof Error ? e : new Error(String(e)) };
   }
+  console.log('[uploadCommunityImage] raw result:', result);
   const upErr = result?.error;
   if (upErr) {
-    // eslint-disable-next-line no-console
-    console.error('[uploadCommunityImage] storage error:', upErr);
+    console.error('[uploadCommunityImage] storage error:', upErr, 'json:', JSON.stringify(upErr));
     const msg = upErr.message
       || upErr.error
       || (typeof upErr === 'string' ? upErr : 'Upload failed. Check storage policies.');
@@ -325,7 +329,9 @@ export async function uploadCommunityImage(file, { communityId, purpose = 'misc'
   }
 
   const { data: pub } = supabase.storage.from('media').getPublicUrl(path);
+  console.log('[uploadCommunityImage] public url:', pub?.publicUrl);
   return { data: { url: pub?.publicUrl || null, path }, error: null };
+  /* eslint-enable no-console */
 }
 
 /**
