@@ -2063,3 +2063,183 @@ nav.site-nav {
   line-height: 1.45;
   color: #4A2E15;
 }
+
+/* ============================================================
+ * For Hire panel — left filter sidebar + right list
+ * ============================================================ */
+.forhire-wrap {
+  display: grid;
+  grid-template-columns: 250px 1fr;
+  gap: 24px;
+  max-width: 1380px;
+  margin: 0 auto;
+  padding: 24px 2.5rem 40px;
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .forhire-wrap { grid-template-columns: 1fr; }
+}
+
+.forhire-filters { position: sticky; top: 80px; }
+.ff-card {
+  background: #fff;
+  border: 1px solid var(--border-light, #EDD9B0);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.ff-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 14px;
+  background: var(--wood-dark, #2C1A0E);
+  color: #FBF4E8;
+  font-weight: 700;
+  font-size: 14px;
+}
+.ff-clear {
+  background: transparent;
+  border: 0;
+  color: #E0A02B;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+.ff-clear:hover { text-decoration: underline; }
+.ff-section {
+  padding: 12px 14px;
+  border-bottom: 1px solid #f3eee2;
+}
+.ff-section:last-child { border-bottom: 0; }
+.ff-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--text-muted, #9A7B5C);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.ff-input {
+  width: 100%;
+  padding: 7px 10px;
+  border: 1px solid var(--border-light, #EDD9B0);
+  border-radius: 6px;
+  font: inherit;
+  font-size: 13px;
+  background: #fff;
+}
+.ff-input:focus {
+  outline: 2px solid var(--wood-warm, #6B3F1F);
+  outline-offset: -1px;
+}
+.ff-checks { display: flex; flex-direction: column; gap: 6px; }
+.ff-check {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 13px;
+  color: #1c1c1c;
+  cursor: pointer;
+  text-transform: capitalize;
+}
+.ff-check input { margin: 0; }
+.ff-count {
+  font-size: 11px;
+  color: var(--text-muted, #9A7B5C);
+  background: #F5EAD6;
+  padding: 1px 7px;
+  border-radius: 999px;
+  min-width: 22px;
+  text-align: center;
+}
+
+.forhire-list-col { min-width: 0; }
+.forhire-list-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.forhire-empty {
+  padding: 32px;
+  text-align: center;
+  color: var(--text-muted, #9A7B5C);
+  background: #FFF8EE;
+  border: 1px dashed var(--border-light, #EDD9B0);
+  border-radius: 10px;
+  font-size: 14px;
+}
+.forhire-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.fh-row {
+  display: grid;
+  grid-template-columns: 56px 1fr auto;
+  gap: 14px;
+  padding: 14px 16px;
+  background: #fff;
+  border: 1px solid var(--border-light, #EDD9B0);
+  border-radius: 10px;
+  align-items: start;
+}
+.fh-av {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.fh-av-fallback {
+  background: linear-gradient(135deg, #2C1A0E, #6B3F1F);
+  color: #fff;
+  font-weight: 700;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.fh-meta { min-width: 0; }
+.fh-name { font-weight: 700; font-size: 14px; }
+.fh-loc { font-weight: 400; color: var(--text-muted, #9A7B5C); }
+.fh-title { font-weight: 600; color: var(--wood-warm, #6B3F1F); margin-top: 2px; font-size: 14px; }
+.fh-desc {
+  margin-top: 6px;
+  font-size: 13px;
+  color: #444;
+  line-height: 1.45;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.fh-chips { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px; }
+.fh-chip {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+.fh-chip-trade { background: #F5EAD6; color: #6B3F1F; }
+.fh-chip-type  { background: #E6F1FB; color: #185FA5; }
+.fh-chip-yrs   { background: #F0E7FA; color: #5E2E8F; }
+.fh-chip-rate  { background: #DDEFD3; color: #2E6F2E; }
+.fh-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-self: center;
+  min-width: 110px;
+}
+.fh-btn { font-size: 12px; padding: 7px 12px; text-align: center; }
+@media (max-width: 700px) {
+  .fh-row { grid-template-columns: 48px 1fr; }
+  .fh-actions { grid-column: 1 / -1; flex-direction: row; }
+  .fh-btn { flex: 1; }
+}

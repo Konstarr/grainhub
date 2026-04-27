@@ -385,81 +385,229 @@ export default function Jobs() {
   );
 }
 
-/** Render the For Hire list for the seeking tab. */
+const FH_TRADES = ['millwork', 'cabinet', 'finishing', 'install', 'cnc', 'lumber', 'other'];
+const FH_EMP_TYPES = ['full-time', 'part-time', 'contract', 'apprenticeship'];
+
+/** For Hire tab — left filter sidebar, right list of workers. */
 function ForHirePanel() {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Filter state — kept client-side; no extra fetch on filter change.
+  const [trades, setTrades]         = useState(new Set());
+  const [empTypes, setEmpTypes]     = useState(new Set());
+  const [minYears, setMinYears]     = useState('');
+  const [maxRate, setMaxRate]       = useState('');
+  const [locQuery, setLocQuery]     = useState('');
+  const [keyword, setKeyword]       = useState('');
+
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const { data } = await fetchForHireListings({ limit: 100 });
+      const { data } = await fetchForHireListings({ limit: 200 });
       if (!cancelled) { setRows(data || []); setLoading(false); }
     })();
     return () => { cancelled = true; };
   }, []);
 
+  const toggleSet = (set, value) => {
+    const next = new Set(set);
+    if (next.has(value)) next.delete(value);
+    else next.add(value);
+    return next;
+  };
+
+  const filtered = useMemo(() => {
+    return rows.filter((r) => {
+      if (trades.size > 0 && !trades.has(r.trade)) return false;
+      if (empTypes.size > 0 && !empTypes.has(r.employment_type)) return false;
+      if (minYears !== '' && (r.years_experience ?? 0) < Number(minYears)) return false;
+      if (maxRate !== '' && r.hourly_rate_min != null && r.hourly_rate_min > Number(maxRate)) return false;
+      if (locQuery.trim() && !(r.location || '').toLowerCase().includes(locQuery.trim().toLowerCase())) return false;
+      if (keyword.trim()) {
+        const k = keyword.trim().toLowerCase();
+        const hay = `${r.title || ''} ${r.description || ''}`.toLowerCase();
+        if (!hay.includes(k)) return false;
+      }
+      return true;
+    });
+  }, [rows, trades, empTypes, minYears, maxRate, locQuery, keyword]);
+
+  const clearAll = () => {
+    setTrades(new Set());
+    setEmpTypes(new Set());
+    setMinYears('');
+    setMaxRate('');
+    setLocQuery('');
+    setKeyword('');
+  };
+
+  // Live counts per trade / type so users see "millwork (12)" etc.
+  const tradeCounts = useMemo(() => {
+    const m = {};
+    rows.forEach((r) => { if (r.trade) m[r.trade] = (m[r.trade] || 0) + 1; });
+    return m;
+  }, [rows]);
+  const empCounts = useMemo(() => {
+    const m = {};
+    rows.forEach((r) => { if (r.employment_type) m[r.employment_type] = (m[r.employment_type] || 0) + 1; });
+    return m;
+  }, [rows]);
+
   return (
-    <div className="wrap" style={{ padding: '20px 2.5rem 32px', maxWidth: 1380, margin: '0 auto' }}>
-      <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-        <div>
-          <h2 style={{ margin: 0 }}>People available for hire</h2>
-          <p style={{ color: 'var(--text-muted)', marginTop: 4, fontSize: 13 }}>
-            Workers who are open to new opportunities. Click to see specialties, experience, and resume.
-          </p>
-        </div>
-        <Link to="/jobs/for-hire/new" className="claim-btn primary">+ Post yourself</Link>
-      </div>
-      {loading ? <div>Loading…</div> : (
-        rows.length === 0 ? (
-          <div style={{ padding: 32, color: 'var(--text-muted)', textAlign: 'center', background: '#FFF8EE', border: '1px solid var(--border-light)', borderRadius: 10 }}>
-            No one is listed for hire yet. Be the first.
+    <div className="forhire-wrap">
+      {/* LEFT: filters */}
+      <aside className="forhire-filters">
+        <div className="ff-card">
+          <div className="ff-header">
+            Filter <button type="button" className="ff-clear" onClick={clearAll}>Clear all</button>
           </div>
-        ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 14 }}>
-            {rows.map((r) => {
-              const initials = (r.author?.full_name || r.author?.username || '??').split(/\s+/).slice(0,2).map((w) => w[0]).join('').toUpperCase();
-              const rate = r.hourly_rate_min && r.hourly_rate_max
-                ? `$${r.hourly_rate_min}–${r.hourly_rate_max}/hr`
-                : r.hourly_rate_min ? `$${r.hourly_rate_min}+/hr` : null;
-              return (
-                <div key={r.id} className="card" style={{ padding: 14 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
-                    {r.author?.avatar_url
-                      ? <img src={r.author.avatar_url} alt="" style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover' }} />
-                      : <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'linear-gradient(135deg, #2C1A0E, #6B3F1F)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 13 }}>{initials}</div>}
-                    <div style={{ minWidth: 0, flex: 1 }}>
-                      <div style={{ fontWeight: 600 }}>{r.author?.full_name || r.author?.username || 'Worker'}</div>
-                      {r.location && <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{r.location}</div>}
-                    </div>
+
+          <div className="ff-section">
+            <label className="ff-label">Search</label>
+            <input
+              type="text"
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
+              placeholder="Skills, specialties…"
+              className="ff-input"
+            />
+          </div>
+
+          <div className="ff-section">
+            <label className="ff-label">Location</label>
+            <input
+              type="text"
+              value={locQuery}
+              onChange={(e) => setLocQuery(e.target.value)}
+              placeholder="City or state"
+              className="ff-input"
+            />
+          </div>
+
+          <div className="ff-section">
+            <label className="ff-label">Trade</label>
+            <div className="ff-checks">
+              {FH_TRADES.map((t) => (
+                <label key={t} className="ff-check">
+                  <input
+                    type="checkbox"
+                    checked={trades.has(t)}
+                    onChange={() => setTrades((s) => toggleSet(s, t))}
+                  />
+                  <span style={{ flex: 1 }}>{t}</span>
+                  <span className="ff-count">{tradeCounts[t] || 0}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <div className="ff-section">
+            <label className="ff-label">Looking for</label>
+            <div className="ff-checks">
+              {FH_EMP_TYPES.map((t) => (
+                <label key={t} className="ff-check">
+                  <input
+                    type="checkbox"
+                    checked={empTypes.has(t)}
+                    onChange={() => setEmpTypes((s) => toggleSet(s, t))}
+                  />
+                  <span style={{ flex: 1 }}>{t}</span>
+                  <span className="ff-count">{empCounts[t] || 0}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <div className="ff-section">
+            <label className="ff-label">Minimum experience</label>
+            <input
+              type="number"
+              min="0"
+              max="60"
+              value={minYears}
+              onChange={(e) => setMinYears(e.target.value)}
+              placeholder="years"
+              className="ff-input"
+            />
+          </div>
+
+          <div className="ff-section">
+            <label className="ff-label">Max hourly rate ($)</label>
+            <input
+              type="number"
+              min="0"
+              value={maxRate}
+              onChange={(e) => setMaxRate(e.target.value)}
+              placeholder="e.g. 35"
+              className="ff-input"
+            />
+          </div>
+        </div>
+      </aside>
+
+      {/* RIGHT: list */}
+      <div className="forhire-list-col">
+        <div className="forhire-list-head">
+          <div>
+            <h2 style={{ margin: 0, fontSize: 22 }}>People available for hire</h2>
+            <p style={{ color: 'var(--text-muted)', marginTop: 2, fontSize: 13 }}>
+              {loading ? 'Loading…' : `${filtered.length} of ${rows.length} listing${rows.length === 1 ? '' : 's'}`}
+            </p>
+          </div>
+          <Link to="/jobs/for-hire/new" className="claim-btn primary">+ Post yourself</Link>
+        </div>
+
+        {!loading && filtered.length === 0 && (
+          <div className="forhire-empty">
+            {rows.length === 0
+              ? 'No one is listed for hire yet. Be the first.'
+              : 'No workers match these filters. Try clearing some.'}
+          </div>
+        )}
+
+        <div className="forhire-list">
+          {filtered.map((r) => {
+            const initials = (r.author?.full_name || r.author?.username || '??').split(/\s+/).slice(0, 2).map((w) => w[0]).join('').toUpperCase();
+            const rate = r.hourly_rate_min && r.hourly_rate_max
+              ? `$${r.hourly_rate_min}–${r.hourly_rate_max}/hr`
+              : r.hourly_rate_min ? `$${r.hourly_rate_min}+/hr` : null;
+            return (
+              <div key={r.id} className="fh-row">
+                {r.author?.avatar_url
+                  ? <img src={r.author.avatar_url} alt="" className="fh-av" />
+                  : <div className="fh-av fh-av-fallback">{initials}</div>}
+                <div className="fh-meta">
+                  <div className="fh-name">
+                    {r.author?.full_name || r.author?.username || 'Worker'}
+                    {r.location && <span className="fh-loc"> · {r.location}</span>}
                   </div>
-                  <div style={{ fontWeight: 600, marginBottom: 6 }}>{r.title}</div>
-                  <div style={{ fontSize: 13, color: '#444', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                    {r.description}
-                  </div>
-                  <div style={{ marginTop: 8, display: 'flex', flexWrap: 'wrap', gap: 6, fontSize: 12 }}>
-                    {r.trade && <span style={{ padding: '2px 8px', background: '#F5EAD6', borderRadius: 999, color: '#6B3F1F', fontWeight: 600 }}>{r.trade}</span>}
-                    {r.years_experience != null && <span style={{ padding: '2px 8px', background: '#F0E7FA', borderRadius: 999, color: '#5E2E8F', fontWeight: 600 }}>{r.years_experience} yrs</span>}
-                    {rate && <span style={{ padding: '2px 8px', background: '#DDEFD3', borderRadius: 999, color: '#2E6F2E', fontWeight: 600 }}>{rate}</span>}
-                  </div>
-                  <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
-                    {r.resume_url && (
-                      <a href={r.resume_url} target="_blank" rel="noreferrer" className="claim-btn ghost" style={{ flex: 1, textAlign: 'center', padding: '6px 10px', fontSize: 12 }}>
-                        📄 Resume
-                      </a>
-                    )}
-                    {r.apply_email && (
-                      <a href={`mailto:${r.apply_email}?subject=${encodeURIComponent('Re: ' + r.title)}`} className="claim-btn primary" style={{ flex: 1, textAlign: 'center', padding: '6px 10px', fontSize: 12 }}>
-                        Contact
-                      </a>
-                    )}
+                  <div className="fh-title">{r.title}</div>
+                  <div className="fh-desc">{r.description}</div>
+                  <div className="fh-chips">
+                    {r.trade && <span className="fh-chip fh-chip-trade">{r.trade}</span>}
+                    {r.employment_type && <span className="fh-chip fh-chip-type">{r.employment_type}</span>}
+                    {r.years_experience != null && <span className="fh-chip fh-chip-yrs">{r.years_experience} yrs</span>}
+                    {rate && <span className="fh-chip fh-chip-rate">{rate}</span>}
                   </div>
                 </div>
-              );
-            })}
-          </div>
-        )
-      )}
+                <div className="fh-actions">
+                  {r.resume_url && (
+                    <a href={r.resume_url} target="_blank" rel="noreferrer" className="claim-btn ghost fh-btn">
+                      📄 Resume
+                    </a>
+                  )}
+                  {r.apply_email && (
+                    <a href={`mailto:${r.apply_email}?subject=${encodeURIComponent('Re: ' + r.title)}`} className="claim-btn primary fh-btn">
+                      Contact
+                    </a>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 }
