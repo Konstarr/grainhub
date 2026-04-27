@@ -17,6 +17,7 @@ import {
   inviteToCommunity,
   searchProfilesToInvite,
   transferOwnership,
+  updateCommunitySettings,
   leaveCommunity,
   kickCommunityMember,
   banCommunityMember,
@@ -199,6 +200,16 @@ export default function CommunityHome() {
     setBusy(false);
     if (error) { alert(error.message); return; }
     await load();
+  };
+
+  const handleSaveSettings = async (patch) => {
+    if (!community) return false;
+    setBusy(true);
+    const { data, error } = await updateCommunitySettings(community.id, patch);
+    setBusy(false);
+    if (error) { alert(prettyMembershipError(error.message)); return false; }
+    if (data) setCommunity(data);
+    return true;
   };
 
   const handleTransfer = async (newOwnerId) => {
@@ -404,6 +415,7 @@ export default function CommunityHome() {
           onKick={handleKick}
           onBan={handleBan}
           onUnban={handleUnban}
+          onSaveSettings={handleSaveSettings}
         />
       )}
     </>
@@ -947,9 +959,9 @@ function PendingRequestsCard({ requests, onApprove, onReject, busy }) {
 
 function ManageMembershipModal({
   community, members, isOwner, isMod, pendingRequests, bans, busy,
-  onClose, onTransfer, onInvite, onApprove, onReject, onKick, onBan, onUnban,
+  onClose, onTransfer, onInvite, onApprove, onReject, onKick, onBan, onUnban, onSaveSettings,
 }) {
-  const [section, setSection] = useState('requests');
+  const [section, setSection] = useState('settings');
   const [inviteQuery, setInviteQuery] = useState('');
   const [inviteResults, setInviteResults] = useState([]);
   const [searching, setSearching] = useState(false);
@@ -966,6 +978,7 @@ function ManageMembershipModal({
   }, [inviteQuery]);
   const transferCandidates = members.filter((m) => m.role !== 'owner' && m.profile);
   const sections = [
+    { id: 'settings', label: 'Settings' },
     { id: 'requests', label: `Requests${pendingRequests.length ? ' · ' + pendingRequests.length : ''}` },
     { id: 'members',  label: `Members · ${members.length}` },
     { id: 'invite',   label: 'Invite' },
@@ -991,6 +1004,10 @@ function ManageMembershipModal({
           ))}
         </div>
         <div style={{ padding: '1rem 1.25rem', overflowY: 'auto', flex: 1 }}>
+          {section === 'settings' && (
+            <SettingsForm community={community} busy={busy} onSave={onSaveSettings} />
+          )}
+
           {section === 'requests' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               {pendingRequests.length === 0 ? (<div style={{ color: 'var(--text-muted)', fontSize: 14, padding: '1rem 0' }}>No pending requests right now.</div>)
@@ -1145,6 +1162,87 @@ function ManageMembershipModal({
         </div>
       </div>
     </div>
+  );
+}
+
+function SettingsForm({ community, busy, onSave }) {
+  const [name, setName] = useState(community.name || '');
+  const [description, setDescription] = useState(community.description || '');
+  const [iconUrl, setIconUrl] = useState(community.icon_url || '');
+  const [bannerUrl, setBannerUrl] = useState(community.banner_url || '');
+  const [isPublic, setIsPublic] = useState(!!community.is_public);
+  const [savedNote, setSavedNote] = useState('');
+
+  const dirty =
+    name.trim() !== (community.name || '').trim() ||
+    description !== (community.description || '') ||
+    iconUrl !== (community.icon_url || '') ||
+    bannerUrl !== (community.banner_url || '') ||
+    isPublic !== !!community.is_public;
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!dirty || busy) return;
+    const ok = await onSave({
+      name: name.trim(),
+      description: description,
+      iconUrl: iconUrl.trim(),
+      bannerUrl: bannerUrl.trim(),
+      isPublic,
+    });
+    if (ok) {
+      setSavedNote('Saved.');
+      setTimeout(() => setSavedNote(''), 2200);
+    }
+  };
+
+  const inputStyle = { width: '100%', padding: '10px 12px', fontSize: 14, fontFamily: 'Montserrat, sans-serif', border: '1px solid var(--border)', borderRadius: 8, outline: 'none', background: 'var(--white)', color: 'var(--text-primary)' };
+  const labelStyle = { display: 'block', fontSize: 11, fontWeight: 700, letterSpacing: 1.2, textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 6 };
+
+  return (
+    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+      <div>
+        <label style={labelStyle} htmlFor="cm-set-name">Name</label>
+        <input id="cm-set-name" type="text" value={name} onChange={(e) => setName(e.target.value)} maxLength={80} style={inputStyle} />
+      </div>
+      <div>
+        <label style={labelStyle} htmlFor="cm-set-desc">About</label>
+        <textarea id="cm-set-desc" value={description} onChange={(e) => setDescription(e.target.value)} rows={5} maxLength={4000} style={{ ...inputStyle, resize: 'vertical', minHeight: 96, fontFamily: 'Montserrat, sans-serif' }} placeholder="Tell new members what this community is about." />
+        <div style={{ fontSize: 11.5, color: 'var(--text-muted)', marginTop: 4 }}>{description.length}/4000</div>
+      </div>
+      <div>
+        <label style={labelStyle} htmlFor="cm-set-icon">Icon image URL</label>
+        <input id="cm-set-icon" type="url" value={iconUrl} onChange={(e) => setIconUrl(e.target.value)} placeholder="https://..." style={inputStyle} />
+        <div style={{ fontSize: 11.5, color: 'var(--text-muted)', marginTop: 4 }}>Square image works best.</div>
+        {iconUrl && (
+          <div style={{ marginTop: 8 }}>
+            <img src={safeImageUrl(iconUrl) || ''} alt="" style={{ width: 56, height: 56, borderRadius: 10, objectFit: 'cover', border: '1px solid var(--border-light)' }} />
+          </div>
+        )}
+      </div>
+      <div>
+        <label style={labelStyle} htmlFor="cm-set-banner">Banner image URL</label>
+        <input id="cm-set-banner" type="url" value={bannerUrl} onChange={(e) => setBannerUrl(e.target.value)} placeholder="https://..." style={inputStyle} />
+      </div>
+      <div style={{ padding: 12, border: '1px solid var(--border-light)', borderRadius: 10, background: '#FDFBF5' }}>
+        <label style={{ display: 'flex', alignItems: 'flex-start', gap: 10, cursor: 'pointer' }}>
+          <input type="checkbox" checked={isPublic} onChange={(e) => setIsPublic(e.target.checked)} style={{ marginTop: 3, accentColor: 'var(--wood-warm)' }} />
+          <div>
+            <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--text-primary)' }}>{isPublic ? 'Public community' : 'Private community'}</div>
+            <div style={{ fontSize: 12.5, color: 'var(--text-muted)', marginTop: 2, lineHeight: 1.5 }}>
+              {isPublic ? 'Anyone can find this community in the directory and request to join. Posts inside are still members-only.' : 'Hidden from the public directory. Only people you invite can find and join.'}
+            </div>
+          </div>
+        </label>
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 4 }}>
+        <button type="submit" className="comm-btn primary" disabled={!dirty || busy} style={{ padding: '8px 16px' }}>
+          {busy ? 'Saving...' : 'Save changes'}
+        </button>
+        {savedNote && <span style={{ color: 'var(--accent-green)', fontSize: 13 }}>{savedNote}</span>}
+        {dirty && !savedNote && <span style={{ color: 'var(--text-muted)', fontSize: 13 }}>Unsaved changes</span>}
+      </div>
+    </form>
   );
 }
 

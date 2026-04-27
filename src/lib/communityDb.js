@@ -265,6 +265,24 @@ export async function leaveCommunity(communityId) {
   return { data: null, error };
 }
 
+/**
+ * Mod / owner / admin: edit a community's name, description, icon,
+ * banner, and visibility. Pass undefined or null for any field you
+ * don't want to change.
+ */
+export async function updateCommunitySettings(communityId, patch = {}) {
+  if (!communityId) return { data: null, error: new Error('Missing community id') };
+  const { data, error } = await supabase.rpc('update_community_settings', {
+    community_id_in: communityId,
+    name_in:        patch.name        ?? null,
+    description_in: patch.description ?? null,
+    icon_url_in:    patch.iconUrl     ?? null,
+    banner_url_in:  patch.bannerUrl   ?? null,
+    is_public_in:   typeof patch.isPublic === 'boolean' ? patch.isPublic : null,
+  });
+  return { data, error };
+}
+
 export async function transferOwnership(communityId, newOwnerProfileId) {
   if (!communityId || !newOwnerProfileId) {
     return { error: new Error('Missing community id or new owner id') };
