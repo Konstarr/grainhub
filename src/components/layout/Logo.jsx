@@ -23,8 +23,6 @@ export default function Logo({ size = 56, as = 'link', style }) {
     <img
       src={logoSrc(size)}
       alt="Millwork.io"
-      height={size}
-      style={{ height: size, width: 'auto', display: 'block' }}
       loading="eager"
       fetchpriority="high"
       decoding="async"
