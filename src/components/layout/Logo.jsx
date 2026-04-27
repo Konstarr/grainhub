@@ -1,29 +1,26 @@
 import { Link } from 'react-router-dom';
 
+const LOGO_URL =
+  'https://ozjtreaqyxlgsmopvwif.supabase.co/storage/v1/object/public/media/millwork_logo_transparent_1.png';
+
 /**
- * The Millwork.io logo mark + wordmark.
- * Accepts a `size` prop (SVG pixel size) so the footer can render it smaller.
+ * The Millwork.io logo. Renders the supplied transparent PNG so the
+ * mark + wordmark stay locked together visually. The `size` prop sets
+ * the rendered HEIGHT in pixels; width is computed from the image's
+ * intrinsic aspect ratio so the logo never gets squished.
+ *
+ * Used by Nav (size=36) and Footer (size=32). If a parent needs a
+ * pure visual (no link), pass `as="div"`.
  */
 export default function Logo({ size = 36, as = 'link', style }) {
   const inner = (
-    <>
-      <svg viewBox="0 0 36 36" fill="none" width={size} height={size}>
-        <rect width="36" height="36" rx="7" fill="#A0522D" opacity="0.3" />
-        <path
-          d="M7 26 L18 9 L29 26"
-          stroke="#D2925A"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          fill="none"
-        />
-        <path d="M7 26 L29 26" stroke="#D2925A" strokeWidth="2.5" strokeLinecap="round" />
-        <path d="M15 26 L15 20 L21 20 L21 26" stroke="#A0522D" strokeWidth="1.5" fill="none" />
-      </svg>
-      <span className="logo-text">
-        Millwork<span>.io</span>
-      </span>
-    </>
+    <img
+      src={LOGO_URL}
+      alt="Millwork.io"
+      height={size}
+      style={{ height: size, width: 'auto', display: 'block' }}
+      draggable={false}
+    />
   );
 
   if (as === 'div') {
@@ -34,7 +31,8 @@ export default function Logo({ size = 36, as = 'link', style }) {
     );
   }
   return (
-    <Link to="/" className="logo" style={style}>
+    <Link to="/" className="logo" style={style} aria-label="Millwork.io home">
       {inner}
     </Link>
-  );}
+  );
+}
