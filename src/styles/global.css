@@ -2301,18 +2301,9 @@ img {
   min-height: 280px;
 }
 
-/* INP hardening — let the browser skip rendering off-screen list rows.
-   `contain-intrinsic-size` reserves a placeholder size so the scrollbar
-   stays accurate. */
-.fh-row,
-.kind-col-row,
-.supplier-row,
-.cat-tile,
-.rev,
-.machine-item {
-  content-visibility: auto;
-  contain-intrinsic-size: 80px;
-}
+/* (content-visibility was tried here but reverted — rows are taller
+   than a single intrinsic-size estimate can predict, so it caused
+   layout jumps on scroll which spiked CLS.) */
 @media (max-width: 700px) {
   .fh-row { grid-template-columns: 48px 1fr; }
   .fh-actions { grid-column: 1 / -1; flex-direction: row; }
