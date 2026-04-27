@@ -47,6 +47,15 @@
       href="https://ozjtreaqyxlgsmopvwif.supabase.co/storage/v1/object/public/media/homepage/museums-victoria-U01ptiZV3Uo-unsplash.jpg"
       fetchpriority="high"
     />
+    <!-- Preload the nav logo at the size we render it (height ~56px,
+         2x for retina = ~336 wide). Served via Supabase image-transform
+         so the byte payload is small. -->
+    <link
+      rel="preload"
+      as="image"
+      href="https://ozjtreaqyxlgsmopvwif.supabase.co/storage/v1/render/image/public/media/millwork_logo_transparent_1.png?width=336&resize=contain&quality=85"
+      fetchpriority="high"
+    />
 
     <!-- Preconnect to Supabase + fonts so the first DB / image / font
          requests are already through the TLS handshake when JS fires. -->
