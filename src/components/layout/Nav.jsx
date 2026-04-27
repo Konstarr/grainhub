@@ -4,6 +4,7 @@ import Logo from './Logo.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { usePlanChanges } from '../../context/PlanContext.jsx';
 import { fetchUnreadCount } from '../../lib/messagingDb.js';
+import NotificationBell from './NotificationBell.jsx';
 
 const NAV_ITEMS = [
   { label: 'Home', to: '/' },
@@ -110,6 +111,7 @@ export default function Nav() {
 
         {isAuthed ? (
           <div ref={menuRef} style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 8 }}>
+            <NotificationBell userId={user?.id} />
             <button
               type="button"
               onClick={() => setMenuOpen((v) => !v)}
