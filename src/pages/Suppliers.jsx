@@ -31,6 +31,7 @@ export default function Suppliers() {
   const liveSuppliers = rows.map((r) => {
     const m = mapSupplierRow(r);
     return {
+      slug: m.slug,
       logo: m.logo,
       logoUrl: m.logoUrl,
       name: m.name,
