@@ -1,48 +1,106 @@
-import { NavLink, Link } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
+import { NavLink, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
 import '../../styles/admin.css';
 
 /**
- * Two-column admin shell with a dark sidebar (brand + nav) and a main area
- * that receives the routed admin page as children.
- *
- * Sidebar links are grouped by domain. Sections that haven't been built yet
- * render as disabled items with a "SOON" badge so the user can see the
- * roadmap. Flip the `enabled` flag below when a new admin section ships.
+ * Admin sidebar layout. Sections are grouped by domain and individually
+ * collapsible (state persisted to localStorage). A search box at the top
+ * filters items by label so power users can jump straight to what they need.
  */
 export const ADMIN_SECTIONS = [
   {
-    group: 'Content',
+    id: 'editorial',
+    group: 'Editorial',
     items: [
-      { to: '/admin/news',     label: 'News',      icon: <IconNews />,     enabled: true  },
-      { to: '/admin/events',   label: 'Events',    icon: <IconCal />,      enabled: true  },
-      { to: '/admin/jobs',     label: 'Jobs',      icon: <IconBriefcase />, enabled: true },
-      { to: '/admin/listings', label: 'Listings',  icon: <IconTag />,      enabled: true  },
-      { to: '/admin/marketplace-settings', label: 'Listing limits', icon: <IconTag />, enabled: true },
-      { to: '/admin/sponsors', label: 'Sponsors',  icon: <IconStar />,     enabled: true  },
-      { to: '/admin/suppliers',       label: 'Suppliers',       icon: <IconStar />, enabled: true },
-      { to: '/admin/supplier-claims', label: 'Supplier claims', icon: <IconStar />, enabled: true },
+      { to: '/admin/news',   label: 'News',   icon: <IconNews />, enabled: true },
+      { to: '/admin/events', label: 'Events', icon: <IconCal />,  enabled: true },
     ],
   },
   {
-    group: 'Community',
+    id: 'marketplace',
+    group: 'Marketplace',
     items: [
-      { to: '/admin/forums',          label: 'Forum mod.',     icon: <IconShield />,  enabled: true  },
-      { to: '/admin/forums/threads',  label: 'Threads',        icon: <IconShield />,  enabled: true  },
-      { to: '/admin/forums/reports',  label: 'Forum reports',  icon: <IconFlag />,    enabled: true  },
-      { to: '/admin/forums/words',    label: 'Blocked words',  icon: <IconShield />,  enabled: true  },
-      { to: '/admin/forums/log',      label: 'Mod log',        icon: <IconFlag />,    enabled: true  },
-      { to: '/admin/forums/reputation', label: 'Rep gains',           icon: <IconStar />, enabled: true },
-      { to: '/admin/forums/badges',     label: 'Levels & accolades',  icon: <IconStar />, enabled: true },
-      { to: '/admin/users',       label: 'Users',       icon: <IconUsers />,   enabled: true  },
-      { to: '/admin/communities', label: 'Communities', icon: <IconUsers />,   enabled: true  },
-      { to: '/admin/connections', label: 'Connections', icon: <IconLink />,    enabled: true  },
+      { to: '/admin/listings',             label: 'Listings',       icon: <IconTag />,       enabled: true },
+      { to: '/admin/marketplace-settings', label: 'Listing limits', icon: <IconTag />,       enabled: true },
+      { to: '/admin/jobs',                 label: 'Jobs',           icon: <IconBriefcase />, enabled: true },
+    ],
+  },
+  {
+    id: 'directory',
+    group: 'Directory',
+    items: [
+      { to: '/admin/suppliers',       label: 'Suppliers',       icon: <IconStar />,  enabled: true },
+      { to: '/admin/supplier-claims', label: 'Supplier claims', icon: <IconFlag />,  enabled: true },
+      { to: '/admin/sponsors',        label: 'Sponsors',        icon: <IconStar />,  enabled: true },
+    ],
+  },
+  {
+    id: 'forum',
+    group: 'Forum moderation',
+    items: [
+      { to: '/admin/forums',            label: 'Overview',           icon: <IconShield />, enabled: true },
+      { to: '/admin/forums/threads',    label: 'Threads',            icon: <IconShield />, enabled: true },
+      { to: '/admin/forums/reports',    label: 'Reports',            icon: <IconFlag />,   enabled: true },
+      { to: '/admin/forums/log',        label: 'Mod log',            icon: <IconFlag />,   enabled: true },
+      { to: '/admin/forums/words',      label: 'Blocked words',      icon: <IconShield />, enabled: true },
+      { to: '/admin/forums/reputation', label: 'Rep gains',          icon: <IconStar />,   enabled: true },
+      { to: '/admin/forums/badges',     label: 'Levels & accolades', icon: <IconStar />,   enabled: true },
+    ],
+  },
+  {
+    id: 'people',
+    group: 'People',
+    items: [
+      { to: '/admin/users',       label: 'Users',       icon: <IconUsers />, enabled: true },
+      { to: '/admin/communities', label: 'Communities', icon: <IconUsers />, enabled: true },
+      { to: '/admin/connections', label: 'Connections', icon: <IconLink />,  enabled: true },
     ],
   },
 ];
 
+/** localStorage helper — persist which groups are collapsed. */
+const COLLAPSE_KEY = 'mw-admin-collapse-v2';
+function loadCollapseState() {
+  try {
+    const raw = window.localStorage.getItem(COLLAPSE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch { return {}; }
+}
+function saveCollapseState(state) {
+  try { window.localStorage.setItem(COLLAPSE_KEY, JSON.stringify(state)); } catch {}
+}
+
 export default function AdminLayout({ title, subtitle, actions, children }) {
   const { profile, role, isOwner } = useAuth();
+  const location = useLocation();
+
+  const [collapsed, setCollapsed] = useState(() => loadCollapseState());
+  const [query, setQuery] = useState('');
+
+  useEffect(() => { saveCollapseState(collapsed); }, [collapsed]);
+
+  const toggleSection = (id) =>
+    setCollapsed((c) => ({ ...c, [id]: !c[id] }));
+
+  // Auto-expand the section that contains the active route, so people
+  // never end up on a page whose group is collapsed.
+  useEffect(() => {
+    const here = location.pathname;
+    const owning = ADMIN_SECTIONS.find((s) => s.items.some((i) => i.to === here || here.startsWith(i.to + '/')));
+    if (owning && collapsed[owning.id]) {
+      setCollapsed((c) => ({ ...c, [owning.id]: false }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.pathname]);
+
+  const q = query.trim().toLowerCase();
+  const visibleSections = useMemo(() => {
+    if (!q) return ADMIN_SECTIONS;
+    return ADMIN_SECTIONS
+      .map((s) => ({ ...s, items: s.items.filter((i) => i.label.toLowerCase().includes(q)) }))
+      .filter((s) => s.items.length > 0);
+  }, [q]);
 
   return (
     <div className="adm-shell">
@@ -55,12 +113,21 @@ export default function AdminLayout({ title, subtitle, actions, children }) {
           </div>
         </div>
 
-        {/* Owner-only section. Rendered above all other groups so the
-            financial dashboard is the first thing a platform owner
-            sees when they open the admin panel. */}
+        <div className="adm-nav-search">
+          <input
+            type="search"
+            placeholder="Filter…"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            spellCheck={false}
+          />
+        </div>
+
+        {/* Owner-only Dashboard pinned at the top — never inside a
+            collapsible group so financial info is one click away. */}
         {isOwner && (
-          <div>
-            <div className="adm-nav-group">Owner</div>
+          <div className="adm-nav-section">
+            <div className="adm-nav-group adm-nav-group-static">Overview</div>
             <NavLink
               to="/admin/dashboard"
               className={({ isActive }) => 'adm-nav-item ' + (isActive ? 'active' : '')}
@@ -71,29 +138,51 @@ export default function AdminLayout({ title, subtitle, actions, children }) {
           </div>
         )}
 
-        {ADMIN_SECTIONS.map((section) => (
-          <div key={section.group}>
-            <div className="adm-nav-group">{section.group}</div>
-            {section.items.map((item) =>
-              item.enabled ? (
-                <NavLink
-                  key={item.to}
-                  to={item.to}
-                  className={({ isActive }) => 'adm-nav-item ' + (isActive ? 'active' : '')}
-                >
-                  <span className="adm-nav-icon">{item.icon}</span>
-                  <span>{item.label}</span>
-                </NavLink>
-              ) : (
-                <div key={item.to} className="adm-nav-item disabled" title="Coming soon">
-                  <span className="adm-nav-icon">{item.icon}</span>
-                  <span>{item.label}</span>
-                  <span className="adm-nav-soon">SOON</span>
+        {visibleSections.map((section) => {
+          const isCollapsed = !q && collapsed[section.id];
+          return (
+            <div key={section.id} className="adm-nav-section">
+              <button
+                type="button"
+                className={'adm-nav-group adm-nav-group-toggle' + (isCollapsed ? ' collapsed' : '')}
+                onClick={() => toggleSection(section.id)}
+                aria-expanded={!isCollapsed}
+              >
+                <span>{section.group}</span>
+                <span className="adm-nav-chev" aria-hidden="true">▾</span>
+              </button>
+              {!isCollapsed && (
+                <div className="adm-nav-section-body">
+                  {section.items.map((item) =>
+                    item.enabled ? (
+                      <NavLink
+                        key={item.to}
+                        to={item.to}
+                        end={item.to === '/admin/forums'}
+                        className={({ isActive }) => 'adm-nav-item ' + (isActive ? 'active' : '')}
+                      >
+                        <span className="adm-nav-icon">{item.icon}</span>
+                        <span>{item.label}</span>
+                      </NavLink>
+                    ) : (
+                      <div key={item.to} className="adm-nav-item disabled" title="Coming soon">
+                        <span className="adm-nav-icon">{item.icon}</span>
+                        <span>{item.label}</span>
+                        <span className="adm-nav-soon">SOON</span>
+                      </div>
+                    )
+                  )}
                 </div>
-              )
-            )}
+              )}
+            </div>
+          );
+        })}
+
+        {q && visibleSections.length === 0 && (
+          <div style={{ padding: '12px 16px', fontSize: 12, color: 'rgba(255,255,255,0.5)' }}>
+            No matching admin pages.
           </div>
-        ))}
+        )}
 
         <div className="adm-aside-foot">
           <div>Signed in as</div>
