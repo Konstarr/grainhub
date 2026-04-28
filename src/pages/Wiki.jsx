@@ -233,7 +233,7 @@ export default function Wiki() {
         </div>
 
         <div className="wd-grid">
-          {CLUSTERS.map((c) => {
+          {[...CLUSTERS].sort((a, b) => a.key.localeCompare(b.key)).map((c) => {
             const list = articlesByCluster[c.key] || [];
             return (
               <Link

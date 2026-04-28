@@ -126,7 +126,10 @@ export default function WikiCluster() {
 
         {/* Inline jump to other fields */}
         <div className="wd-cluster-banner-jump">
-          {CLUSTERS.filter((c) => c.slug !== cluster.slug).map((c) => (
+          {CLUSTERS
+            .filter((c) => c.slug !== cluster.slug)
+            .sort((a, b) => a.key.localeCompare(b.key))
+            .map((c) => (
             <Link key={c.slug} to={'/wiki/cluster/' + c.slug} className="wd-cluster-pill" style={{ '--accent': c.accent }}>
               {c.key}
             </Link>
