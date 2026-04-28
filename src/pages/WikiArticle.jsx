@@ -53,7 +53,11 @@ export default function WikiArticle() {
         .maybeSingle();
       if (cancelled) return;
       if (error || !data) setArticle(null);
-      else setArticle(mapWikiRow(data));
+      else {
+        setArticle({ ...mapWikiRow(data), id: data.id, view_count: data.view_count || 0 });
+        // Record a view (server-side, anyone can call, idempotent-ish).
+        if (data.id) supabase.rpc('record_wiki_view', { article_id_in: data.id });
+      }
       setLoading(false);
     })();
     return () => { cancelled = true; };
@@ -138,6 +142,11 @@ export default function WikiArticle() {
             <div className="meta-item">From <strong>Millwork.io Wiki</strong>, the community knowledge base</div>
             {article?.updatedAt && <div className="meta-item">Last updated {formatDate(article.updatedAt)}</div>}
             {article?.readTime && <div className="meta-item">{article.readTime}</div>}
+            {article?.view_count != null && (
+              <div className="meta-item">
+                {article.view_count.toLocaleString()} view{article.view_count === 1 ? '' : 's'}
+              </div>
+            )}
           </div>
 
           <div className="article-body">
