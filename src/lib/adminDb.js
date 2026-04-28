@@ -677,3 +677,56 @@ export async function fetchSponsorDashboard() {
 
   return { data: grouped, error: null };
 }
+
+/* ─────────────── Wiki articles (admin) ─────────────── */
+
+export async function listWikiArticles({ search = '', category = '', limit = 500 } = {}) {
+  let q = supabase
+    .from('wiki_articles')
+    .select('id, slug, title, category, trade, excerpt, read_time_minutes, is_published, view_count, updated_at, published_at, cover_image_url')
+    .order('updated_at', { ascending: false })
+    .limit(limit);
+  if (search && search.trim()) {
+    const s = search.trim().replace(/[%_]/g, (c) => '\\' + c);
+    q = q.or(`title.ilike.%${s}%,slug.ilike.%${s}%,category.ilike.%${s}%`);
+  }
+  if (category) q = q.eq('category', category);
+  const { data, error } = await q;
+  return { data: data || [], error };
+}
+
+export async function getWikiArticle(id) {
+  if (!id) return { data: null, error: new Error('Missing id') };
+  const { data, error } = await supabase
+    .from('wiki_articles')
+    .select('*')
+    .eq('id', id)
+    .maybeSingle();
+  return { data, error };
+}
+
+export async function updateWikiArticle(id, patch) {
+  if (!id) return { data: null, error: new Error('Missing id') };
+  const { data, error } = await supabase
+    .from('wiki_articles')
+    .update({ ...patch, updated_at: new Date().toISOString() })
+    .eq('id', id)
+    .select()
+    .maybeSingle();
+  return { data, error };
+}
+
+export async function deleteWikiArticle(id) {
+  if (!id) return { error: new Error('Missing id') };
+  const { error } = await supabase.from('wiki_articles').delete().eq('id', id);
+  return { error };
+}
+
+export async function createWikiArticle(payload) {
+  const { data, error } = await supabase
+    .from('wiki_articles')
+    .insert({ ...payload, published_at: payload.is_published ? new Date().toISOString() : null })
+    .select()
+    .maybeSingle();
+  return { data, error };
+}

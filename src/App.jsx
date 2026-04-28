@@ -99,6 +99,8 @@ import CommunityRules from './pages/CommunityRules.jsx';
 
 const AdminNews             = lazy(() => import('./pages/admin/AdminNews.jsx'));
 const AdminNewsEdit         = lazy(() => import('./pages/admin/AdminNewsEdit.jsx'));
+const AdminWiki             = lazy(() => import('./pages/admin/AdminWiki.jsx'));
+const AdminWikiEdit         = lazy(() => import('./pages/admin/AdminWikiEdit.jsx'));
 const AdminNewsReports      = lazy(() => import('./pages/admin/AdminNewsReports.jsx'));
 const AdminOwnerDashboard   = lazy(() => import('./pages/admin/AdminOwnerDashboard.jsx'));
 const AdminEvents           = lazy(() => import('./pages/admin/AdminEvents.jsx'));
@@ -157,6 +159,8 @@ export default function App() {
         <Route path="/admin/news"             element={adminRoute('admin', AdminNews)} />
         <Route path="/admin/news/reports"     element={adminRoute('admin', AdminNewsReports)} />
         <Route path="/admin/news/:id"         element={adminRoute('admin', AdminNewsEdit)} />
+        <Route path="/admin/wiki"             element={adminRoute('admin', AdminWiki)} />
+        <Route path="/admin/wiki/:id"         element={adminRoute('admin', AdminWikiEdit)} />
         <Route path="/admin/events"           element={adminRoute('admin', AdminEvents)} />
         <Route path="/admin/events/:id"       element={adminRoute('admin', AdminEventsEdit)} />
         <Route path="/admin/jobs"             element={adminRoute('mod',   AdminJobs)} />
