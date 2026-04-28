@@ -1,10 +1,60 @@
 import { lazy, Suspense } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext.jsx';
 // Lazy-load Vercel telemetry so it never competes with the user's
 // first interactions for main-thread time.
 const Analytics     = lazy(() => import('@vercel/analytics/react').then((m) => ({ default: m.Analytics })));
 const SpeedInsights = lazy(() => import('@vercel/speed-insights/react').then((m) => ({ default: m.SpeedInsights })));
+
+/**
+ * Map the live pathname to a stable Vercel "route" template so every
+ * /jobs/<id>, /suppliers/<slug>, etc. groups under one bucket instead
+ * of polluting the dashboard with one row per UUID.
+ *
+ * The patterns are simple — full path → template. Anything that doesn't
+ * match falls through to the raw pathname so we still see the page.
+ */
+function templateFor(pathname) {
+  if (!pathname) return '/';
+  // Exact static routes first.
+  const exact = new Set([
+    '/', '/forums', '/wiki', '/news', '/marketplace', '/jobs',
+    '/suppliers', '/events', '/communities', '/cart', '/signup', '/login',
+    '/contact', '/sponsor', '/pricing', '/inbox', '/messages',
+    '/terms', '/privacy', '/community-rules',
+  ]);
+  if (exact.has(pathname)) return pathname;
+
+  // Common dynamic patterns.
+  if (pathname.startsWith('/forum/thread/'))      return '/forum/thread/:slug';
+  if (pathname.startsWith('/forum/category/'))    return '/forum/category/:slug';
+  if (pathname.startsWith('/forum/topic/'))       return '/forum/topic/:slug';
+  if (pathname.startsWith('/c/'))                 return '/c/:slug';
+  if (pathname.startsWith('/communities/'))       return '/communities/:slug';
+  if (pathname.startsWith('/profile/'))           return '/profile/:handle';
+  if (pathname.startsWith('/jobs/for-hire/new'))  return '/jobs/for-hire/new';
+  if (pathname.startsWith('/jobs/'))              return '/jobs/:id';
+  if (pathname.startsWith('/suppliers/'))         return '/suppliers/:slug';
+  if (pathname.startsWith('/news/'))              return '/news/:slug';
+  if (pathname.startsWith('/wiki/'))              return '/wiki/:slug';
+  if (pathname.startsWith('/events/'))            return '/events/:slug';
+  if (pathname.startsWith('/marketplace/'))       return '/marketplace/:slug';
+  if (pathname.startsWith('/messages/'))          return '/messages/:id';
+  if (pathname.startsWith('/admin/'))             return '/admin/*';
+
+  return pathname;
+}
+
+function VercelTelemetry() {
+  const { pathname } = useLocation();
+  const route = templateFor(pathname);
+  return (
+    <Suspense fallback={null}>
+      <Analytics />
+      <SpeedInsights route={route} />
+    </Suspense>
+  );
+}
 import RequireAuth from './components/auth/RequireAuth.jsx';
 import RequireStaff from './components/auth/RequireStaff.jsx';
 import Layout from './components/layout/Layout.jsx';
@@ -100,10 +150,7 @@ const adminRoute = (level, Component) => (
 export default function App() {
   return (
     <AuthProvider>
-      <Suspense fallback={null}>
-        <Analytics />
-        <SpeedInsights />
-      </Suspense>
+      <VercelTelemetry />
       <Routes>
         <Route path="/admin"                  element={adminRoute('admin', AdminNews)} />
         <Route path="/admin/dashboard"        element={adminRoute('owner', AdminOwnerDashboard)} />
