@@ -35,7 +35,7 @@
   width: 32px;
   height: 32px;
   border-radius: 8px;
-  background: linear-gradient(135deg, #6B8E5A, #2D6A4F);
+  background: linear-gradient(135deg, #B5A04A, #2D6A4F);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -146,7 +146,7 @@
 
 .adm-nav-item.active {
   background: rgba(107, 142, 90, 0.18);
-  color: #D5E5BC;
+  color: #E0CC8A;
 }
 
 .adm-nav-item.disabled {
@@ -158,7 +158,7 @@
   margin-left: auto;
   font-size: 10px;
   background: rgba(255, 215, 172, 0.15);
-  color: #D5E5BC;
+  color: #E0CC8A;
   padding: 1px 7px;
   border-radius: 999px;
   font-weight: 600;

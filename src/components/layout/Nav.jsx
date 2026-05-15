@@ -253,7 +253,7 @@ export default function Nav() {
                           justifyContent: 'center',
                           width: 18, height: 18,
                           borderRadius: 4,
-                          background: 'linear-gradient(135deg, #6B8E5A, #2D6A4F)',
+                          background: 'linear-gradient(135deg, #B5A04A, #2D6A4F)',
                               color: '#fff',
                           fontSize: 10,
                           fontWeight: 700,

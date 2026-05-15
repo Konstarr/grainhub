@@ -177,7 +177,7 @@ export default function AdminLayout({ title, subtitle, actions, children }) {
 
         <div className="adm-aside-foot">
           <div>Signed in as</div>
-          <div style={{ color: '#D5E5BC', fontWeight: 600, marginTop: 2 }}>
+          <div style={{ color: '#E0CC8A', fontWeight: 600, marginTop: 2 }}>
             {profile?.full_name || profile?.username || 'Staff'}
           </div>
           <div style={{ opacity: 0.7, marginTop: 2, textTransform: 'uppercase', letterSpacing: '0.08em' }}>

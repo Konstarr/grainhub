@@ -10,7 +10,7 @@
   --wood-dark: #1B3A2E;
   --wood-mid: #2D5A3D;
   --wood-warm: #2D6A4F;
-  --wood-light: #6B8E5A;
+  --wood-light: #B5A04A;
   --wood-cream: #F5ECD7;
   --wood-paper: #FAF5EC;
   --accent-green: #1B4332;
@@ -553,9 +553,9 @@ nav.site-nav {
 
 /* Wiki hero — the search-driven landing page. Re-tint for the dark
    bg + recenter content so the title + search bar dominate. */
-.wiki-hero.gh-hero .hero-eyebrow { color: #D5E5BC; }
+.wiki-hero.gh-hero .hero-eyebrow { color: #E0CC8A; }
 .wiki-hero.gh-hero .hero-title   { color: #F5EFE6; }
-.wiki-hero.gh-hero .hero-title em { color: #D5E5BC; }
+.wiki-hero.gh-hero .hero-title em { color: #E0CC8A; }
 .wiki-hero.gh-hero .hero-sub     { color: rgba(245, 239, 230, 0.78); }
 .wiki-hero.gh-hero .search-sug,
 .wiki-hero.gh-hero .search-sug-label { color: rgba(245, 239, 230, 0.8); }
@@ -563,7 +563,7 @@ nav.site-nav {
   background: rgba(255, 255, 255, 0.08);
   border-color: rgba(255, 255, 255, 0.15);
 }
-.wiki-hero.gh-hero .hs-num   { color: #D5E5BC; }
+.wiki-hero.gh-hero .hs-num   { color: #E0CC8A; }
 .wiki-hero.gh-hero .hs-label { color: rgba(245, 239, 230, 0.75); }
 
 /* Drop the right-side stat grid + popular-search tail — they were
@@ -739,7 +739,7 @@ nav.site-nav {
   font-weight: 800;
   line-height: 1;
   letter-spacing: -1.2px;
-  background: linear-gradient(135deg, #2D5A3D 0%, #2D6A4F 60%, #6B8E5A 100%);
+  background: linear-gradient(135deg, #2D5A3D 0%, #2D6A4F 60%, #B5A04A 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;

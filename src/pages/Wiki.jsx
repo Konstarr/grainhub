@@ -306,7 +306,7 @@ export default function Wiki() {
           </div>
 
           <div className="wd-card wd-card-dark">
-            <div className="wd-card-eyebrow" style={{ color: '#D5E5BC' }}>Help build it</div>
+            <div className="wd-card-eyebrow" style={{ color: '#E0CC8A' }}>Help build it</div>
             <h3 className="wd-card-title">Articles needed in every field</h3>
             <p className="wd-card-text">
               Working pros get bylines, reputation, and a public reviewer credit on every

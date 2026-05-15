@@ -361,7 +361,7 @@ export default function WikiArticle() {
               </div>
             )}
             {editMode && (
-              <div className="meta-item" style={{ marginLeft: 'auto', color: '#7C6E22', fontWeight: 600 }}>
+              <div className="meta-item" style={{ marginLeft: 'auto', color: '#8C7A35', fontWeight: 600 }}>
                 ✎ Editing — changes are not saved until you click Save
               </div>
             )}

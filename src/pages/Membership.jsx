@@ -118,11 +118,11 @@ export default function Membership() {
       {/* Hero */}
       <section className="gh-hero" style={{ background: 'linear-gradient(180deg, #1F4534 0%, #1B3A2E 100%)', color: '#F5EAD6', padding: '3rem 2rem 2.5rem' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-          <div style={{ fontSize: 12, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#B5C9A5', marginBottom: 8, fontWeight: 700 }}>
+          <div style={{ fontSize: 12, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#B5A04A', marginBottom: 8, fontWeight: 700 }}>
             AWI Florida Chapter · Membership & Sponsorship
           </div>
           <h1 style={{ fontSize: 38, lineHeight: 1.15, margin: '0 0 14px', fontWeight: 400 }}>
-            Join the chapter. <em style={{ color: '#D5E5BC' }}>Sponsor a chapter event.</em>
+            Join the chapter. <em style={{ color: '#E0CC8A' }}>Sponsor a chapter event.</em>
           </h1>
           <p style={{ fontSize: 16, maxWidth: 760, lineHeight: 1.55, color: 'rgba(245,234,214,0.85)', margin: 0 }}>
             Two paid membership tiers — Manufacturer and Supplier — plus a free Guest tier.
@@ -294,7 +294,7 @@ function SponsorCard({ sponsorship: s, highlight, cta }) {
   return (
     <div style={{
       background: '#fff',
-      border: highlight ? '2px solid #6B8E5A' : '1px solid #DDE5D8',
+      border: highlight ? '2px solid #B5A04A' : '1px solid #DDE5D8',
       borderRadius: 14, padding: '22px 20px',
       display: 'flex', flexDirection: 'column', gap: 12, position: 'relative',
       boxShadow: highlight ? '0 6px 18px rgba(107, 142, 90, 0.18)' : '0 1px 4px rgba(27, 58, 46, 0.04)',
@@ -302,7 +302,7 @@ function SponsorCard({ sponsorship: s, highlight, cta }) {
       {highlight && (
         <div style={{
           position: 'absolute', top: -12, left: 18,
-          background: 'linear-gradient(180deg, #d8a25b, #6B8E5A)', color: '#0F2A1F',
+          background: 'linear-gradient(180deg, #d8a25b, #B5A04A)', color: '#0F2A1F',
           padding: '4px 12px', borderRadius: 999,
           fontSize: 10, fontWeight: 800, letterSpacing: 1.2, textTransform: 'uppercase',
         }}>Top tier</div>
@@ -315,7 +315,7 @@ function SponsorCard({ sponsorship: s, highlight, cta }) {
         </div>
       )}
       {s.slots_available != null && (
-        <div style={{ fontSize: 12, color: '#7C6E22', fontWeight: 600 }}>
+        <div style={{ fontSize: 12, color: '#8C7A35', fontWeight: 600 }}>
           {s.slots_available} {s.slots_available === 1 ? 'slot' : 'slots'} available
         </div>
       )}
@@ -323,7 +323,7 @@ function SponsorCard({ sponsorship: s, highlight, cta }) {
       <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: 6 }}>
         {perks.map((p, i) => (
           <li key={i} style={{ fontSize: 13, color: '#1F4534', display: 'flex', gap: 6, alignItems: 'flex-start' }}>
-            <span style={{ color: '#6B8E5A', fontWeight: 700, flexShrink: 0 }}>✦</span>
+            <span style={{ color: '#B5A04A', fontWeight: 700, flexShrink: 0 }}>✦</span>
             <span>{p}</span>
           </li>
         ))}
@@ -343,7 +343,7 @@ function EventSponsorBlock({ eventSlug, items, sponsorshipCTA }) {
         display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap',
       }}>
         <div>
-          <div style={{ fontSize: 11, letterSpacing: 1.4, textTransform: 'uppercase', color: '#B5C9A5', fontWeight: 700 }}>Event sponsorship</div>
+          <div style={{ fontSize: 11, letterSpacing: 1.4, textTransform: 'uppercase', color: '#B5A04A', fontWeight: 700 }}>Event sponsorship</div>
           <div style={{ fontSize: 18, fontWeight: 600, marginTop: 2 }}>{eventName}</div>
         </div>
         <div style={{ fontSize: 12, color: 'rgba(245,234,214,0.7)' }}>
@@ -372,7 +372,7 @@ function EventSponsorBlock({ eventSlug, items, sponsorshipCTA }) {
               <td style={{ ...td, textAlign: 'right', fontVariantNumeric: 'tabular-nums', fontWeight: 700, color: '#1B3A2E' }}>
                 ${Number(s.price_usd || 0).toLocaleString()}
               </td>
-              <td style={{ ...td, textAlign: 'right', fontVariantNumeric: 'tabular-nums', color: s.slots_available === 1 ? '#9B2222' : '#7C6E22', fontWeight: 600 }}>
+              <td style={{ ...td, textAlign: 'right', fontVariantNumeric: 'tabular-nums', color: s.slots_available === 1 ? '#9B2222' : '#8C7A35', fontWeight: 600 }}>
                 {s.slots_available == null ? 'open' : s.slots_available}
               </td>
               <td style={{ ...td, textAlign: 'right' }}>{sponsorshipCTA(s)}</td>
