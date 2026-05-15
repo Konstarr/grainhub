@@ -150,7 +150,7 @@ export default function AdminOwnerDashboard() {
 
   // Revenue by axis (for the stacked bar)
   const byAxis = useMemo(() => ([
-    { label: 'Memberships', value: finance.membershipMrr, color: '#2D5A3D' },
+    { label: 'Memberships', value: finance.membershipMrr, color: '#4B5563' },
     { label: 'Role packs',  value: finance.packsMrr,      color: '#2D6A4F' },
     { label: 'Sponsorships',value: finance.sponsorMrr,    color: '#C08050' },
   ]), [finance]);
@@ -178,7 +178,7 @@ export default function AdminOwnerDashboard() {
 
       {/* ───── Headline KPIs ───── */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0,1fr))', gap: 12, marginBottom: 16 }}>
-        <Kpi label="Monthly recurring revenue" value={'$' + finance.totalMrr.toLocaleString()} accent="#2D5A3D" big />
+        <Kpi label="Monthly recurring revenue" value={'$' + finance.totalMrr.toLocaleString()} accent="#4B5563" big />
         <Kpi label="Annual run-rate"           value={'$' + finance.arr.toLocaleString()} />
         <Kpi label="Paying users"              value={finance.paying.toLocaleString()} accent="#1B4332" />
         <Kpi label="Total users"               value={(content?.users_total ?? 0).toLocaleString()}
@@ -354,7 +354,7 @@ function UsersByTier({ rows }) {
 
   return (
     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-      <TierColumn title="Individuals" rows={ind} max={max} color="#2D5A3D" />
+      <TierColumn title="Individuals" rows={ind} max={max} color="#4B5563" />
       <TierColumn title="Businesses"  rows={biz} max={max} color="#2D6A4F" />
     </div>
   );
@@ -410,7 +410,7 @@ function RevenueLines({ membershipBreakdown, packsBreakdown, sponsorBreakdown })
             <div style={{ height: 5, background: '#F0E5CF', borderRadius: 999, overflow: 'hidden' }}>
               <div style={{
                 width: pct + '%', height: '100%',
-                background: 'linear-gradient(90deg, #2D5A3D 0%, #2D6A4F 100%)',
+                background: 'linear-gradient(90deg, #4B5563 0%, #2D6A4F 100%)',
                 transition: 'width .3s ease',
               }} />
             </div>
@@ -449,8 +449,8 @@ function LineChart({ data, valueKey = 'views' }) {
       <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', height: 'auto', display: 'block' }}>
         <defs>
           <linearGradient id="ownerAreaGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%"   stopColor="#2D5A3D" stopOpacity="0.35" />
-            <stop offset="100%" stopColor="#2D5A3D" stopOpacity="0" />
+            <stop offset="0%"   stopColor="#4B5563" stopOpacity="0.35" />
+            <stop offset="100%" stopColor="#4B5563" stopOpacity="0" />
           </linearGradient>
         </defs>
         {ticks.map((t, i) => {
@@ -471,10 +471,10 @@ function LineChart({ data, valueKey = 'views' }) {
           ) : null
         )}
         {areaD && <path d={areaD} fill="url(#ownerAreaGrad)" />}
-        {pathD && <path d={pathD} fill="none" stroke="#2D5A3D" strokeWidth="2"
+        {pathD && <path d={pathD} fill="none" stroke="#4B5563" strokeWidth="2"
                          strokeLinecap="round" strokeLinejoin="round" />}
         {points.map((p) => (
-          <circle key={p.day} cx={p.x} cy={p.y} r="3" fill="#fff" stroke="#2D5A3D" strokeWidth="1.5">
+          <circle key={p.day} cx={p.x} cy={p.y} r="3" fill="#fff" stroke="#4B5563" strokeWidth="1.5">
             <title>{fmtShortDate(p.day)}: {p[valueKey]}</title>
           </circle>
         ))}

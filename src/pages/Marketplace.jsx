@@ -122,7 +122,7 @@ function toListingCard(row) {
     priceUnit: '',
     emoji: EMOJI_BY_CAT[m.category] || '?',
     imgClass: 'mk-img-default',
-    imgStyle: { background: 'linear-gradient(135deg, #1B3A2E, #2D5A3D)' },
+    imgStyle: { background: 'linear-gradient(135deg, #1B3A2E, #4B5563)' },
     specs: m.description ? m.description.slice(0, 80) + (m.description.length > 80 ? '...' : '') : '',
     isNew: false,
     images: m.images,
@@ -282,8 +282,8 @@ export default function Marketplace() {
           <div className="search-hero">
             <div className="search-hero-input">
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <circle cx="7" cy="7" r="5.5" stroke="#7A8B82" strokeWidth="1.5" />
-                <path d="M11 11 L14 14" stroke="#7A8B82" strokeWidth="1.5" strokeLinecap="round" />
+                <circle cx="7" cy="7" r="5.5" stroke="#6B7280" strokeWidth="1.5" />
+                <path d="M11 11 L14 14" stroke="#6B7280" strokeWidth="1.5" strokeLinecap="round" />
               </svg>
               <input
                 type="text"

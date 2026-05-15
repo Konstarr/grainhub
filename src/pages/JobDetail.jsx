@@ -198,7 +198,7 @@ export default function JobDetail() {
             borderRadius: 10,
             padding: '12px 16px',
           }}>
-            <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: 0.6, textTransform: 'uppercase', color: 'var(--wood-warm, #2D5A3D)' }}>
+            <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: 0.6, textTransform: 'uppercase', color: 'var(--wood-warm, #4B5563)' }}>
               {isOwner ? 'Your listing' : 'Admin view'}
             </div>
             <div style={{ display: 'flex', gap: 22 }}>
@@ -299,7 +299,7 @@ export default function JobDetail() {
 function Stat({ label, value }) {
   return (
     <div>
-      <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.4, textTransform: 'uppercase', color: 'var(--text-muted, #7A8B82)' }}>{label}</div>
+      <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.4, textTransform: 'uppercase', color: 'var(--text-muted, #6B7280)' }}>{label}</div>
       <div style={{ fontSize: 20, fontWeight: 700, marginTop: 1, fontVariantNumeric: 'tabular-nums', color: '#1B3A2E' }}>
         {typeof value === 'number' ? value.toLocaleString() : value}
       </div>

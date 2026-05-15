@@ -328,7 +328,7 @@ export default function Jobs() {
               type="button"
               className={'kind-tab' + (kindParam === 'hiring' ? ' active' : '')}
               onClick={() => switchKind('hiring')}
-              style={{ color: kindParam === 'hiring' ? '#1B3A2E' : '#2D5A3D' }}
+              style={{ color: kindParam === 'hiring' ? '#1B3A2E' : '#4B5563' }}
             >
               Jobs
             </button>
@@ -336,7 +336,7 @@ export default function Jobs() {
               type="button"
               className={'kind-tab' + (kindParam === 'seeking' ? ' active' : '')}
               onClick={() => switchKind('seeking')}
-              style={{ color: kindParam === 'seeking' ? '#1B3A2E' : '#2D5A3D' }}
+              style={{ color: kindParam === 'seeking' ? '#1B3A2E' : '#4B5563' }}
             >
               For Hire
             </button>

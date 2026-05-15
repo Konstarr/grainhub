@@ -10,7 +10,7 @@ import { getForumThreadVisits, isThreadUnread } from '../lib/forumLastVisit.js';
 
 const AV_PALETTE = ['av-a', 'av-b', 'av-c', 'av-d', 'av-e'];
 const CAT_COLORS = [
-  { bg: '#EDE0C4', text: '#2D5A3D' },
+  { bg: '#EDE0C4', text: '#4B5563' },
   { bg: '#E6F1FB', text: '#185FA5' },
   { bg: '#E9F5E6', text: '#2E6F2E' },
   { bg: '#FBEDE0', text: '#A05C1F' },

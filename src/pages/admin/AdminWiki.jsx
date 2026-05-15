@@ -185,7 +185,7 @@ export default function AdminWiki() {
 
 function KpiTile({ label, value, accent }) {
   const palette = accent === 'green' ? { bg: '#DDEFD3', fg: '#2E6F2E' }
-                : accent === 'amber' ? { bg: '#F5EAD6', fg: '#2D5A3D' }
+                : accent === 'amber' ? { bg: '#F5EAD6', fg: '#4B5563' }
                 : { bg: '#fff', fg: '#1c1c1c' };
   return (
     <div style={{

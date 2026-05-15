@@ -18,8 +18,8 @@ export default function JobsSearchHero({
         <div className="search-hero">
           <div className="search-input-wrap">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <circle cx="7" cy="7" r="5.5" stroke="#7A8B82" strokeWidth="1.5" />
-              <path d="M11 11 L14 14" stroke="#7A8B82" strokeWidth="1.5" strokeLinecap="round" />
+              <circle cx="7" cy="7" r="5.5" stroke="#6B7280" strokeWidth="1.5" />
+              <path d="M11 11 L14 14" stroke="#6B7280" strokeWidth="1.5" strokeLinecap="round" />
             </svg>
             <input
               type="text"
@@ -32,11 +32,11 @@ export default function JobsSearchHero({
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               <path
                 d="M8 2C5.8 2 4 3.8 4 6c0 3.5 4 8 4 8s4-4.5 4-8c0-2.2-1.8-4-4-4z"
-                stroke="#7A8B82"
+                stroke="#6B7280"
                 strokeWidth="1.5"
                 fill="none"
               />
-              <circle cx="8" cy="6" r="1.5" stroke="#7A8B82" strokeWidth="1.3" fill="none" />
+              <circle cx="8" cy="6" r="1.5" stroke="#6B7280" strokeWidth="1.3" fill="none" />
             </svg>
             <input
               type="text"

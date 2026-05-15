@@ -208,7 +208,7 @@ export const RECENT_EDITS = [
   {
     title: 'Frameless Cabinet Construction',
     subtitle: 'Expanded installation sequence, added out-of-square steps',
-    category: { label: 'Construction', bgColor: '#EDE0C4', textColor: '#2D5A3D' },
+    category: { label: 'Construction', bgColor: '#EDE0C4', textColor: '#4B5563' },
     editor: { initials: 'MB', name: 'MikeBrosnan', bgColor: '#5F3091' },
     time: '2 hours ago',
   },
@@ -243,7 +243,7 @@ export const RECENT_EDITS = [
   {
     title: 'Shop Labor Rate Calculator',
     subtitle: 'Updated formula for 2025 burden rate benchmarks',
-    category: { label: 'Business', bgColor: '#EDE0C4', textColor: '#2D5A3D' },
+    category: { label: 'Business', bgColor: '#EDE0C4', textColor: '#4B5563' },
     editor: { initials: 'RG', name: 'RGarner', bgColor: '#0F6E56' },
     time: '1 week ago',
   },

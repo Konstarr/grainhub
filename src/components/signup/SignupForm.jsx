@@ -846,7 +846,7 @@ function AccountTypeCard({ title, tag, iconKind, bullets, selected, onClick }) {
         width: 44,
         height: 44,
         borderRadius: 10,
-        background: selected ? 'linear-gradient(135deg, #2D5A3D, #2D6A4F)' : 'var(--wood-cream, #F5EAD6)',
+        background: selected ? 'linear-gradient(135deg, #4B5563, #2D6A4F)' : 'var(--wood-cream, #F5EAD6)',
         color: selected ? '#fff' : 'var(--wood-warm)',
         display: 'inline-flex',
         alignItems: 'center',

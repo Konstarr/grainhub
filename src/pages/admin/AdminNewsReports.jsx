@@ -360,7 +360,7 @@ function CategoryBars({ rows }) {
               <div style={{
                 width: pct + '%',
                 height: '100%',
-                background: 'linear-gradient(90deg, #2D5A3D 0%, #2D6A4F 100%)',
+                background: 'linear-gradient(90deg, #4B5563 0%, #2D6A4F 100%)',
                 transition: 'width 0.3s ease',
               }} />
             </div>

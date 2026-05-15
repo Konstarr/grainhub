@@ -8,7 +8,7 @@ export default function PlatinumBar() {
         <div className="platinum-grid">
           {PLATINUM_SPONSORS.map((sponsor) => (
             <div key={sponsor.logo} className="platinum-card">
-              <div className="plat-logo" style={{ background: 'linear-gradient(135deg, #2D5A3D, #2D6A4F)' }}>
+              <div className="plat-logo" style={{ background: 'linear-gradient(135deg, #4B5563, #2D6A4F)' }}>
                 {sponsor.logo}
               </div>
               <div className="plat-info">
