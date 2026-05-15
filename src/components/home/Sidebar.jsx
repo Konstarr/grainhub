@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useSupabaseList } from '../../hooks/useSupabaseList.js';
+import { SponsorSidebar } from '../sponsors/AdSlot.jsx';
 
 /**
  * Home sidebar — chapter-focused. Surfaces upcoming chapter events,
@@ -78,6 +79,7 @@ function NewsletterCard() {
 export default function Sidebar() {
   return (
     <aside className="sidebar">
+      <SponsorSidebar />
       <EventsCard />
       <MembershipCard />
       <NewsletterCard />

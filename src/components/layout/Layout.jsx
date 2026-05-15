@@ -1,7 +1,6 @@
 import { Outlet } from 'react-router-dom';
 import Nav from './Nav.jsx';
 import Footer from './Footer.jsx';
-import SponsorStrip from './SponsorStrip.jsx';
 import ScrollToTop from '../shared/ScrollToTop.jsx';
 
 /**
@@ -16,7 +15,6 @@ export default function Layout() {
       <ScrollToTop />
       <Nav />
       <Outlet />
-      <SponsorStrip />
       <Footer />
     </>
   );
