@@ -211,12 +211,12 @@ export default function Membership() {
         </h2>
         <div style={{ display: 'grid', gap: 14, fontSize: 15, color: '#475569', lineHeight: 1.65 }}>
           <p>
-            <strong>Manufacturer Member</strong> ($575/yr) — for Florida shops that build the work: cabinet
+            <strong>Manufacturer Member</strong> ($500/yr) — for Florida shops that build the work: cabinet
             shops, architectural millwork firms, finishers, installers. Voting rights, directory listing,
             event member-rate pricing.
           </p>
           <p>
-            <strong>Supplier Member</strong> ($575/yr) — for hardware, lumber, machinery, finish, and software
+            <strong>Supplier Member</strong> ($500/yr) — for hardware, lumber, machinery, finish, and software
             vendors selling into the Florida architectural woodwork industry. Same access plus direct
             visibility into the manufacturer membership at chapter events.
           </p>
@@ -397,7 +397,7 @@ function labelFor(id) {
 function friendlyEventName(slug) {
   switch (slug) {
     case 'annual-golf-outing': return 'Annual Golf Outing';
-    case 'tabletop-showcase':  return 'Tabletop Product Showcase';
+    case 'tabletop-showcase':  return 'Annual Product Showcase';
     case 'other':              return 'Other events';
     default:
       return (slug || 'Event').split('-').map((s) => s ? s[0].toUpperCase() + s.slice(1) : s).join(' ');

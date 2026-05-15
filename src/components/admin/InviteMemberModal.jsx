@@ -25,8 +25,8 @@ import { supabase } from '../../lib/supabase.js';
  * expected to change it from their profile page.
  */
 const TIERS = [
-  { value: 'manufacturer', label: 'Manufacturer Member ($575/yr)' },
-  { value: 'supplier',     label: 'Supplier Member ($575/yr)' },
+  { value: 'manufacturer', label: 'Manufacturer Member ($500/yr)' },
+  { value: 'supplier',     label: 'Supplier Member ($500/yr)' },
   { value: 'guest',        label: 'Guest (free, read-only)' },
 ];
 
