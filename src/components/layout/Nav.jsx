@@ -11,7 +11,6 @@ const NAV_ITEMS = [
   { label: 'Forums',    to: '/forums' },
   { label: 'Events',    to: '/events' },
   { label: 'Education', to: '/education' },
-  { label: 'Resources', to: '/wiki' },
   { label: 'Directory', to: '/suppliers' },
   { label: 'Membership',to: '/membership' },
   { label: 'Board',     to: '/board' },

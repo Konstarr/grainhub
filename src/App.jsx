@@ -18,7 +18,7 @@ function templateFor(pathname) {
   if (!pathname) return '/';
   // Exact static routes first.
   const exact = new Set([
-    '/', '/forums', '/wiki', '/news',
+    '/', '/forums', '/news',
     '/suppliers', '/events', '/membership', '/board', '/education', '/signup', '/login',
     '/contact', '/inbox', '/messages',
     '/terms', '/privacy', '/community-rules',
@@ -32,7 +32,6 @@ function templateFor(pathname) {
   if (pathname.startsWith('/profile/'))           return '/profile/:handle';
   if (pathname.startsWith('/suppliers/'))         return '/suppliers/:slug';
   if (pathname.startsWith('/news/'))              return '/news/:slug';
-  if (pathname.startsWith('/wiki/'))              return '/wiki/:slug';
   if (pathname.startsWith('/events/'))            return '/events/:slug';
   if (pathname.startsWith('/messages/'))          return '/messages/:id';
   if (pathname.startsWith('/admin/'))             return '/admin/*';
@@ -61,9 +60,6 @@ import NewThread from './pages/NewThread.jsx';
 import ForumRules from './pages/ForumRules.jsx';
 import ForumSearch from './pages/ForumSearch.jsx';
 import ForumTopic from './pages/ForumTopic.jsx';
-import Wiki from './pages/Wiki.jsx';
-import WikiArticle from './pages/WikiArticle.jsx';
-import WikiCluster from './pages/WikiCluster.jsx';
 import News from './pages/News.jsx';
 import NewsArticle from './pages/NewsArticle.jsx';
 import Suppliers from './pages/Suppliers.jsx';
@@ -160,7 +156,7 @@ export default function App() {
         <Route element={<Layout />}>
           <Route path="/" element={<Home />} />
           <Route path="/forums" element={<Forums />} />
-          <Route path="/wiki" element={<Wiki />} />
+          <Route path="/wiki/*" element={<Navigate to="/" replace />} />
           <Route path="/news" element={<News />} />
           <Route path="/suppliers" element={<Suppliers />} />
           <Route path="/events" element={<Events />} />
@@ -193,10 +189,7 @@ export default function App() {
           <Route path="/forums/thread/:slug" element={<RequireAuth><ForumThread /></RequireAuth>} />
           <Route path="/forums/thread" element={<RequireAuth><ForumThread /></RequireAuth>} />
 
-          <Route path="/wiki/article/:slug" element={<RequireAuth><WikiArticle /></RequireAuth>} />
-          <Route path="/wiki/article" element={<RequireAuth><WikiArticle /></RequireAuth>} />
-          <Route path="/wiki/cluster/:slug" element={<WikiCluster />} />
-
+          
           <Route path="/news/article/:slug" element={<RequireAuth><NewsArticle /></RequireAuth>} />
           <Route path="/news/article" element={<RequireAuth><NewsArticle /></RequireAuth>} />
 

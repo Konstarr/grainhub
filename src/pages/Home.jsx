@@ -4,7 +4,6 @@ import StatsStrip from '../components/home/StatsStrip.jsx';
 import TradeCategoriesTiles from '../components/home/TradeCategoriesTiles.jsx';
 import NewsSection from '../components/home/NewsSection.jsx';
 import ForumSection from '../components/home/ForumSection.jsx';
-import WikiSection from '../components/home/WikiSection.jsx';
 import JoinBanner from '../components/home/JoinBanner.jsx';
 import Sidebar from '../components/home/Sidebar.jsx';
 
@@ -47,7 +46,6 @@ export default function Home() {
             <div className="content">
               <NewsSection />
               <ForumSection />
-              <WikiSection />
             </div>
             <Sidebar />
           </div>

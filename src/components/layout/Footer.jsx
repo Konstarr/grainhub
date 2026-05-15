@@ -16,7 +16,6 @@ const FOOTER_COLS = [
     heading: 'Community',
     links: [
       { label: 'Forums',            to: '/forums' },
-      { label: 'Resources',         to: '/wiki' },
       { label: 'Forum Rules',       to: '/community-rules' },
     ],
   },
