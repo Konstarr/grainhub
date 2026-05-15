@@ -4,10 +4,10 @@ export default function JoinBanner() {
   return (
     <div className="join-banner">
       <div className="join-text">
-        <h3>Join 24,800 millwork &amp; cabinet professionals</h3>
-        <p>Free membership. No spam. Just the best community in the industry.</p>
+        <h3>Join the AWI Florida Chapter</h3>
+        <p>Manufacturer and Supplier membership tiers, regional forums, chapter events, and a member directory built for Florida architectural woodwork pros.</p>
       </div>
-      <Link to="/signup" className="btn-hero-primary">Create Your Free Account →</Link>
+      <Link to="/membership" className="btn-hero-primary">See membership tiers →</Link>
     </div>
   );
 }

@@ -7,8 +7,8 @@
  */
 
 export const EVENTS_PAGE_HEADER = {
-  eyebrow: 'Industry Events',
-  title: 'Trade Shows, Workshops & Conferences',
+  eyebrow: 'AWI Florida Chapter',
+  title: 'Chapter Events',
   subtitle:
     'Find the next cabinet, millwork, and woodworking events worth your time — from international machinery shows to regional meet-ups hosted by fellow shops.',
 };

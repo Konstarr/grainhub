@@ -9,7 +9,7 @@ export default function SignupLeftPanel() {
       </div>
 
       <h1>
-        Join the trade's<br />best <em>community.</em>
+        Join the <em>AWI Florida</em><br />Chapter.
       </h1>
 
       <p className="signup-left-sub">

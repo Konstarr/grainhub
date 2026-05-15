@@ -4,8 +4,8 @@
 
 export const NEWS_PAGE_HEADER = {
   eyebrow: 'AWI Florida Chapter Industry News',
-  title: 'The Latest from Millwork & Cabinets',
-  subtitle: 'Market reports, product launches, industry events, regulatory updates, and trade news from across the millwork and cabinet industry.',
+  title: 'AWI Florida Chapter News',
+  subtitle: 'Chapter announcements, board updates, member spotlights, and industry news relevant to Florida architectural woodwork professionals.',
 };
 
 // Tab ids MUST match the `category` column values in the
