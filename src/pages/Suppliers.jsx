@@ -98,23 +98,31 @@ export default function Suppliers() {
   useEffect(() => { setActiveCategory(navCategory); }, [navCategory]);
 
   // Landing mode: two preview lists (10 each).
+  // Note: every listing in this directory is an AWI Florida Chapter
+  // member by definition — no need to filter by FL state in the address.
+  // The old `address.ilike '%, FL %'` filter hid every new listing whose
+  // address didn't happen to be formatted with ", FL " in it (or no
+  // address at all), which made admin-created listings invisible.
+  // Order by created_at desc so newly added members surface at the top
+  // of the directory. (Rating-based ordering hid brand-new listings
+  // because they have no reviews yet — rating null sorts to the bottom.)
   const { data: vendorRows } = useSupabaseList('suppliers', {
-    filter: (q) => q.eq('is_approved', true).eq('kind', 'vendor').or('address.ilike.%, FL %,address.ilike.%, FL,%,address.ilike.%Florida%'),
-    order:  { column: 'rating', ascending: false },
+    filter: (q) => q.eq('is_approved', true).eq('kind', 'vendor'),
+    order:  { column: 'created_at', ascending: false },
     limit:  PREVIEW_LIMIT,
     deps:   ['preview-vendor'],
   });
   const { data: mfrRows } = useSupabaseList('suppliers', {
-    filter: (q) => q.eq('is_approved', true).eq('kind', 'manufacturer').or('address.ilike.%, FL %,address.ilike.%, FL,%,address.ilike.%Florida%'),
-    order:  { column: 'rating', ascending: false },
+    filter: (q) => q.eq('is_approved', true).eq('kind', 'manufacturer'),
+    order:  { column: 'created_at', ascending: false },
     limit:  PREVIEW_LIMIT,
     deps:   ['preview-manufacturer'],
   });
 
   // Focused mode: one full list, by kind.
   const { data: focusedRows } = useSupabaseList('suppliers', {
-    filter: (q) => q.eq('is_approved', true).eq('kind', focusedKind || 'vendor').or('address.ilike.%, FL %,address.ilike.%, FL,%,address.ilike.%Florida%'),
-    order:  { column: 'rating', ascending: false },
+    filter: (q) => q.eq('is_approved', true).eq('kind', focusedKind || 'vendor'),
+    order:  { column: 'created_at', ascending: false },
     limit:  100,
     deps:   ['focused-' + (focusedKind || 'vendor')],
   });
