@@ -3,7 +3,7 @@ import useDocumentTitle from '../lib/useDocumentTitle.js';
 import '../styles/legal.css';
 
 /**
- * /privacy - Millwork.io LLC Privacy Policy.
+ * /privacy - AWI Florida Chapter LLC Privacy Policy.
  * Florida-based; CCPA + GDPR + COPPA aware.
  */
 export default function Privacy() {
@@ -125,10 +125,10 @@ export default function Privacy() {
           <h2>5. When we share information</h2>
           <p>We share narrowly and only when needed:</p>
           <ul>
-            <li><strong>Service providers (sub-processors)</strong> - vendors that host, send email, process payments, or analyze errors for us, under contracts that limit their use to running Millwork.io. See Section 6 for the current list.</li>
+            <li><strong>Service providers (sub-processors)</strong> - vendors that host, send email, process payments, or analyze errors for us, under contracts that limit their use to running AWI Florida Chapter. See Section 6 for the current list.</li>
             <li><strong>Other members</strong> - content you choose to post is visible to other signed-in members or, on public surfaces, the public. Your profile shows whatever you put on it.</li>
             <li><strong>Law enforcement and legal compliance</strong> - when we are legally required to share information, or when sharing is necessary to protect rights, safety, or property. We push back on overbroad requests.</li>
-            <li><strong>Business transfer</strong> - if Millwork.io is acquired or merged, your information may transfer. We'll tell you before that happens and give you a chance to delete your account.</li>
+            <li><strong>Business transfer</strong> - if AWI Florida Chapter is acquired or merged, your information may transfer. We'll tell you before that happens and give you a chance to delete your account.</li>
           </ul>
           <p>
             Sponsors and advertisers <em>do not</em> get your personal information.
@@ -259,8 +259,8 @@ export default function Privacy() {
         <section id="gdpr">
           <h2>12. EU / EEA / UK residents (GDPR / UK GDPR)</h2>
           <p>
-            <strong>Controller.</strong> Millwork.io LLC is the controller of personal
-            data processed for the Millwork.io service.
+            <strong>Controller.</strong> AWI Florida Chapter LLC is the controller of personal
+            data processed for the AWI Florida Chapter service.
           </p>
           <p>
             <strong>Legal bases</strong> for our processing are:
@@ -279,7 +279,7 @@ export default function Privacy() {
             things first.
           </p>
           <p>
-            <strong>International transfers.</strong> Millwork.io is operated from the
+            <strong>International transfers.</strong> AWI Florida Chapter is operated from the
             United States. Where we transfer EU/EEA/UK personal data to the U.S. we
             rely on appropriate safeguards such as the Standard Contractual Clauses.
           </p>
@@ -288,7 +288,7 @@ export default function Privacy() {
         <section id="children">
           <h2>13. Children's privacy (COPPA)</h2>
           <p>
-            <strong>Millwork.io is not directed to children under 16, and we have no
+            <strong>AWI Florida Chapter is not directed to children under 16, and we have no
             intention of collecting personal information from children under 16</strong>
             (or under 13 in the United States, the threshold under the Children's
             Online Privacy Protection Act). Account registration requires
@@ -304,7 +304,7 @@ export default function Privacy() {
           </p>
           <p>
             Parents or guardians who believe a child under 13 has provided personal
-            information to Millwork.io may request to review, delete, or stop further
+            information to AWI Florida Chapter may request to review, delete, or stop further
             collection of that information by emailing us. We will verify the
             requester before acting.
           </p>
@@ -368,7 +368,7 @@ export default function Privacy() {
         <section id="intl">
           <h2>18. International users</h2>
           <p>
-            Millwork.io is operated from the United States. If you use the service
+            AWI Florida Chapter is operated from the United States. If you use the service
             from another country, you consent to your information being
             transferred to and processed in the U.S., subject to the protections in
             this Policy and any applicable data-transfer safeguards.
@@ -388,7 +388,7 @@ export default function Privacy() {
         <section id="contact">
           <h2>20. Contact</h2>
           <p>
-            <strong>Millwork.io LLC</strong><br />
+            <strong>AWI Florida Chapter LLC</strong><br />
             Privacy contact:{' '}
             <a href="mailto:support@millwork.io">support@millwork.io</a>
           </p>

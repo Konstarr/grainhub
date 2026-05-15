@@ -94,7 +94,7 @@ export default function PriceCard({ listing }) {
               </div>
               <button className="modal-submit">Send Message to Seller →</button>
               <div className="modal-note">
-                Your contact info is shared only with this seller. Millwork.io does not share your details with third parties.
+                Your contact info is shared only with this seller. AWI Florida Chapter does not share your details with third parties.
               </div>
             </div>
           </div>

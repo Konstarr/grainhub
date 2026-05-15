@@ -3,7 +3,7 @@ import { SAFETY_TIPS } from '../../data/listingData.js';
 export default function SafetyCard() {
   return (
     <div className="safety-card">
-      <div className="safety-title">🛡 Buying Safely on Millwork.io</div>
+      <div className="safety-title">🛡 Buying Safely on AWI Florida Chapter</div>
       <div className="safety-items">
         {SAFETY_TIPS.map((tip, idx) => (
           <div key={idx} className="safety-item">

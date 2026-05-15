@@ -124,7 +124,7 @@ export default function Wiki() {
     <div className="wiki-dash">
       <section className="wd-hero">
         <div className="wd-hero-inner">
-          <div className="wd-hero-eyebrow">Millwork.io Encyclopedia</div>
+          <div className="wd-hero-eyebrow">AWI Florida Chapter Encyclopedia</div>
           <h1 className="wd-hero-title">The reference for everyone who works wood.</h1>
           <p className="wd-hero-sub">
             From standing tree to finished piece - {CLUSTERS.length} fields, {TOTAL_SUBTOPICS} sub-topics,

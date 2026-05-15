@@ -4,7 +4,7 @@
  */
 
 export const JOBS_PAGE_HEADER = {
-  eyebrow: 'Millwork.io Career Center',
+  eyebrow: 'AWI Florida Chapter Career Center',
   title: 'Jobs in the\nWood Trades',
   subtitle: 'Cabinet makers, CNC operators, estimators, finishing supervisors, millwork installers, shop foremen — find your next role or your next hire, exclusively in the industry.',
   stats: [
@@ -342,5 +342,5 @@ export const POST_JOB_CTA = {
 
 export const TALENT_CTA = {
   title: 'Looking for work?',
-  description: 'Create a free talent profile and let employers find you. 312 companies are actively hiring on Millwork.io right now.',
+  description: 'Create a free talent profile and let employers find you. 312 companies are actively hiring on AWI Florida Chapter right now.',
 };

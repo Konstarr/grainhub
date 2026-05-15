@@ -3,7 +3,7 @@
  */
 
 export const NEWS_PAGE_HEADER = {
-  eyebrow: 'Millwork.io Industry News',
+  eyebrow: 'AWI Florida Chapter Industry News',
   title: 'The Latest from Millwork & Cabinets',
   subtitle: 'Market reports, product launches, industry events, regulatory updates, and trade news from across the millwork and cabinet industry.',
 };
@@ -80,7 +80,7 @@ export const NEWS_STORIES = [
     categoryColor: 'red',
     kicker: { label: 'Regulatory', color: 'red' },
     title: 'CARB Phase 3 Composite Wood Emissions Rules: What Cabinet Shops Need to Know Before 2026',
-    excerpt: "California's strict new emissions limits take effect Jan 1, 2026. Millwork.io explains the compliance pathway, testing costs, and supply chain timing for manufacturers.",
+    excerpt: "California's strict new emissions limits take effect Jan 1, 2026. AWI Florida Chapter explains the compliance pathway, testing costs, and supply chain timing for manufacturers.",
     imgGradient: 'linear-gradient(135deg, #3A0A0A 0%, #7A2020 100%)',
     author: { initials: 'KR', name: 'KarenReid' },
     publishedDate: '1 day ago',
@@ -104,7 +104,7 @@ export const NEWS_STORIES = [
     categoryColor: 'teal',
     kicker: { label: 'Events', color: 'teal' },
     title: "LIGNA 2025: Five Cabinet Tech Demos You Can't Miss on the Hannover Fairgrounds",
-    excerpt: 'Preview of new CNC controllers, edge-banding systems, and software suites. Millwork.io correspondent on the ground with hands-on demos and manufacturer interviews.',
+    excerpt: 'Preview of new CNC controllers, edge-banding systems, and software suites. AWI Florida Chapter correspondent on the ground with hands-on demos and manufacturer interviews.',
     imgGradient: 'linear-gradient(135deg, #0A2A28 0%, #1A5A58 100%)',
     author: { initials: 'TK', name: 'TomKowalski' },
     publishedDate: '3 days ago',

@@ -18,7 +18,7 @@ export default function CommunityRules() {
           <div className="legal-eyebrow">Community</div>
           <h1>Community Rules</h1>
           <p className="legal-sub">
-            How we keep Millwork.io useful, respectful, and worth coming back to.
+            How we keep AWI Florida Chapter useful, respectful, and worth coming back to.
           </p>
           <div className="legal-meta">
             <span>Effective: April 26, 2026</span>
@@ -32,7 +32,7 @@ export default function CommunityRules() {
         <section>
           <h2>The spirit of the place</h2>
           <p>
-            Millwork.io is a working-professionals community for woodworking, millwork,
+            AWI Florida Chapter is a working-professionals community for woodworking, millwork,
             cabinet, and adjacent trades. Treat the place like a busy shop floor:
             people are here to learn, to do business, and to swap stories — not to
             argue politics, not to spam, and not to pick fights. We're trade-friendly
@@ -76,7 +76,7 @@ export default function CommunityRules() {
             <li>No bait-and-switch listings, no fake "sold" relistings to bump posts.</li>
             <li>If you're a supplier or shop, claim your business profile rather than running it from a personal account.</li>
             <li>No multi-level-marketing recruitment.</li>
-            <li>Millwork.io doesn't process payments. Don't ask people to wire money to a "verification address," and don't fall for it when someone else does.</li>
+            <li>AWI Florida Chapter doesn't process payments. Don't ask people to wire money to a "verification address," and don't fall for it when someone else does.</li>
           </ul>
         </section>
 

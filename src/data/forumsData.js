@@ -5,7 +5,7 @@
 
 export const FORUMS_PAGE_HEADER = {
   eyebrow: 'Community Discussion',
-  title: 'Millwork.io Forums',
+  title: 'AWI Florida Chapter Forums',
   subtitle: 'Expert advice, shop talk, and peer knowledge from 24,800 millwork and cabinet professionals. Ask anything — someone here has done it.',
   stats: [
     { num: '142K', label: 'Total posts' },
@@ -315,7 +315,7 @@ export const FORUM_GROUPS = [
         name: 'Introductions',
         isNew: true,
         newCount: 3,
-        description: 'New to Millwork.io? Introduce yourself, your shop, and your specialty',
+        description: 'New to AWI Florida Chapter? Introduce yourself, your shop, and your specialty',
         posts: 2840,
         threads: 2840,
         latestUser: { initials: 'NM', color: 'av-e' },
@@ -357,7 +357,7 @@ export const FORUM_GROUPS = [
         iconColor: 'gray',
         name: 'Site Feedback & Suggestions',
         isNew: false,
-        description: 'Ideas for improving Millwork.io — features, categories, wiki topics, suggestions',
+        description: 'Ideas for improving AWI Florida Chapter — features, categories, wiki topics, suggestions',
         posts: 840,
         threads: 210,
         latestUser: { initials: 'MB', color: 'av-c' },

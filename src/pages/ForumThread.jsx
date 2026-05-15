@@ -441,7 +441,7 @@ export default function ForumThread() {
     // Client-side word-filter gate. Logs the attempt to filter_violations.
     if (!checkText(replyBody).ok) {
       // eslint-disable-next-line no-alert
-      alert('Your reply contains language we don\'t allow on Millwork.io. Please remove it and try again.');
+      alert('Your reply contains language we don\'t allow on AWI Florida Chapter. Please remove it and try again.');
       logFilterViolation('post', replyBody).catch(() => {});
       return;
     }

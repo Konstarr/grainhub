@@ -242,7 +242,7 @@ export const A_LA_CARTE = [
     unit: 'one-time',
     tagline: 'Your message, your design, to the full subscriber list.',
     description:
-      'One dedicated send to our full Millwork.io newsletter audience — your copy, your CTA, your branding. 24-hour turnaround on proofs.',
+      'One dedicated send to our full AWI Florida Chapter newsletter audience — your copy, your CTA, your branding. 24-hour turnaround on proofs.',
   },
   {
     id: 'newsletter-sponsor',
@@ -260,7 +260,7 @@ export const A_LA_CARTE = [
     icon: '🎪',
     price: 1499,
     unit: 'per event',
-    tagline: 'Put your brand on a Millwork.io-hosted webinar or summit.',
+    tagline: 'Put your brand on a AWI Florida Chapter-hosted webinar or summit.',
     description:
       'Logo on event page + slides, 30-second intro during the live session, post-event attendee list (with opt-in).',
   },

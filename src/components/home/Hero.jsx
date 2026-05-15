@@ -27,19 +27,19 @@ export default function Hero() {
       <div className="hero-image-scrim" aria-hidden="true" />
 
       <div className="hero-inner hero-inner-left">
-        <div className="hero-eyebrow">The Industry's Knowledge Hub</div>
+        <div className="hero-eyebrow">Architectural Woodwork Institute · Florida Chapter</div>
         <h1>
-          Built by <em>makers,</em>
+          Florida's <em>architectural</em>
           <br />
-          for makers.
+          woodwork community.
         </h1>
         <p className="hero-sub">
-          The modern community for millwork and cabinet professionals — industry news, expert
-          forums, machinery listings, job postings, and a living wiki. All in one place.
+          The official home of the AWI Florida Chapter — chapter events, member directory,
+          technical resources, and forums for architectural woodwork professionals across the state.
         </p>
         <div className="hero-actions">
-          <Link to="/signup" className="btn-hero-primary">Join Free — It Takes 30 Seconds →</Link>
-          <Link to="/wiki" className="btn-hero-outline">Browse the Wiki</Link>
+          <Link to="/membership" className="btn-hero-primary">Join the Chapter →</Link>
+          <Link to="/events" className="btn-hero-outline">See upcoming events</Link>
         </div>
       </div>
     </section>

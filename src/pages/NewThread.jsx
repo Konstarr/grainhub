@@ -77,7 +77,7 @@ export default function NewThread() {
     // Word-filter check before hitting the network
     const filterResult = checkFields([title, body]);
     if (!filterResult.ok) {
-      setErr('Your thread contains language we do not allow on Millwork.io. Please remove it and try again.');
+      setErr('Your thread contains language we do not allow on AWI Florida Chapter. Please remove it and try again.');
       // Log fire-and-forget so admins see it in /admin/forums/log
       logFilterViolation('thread', title + '\n\n' + body).catch(() => {});
       return;

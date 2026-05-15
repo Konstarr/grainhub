@@ -7,14 +7,13 @@ import { fetchUnreadCount } from '../../lib/messagingDb.js';
 import NotificationBell from './NotificationBell.jsx';
 
 const NAV_ITEMS = [
-  { label: 'Home', to: '/' },
-  { label: 'Forums', to: '/forums' },
-  { label: 'Wiki', to: '/wiki' },
-  { label: 'News', to: '/news' },
-  { label: 'Marketplace', to: '/marketplace' },
-  { label: 'Jobs', to: '/jobs' },
-  { label: 'Suppliers', to: '/suppliers' },
-  { label: 'Events', to: '/events' },
+  { label: 'Home',      to: '/' },
+  { label: 'Forums',    to: '/forums' },
+  { label: 'Events',    to: '/events' },
+  { label: 'News',      to: '/news' },
+  { label: 'Resources', to: '/wiki' },
+  { label: 'Directory', to: '/suppliers' },
+  { label: 'Membership',to: '/membership' },
 ];
 
 function initialsFromProfile(profile, user) {
@@ -106,7 +105,7 @@ export default function Nav() {
             <circle cx="7" cy="7" r="5.5" stroke="rgba(255,255,255,0.4)" strokeWidth="1.5" />
             <path d="M11 11 L14 14" stroke="rgba(255,255,255,0.4)" strokeWidth="1.5" strokeLinecap="round" />
           </svg>
-          <input type="text" placeholder="Search Millwork.io..." />
+          <input type="text" placeholder="Search AWI Florida..." />
         </div>
 
         {isAuthed ? (
@@ -274,8 +273,8 @@ export default function Nav() {
           </div>
         ) : (
           <>
-            <Link to="/login" className="nav-btn">Log In</Link>
-            <Link to="/signup" className="nav-btn primary">Join Free</Link>
+            <Link to="/login" className="nav-btn">Sign In</Link>
+            <Link to="/membership" className="nav-btn primary">Join the Chapter</Link>
           </>
         )}
       </div>

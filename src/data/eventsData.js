@@ -80,7 +80,7 @@ export const EVENT_LISTINGS = [
       'Live deep-dive with two veteran programmers on squeezing yield out of 4x8 sheets. Case studies from 50–300-cabinet-per-day shops.',
     imgGradient: 'linear-gradient(135deg, #2A1A48 0%, #5A3A88 100%)',
     attendees: '500 seats',
-    price: 'Free for Millwork.io members',
+    price: 'Free for AWI Florida Chapter members',
   },
   {
     category: 'Trade Show',
@@ -110,7 +110,7 @@ export const EVENT_LISTINGS = [
 
 export const SUBMIT_EVENT_CARD = {
   label: 'Hosting an event?',
-  title: 'List your event on Millwork.io',
+  title: 'List your event on AWI Florida Chapter',
   description:
     'Reach 48,000+ cabinet and millwork pros. Event listings start at $99 and run until the event date.',
   cta: 'Submit an Event →',

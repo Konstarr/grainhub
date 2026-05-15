@@ -67,7 +67,7 @@ export default function SponsorPlacements() {
               </div>
               <div style={{ fontSize: '13px', color: 'var(--text-muted)', lineHeight: '1.6', marginBottom: '10px' }}>
                 Your logo and tagline appear in the sponsor strip seen by every member on every
-                page load. The highest-visibility placement on Millwork.io.
+                page load. The highest-visibility placement on AWI Florida Chapter.
               </div>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
                 <div style={{ fontFamily: "'Montserrat', sans-serif", fontSize: '20px', color: 'var(--wood-warm)' }}>

@@ -39,7 +39,7 @@ export default function EditablePostBody({ post, canEdit, onUpdate }) {
       return;
     }
     if (!checkText(draft).ok) {
-      setErr('Your edit contains language we don\'t allow on Millwork.io.');
+      setErr('Your edit contains language we don\'t allow on AWI Florida Chapter.');
       return;
     }
     setBusy(true);

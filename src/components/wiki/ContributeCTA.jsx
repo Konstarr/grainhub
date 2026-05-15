@@ -4,7 +4,7 @@ export default function ContributeCTA() {
       <div>
         <div className="cc-title">Know something worth sharing?</div>
         <div className="cc-sub">
-          The Millwork.io Wiki is written by working professionals — shop owners, machinists, estimators, and finishers who've learned things the hard way and want to pass it on. Every article starts with one expert's knowledge.
+          The AWI Florida Chapter Wiki is written by working professionals — shop owners, machinists, estimators, and finishers who've learned things the hard way and want to pass it on. Every article starts with one expert's knowledge.
         </div>
         <div className="cc-actions">
           <button className="btn-contribute">✏ Write an Article</button>

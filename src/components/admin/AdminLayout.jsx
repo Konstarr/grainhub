@@ -11,29 +11,20 @@ import '../../styles/admin.css';
 export const ADMIN_SECTIONS = [
   {
     id: 'editorial',
-    group: 'Editorial',
+    group: 'Chapter content',
     items: [
-      { to: '/admin/news',   label: 'News',   icon: <IconNews />, enabled: true },
-      { to: '/admin/events', label: 'Events', icon: <IconCal />,  enabled: true },
-      { to: '/admin/wiki',   label: 'Wiki',   icon: <IconNews />, enabled: true },
-    ],
-  },
-  {
-    id: 'marketplace',
-    group: 'Marketplace',
-    items: [
-      { to: '/admin/listings',             label: 'Listings',       icon: <IconTag />,       enabled: true },
-      { to: '/admin/marketplace-settings', label: 'Listing limits', icon: <IconTag />,       enabled: true },
-      { to: '/admin/jobs',                 label: 'Jobs',           icon: <IconBriefcase />, enabled: true },
+      { to: '/admin/news',   label: 'News',      icon: <IconNews />, enabled: true },
+      { to: '/admin/events', label: 'Events',    icon: <IconCal />,  enabled: true },
+      { to: '/admin/wiki',   label: 'Resources', icon: <IconNews />, enabled: true },
     ],
   },
   {
     id: 'directory',
-    group: 'Directory',
+    group: 'Member directory',
     items: [
-      { to: '/admin/suppliers',       label: 'Suppliers',       icon: <IconStar />,  enabled: true },
-      { to: '/admin/supplier-claims', label: 'Supplier claims', icon: <IconFlag />,  enabled: true },
-      { to: '/admin/sponsors',        label: 'Sponsors',        icon: <IconStar />,  enabled: true },
+      { to: '/admin/suppliers',       label: 'Members',          icon: <IconStar />,  enabled: true },
+      { to: '/admin/supplier-claims', label: 'Claim requests',   icon: <IconFlag />,  enabled: true },
+      { to: '/admin/sponsors',        label: 'Chapter sponsors', icon: <IconStar />,  enabled: true },
     ],
   },
   {
@@ -53,8 +44,7 @@ export const ADMIN_SECTIONS = [
     id: 'people',
     group: 'People',
     items: [
-      { to: '/admin/users',       label: 'Users',       icon: <IconUsers />, enabled: true },
-      { to: '/admin/communities', label: 'Communities', icon: <IconUsers />, enabled: true },
+      { to: '/admin/users',       label: 'Members',     icon: <IconUsers />, enabled: true },
       { to: '/admin/connections', label: 'Connections', icon: <IconLink />,  enabled: true },
     ],
   },
@@ -107,10 +97,10 @@ export default function AdminLayout({ title, subtitle, actions, children }) {
     <div className="adm-shell">
       <aside className="adm-aside">
         <div className="adm-brand">
-          <div className="adm-brand-badge">MW</div>
+          <div className="adm-brand-badge">AWI</div>
           <div>
             <div className="adm-brand-title">Admin</div>
-            <div className="adm-brand-sub">Millwork.io</div>
+            <div className="adm-brand-sub">AWI Florida Chapter</div>
           </div>
         </div>
 

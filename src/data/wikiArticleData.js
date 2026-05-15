@@ -4,7 +4,7 @@
 
 export const ARTICLE_DATA = {
   title: 'Frameless Cabinet Construction — The Definitive Guide',
-  tagline: 'Everything about the European 32mm system — box structure, joinery methods, hardware, installation in out-of-square openings, finishing, and full AWI/KCMA standards coverage. The most-read article on Millwork.io.',
+  tagline: 'Everything about the European 32mm system — box structure, joinery methods, hardware, installation in out-of-square openings, finishing, and full AWI/KCMA standards coverage. The most-read article on AWI Florida Chapter.',
   category: 'Joinery & Construction',
   published: 'February 12, 2025',
   lastEdited: '2 hours ago',
@@ -111,7 +111,7 @@ export const RELATED_ARTICLES = [
 
 export const ARTICLE_FOOTER = {
   author: { initials: 'MB', name: 'Mike Brosnan', role: 'Cabinet Maker, Denver CO' },
-  bio: 'Mike has been building custom frameless cabinetry for 18 years. He runs Heritage Millwork and contributes regularly to the Millwork.io Wiki.',
+  bio: 'Mike has been building custom frameless cabinetry for 18 years. He runs Heritage Millwork and contributes regularly to the AWI Florida Chapter Wiki.',
 };
 
 export const COMMENTS = [
@@ -125,6 +125,6 @@ export const COMMENTS = [
     initials: 'DL',
     name: 'DianeLachapelle',
     time: '3 days ago',
-    text: 'This article is the reason I recommended Millwork.io to our entire shop. Clear, practical, and standards-focused. Thank you.',
+    text: 'This article is the reason I recommended AWI Florida Chapter to our entire shop. Clear, practical, and standards-focused. Thank you.',
   },
 ];

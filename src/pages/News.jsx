@@ -41,7 +41,7 @@ function toUi(row) {
     readTime: '4 min read',
     title: m.title,
     excerpt: m.excerpt || '',
-    author: { initials: authorInitials, name: m.sourceUrl ? 'Syndicated' : 'Millwork.io Staff' },
+    author: { initials: authorInitials, name: m.sourceUrl ? 'Syndicated' : 'AWI Florida Chapter Staff' },
   };
 }
 

@@ -18,9 +18,9 @@ function templateFor(pathname) {
   if (!pathname) return '/';
   // Exact static routes first.
   const exact = new Set([
-    '/', '/forums', '/wiki', '/news', '/marketplace', '/jobs',
-    '/suppliers', '/events', '/communities', '/cart', '/signup', '/login',
-    '/contact', '/sponsor', '/pricing', '/inbox', '/messages',
+    '/', '/forums', '/wiki', '/news',
+    '/suppliers', '/events', '/membership', '/signup', '/login',
+    '/contact', '/inbox', '/messages',
     '/terms', '/privacy', '/community-rules',
   ]);
   if (exact.has(pathname)) return pathname;
@@ -29,16 +29,11 @@ function templateFor(pathname) {
   if (pathname.startsWith('/forum/thread/'))      return '/forum/thread/:slug';
   if (pathname.startsWith('/forum/category/'))    return '/forum/category/:slug';
   if (pathname.startsWith('/forum/topic/'))       return '/forum/topic/:slug';
-  if (pathname.startsWith('/c/'))                 return '/c/:slug';
-  if (pathname.startsWith('/communities/'))       return '/communities/:slug';
   if (pathname.startsWith('/profile/'))           return '/profile/:handle';
-  if (pathname.startsWith('/jobs/for-hire/new'))  return '/jobs/for-hire/new';
-  if (pathname.startsWith('/jobs/'))              return '/jobs/:id';
   if (pathname.startsWith('/suppliers/'))         return '/suppliers/:slug';
   if (pathname.startsWith('/news/'))              return '/news/:slug';
   if (pathname.startsWith('/wiki/'))              return '/wiki/:slug';
   if (pathname.startsWith('/events/'))            return '/events/:slug';
-  if (pathname.startsWith('/marketplace/'))       return '/marketplace/:slug';
   if (pathname.startsWith('/messages/'))          return '/messages/:id';
   if (pathname.startsWith('/admin/'))             return '/admin/*';
 
@@ -66,26 +61,15 @@ import NewThread from './pages/NewThread.jsx';
 import ForumRules from './pages/ForumRules.jsx';
 import ForumSearch from './pages/ForumSearch.jsx';
 import ForumTopic from './pages/ForumTopic.jsx';
-import Jobs from './pages/Jobs.jsx';
-import JobDetail from './pages/JobDetail.jsx';
-import ForHireNew from './pages/ForHireNew.jsx';
 import Wiki from './pages/Wiki.jsx';
 import WikiArticle from './pages/WikiArticle.jsx';
 import WikiCluster from './pages/WikiCluster.jsx';
 import News from './pages/News.jsx';
 import NewsArticle from './pages/NewsArticle.jsx';
-import Marketplace from './pages/Marketplace.jsx';
-import Listing from './pages/Listing.jsx';
-import MarketplaceNew from './pages/MarketplaceNew.jsx';
-import MarketplaceEdit from './pages/MarketplaceEdit.jsx';
 import Suppliers from './pages/Suppliers.jsx';
 import SupplierProfile from './pages/SupplierProfile.jsx';
 import Signup from './pages/Signup.jsx';
 import Login from './pages/Login.jsx';
-import Sponsor from './pages/Sponsor.jsx';
-import Communities from './pages/Communities.jsx';
-import CommunityNew from './pages/CommunityNew.jsx';
-import CommunityHome from './pages/CommunityHome.jsx';
 import AuthCallback from './pages/AuthCallback.jsx';
 import AccountSubscription from './pages/AccountSubscription.jsx';
 import Events from './pages/Events.jsx';
@@ -105,8 +89,6 @@ const AdminNewsReports      = lazy(() => import('./pages/admin/AdminNewsReports.
 const AdminOwnerDashboard   = lazy(() => import('./pages/admin/AdminOwnerDashboard.jsx'));
 const AdminEvents           = lazy(() => import('./pages/admin/AdminEvents.jsx'));
 const AdminEventsEdit       = lazy(() => import('./pages/admin/AdminEventsEdit.jsx'));
-const AdminJobs             = lazy(() => import('./pages/admin/AdminJobs.jsx'));
-const AdminJobsEdit         = lazy(() => import('./pages/admin/AdminJobsEdit.jsx'));
 const AdminUsers            = lazy(() => import('./pages/admin/AdminUsers.jsx'));
 const AdminUserEdit         = lazy(() => import('./pages/admin/AdminUserEdit.jsx'));
 const AdminSponsors         = lazy(() => import('./pages/admin/AdminSponsors.jsx'));
@@ -121,11 +103,6 @@ const AdminForumWords       = lazy(() => import('./pages/admin/AdminForumWords.j
 const AdminForumLog         = lazy(() => import('./pages/admin/AdminForumLog.jsx'));
 const AdminForumReputation  = lazy(() => import('./pages/admin/AdminForumReputation.jsx'));
 const AdminForumBadges      = lazy(() => import('./pages/admin/AdminForumBadges.jsx'));
-const AdminMarketplace      = lazy(() => import('./pages/admin/AdminMarketplace.jsx'));
-const AdminMarketplaceEdit  = lazy(() => import('./pages/admin/AdminMarketplaceEdit.jsx'));
-const AdminMarketplaceSettings = lazy(() => import('./pages/admin/AdminMarketplaceSettings.jsx'));
-const AdminCommunities      = lazy(() => import('./pages/admin/AdminCommunities.jsx'));
-const AdminCommunityEdit    = lazy(() => import('./pages/admin/AdminCommunityEdit.jsx'));
 
 const AdminFallback = (
   <div style={{
@@ -163,11 +140,6 @@ export default function App() {
         <Route path="/admin/wiki/:id"         element={adminRoute('admin', AdminWikiEdit)} />
         <Route path="/admin/events"           element={adminRoute('admin', AdminEvents)} />
         <Route path="/admin/events/:id"       element={adminRoute('admin', AdminEventsEdit)} />
-        <Route path="/admin/jobs"             element={adminRoute('mod',   AdminJobs)} />
-        <Route path="/admin/jobs/:id"         element={adminRoute('mod',   AdminJobsEdit)} />
-        <Route path="/admin/listings"         element={adminRoute('mod',   AdminMarketplace)} />
-        <Route path="/admin/listings/:id"     element={adminRoute('mod',   AdminMarketplaceEdit)} />
-        <Route path="/admin/marketplace-settings" element={adminRoute('admin', AdminMarketplaceSettings)} />
         <Route path="/admin/users"            element={adminRoute('admin', AdminUsers)} />
         <Route path="/admin/users/:id"        element={adminRoute('admin', AdminUserEdit)} />
         <Route path="/admin/sponsors"         element={adminRoute('admin', AdminSponsors)} />
@@ -175,8 +147,6 @@ export default function App() {
         <Route path="/admin/suppliers"        element={adminRoute('admin', AdminSuppliers)} />
         <Route path="/admin/suppliers/:id"    element={adminRoute('admin', AdminSupplierEdit)} />
         <Route path="/admin/connections"      element={adminRoute('admin', AdminConnections)} />
-        <Route path="/admin/communities"      element={adminRoute('admin', AdminCommunities)} />
-        <Route path="/admin/communities/:id"  element={adminRoute('admin', AdminCommunityEdit)} />
         <Route path="/admin/forums"           element={adminRoute('admin', AdminForums)} />
         <Route path="/admin/forums/threads"   element={adminRoute('admin', AdminForumThreads)} />
         <Route path="/admin/forums/reports"   element={adminRoute('admin', AdminForumReports)} />
@@ -188,21 +158,20 @@ export default function App() {
         <Route element={<Layout />}>
           <Route path="/" element={<Home />} />
           <Route path="/forums" element={<Forums />} />
-          <Route path="/jobs" element={<Jobs />} />
-          <Route path="/jobs/for-hire/new" element={<RequireAuth><ForHireNew /></RequireAuth>} />
-          <Route path="/jobs/:id" element={<RequireAuth><JobDetail /></RequireAuth>} />
           <Route path="/wiki" element={<Wiki />} />
           <Route path="/news" element={<News />} />
-          <Route path="/marketplace" element={<Marketplace />} />
           <Route path="/suppliers" element={<Suppliers />} />
           <Route path="/events" element={<Events />} />
           <Route path="/events/:slug" element={<RequireAuth><EventDetail /></RequireAuth>} />
-          <Route path="/communities" element={<Communities />} />
-          <Route path="/communities/new" element={<RequireAuth><CommunityNew /></RequireAuth>} />
-          <Route path="/c/:slug" element={<CommunityHome />} />
-          <Route path="/sponsor" element={<Sponsor />} />
-          <Route path="/pricing" element={<Navigate to="/account/subscription" replace />} />
-          <Route path="/account/subscription" element={<AccountSubscription />} />
+          <Route path="/membership" element={<AccountSubscription />} />
+          <Route path="/account/subscription" element={<Navigate to="/membership" replace />} />
+          <Route path="/pricing" element={<Navigate to="/membership" replace />} />
+          {/* Decommissioned in the AWI Florida rebrand. Redirects keep old links working. */}
+          <Route path="/jobs/*" element={<Navigate to="/forums" replace />} />
+          <Route path="/marketplace/*" element={<Navigate to="/suppliers" replace />} />
+          <Route path="/communities/*" element={<Navigate to="/forums" replace />} />
+          <Route path="/c/:slug" element={<Navigate to="/forums" replace />} />
+          <Route path="/sponsor" element={<Navigate to="/membership" replace />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/login" element={<Login />} />
@@ -226,10 +195,6 @@ export default function App() {
 
           <Route path="/news/article/:slug" element={<RequireAuth><NewsArticle /></RequireAuth>} />
           <Route path="/news/article" element={<RequireAuth><NewsArticle /></RequireAuth>} />
-          <Route path="/marketplace/listing/:slug" element={<RequireAuth><Listing /></RequireAuth>} />
-          <Route path="/marketplace/listing" element={<RequireAuth><Listing /></RequireAuth>} />
-          <Route path="/marketplace/new" element={<RequireAuth><MarketplaceNew /></RequireAuth>} />
-          <Route path="/marketplace/edit/:id" element={<RequireAuth><MarketplaceEdit /></RequireAuth>} />
 
           <Route path="/suppliers/profile" element={<RequireAuth><SupplierProfile /></RequireAuth>} />
           <Route path="/suppliers/:slug"   element={<RequireAuth><SupplierProfile /></RequireAuth>} />

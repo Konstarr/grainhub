@@ -11,10 +11,10 @@ export default function WikiHero({ searchQuery = '', onSearchChange, onSearchSub
         <div className="hero-inner">
           <div className="hero-top">
             <div className="hero-left">
-              <div className="hero-eyebrow">Millwork.io Industry Wiki</div>
-              <h1 className="hero-title">The trade's <em>knowledge base.</em> Written by the pros.</h1>
+              <div className="hero-eyebrow">AWI Florida Chapter · Member Resources</div>
+              <h1 className="hero-title">Technical resources for <em>Florida millwork pros.</em></h1>
               <p className="hero-sub">
-                Community-written articles covering every aspect of millwork and cabinet work — construction methods, species profiles, machine operation and more.
+                Reference articles on construction methods, species profiles, finishing, hardware, AWS standards, Florida code compliance, and shop operations — curated by the chapter and contributed by members.
               </p>
             </div>
 

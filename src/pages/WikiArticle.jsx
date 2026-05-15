@@ -352,7 +352,7 @@ export default function WikiArticle() {
           )}
 
           <div className="article-meta-bar">
-            <div className="meta-item">From <strong>Millwork.io Wiki</strong>, the community knowledge base</div>
+            <div className="meta-item">From <strong>AWI Florida Chapter Wiki</strong>, the community knowledge base</div>
             {article?.updatedAt && <div className="meta-item">Last updated {formatDate(article.updatedAt)}</div>}
             {article?.readTime && <div className="meta-item">{article.readTime}</div>}
             {article?.view_count != null && (
