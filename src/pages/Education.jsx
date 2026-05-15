@@ -103,11 +103,10 @@ export default function Education() {
     <div style={{ background: '#FAF4E7', minHeight: '70vh' }}>
       {/* Hero */}
       <section
-        className="gh-hero"
         style={{
           background: 'linear-gradient(180deg, #1F4534 0%, #1B3A2E 100%)',
           color: '#F5EAD6',
-          padding: '3rem 2rem 2.5rem',
+          padding: '5rem 2rem 4rem',
         }}
       >
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
