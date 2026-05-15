@@ -3,19 +3,20 @@ import { Link } from 'react-router-dom';
 /**
  * /board — AWI Florida Chapter Board of Directors.
  *
- * To update: edit the BOARD constant below. When you have member photos,
- * add `photoUrl` to a row and the avatar will switch from initials to
- * the image automatically.
+ * Each member's email is rendered as a clickable mailto link below
+ * their name. To update: edit the BOARD constant below. If a member
+ * gets a real chapter email at a different address, replace the email
+ * string. To use a photo, set `photoUrl`.
  */
 const BOARD = [
-  { role: 'President',         name: 'Sebastian DesMarais', email: '', bio: '', photoUrl: '' },
-  { role: 'Vice President',    name: 'Caroline Tart',       email: '', bio: '', photoUrl: '' },
-  { role: 'Secretary',         name: 'Alba Rybak',          email: '', bio: '', photoUrl: '' },
-  { role: 'Treasurer',         name: 'Joe Sorrelli',        email: '', bio: '', photoUrl: '' },
-  { role: 'Education Chair',   name: 'Richard Barrieau',    email: '', bio: '', photoUrl: '' },
-  { role: 'Membership Chair',  name: 'Nik Athanasakos',     email: '', bio: '', photoUrl: '' },
-  { role: 'Social Media Chair',name: 'Vincent Federici',    email: '', bio: '', photoUrl: '' },
-  { role: 'Sponsorship Chair', name: 'Edmond Zaho',         email: '', bio: '', photoUrl: '' },
+  { role: 'President',          name: 'Sebastian DesMarais', email: 'sebastian@awiflorida.org', bio: '', photoUrl: '' },
+  { role: 'Vice President',     name: 'Caroline Tart',       email: 'caroline@awiflorida.org',  bio: '', photoUrl: '' },
+  { role: 'Secretary',          name: 'Alba Rybak',          email: 'alba@awiflorida.org',      bio: '', photoUrl: '' },
+  { role: 'Treasurer',          name: 'Joe Sorrelli',        email: 'joe@awiflorida.org',       bio: '', photoUrl: '' },
+  { role: 'Education Chair',    name: 'Richard Barrieau',    email: 'richard@awiflorida.org',   bio: '', photoUrl: '' },
+  { role: 'Membership Chair',   name: 'Nik Athanasakos',     email: 'nik@awiflorida.org',       bio: '', photoUrl: '' },
+  { role: 'Social Media Chair', name: 'Vincent Federici',    email: 'vincent@awiflorida.org',   bio: '', photoUrl: '' },
+  { role: 'Sponsorship Chair',  name: 'Edmond Zaho',         email: 'edmond@awiflorida.org',    bio: '', photoUrl: '' },
 ];
 
 function initials(name) {
@@ -71,7 +72,7 @@ export default function Board() {
           ))}
         </div>
 
-        {/* Bio / contact note */}
+        {/* Contact note */}
         <div style={{
           marginTop: 32,
           padding: '18px 20px',
@@ -83,11 +84,10 @@ export default function Board() {
           lineHeight: 1.6,
         }}>
           <strong style={{ color: '#1B3A2E' }}>Reach the board.</strong>{' '}
-          For chapter questions, sponsorship inquiries, or to suggest an agenda item for
-          the next board meeting, the easiest path is the relevant chair: events through
-          the Education Chair, dues and tier questions through the Membership Chair,
-          payment and accounting through the Treasurer, and event sponsorships through
-          the Sponsorship Chair. Or contact the chapter at large via the{' '}
+          Email any chair directly above, or route by topic — events through the Education
+          Chair, dues and tier questions through the Membership Chair, payment and accounting
+          through the Treasurer, and event sponsorships through the Sponsorship Chair. Or
+          contact the chapter at large via the{' '}
           <Link to="/membership" style={{ color: '#2D6A4F', fontWeight: 600 }}>Membership page</Link>.
         </div>
       </section>
@@ -108,11 +108,11 @@ function BoardCard({ member }) {
         flexDirection: 'column',
         alignItems: 'center',
         textAlign: 'center',
-        gap: 10,
+        gap: 8,
         boxShadow: '0 1px 4px rgba(27, 58, 46, 0.05)',
       }}
     >
-      {/* Avatar — photo if available, otherwise initials on forest-green */}
+      {/* Avatar */}
       {member.photoUrl ? (
         <img
           src={member.photoUrl}
@@ -144,7 +144,7 @@ function BoardCard({ member }) {
       {/* Role — gold eyebrow */}
       <div style={{
         fontSize: 11, fontWeight: 800, letterSpacing: 1.4,
-        textTransform: 'uppercase', color: '#8C7A35', marginTop: 4,
+        textTransform: 'uppercase', color: '#8C7A35', marginTop: 6,
       }}>
         {member.role}
       </div>
@@ -156,24 +156,25 @@ function BoardCard({ member }) {
         {member.name}
       </div>
 
-      {/* Bio when provided */}
-      {member.bio && (
-        <p style={{ fontSize: 13, color: '#475569', lineHeight: 1.5, margin: 0 }}>
-          {member.bio}
-        </p>
-      )}
-
-      {/* Contact link only if email exists */}
+      {/* Email — mailto, displayed under the name */}
       {member.email && (
         <a
           href={`mailto:${member.email}`}
           style={{
-            fontSize: 12.5, fontWeight: 600, color: '#2D6A4F',
-            textDecoration: 'none', marginTop: 2,
+            fontSize: 13, fontWeight: 500, color: '#2D6A4F',
+            textDecoration: 'none', wordBreak: 'break-all',
+            borderBottom: '1px dotted #2D6A4F', paddingBottom: 1,
           }}
         >
-          Contact →
+          {member.email}
         </a>
+      )}
+
+      {/* Bio when provided */}
+      {member.bio && (
+        <p style={{ fontSize: 13, color: '#475569', lineHeight: 1.5, margin: '4px 0 0' }}>
+          {member.bio}
+        </p>
       )}
     </div>
   );
