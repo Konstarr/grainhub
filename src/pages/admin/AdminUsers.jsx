@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import AdminLayout from '../../components/admin/AdminLayout.jsx';
+import InviteMemberModal from '../../components/admin/InviteMemberModal.jsx';
+import { useAuth } from '../../context/AuthContext.jsx';
 import { listProfiles } from '../../lib/adminDb.js';
 
 /**
@@ -9,6 +11,9 @@ import { listProfiles } from '../../lib/adminDb.js';
  */
 export default function AdminUsers() {
   const navigate = useNavigate();
+  const { profile } = useAuth();
+  const fromName = profile?.full_name || profile?.username || 'AWI Florida Chapter Board';
+  const [inviteOpen, setInviteOpen] = useState(false);
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -37,7 +42,21 @@ export default function AdminUsers() {
 
   return (
     <AdminLayout
-      title="Users"
+      title="Members"
+      actions={(
+        <button
+          type="button"
+          onClick={() => setInviteOpen(true)}
+          style={{
+            background: '#2D6A4F', color: '#F5EAD6',
+            border: 'none', borderRadius: 8,
+            padding: '9px 16px', fontWeight: 700, fontSize: 13,
+            cursor: 'pointer',
+          }}
+        >
+          + Invite member
+        </button>
+      )}
       subtitle={loading
         ? 'Loading…'
         : `${rows.length} shown · ${counts.individual} individual · ${counts.business} business`}
@@ -184,6 +203,11 @@ export default function AdminUsers() {
           </table>
         )}
       </div>
+      <InviteMemberModal
+        open={inviteOpen}
+        onClose={() => setInviteOpen(false)}
+        fromName={fromName}
+      />
     </AdminLayout>
   );
 }
