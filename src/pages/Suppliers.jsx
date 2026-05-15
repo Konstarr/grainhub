@@ -130,20 +130,20 @@ export default function Suppliers() {
           <div className="header-top">
             <div>
               <div className="page-eyebrow">
-                {focusedKind === 'manufacturer' ? 'MANUFACTURERS'
-                  : focusedKind === 'vendor'    ? 'VENDORS'
+                {focusedKind === 'manufacturer' ? 'MANUFACTURER MEMBERS'
+                  : focusedKind === 'vendor'    ? 'SUPPLIER MEMBERS'
                   : SUPPLIERS_HEADER.eyebrow}
               </div>
               <h1 className="page-title">
-                {focusedKind === 'manufacturer' ? 'Millwork shops & cabinet makers'
-                  : focusedKind === 'vendor'    ? 'Vendors & parts suppliers'
+                {focusedKind === 'manufacturer' ? 'Manufacturer Members'
+                  : focusedKind === 'vendor'    ? 'Supplier Members'
                   : SUPPLIERS_HEADER.title}
               </h1>
               <p className="page-subtitle">
                 {focusedKind === 'manufacturer'
-                  ? 'Find local custom millwork shops, cabinet makers, finishers, and installers.'
+                  ? 'Florida cabinet shops, architectural millwork firms, finishers, and installers doing the work.'
                   : focusedKind === 'vendor'
-                  ? 'Hardware, lumber, CNC tooling, finishes, and everything in between.'
+                  ? 'Hardware, lumber, machinery, software, finish, and tooling suppliers selling into the Florida architectural woodwork industry.'
                   : SUPPLIERS_HEADER.subtitle}
               </p>
             </div>

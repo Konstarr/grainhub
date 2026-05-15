@@ -13,14 +13,14 @@
  */
 
 export const SUPPLIERS_HEADER = {
-  eyebrow: 'Suppliers & Manufacturers',
-  title: 'Find Quality Vendors',
+  eyebrow: 'AWI Florida Chapter · Member Directory',
+  title: 'Member Directory',
   subtitle:
-    'Verified cabinet hardware, lumber distributors, CNC tooling suppliers, finishing products, and specialty equipment manufacturers. Rated by 24,800+ industry professionals.',
+    'Florida\'s architectural woodwork community in one place. Manufacturer Members are the cabinet shops, millwork firms, finishers, and installers building the work. Supplier Members are the hardware, lumber, machinery, finish, and software vendors who supply them. Both are listed below.',
   stats: [
-    { num: '2,840', label: 'Verified suppliers' },
-    { num: '48,600', label: 'Member reviews' },
-    { num: '156', label: 'Product categories' },
+    { num: '—', label: 'Manufacturer members' },
+    { num: '—', label: 'Supplier members' },
+    { num: 'FL', label: 'Statewide' },
   ],
 };
 
