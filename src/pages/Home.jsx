@@ -25,8 +25,8 @@ export default function Home() {
   return (
     <>
       <Hero />
-      <SponsorStrip />
       <StatsStrip />
+      <SponsorStrip />
       <TradeCategoriesTiles />
 
       {/* Feed section — News on top, Forum + Wiki below, with sidebar */}
