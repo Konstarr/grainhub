@@ -1,4 +1,3 @@
-import SponsorStrip from '../components/layout/SponsorStrip.jsx';
 import Hero from '../components/home/Hero.jsx';
 import StatsStrip from '../components/home/StatsStrip.jsx';
 import TradeCategoriesTiles from '../components/home/TradeCategoriesTiles.jsx';
@@ -26,7 +25,6 @@ export default function Home() {
     <>
       <Hero />
       <StatsStrip />
-      <SponsorStrip />
       <TradeCategoriesTiles />
 
       {/* Feed section — News on top, Forum + Wiki below, with sidebar */}
