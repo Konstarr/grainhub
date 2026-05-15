@@ -143,6 +143,7 @@ export default function App() {
         <Route path="/admin/sponsors"         element={adminRoute('admin', AdminSponsors)} />
         <Route path="/admin/supplier-claims"  element={adminRoute('admin', AdminSupplierClaims)} />
         <Route path="/admin/suppliers"        element={adminRoute('admin', AdminSuppliers)} />
+        <Route path="/admin/suppliers/new"    element={adminRoute('admin', AdminSupplierEdit)} />
         <Route path="/admin/suppliers/:id"    element={adminRoute('admin', AdminSupplierEdit)} />
         <Route path="/admin/connections"      element={adminRoute('admin', AdminConnections)} />
         <Route path="/admin/forums"           element={adminRoute('admin', AdminForums)} />

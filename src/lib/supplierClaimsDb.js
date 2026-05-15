@@ -83,10 +83,33 @@ export async function adminUpdateSupplier(supplierId, patch = {}) {
 export async function fetchAllSuppliersAdmin({ limit = 200 } = {}) {
   const { data, error } = await supabase
     .from('suppliers')
-    .select('id, slug, name, category, claimed_by, is_verified, is_approved, rating, review_count, updated_at')
+    .select('id, slug, name, kind, category, claimed_by, is_verified, is_approved, rating, review_count, updated_at')
     .order('updated_at', { ascending: false })
     .limit(limit);
   return { data: data || [], error };
+}
+
+/**
+ * Insert a new directory listing (manufacturer or supplier/vendor).
+ * Admin-only — relies on the RLS policy that lets users with the
+ * 'admin' role insert into public.suppliers. Returns { data, error }
+ * with the new id + slug on success.
+ */
+export async function adminCreateSupplier(insert = {}) {
+  const cleaned = Object.fromEntries(
+    Object.entries(insert).filter(([, v]) => v !== '' && v !== undefined)
+  );
+  if (!cleaned.name) return { data: null, error: new Error('Name is required.') };
+  if (!cleaned.slug) return { data: null, error: new Error('Slug is required.') };
+  if (!cleaned.kind) cleaned.kind = 'vendor';
+  if (cleaned.is_approved === undefined) cleaned.is_approved = true;
+
+  const { data, error } = await supabase
+    .from('suppliers')
+    .insert(cleaned)
+    .select('id, slug, name, kind')
+    .single();
+  return { data, error };
 }
 
 export async function submitSupplierClaim({ supplierId, email, evidence }) {
@@ -99,7 +122,6 @@ export async function submitSupplierClaim({ supplierId, email, evidence }) {
     evidence_in:    evidence?.trim() || null,
   });
   if (error) return { data: null, error };
-  // Function returns table(claim_id, status); supabase-js gives [{...}].
   const row = Array.isArray(data) ? data[0] : data;
   return { data: row || null, error: null };
 }

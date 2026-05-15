@@ -43,9 +43,17 @@ export default function AdminSuppliers() {
       title="Suppliers"
       subtitle={loading ? 'Loading…' : `${filtered.length} of ${rows.length} listing${rows.length === 1 ? '' : 's'}`}
       actions={(
-        <Link to="/admin/supplier-claims" className="claim-btn ghost">
-          Pending claims →
-        </Link>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          <Link to="/admin/suppliers/new?kind=manufacturer" className="claim-btn primary">
+            + Add manufacturer
+          </Link>
+          <Link to="/admin/suppliers/new?kind=vendor" className="claim-btn ghost">
+            + Add supplier
+          </Link>
+          <Link to="/admin/supplier-claims" className="claim-btn ghost">
+            Pending claims →
+          </Link>
+        </div>
       )}
     >
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 12, marginBottom: 16 }}>
