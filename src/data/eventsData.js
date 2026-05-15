@@ -30,7 +30,7 @@ export const FEATURED_EVENT = {
   excerpt:
     'The world\u2019s leading trade fair for woodworking and wood processing. 1,500+ exhibitors across 10 halls covering CNC, finishing, edge-banding, sawmill technology, and automation.',
   tags: ['Machinery', 'CNC', 'Finishing', 'International'],
-  imgGradient: 'linear-gradient(135deg, #1C0E05 0%, #3D2010 35%, #6B3820 65%, #9A5030 100%)',
+  imgGradient: 'linear-gradient(135deg, #0F2A1F 0%, #3D2010 35%, #6B3820 65%, #9A5030 100%)',
 };
 
 export const EVENT_LISTINGS = [

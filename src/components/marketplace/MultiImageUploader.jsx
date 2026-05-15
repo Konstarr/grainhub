@@ -287,7 +287,7 @@ export default function MultiImageUploader({
           border: '2px dashed ' + (dragOver ? 'var(--wood-warm)' : 'var(--border)'),
           borderRadius: 12,
           padding: '1.25rem',
-          background: dragOver ? 'rgba(138, 80, 48, 0.06)' : 'var(--wood-cream, #FBF6EC)',
+          background: dragOver ? 'rgba(45, 106, 79, 0.06)' : 'var(--wood-cream, #FBF6EC)',
           cursor: canAddMore ? 'pointer' : 'not-allowed',
           opacity: canAddMore ? 1 : 0.6,
           textAlign: 'center',

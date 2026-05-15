@@ -68,7 +68,7 @@ export default function SponsorEligibilityBanner() {
         .sp-banner-primary {
           display: inline-flex; align-items: center; gap: 6px;
           padding: 0.55rem 1.15rem;
-          background: linear-gradient(135deg, #8A5030, #6B3D20);
+          background: linear-gradient(135deg, #2D6A4F, #6B3D20);
           color: #fff; text-decoration: none; border-radius: 999px;
           font-weight: 600; font-size: 13.5px;
           box-shadow: 0 2px 4px rgba(90,66,38,0.2);

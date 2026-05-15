@@ -417,7 +417,7 @@ function MemberAvatar({ profile, size = 32 }) {
   return (
     <div style={{
       width: size, height: size, borderRadius: '50%',
-      background: 'linear-gradient(135deg, #8a5030, #5d3a1c)',
+      background: 'linear-gradient(135deg, #2D6A4F, #5d3a1c)',
       color: '#fff', fontSize: size * 0.38, fontWeight: 700,
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       flexShrink: 0,

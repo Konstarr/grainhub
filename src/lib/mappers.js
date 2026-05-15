@@ -106,7 +106,7 @@ export function mapEventRow(row) {
 
   const gradients = [
     'linear-gradient(135deg, #1A3A10 0%, #3A6A20 100%)',
-    'linear-gradient(135deg, #1C0E05 0%, #6B3820 100%)',
+    'linear-gradient(135deg, #0F2A1F 0%, #6B3820 100%)',
     'linear-gradient(135deg, #0F2838 0%, #2A5880 100%)',
     'linear-gradient(135deg, #3D1A2A 0%, #8B3860 100%)',
     'linear-gradient(135deg, #2A2010 0%, #8B6820 100%)',

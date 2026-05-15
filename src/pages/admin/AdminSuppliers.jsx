@@ -151,7 +151,7 @@ export default function AdminSuppliers() {
 
 function StatTile({ label, value, accent }) {
   const palette = accent === 'green' ? { bg: '#DDEFD3', fg: '#2E6F2E' }
-                : accent === 'amber' ? { bg: '#F5EAD6', fg: '#6B3F1F' }
+                : accent === 'amber' ? { bg: '#F5EAD6', fg: '#2D5A3D' }
                 : { bg: '#fff', fg: '#1c1c1c' };
   return (
     <div style={{
@@ -180,7 +180,7 @@ function Pillbar({ value, onChange, options }) {
             border: 0,
             borderRadius: 6,
             background: value === o.value ? '#fff' : 'transparent',
-            color: value === o.value ? '#2C1A0E' : '#6B3F1F',
+            color: value === o.value ? '#1B3A2E' : '#2D5A3D',
             fontWeight: 600,
             fontSize: 12.5,
             cursor: 'pointer',

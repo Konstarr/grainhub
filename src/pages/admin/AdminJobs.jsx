@@ -95,7 +95,7 @@ export default function AdminJobs() {
             style={{
               padding: '6px 14px', border: 0, borderRadius: 6,
               background: kindTab === opt.v ? '#fff' : 'transparent',
-              color: kindTab === opt.v ? '#2C1A0E' : '#6B3F1F',
+              color: kindTab === opt.v ? '#1B3A2E' : '#2D5A3D',
               fontWeight: 600, fontSize: 13, cursor: 'pointer', font: 'inherit',
             }}
           >
@@ -218,13 +218,13 @@ export default function AdminJobs() {
 
 function KpiTile({ label, value, accent }) {
   const palette = accent === 'green' ? { bg: '#DDEFD3', fg: '#2E6F2E' }
-                : accent === 'amber' ? { bg: '#F5EAD6', fg: '#6B3F1F' }
+                : accent === 'amber' ? { bg: '#F5EAD6', fg: '#2D5A3D' }
                 : { bg: '#fff', fg: '#1c1c1c' };
   return (
     <div style={{
       background: palette.bg,
       color: palette.fg,
-      border: '1px solid var(--border-light, #EDD9B0)',
+      border: '1px solid var(--border-light, #DDE5D8)',
       borderRadius: 10,
       padding: '12px 14px',
     }}>

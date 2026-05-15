@@ -45,7 +45,7 @@ function WordmarkSVG({ height = 56 }) {
         fontWeight="800"
         fontSize="18"
         letterSpacing="1"
-        fill="#3A2410"
+        fill="#1F4534"
       >AWI</text>
 
       {/* Wordmark */}

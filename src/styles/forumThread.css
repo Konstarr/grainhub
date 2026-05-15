@@ -28,7 +28,7 @@
   border-radius: 14px;
   padding: 2rem;
   margin-bottom: 1.25rem;
-  box-shadow: 0 2px 12px rgba(44,26,14,0.06);
+  box-shadow: 0 2px 12px rgba(27, 58, 46,0.06);
 }
 
 .thread-tags {
@@ -51,7 +51,7 @@
 }
 .tag-cat { background: #FFF3DC; color: #8B5E08; }
 .tag-hot { background: #FCEBEB; color: #A32D2D; }
-.tag-solved { background: #EAF3DE; color: #2D5016; }
+.tag-solved { background: #EAF3DE; color: #1B4332; }
 
 .thread-title {
   font-family: 'Montserrat', sans-serif;
@@ -98,7 +98,7 @@
 }
 .act-btn:hover { border-color: var(--wood-light); background: var(--wood-cream); }
 .act-btn.primary { background: var(--wood-warm); color: white; border-color: var(--wood-warm); font-weight: 500; }
-.act-btn.primary:hover { background: #8B4316; }
+.act-btn.primary:hover { background: #1F4534; }
 
 /* SORT BAR */
 .sort-bar {
@@ -300,7 +300,7 @@
   color: #fff;
   border-color: var(--wood-warm);
 }
-.post-edit-save:hover { background: #8B4316; }
+.post-edit-save:hover { background: #1F4534; }
 .post-edit-save:disabled,
 .post-edit-cancel:disabled { opacity: 0.6; cursor: wait; }
 .post-edit-err {
@@ -367,8 +367,8 @@
   display: block;
 }
 
-.av-a { background: #A0522D; }
-.av-b { background: #2D5016; }
+.av-a { background: #2D6A4F; }
+.av-b { background: #1B4332; }
 .av-c { background: #5F3091; }
 .av-d { background: #1565C0; }
 .av-e { background: #B45309; }
@@ -505,7 +505,7 @@
 
 .post-num { background: #EDE0C4; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; color: var(--text-secondary); }
 .post-op-badge { background: #FFF3DC; color: #8B5E08; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
-.best-badge { background: #EAF3DE; color: #2D5016; padding: 3px 10px; border-radius: 5px; font-size: 11px; font-weight: 700; }
+.best-badge { background: #EAF3DE; color: #1B4332; padding: 3px 10px; border-radius: 5px; font-size: 11px; font-weight: 700; }
 
 .post-text {
   font-size: 14px;
@@ -600,7 +600,7 @@
 .post-image-thumb {
   width: 88px;
   height: 68px;
-  background: linear-gradient(135deg, #6B3F1F, #A0522D);
+  background: linear-gradient(135deg, #2D5A3D, #2D6A4F);
   border-radius: 7px;
   flex-shrink: 0;
   display: flex;
@@ -739,7 +739,7 @@
   border-radius: 12px;
   overflow: hidden;
   margin-top: 1.5rem;
-  box-shadow: 0 2px 10px rgba(44,26,14,0.05);
+  box-shadow: 0 2px 10px rgba(27, 58, 46,0.05);
 }
 
 .reply-box-header {
@@ -842,7 +842,7 @@
   color: var(--wood-mid);
 }
 .reply-editor pre {
-  background: #2C1A0E;
+  background: #1B3A2E;
   color: #F5E6C8;
   border-radius: 8px;
   padding: 0.85rem 1rem;

@@ -248,7 +248,7 @@ function Pill({ children, color }) {
   const map = {
     amber: { bg: '#FDF6E8', fg: '#92551E', bd: '#E5C77A' },
     red:   { bg: '#FEF3F0', fg: '#991b1b', bd: '#FCA5A5' },
-    green: { bg: '#ECF6E4', fg: '#2D5016', bd: '#C9E0B6' },
+    green: { bg: '#ECF6E4', fg: '#1B4332', bd: '#C9E0B6' },
   };
   const c = map[color] || map.amber;
   return (

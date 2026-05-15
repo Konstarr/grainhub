@@ -144,7 +144,7 @@ export default function PriceRangeSlider({
           top: '50%',
           height: TRACK_HEIGHT,
           marginTop: -TRACK_HEIGHT / 2,
-          background: 'var(--wood-warm, #8a5030)',
+          background: 'var(--wood-warm, #2D6A4F)',
           borderRadius: TRACK_HEIGHT,
           left: pctMin + '%',
           right: (100 - pctMax) + '%',
@@ -260,7 +260,7 @@ input[type=range].gh-prs::-webkit-slider-thumb {
   height: ${HANDLE_SIZE}px;
   border-radius: 50%;
   background: #fff;
-  border: 2px solid var(--wood-warm, #8a5030);
+  border: 2px solid var(--wood-warm, #2D6A4F);
   box-shadow: 0 1px 4px rgba(0,0,0,0.15);
   cursor: grab;
 }
@@ -274,7 +274,7 @@ input[type=range].gh-prs::-moz-range-thumb {
   height: ${HANDLE_SIZE}px;
   border-radius: 50%;
   background: #fff;
-  border: 2px solid var(--wood-warm, #8a5030);
+  border: 2px solid var(--wood-warm, #2D6A4F);
   box-shadow: 0 1px 4px rgba(0,0,0,0.15);
   cursor: grab;
 }
@@ -284,10 +284,10 @@ input[type=range].gh-prs::-moz-range-track { background: transparent; }
 input[type=range].gh-prs::-webkit-slider-runnable-track { background: transparent; }
 .filter-col input[type=range]:focus { outline: none; }
 .filter-col input[type=range]:focus::-webkit-slider-thumb {
-  box-shadow: 0 0 0 3px rgba(138, 80, 48, 0.25);
+  box-shadow: 0 0 0 3px rgba(45, 106, 79, 0.25);
 }
 .filter-col input[type=range]:focus::-moz-range-thumb {
-  box-shadow: 0 0 0 3px rgba(138, 80, 48, 0.25);
+  box-shadow: 0 0 0 3px rgba(45, 106, 79, 0.25);
 }
 `;
   const tag = document.createElement('style');

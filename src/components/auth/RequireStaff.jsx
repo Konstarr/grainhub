@@ -56,7 +56,7 @@ function StaffGate({ children, level }) {
         style={{
           display: 'inline-block',
           padding: '0.55rem 1.1rem',
-          background: 'linear-gradient(135deg, #8A5030, #6B3D20)',
+          background: 'linear-gradient(135deg, #2D6A4F, #6B3D20)',
           color: '#fff',
           textDecoration: 'none',
           borderRadius: 999,

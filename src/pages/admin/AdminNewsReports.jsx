@@ -93,9 +93,9 @@ export default function AdminNewsReports() {
 
       {/* ───── Stat cards ───── */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0,1fr))', gap: 12, marginBottom: 16 }}>
-        <StatCard label={`Views · last ${windowDays}d`} value={fmtNum(stats.viewsInWindow)} accent="#A0522D" />
+        <StatCard label={`Views · last ${windowDays}d`} value={fmtNum(stats.viewsInWindow)} accent="#2D6A4F" />
         <StatCard label="Lifetime views"                 value={fmtNum(stats.totalViews)} />
-        <StatCard label="Avg views / article"           value={fmtNum(Math.round(stats.avgViews))} accent="#2D5016" />
+        <StatCard label="Avg views / article"           value={fmtNum(Math.round(stats.avgViews))} accent="#1B4332" />
         <StatCard
           label="Best day"
           value={stats.bestDay?.views ? fmtNum(stats.bestDay.views) : '—'}
@@ -260,8 +260,8 @@ function LineChart({ data }) {
       <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', height: 'auto', display: 'block' }}>
         <defs>
           <linearGradient id="viewsAreaGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%"   stopColor="#A0522D" stopOpacity="0.35" />
-            <stop offset="100%" stopColor="#A0522D" stopOpacity="0" />
+            <stop offset="0%"   stopColor="#2D6A4F" stopOpacity="0.35" />
+            <stop offset="100%" stopColor="#2D6A4F" stopOpacity="0" />
           </linearGradient>
         </defs>
 
@@ -300,7 +300,7 @@ function LineChart({ data }) {
           <path
             d={pathD}
             fill="none"
-            stroke="#8B4316"
+            stroke="#1F4534"
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -309,7 +309,7 @@ function LineChart({ data }) {
 
         {/* dots */}
         {points.map((p) => (
-          <circle key={p.day} cx={p.x} cy={p.y} r="3" fill="#fff" stroke="#8B4316" strokeWidth="1.5">
+          <circle key={p.day} cx={p.x} cy={p.y} r="3" fill="#fff" stroke="#1F4534" strokeWidth="1.5">
             <title>{fmtShortDate(p.day)}: {p.views} views</title>
           </circle>
         ))}
@@ -360,7 +360,7 @@ function CategoryBars({ rows }) {
               <div style={{
                 width: pct + '%',
                 height: '100%',
-                background: 'linear-gradient(90deg, #6B3F1F 0%, #A0522D 100%)',
+                background: 'linear-gradient(90deg, #2D5A3D 0%, #2D6A4F 100%)',
                 transition: 'width 0.3s ease',
               }} />
             </div>

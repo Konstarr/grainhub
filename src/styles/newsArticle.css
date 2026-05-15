@@ -122,7 +122,7 @@ article {}
   font-weight: 700;
   color: white;
   flex-shrink: 0;
-  background: linear-gradient(135deg, #A0522D, #6B3F1F);
+  background: linear-gradient(135deg, #2D6A4F, #2D5A3D);
 }
 
 .author-name {
@@ -182,7 +182,7 @@ article {}
 .article-hero-img {
   width: 100%;
   height: 420px;
-  background: linear-gradient(135deg, #1C0E05 0%, #3D2010 35%, #6B3820 65%, #9A5030 100%);
+  background: linear-gradient(135deg, #0F2A1F 0%, #3D2010 35%, #6B3820 65%, #9A5030 100%);
   border-radius: 12px;
   margin-bottom: 2rem;
   display: flex;
@@ -236,7 +236,7 @@ article {}
 .article-body a {
   color: var(--wood-warm);
   text-decoration: underline;
-  text-decoration-color: rgba(160,82,45,0.3);
+  text-decoration-color: rgba(45, 106, 79,0.3);
 }
 .article-body a:hover {
   text-decoration-color: var(--wood-warm);
@@ -353,7 +353,7 @@ article {}
   transition: width 0.6s ease;
 }
 .cb-up {
-  background: linear-gradient(90deg, #2D5016, #4A8020);
+  background: linear-gradient(90deg, #1B4332, #4A8020);
 }
 .cb-down {
   background: linear-gradient(90deg, #A32D2D, #D04040);
@@ -368,7 +368,7 @@ article {}
   flex-shrink: 0;
 }
 .chart-pct.up {
-  color: #2D5016;
+  color: #1B4332;
 }
 .chart-pct.down {
   color: #A32D2D;
@@ -452,7 +452,7 @@ article {}
   width: 52px;
   height: 52px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #A0522D, #6B3F1F);
+  background: linear-gradient(135deg, #2D6A4F, #2D5A3D);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -621,7 +621,7 @@ article {}
 }
 
 .newsletter-card {
-  background: linear-gradient(140deg, #2D5016, #3D6B20);
+  background: linear-gradient(140deg, #1B4332, #3D6B20);
   border-radius: 12px;
   padding: 1.4rem;
   color: white;
@@ -657,7 +657,7 @@ article {}
 }
 .nl-btn {
   background: white;
-  color: #2D5016;
+  color: #1B4332;
   border: none;
   padding: 9px 14px;
   border-radius: 7px;

@@ -503,7 +503,7 @@ function Field({ label, children, full }) {
 
 function TierPill({ tier }) {
   const palette = {
-    bronze:   { bg: '#F5E0D0', fg: '#8B4316' },
+    bronze:   { bg: '#F5E0D0', fg: '#1F4534' },
     silver:   { bg: '#E5E5E5', fg: '#555' },
     gold:     { bg: '#FDF1C9', fg: '#8B6914' },
     platinum: { bg: '#E0E2E5', fg: '#444' },

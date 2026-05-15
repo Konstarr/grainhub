@@ -35,7 +35,7 @@
   color: var(--text-secondary);
   transition: background 120ms, color 120ms, border-color 120ms;
 }
-.gh-tb-btn:hover { background: rgba(138, 80, 48, 0.09); color: var(--text-primary); }
+.gh-tb-btn:hover { background: rgba(45, 106, 79, 0.09); color: var(--text-primary); }
 .gh-tb-btn.active {
   background: var(--wood-warm);
   color: #fff;

@@ -37,8 +37,8 @@ export const SIGNUP_PERKS = [
 ];
 
 export const SIGNUP_PROOF_AVATARS = [
-  { initials: 'TK', bg: '#A0522D' },
-  { initials: 'DL', bg: '#2D5016' },
+  { initials: 'TK', bg: '#2D6A4F' },
+  { initials: 'DL', bg: '#1B4332' },
   { initials: 'MB', bg: '#5F3091' },
   { initials: 'SR', bg: '#1565C0' },
   { initials: 'JP', bg: '#B45309' },

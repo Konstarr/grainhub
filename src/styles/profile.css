@@ -190,12 +190,12 @@
 .pf-btn:active { transform: translateY(1px); }
 
 .pf-btn.primary {
-  background: linear-gradient(135deg, #8A5030, #6B3D20);
+  background: linear-gradient(135deg, #2D6A4F, #6B3D20);
   color: #fff;
   border-color: transparent;
   box-shadow: 0 2px 4px rgba(90, 66, 38, 0.2);
 }
-.pf-btn.primary:hover { filter: brightness(1.07); background: linear-gradient(135deg, #8A5030, #6B3D20); }
+.pf-btn.primary:hover { filter: brightness(1.07); background: linear-gradient(135deg, #2D6A4F, #6B3D20); }
 
 .pf-btn.ghost-danger { color: #9c2b2b; }
 .pf-btn.ghost-danger:hover { background: #fef2f2; border-color: #fecaca; }
@@ -230,7 +230,7 @@
 }
 
 .pf-stat.pf-stat-accent .pf-stat-value {
-  background: linear-gradient(135deg, #8A5030, #d49058);
+  background: linear-gradient(135deg, #2D6A4F, #d49058);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -398,7 +398,7 @@
 
 .pf-badge:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 10px rgba(138, 80, 48, 0.14);
+  box-shadow: 0 4px 10px rgba(45, 106, 79, 0.14);
 }
 
 .pf-badge.tier-bronze { background: linear-gradient(135deg, #f7e4cc, #e5c097); }

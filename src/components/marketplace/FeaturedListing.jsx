@@ -9,7 +9,7 @@ export default function FeaturedListing({ listing }) {
         <div>
           <div className="listing-meta-top">
             <span className="cat-badge cb-machinery">{listing.category}</span>
-            <span className="cat-badge" style={{ background: '#EAF3DE', color: '#2D5016' }}>
+            <span className="cat-badge" style={{ background: '#EAF3DE', color: '#1B4332' }}>
               {listing.subCategory}
             </span>
             <span className="listing-id">{listing.id}</span>
@@ -22,7 +22,7 @@ export default function FeaturedListing({ listing }) {
             </div>
             <div className="spec-item">
               <span className="spec-label">Condition</span>
-              <span className="spec-val" style={{ color: '#2D5016' }}>
+              <span className="spec-val" style={{ color: '#1B4332' }}>
                 {listing.condition}
               </span>
             </div>

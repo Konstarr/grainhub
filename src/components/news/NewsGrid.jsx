@@ -12,7 +12,7 @@ function NewsCard({ story }) {
     teal: 'teal',
   };
 
-  const fallback = 'linear-gradient(135deg,#1C0E05,#6B3820)';
+  const fallback = 'linear-gradient(135deg,#0F2A1F,#6B3820)';
   const bg = story.coverImage
     ? 'url("' + story.coverImage + '") center/cover no-repeat, ' + (story.imgGradient || fallback)
     : (story.imgGradient || fallback);

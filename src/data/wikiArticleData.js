@@ -104,7 +104,7 @@ export const RELATED_ARTICLES = [
   {
     title: 'Face Frame Construction — Fundamentals & Specs',
     category: 'Construction',
-    imgGradient: 'linear-gradient(135deg, #4A2A12, #8A5030)',
+    imgGradient: 'linear-gradient(135deg, #4A2A12, #2D6A4F)',
     badge: 'Good',
   },
 ];

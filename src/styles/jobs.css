@@ -25,7 +25,7 @@
   top: 0;
   bottom: 0;
   width: 40%;
-  background: linear-gradient(135deg, transparent, rgba(160,82,45,0.07) 60%, rgba(210,146,90,0.1));
+  background: linear-gradient(135deg, transparent, rgba(45, 106, 79,0.07) 60%, rgba(210,146,90,0.1));
 }
 
 .header-inner {
@@ -89,7 +89,7 @@
 
 .hstat-label {
   font-size: 12px;
-  color: #7A6858;
+  color: #7A8B82;
   margin-top: 4px;
 }
 
@@ -166,7 +166,7 @@
 }
 
 .search-btn:hover {
-  background: #8B4316;
+  background: #1F4534;
 }
 
 /* ROLE PILLS */
@@ -367,7 +367,7 @@
 }
 
 .apply-btn:hover {
-  background: #8B4316;
+  background: #1F4534;
 }
 
 /* JOB LISTINGS */
@@ -421,7 +421,7 @@
 }
 
 .featured-job:hover {
-  box-shadow: 0 6px 28px rgba(44,26,14,0.13);
+  box-shadow: 0 6px 28px rgba(27, 58, 46,0.13);
 }
 
 .feat-badge {
@@ -453,7 +453,7 @@
 
 .job-card:hover {
   border-color: var(--wood-light);
-  box-shadow: 0 4px 18px rgba(44,26,14,0.09);
+  box-shadow: 0 4px 18px rgba(27, 58, 46,0.09);
   transform: translateX(3px);
 }
 
@@ -486,7 +486,7 @@
 }
 
 .cl-brown {
-  background: linear-gradient(135deg, #4A2A12, #8A5030);
+  background: linear-gradient(135deg, #4A2A12, #2D6A4F);
 }
 
 .cl-green {
@@ -554,7 +554,7 @@
   align-items: center;
   gap: 3px;
   background: #EAF3DE;
-  color: #2D5016;
+  color: #1B4332;
   font-size: 10px;
   font-weight: 600;
   padding: 2px 7px;
@@ -595,10 +595,10 @@
 
 .jt-type { background: #EDE0C4; color: var(--text-secondary); }
 .jt-remote { background: #E6F1FB; color: #185FA5; }
-.jt-onsite { background: #EAF3DE; color: #2D5016; }
+.jt-onsite { background: #EAF3DE; color: #1B4332; }
 .jt-hybrid { background: #FFF3DC; color: #8B5E08; }
 .jt-urgent { background: #FCEBEB; color: #A32D2D; }
-.jt-new { background: #EAF3DE; color: #2D5016; }
+.jt-new { background: #EAF3DE; color: #1B4332; }
 .jt-senior { background: #F3EAFE; color: #5F3091; }
 .jt-entry { background: #E6F1FB; color: #185FA5; }
 
@@ -651,7 +651,7 @@
 }
 
 .btn-apply:hover {
-  background: #8B4316;
+  background: #1F4534;
 }
 
 .btn-save-job {
@@ -749,7 +749,7 @@
   top: -20px;
   width: 120px;
   height: 120px;
-  background: radial-gradient(circle, rgba(160,82,45,0.3), transparent 70%);
+  background: radial-gradient(circle, rgba(45, 106, 79,0.3), transparent 70%);
   border-radius: 50%;
 }
 
@@ -793,7 +793,7 @@
 }
 
 .pjc-btn:hover {
-  background: #8B4316;
+  background: #1F4534;
 }
 
 .pjc-pricing {
@@ -969,7 +969,7 @@ footer {
 
 .footer-brand p {
   font-size: 13px;
-  color: #7A6858;
+  color: #7A8B82;
   line-height: 1.7;
   margin-top: 0.75rem;
   max-width: 280px;
@@ -987,7 +987,7 @@ footer {
 .footer-col a {
   display: block;
   font-size: 13px;
-  color: #7A6858;
+  color: #7A8B82;
   padding: 3px 0;
   transition: color 0.12s;
   cursor: pointer;
@@ -1010,5 +1010,5 @@ footer {
 }
 
 .footer-bottom a {
-  color: #7A6858;
+  color: #7A8B82;
 }

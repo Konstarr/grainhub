@@ -173,7 +173,7 @@ export default function JobDetail() {
         .jd-apply-btn {
           display: inline-flex; align-items: center; gap: 6px;
           padding: 0.65rem 1.25rem;
-          background: linear-gradient(135deg, #8A5030, #6B3D20);
+          background: linear-gradient(135deg, #2D6A4F, #6B3D20);
           color: #fff; text-decoration: none;
           border-radius: 999px; font-weight: 600; font-size: 14px;
           border: none; cursor: pointer; font-family: inherit;
@@ -194,11 +194,11 @@ export default function JobDetail() {
           <div style={{
             display: 'flex', flexWrap: 'wrap', gap: 16, alignItems: 'center',
             background: '#FFF8EE',
-            border: '1px solid var(--border-light, #EDD9B0)',
+            border: '1px solid var(--border-light, #DDE5D8)',
             borderRadius: 10,
             padding: '12px 16px',
           }}>
-            <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: 0.6, textTransform: 'uppercase', color: 'var(--wood-warm, #6B3F1F)' }}>
+            <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: 0.6, textTransform: 'uppercase', color: 'var(--wood-warm, #2D5A3D)' }}>
               {isOwner ? 'Your listing' : 'Admin view'}
             </div>
             <div style={{ display: 'flex', gap: 22 }}>
@@ -299,8 +299,8 @@ export default function JobDetail() {
 function Stat({ label, value }) {
   return (
     <div>
-      <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.4, textTransform: 'uppercase', color: 'var(--text-muted, #9A7B5C)' }}>{label}</div>
-      <div style={{ fontSize: 20, fontWeight: 700, marginTop: 1, fontVariantNumeric: 'tabular-nums', color: '#2C1A0E' }}>
+      <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.4, textTransform: 'uppercase', color: 'var(--text-muted, #7A8B82)' }}>{label}</div>
+      <div style={{ fontSize: 20, fontWeight: 700, marginTop: 1, fontVariantNumeric: 'tabular-nums', color: '#1B3A2E' }}>
         {typeof value === 'number' ? value.toLocaleString() : value}
       </div>
     </div>

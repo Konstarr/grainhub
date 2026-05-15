@@ -795,14 +795,14 @@ function AccountTypeCard({ title, tag, iconKind, bullets, selected, onClick }) {
         position: 'relative',
         textAlign: 'left',
         background: 'var(--white)',
-        border: '1.5px solid ' + (selected ? 'var(--wood-warm, #8a5030)' : 'var(--border)'),
+        border: '1.5px solid ' + (selected ? 'var(--wood-warm, #2D6A4F)' : 'var(--border)'),
         borderRadius: 14,
         padding: '1.5rem 1.35rem 1.4rem',
         cursor: 'pointer',
         transition: 'border-color 140ms ease, box-shadow 140ms ease, transform 120ms ease',
         fontFamily: 'inherit',
         boxShadow: selected
-          ? '0 0 0 4px rgba(138, 80, 48, 0.1), 0 6px 18px rgba(138, 80, 48, 0.08)'
+          ? '0 0 0 4px rgba(45, 106, 79, 0.1), 0 6px 18px rgba(45, 106, 79, 0.08)'
           : '0 1px 3px rgba(43, 26, 14, 0.04)',
         outline: 'none',
       }}
@@ -837,7 +837,7 @@ function AccountTypeCard({ title, tag, iconKind, bullets, selected, onClick }) {
           justifyContent: 'center',
           fontSize: 12,
           fontWeight: 700,
-          boxShadow: '0 2px 6px rgba(138, 80, 48, 0.3)',
+          boxShadow: '0 2px 6px rgba(45, 106, 79, 0.3)',
         }}>✓</div>
       )}
 
@@ -846,7 +846,7 @@ function AccountTypeCard({ title, tag, iconKind, bullets, selected, onClick }) {
         width: 44,
         height: 44,
         borderRadius: 10,
-        background: selected ? 'linear-gradient(135deg, #6B3F1F, #A0522D)' : 'var(--wood-cream, #F5EAD6)',
+        background: selected ? 'linear-gradient(135deg, #2D5A3D, #2D6A4F)' : 'var(--wood-cream, #F5EAD6)',
         color: selected ? '#fff' : 'var(--wood-warm)',
         display: 'inline-flex',
         alignItems: 'center',
@@ -900,7 +900,7 @@ function AccountTypeCard({ title, tag, iconKind, bullets, selected, onClick }) {
               width: 14,
               height: 14,
               borderRadius: '50%',
-              background: 'rgba(138, 80, 48, 0.12)',
+              background: 'rgba(45, 106, 79, 0.12)',
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',

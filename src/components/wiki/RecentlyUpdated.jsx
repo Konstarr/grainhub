@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 
 function ArticleCard({ article }) {
   const variantClass = article.badge && article.badge.variant === 'featured' ? 'ab-featured' : 'ab-new';
-  const fallback = 'linear-gradient(135deg,#6B3F1F,#A0522D)';
+  const fallback = 'linear-gradient(135deg,#2D5A3D,#2D6A4F)';
   const bg = article.coverImage
     ? 'url("' + article.coverImage + '") center/cover no-repeat, ' + (article.imgGradient || fallback)
     : (article.imgGradient || fallback);

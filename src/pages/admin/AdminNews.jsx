@@ -142,9 +142,9 @@ export default function AdminNews() {
         marginBottom: 16,
       }}>
         <StatCard label="Total articles" value={fmtNum(stats.total)} />
-        <StatCard label="Published"      value={fmtNum(stats.published)} accent="#2D5016" />
+        <StatCard label="Published"      value={fmtNum(stats.published)} accent="#1B4332" />
         <StatCard label="Drafts"         value={fmtNum(stats.drafts)} accent="#8B5E08" />
-        <StatCard label="Total views"    value={fmtNum(stats.totalViews)} accent="#A0522D" />
+        <StatCard label="Total views"    value={fmtNum(stats.totalViews)} accent="#2D6A4F" />
       </div>
 
       {stats.topArticle && (

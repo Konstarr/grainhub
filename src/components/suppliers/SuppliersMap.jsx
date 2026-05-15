@@ -150,7 +150,7 @@ export default function SuppliersMap({ activeCategory, onCategoryChange }) {
                       marginTop: '8px',
                       fontSize: '12px',
                       fontWeight: 600,
-                      color: '#A0522D',
+                      color: '#2D6A4F',
                       textDecoration: 'none',
                     }}
                   >

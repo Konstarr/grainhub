@@ -377,7 +377,7 @@ export const RECENT_ACTIVITY_ITEMS = [
     title: 'Best approach for full-overlay frameless on an out-of-square opening? Photos inside',
     category: 'Cabinet Making',
     categoryBg: '#EDE0C4',
-    categoryText: '#6B3F1F',
+    categoryText: '#2D5A3D',
     author: 'TomKowalski',
     time: '2 hours ago',
     replies: 48,
@@ -430,7 +430,7 @@ export const RECENT_ACTIVITY_ITEMS = [
     title: 'AWI Premium grade: scribe vs butt joint on running trim at inside corners — what\'s the standard?',
     category: 'Architectural Millwork',
     categoryBg: '#EAF3DE',
-    categoryText: '#2D5016',
+    categoryText: '#1B4332',
     author: 'DianeLachapelle',
     time: '4 hours ago',
     replies: 19,
@@ -464,7 +464,7 @@ export const RECENT_ACTIVITY_ITEMS = [
     title: 'PUR vs EVA edge banding adhesive on high-humidity kitchen applications — real performance data?',
     category: 'Cabinet Making',
     categoryBg: '#EDE0C4',
-    categoryText: '#6B3F1F',
+    categoryText: '#2D5A3D',
     author: 'KarenReid',
     time: '11 hours ago',
     replies: 22,
@@ -502,9 +502,9 @@ export const FORUM_GUIDELINES = [
 ];
 
 export const THREAD_LEGEND = [
-  { dot: '#A0522D', label: 'New posts since last visit' },
+  { dot: '#2D6A4F', label: 'New posts since last visit' },
   { dot: '#A32D2D', label: '🔥 Hot — 20+ replies today' },
-  { dot: '#2D5016', label: '✓ Solved — best answer marked' },
+  { dot: '#1B4332', label: '✓ Solved — best answer marked' },
   { dot: '#8B5E08', label: '📌 Pinned by moderator' },
   { dot: '#5F3091', label: '⭐ Featured by editors' },
 ];

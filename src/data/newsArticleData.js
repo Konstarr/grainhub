@@ -11,7 +11,7 @@ export const NEWS_ARTICLE = {
   author: { initials: 'JK', name: 'Jonah Kirk', role: 'Senior Industry Reporter' },
   published: 'March 15, 2025',
   readTime: '8 min read',
-  heroImgGradient: 'linear-gradient(135deg, #1C0E05 0%, #3D2010 35%, #6B3820 65%, #9A5030 100%)',
+  heroImgGradient: 'linear-gradient(135deg, #0F2A1F 0%, #3D2010 35%, #6B3820 65%, #9A5030 100%)',
   heroCaption: 'Custom residential cabinet production continues to drive industry growth.',
 };
 

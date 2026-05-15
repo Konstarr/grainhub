@@ -116,13 +116,13 @@ export default function Membership() {
   return (
     <div style={{ background: '#FAF4E7', minHeight: '70vh' }}>
       {/* Hero */}
-      <section className="gh-hero" style={{ background: 'linear-gradient(180deg, #3A2410 0%, #2c1a0e 100%)', color: '#F5EAD6', padding: '3rem 2rem 2.5rem' }}>
+      <section className="gh-hero" style={{ background: 'linear-gradient(180deg, #1F4534 0%, #1B3A2E 100%)', color: '#F5EAD6', padding: '3rem 2rem 2.5rem' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-          <div style={{ fontSize: 12, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#c0a070', marginBottom: 8, fontWeight: 700 }}>
+          <div style={{ fontSize: 12, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#B5C9A5', marginBottom: 8, fontWeight: 700 }}>
             AWI Florida Chapter · Membership & Sponsorship
           </div>
           <h1 style={{ fontSize: 38, lineHeight: 1.15, margin: '0 0 14px', fontWeight: 400 }}>
-            Join the chapter. <em style={{ color: '#FFD7AC' }}>Sponsor a chapter event.</em>
+            Join the chapter. <em style={{ color: '#D5E5BC' }}>Sponsor a chapter event.</em>
           </h1>
           <p style={{ fontSize: 16, maxWidth: 760, lineHeight: 1.55, color: 'rgba(245,234,214,0.85)', margin: 0 }}>
             Two paid membership tiers — Manufacturer and Supplier — plus a free Guest tier.
@@ -140,7 +140,7 @@ export default function Membership() {
           sub="Annual dues, paid directly to the chapter treasurer."
         />
 
-        {loading && <div style={{ textAlign: 'center', padding: 48, color: '#6b3f1f' }}>Loading membership…</div>}
+        {loading && <div style={{ textAlign: 'center', padding: 48, color: '#2D5A3D' }}>Loading membership…</div>}
         {err && <div className="claim-error" style={{ margin: '0 0 16px' }}>{err}</div>}
 
         {!loading && tiers.length > 0 && (
@@ -206,10 +206,10 @@ export default function Membership() {
 
       {/* FAQ / contact */}
       <section style={{ maxWidth: 900, margin: '0 auto', padding: '2.5rem 2rem 4rem' }}>
-        <h2 style={{ fontSize: 22, color: '#2c1a0e', margin: '0 0 14px', fontWeight: 600 }}>
+        <h2 style={{ fontSize: 22, color: '#1B3A2E', margin: '0 0 14px', fontWeight: 600 }}>
           How chapter membership &amp; sponsorship works
         </h2>
-        <div style={{ display: 'grid', gap: 14, fontSize: 15, color: '#4d3a26', lineHeight: 1.65 }}>
+        <div style={{ display: 'grid', gap: 14, fontSize: 15, color: '#2D4A3D', lineHeight: 1.65 }}>
           <p>
             <strong>Manufacturer Member</strong> ($575/yr) — for Florida shops that build the work: cabinet
             shops, architectural millwork firms, finishers, installers. Voting rights, directory listing,
@@ -225,9 +225,9 @@ export default function Membership() {
             event. <strong>Event sponsors</strong> back one specific event — typically the annual golf outing
             and tabletop product showcase — and have limited slots.
           </p>
-          <p style={{ padding: '14px 16px', background: '#fff', border: '1px solid #EDD9B0', borderRadius: 8 }}>
+          <p style={{ padding: '14px 16px', background: '#fff', border: '1px solid #DDE5D8', borderRadius: 8 }}>
             Questions, payment, or reservations? Email the chapter treasurer at{' '}
-            <a href={`mailto:${TREASURER_EMAIL}`} style={{ color: '#8a5030', fontWeight: 600 }}>{TREASURER_EMAIL}</a>.
+            <a href={`mailto:${TREASURER_EMAIL}`} style={{ color: '#2D6A4F', fontWeight: 600 }}>{TREASURER_EMAIL}</a>.
           </p>
         </div>
       </section>
@@ -240,11 +240,11 @@ export default function Membership() {
 function SectionHeading({ eyebrow, title, sub }) {
   return (
     <div style={{ marginBottom: 22 }}>
-      <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: 1.6, color: '#8a5030', textTransform: 'uppercase', marginBottom: 6 }}>
+      <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: 1.6, color: '#2D6A4F', textTransform: 'uppercase', marginBottom: 6 }}>
         {eyebrow}
       </div>
-      <h2 style={{ fontSize: 28, fontWeight: 500, color: '#2c1a0e', margin: '0 0 6px', lineHeight: 1.2 }}>{title}</h2>
-      {sub && <p style={{ fontSize: 14.5, color: '#4d3a26', margin: 0, lineHeight: 1.55, maxWidth: 760 }}>{sub}</p>}
+      <h2 style={{ fontSize: 28, fontWeight: 500, color: '#1B3A2E', margin: '0 0 6px', lineHeight: 1.2 }}>{title}</h2>
+      {sub && <p style={{ fontSize: 14.5, color: '#2D4A3D', margin: 0, lineHeight: 1.55, maxWidth: 760 }}>{sub}</p>}
     </div>
   );
 }
@@ -255,29 +255,29 @@ function TierCard({ tier, highlight, cta }) {
   return (
     <div style={{
       background: '#fff',
-      border: highlight ? '2px solid #8a5030' : '1px solid #EDD9B0',
+      border: highlight ? '2px solid #2D6A4F' : '1px solid #DDE5D8',
       borderRadius: 14, padding: '24px 22px',
       display: 'flex', flexDirection: 'column', gap: 14, position: 'relative',
-      boxShadow: highlight ? '0 8px 24px rgba(138, 80, 48, 0.16)' : '0 1px 4px rgba(44, 26, 14, 0.04)',
+      boxShadow: highlight ? '0 8px 24px rgba(45, 106, 79, 0.16)' : '0 1px 4px rgba(27, 58, 46, 0.04)',
     }}>
       <div>
-        <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: 1.4, textTransform: 'uppercase', color: '#8a5030', marginBottom: 6 }}>{tier.id}</div>
-        <div style={{ fontSize: 24, fontWeight: 600, color: '#2c1a0e', lineHeight: 1.15 }}>{tier.name}</div>
+        <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: 1.4, textTransform: 'uppercase', color: '#2D6A4F', marginBottom: 6 }}>{tier.id}</div>
+        <div style={{ fontSize: 24, fontWeight: 600, color: '#1B3A2E', lineHeight: 1.15 }}>{tier.name}</div>
       </div>
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
         {dues != null && dues > 0 ? (
           <>
-            <span style={{ fontSize: 36, fontWeight: 700, color: '#2c1a0e' }}>${dues.toFixed(0)}</span>
-            <span style={{ fontSize: 13, color: '#6b3f1f' }}>/ year</span>
+            <span style={{ fontSize: 36, fontWeight: 700, color: '#1B3A2E' }}>${dues.toFixed(0)}</span>
+            <span style={{ fontSize: 13, color: '#2D5A3D' }}>/ year</span>
           </>
         ) : (
           <span style={{ fontSize: 28, fontWeight: 700, color: '#2E6F2E' }}>Free</span>
         )}
       </div>
-      {tier.blurb && <p style={{ fontSize: 14, color: '#4d3a26', lineHeight: 1.55, margin: 0 }}>{tier.blurb}</p>}
+      {tier.blurb && <p style={{ fontSize: 14, color: '#2D4A3D', lineHeight: 1.55, margin: 0 }}>{tier.blurb}</p>}
       <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: 8 }}>
         {perks.map((p, i) => (
-          <li key={i} style={{ fontSize: 13.5, color: '#3a2410', display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+          <li key={i} style={{ fontSize: 13.5, color: '#1F4534', display: 'flex', gap: 8, alignItems: 'flex-start' }}>
             <span style={{ color: '#2E6F2E', fontWeight: 700, flexShrink: 0 }}>✓</span>
             <span>{p}</span>
           </li>
@@ -294,36 +294,36 @@ function SponsorCard({ sponsorship: s, highlight, cta }) {
   return (
     <div style={{
       background: '#fff',
-      border: highlight ? '2px solid #c07a3c' : '1px solid #EDD9B0',
+      border: highlight ? '2px solid #6B8E5A' : '1px solid #DDE5D8',
       borderRadius: 14, padding: '22px 20px',
       display: 'flex', flexDirection: 'column', gap: 12, position: 'relative',
-      boxShadow: highlight ? '0 6px 18px rgba(192, 122, 60, 0.18)' : '0 1px 4px rgba(44, 26, 14, 0.04)',
+      boxShadow: highlight ? '0 6px 18px rgba(107, 142, 90, 0.18)' : '0 1px 4px rgba(27, 58, 46, 0.04)',
     }}>
       {highlight && (
         <div style={{
           position: 'absolute', top: -12, left: 18,
-          background: 'linear-gradient(180deg, #d8a25b, #c07a3c)', color: '#1c0e05',
+          background: 'linear-gradient(180deg, #d8a25b, #6B8E5A)', color: '#0F2A1F',
           padding: '4px 12px', borderRadius: 999,
           fontSize: 10, fontWeight: 800, letterSpacing: 1.2, textTransform: 'uppercase',
         }}>Top tier</div>
       )}
-      <div style={{ fontSize: 20, fontWeight: 600, color: '#2c1a0e', lineHeight: 1.2 }}>{s.name}</div>
+      <div style={{ fontSize: 20, fontWeight: 600, color: '#1B3A2E', lineHeight: 1.2 }}>{s.name}</div>
       {price != null && price > 0 && (
         <div>
-          <span style={{ fontSize: 28, fontWeight: 700, color: '#2c1a0e' }}>${price.toLocaleString()}</span>
-          <span style={{ fontSize: 12, color: '#6b3f1f', marginLeft: 4 }}>/ year</span>
+          <span style={{ fontSize: 28, fontWeight: 700, color: '#1B3A2E' }}>${price.toLocaleString()}</span>
+          <span style={{ fontSize: 12, color: '#2D5A3D', marginLeft: 4 }}>/ year</span>
         </div>
       )}
       {s.slots_available != null && (
-        <div style={{ fontSize: 12, color: '#9B6B22', fontWeight: 600 }}>
+        <div style={{ fontSize: 12, color: '#7C6E22', fontWeight: 600 }}>
           {s.slots_available} {s.slots_available === 1 ? 'slot' : 'slots'} available
         </div>
       )}
-      {s.blurb && <p style={{ fontSize: 13.5, color: '#4d3a26', lineHeight: 1.55, margin: 0 }}>{s.blurb}</p>}
+      {s.blurb && <p style={{ fontSize: 13.5, color: '#2D4A3D', lineHeight: 1.55, margin: 0 }}>{s.blurb}</p>}
       <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: 6 }}>
         {perks.map((p, i) => (
-          <li key={i} style={{ fontSize: 13, color: '#3a2410', display: 'flex', gap: 6, alignItems: 'flex-start' }}>
-            <span style={{ color: '#c07a3c', fontWeight: 700, flexShrink: 0 }}>✦</span>
+          <li key={i} style={{ fontSize: 13, color: '#1F4534', display: 'flex', gap: 6, alignItems: 'flex-start' }}>
+            <span style={{ color: '#6B8E5A', fontWeight: 700, flexShrink: 0 }}>✦</span>
             <span>{p}</span>
           </li>
         ))}
@@ -336,14 +336,14 @@ function SponsorCard({ sponsorship: s, highlight, cta }) {
 function EventSponsorBlock({ eventSlug, items, sponsorshipCTA }) {
   const eventName = friendlyEventName(eventSlug);
   return (
-    <div style={{ background: '#fff', border: '1px solid #EDD9B0', borderRadius: 12, overflow: 'hidden' }}>
+    <div style={{ background: '#fff', border: '1px solid #DDE5D8', borderRadius: 12, overflow: 'hidden' }}>
       <div style={{
-        background: 'linear-gradient(180deg, #3A2410, #2c1a0e)',
+        background: 'linear-gradient(180deg, #1F4534, #1B3A2E)',
         color: '#F5EAD6', padding: '14px 18px',
         display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap',
       }}>
         <div>
-          <div style={{ fontSize: 11, letterSpacing: 1.4, textTransform: 'uppercase', color: '#c0a070', fontWeight: 700 }}>Event sponsorship</div>
+          <div style={{ fontSize: 11, letterSpacing: 1.4, textTransform: 'uppercase', color: '#B5C9A5', fontWeight: 700 }}>Event sponsorship</div>
           <div style={{ fontSize: 18, fontWeight: 600, marginTop: 2 }}>{eventName}</div>
         </div>
         <div style={{ fontSize: 12, color: 'rgba(245,234,214,0.7)' }}>
@@ -361,18 +361,18 @@ function EventSponsorBlock({ eventSlug, items, sponsorshipCTA }) {
         </thead>
         <tbody>
           {items.map((s) => (
-            <tr key={s.id} style={{ borderTop: '1px solid #EDD9B0' }}>
+            <tr key={s.id} style={{ borderTop: '1px solid #DDE5D8' }}>
               <td style={td}>
-                <div style={{ fontWeight: 600, color: '#2c1a0e' }}>{s.name.replace(/^.*?—\s*/, '')}</div>
-                {s.blurb && <div style={{ fontSize: 12.5, color: '#6b3f1f', marginTop: 2 }}>{s.blurb}</div>}
+                <div style={{ fontWeight: 600, color: '#1B3A2E' }}>{s.name.replace(/^.*?—\s*/, '')}</div>
+                {s.blurb && <div style={{ fontSize: 12.5, color: '#2D5A3D', marginTop: 2 }}>{s.blurb}</div>}
                 {Array.isArray(s.perks) && s.perks.length > 0 && (
-                  <div style={{ fontSize: 12, color: '#4d3a26', marginTop: 4 }}>{s.perks.join(' · ')}</div>
+                  <div style={{ fontSize: 12, color: '#2D4A3D', marginTop: 4 }}>{s.perks.join(' · ')}</div>
                 )}
               </td>
-              <td style={{ ...td, textAlign: 'right', fontVariantNumeric: 'tabular-nums', fontWeight: 700, color: '#2c1a0e' }}>
+              <td style={{ ...td, textAlign: 'right', fontVariantNumeric: 'tabular-nums', fontWeight: 700, color: '#1B3A2E' }}>
                 ${Number(s.price_usd || 0).toLocaleString()}
               </td>
-              <td style={{ ...td, textAlign: 'right', fontVariantNumeric: 'tabular-nums', color: s.slots_available === 1 ? '#9B2222' : '#9B6B22', fontWeight: 600 }}>
+              <td style={{ ...td, textAlign: 'right', fontVariantNumeric: 'tabular-nums', color: s.slots_available === 1 ? '#9B2222' : '#7C6E22', fontWeight: 600 }}>
                 {s.slots_available == null ? 'open' : s.slots_available}
               </td>
               <td style={{ ...td, textAlign: 'right' }}>{sponsorshipCTA(s)}</td>
@@ -384,7 +384,7 @@ function EventSponsorBlock({ eventSlug, items, sponsorshipCTA }) {
   );
 }
 
-const th = { padding: '10px 14px', textAlign: 'left', fontSize: 11, fontWeight: 800, letterSpacing: 1.2, textTransform: 'uppercase', color: '#6b3f1f' };
+const th = { padding: '10px 14px', textAlign: 'left', fontSize: 11, fontWeight: 800, letterSpacing: 1.2, textTransform: 'uppercase', color: '#2D5A3D' };
 const td = { padding: '12px 14px', verticalAlign: 'top' };
 
 function labelFor(id) {

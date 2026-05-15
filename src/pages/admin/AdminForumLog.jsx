@@ -179,14 +179,14 @@ function ViolationsTable({ rows }) {
 function ActionPill({ action }) {
   const palette = {
     thread_locked:    { bg: '#FEF3F0', fg: '#991b1b' },
-    thread_unlocked:  { bg: '#ECF6E4', fg: '#2D5016' },
+    thread_unlocked:  { bg: '#ECF6E4', fg: '#1B4332' },
     thread_pinned:    { bg: '#FDF6E8', fg: '#92551E' },
     thread_unpinned:  { bg: '#F4F4F4', fg: '#666' },
-    thread_solved:    { bg: '#ECF6E4', fg: '#2D5016' },
+    thread_solved:    { bg: '#ECF6E4', fg: '#1B4332' },
     thread_unsolved:  { bg: '#F4F4F4', fg: '#666' },
     thread_deleted:   { bg: '#FEF3F0', fg: '#991b1b' },
     post_soft_deleted:{ bg: '#FEF3F0', fg: '#991b1b' },
-    post_restored:    { bg: '#ECF6E4', fg: '#2D5016' },
+    post_restored:    { bg: '#ECF6E4', fg: '#1B4332' },
   };
   const c = palette[action] || { bg: '#F4F4F4', fg: '#666' };
   return (

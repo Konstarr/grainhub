@@ -131,7 +131,7 @@ export default function CoverImageUploader({ value, onChange, folder = 'news', n
           border: '2px dashed ' + (dragOver ? 'var(--wood-warm)' : 'var(--border)'),
           borderRadius: 12,
           padding: value ? 0 : '1.5rem',
-          background: dragOver ? 'rgba(138, 80, 48, 0.06)' : 'var(--wood-cream, #FBF6EC)',
+          background: dragOver ? 'rgba(45, 106, 79, 0.06)' : 'var(--wood-cream, #FBF6EC)',
           cursor: 'pointer',
           textAlign: 'center',
           transition: 'border-color 120ms, background 120ms',

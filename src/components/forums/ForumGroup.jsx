@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 export default function ForumGroup({ group }) {
   const getIconGradient = (color) => {
     const gradients = {
-      brown: 'linear-gradient(135deg, #4A2A12, #8A5030)',
+      brown: 'linear-gradient(135deg, #4A2A12, #2D6A4F)',
       green: 'linear-gradient(135deg, #1A3A10, #3A6A20)',
       blue: 'linear-gradient(135deg, #1A2E48, #2D4A78)',
       purple: 'linear-gradient(135deg, #2A1A48, #5A3A88)',
@@ -17,7 +17,7 @@ export default function ForumGroup({ group }) {
 
   const getCategoryIconGradient = (color) => {
     const gradients = {
-      brown: 'linear-gradient(135deg,#4A2A12,#8A5030)',
+      brown: 'linear-gradient(135deg,#4A2A12,#2D6A4F)',
       green: 'linear-gradient(135deg,#1A3010,#3A6A20)',
       blue: 'linear-gradient(135deg,#1A2E48,#2D4A78)',
       purple: 'linear-gradient(135deg,#2A1A48,#5A3A88)',

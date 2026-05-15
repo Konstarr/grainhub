@@ -46,7 +46,7 @@
   left: 4px;
   width: calc(50% - 4px);
   height: calc(100% - 8px);
-  background: linear-gradient(135deg, var(--wood-dark), #6B3F1F);
+  background: linear-gradient(135deg, var(--wood-dark), #2D5A3D);
   border-radius: 999px;
   transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 2px 6px rgba(43, 26, 14, 0.25);
@@ -116,7 +116,7 @@
   top: -12px;
   left: 50%;
   transform: translateX(-50%);
-  background: linear-gradient(135deg, var(--wood-warm), #8B4316);
+  background: linear-gradient(135deg, var(--wood-warm), #1F4534);
   color: #fff;
   font-family: 'Montserrat', sans-serif;
   font-size: 10.5px;
@@ -191,7 +191,7 @@
   text-decoration: none;
   transition: background 0.15s;
 }
-.tier-cta:hover { background: #8B4316; text-decoration: none; }
+.tier-cta:hover { background: #1F4534; text-decoration: none; }
 
 .tier-card:not(.tier-highlight) .tier-cta {
   background: #fff;
@@ -308,7 +308,7 @@ button.alacarte-cta:disabled {
 .tier-cta-current,
 .mb-cta-current {
   background: #ECF6E4 !important;
-  color: #2D5016 !important;
+  color: #1B4332 !important;
   border-color: #C9E0B6 !important;
   cursor: default !important;
   font-style: italic;
@@ -366,9 +366,9 @@ button.alacarte-cta:disabled {
 .tier-cta-added,
 .mb-cta-added,
 .alacarte-cta-added {
-  background: #2D5016 !important;
+  background: #1B4332 !important;
   color: #fff !important;
-  border-color: #2D5016 !important;
+  border-color: #1B4332 !important;
   cursor: pointer !important;
   transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
@@ -428,7 +428,7 @@ button.alacarte-cta:disabled {
   transition: background 0.15s;
 }
 .pricing-cart-btn:hover {
-  background: #8B4316;
+  background: #1F4534;
   color: #fff;
   text-decoration: none;
 }
@@ -631,7 +631,7 @@ button.alacarte-cta:disabled {
 }
 .mb-cta:hover { background: var(--wood-warm); color: #fff; text-decoration: none; }
 .mb-highlight .mb-cta { background: var(--wood-warm); color: #fff; }
-.mb-highlight .mb-cta:hover { background: #8B4316; }
+.mb-highlight .mb-cta:hover { background: #1F4534; }
 
 @media (max-width: 900px) {
   .mb-strip { grid-template-columns: repeat(2, 1fr); }
@@ -768,7 +768,7 @@ button.alacarte-cta:disabled {
   font-weight: 800;
   letter-spacing: 1.5px;
   text-transform: uppercase;
-  color: #3A2410;
+  color: #1F4534;
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
   position: relative;
   z-index: 1;
@@ -902,7 +902,7 @@ button.alacarte-cta:disabled {
   transition: color 0.12s;
   letter-spacing: 0.3px;
 }
-.alacarte-cta:hover { color: #8B4316; text-decoration: none; }
+.alacarte-cta:hover { color: #1F4534; text-decoration: none; }
 
 /* ── FAQ ─────────────────────────────────────────────── */
 .pricing-faq {

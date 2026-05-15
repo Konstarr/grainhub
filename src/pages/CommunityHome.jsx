@@ -314,7 +314,7 @@ export default function CommunityHome() {
         style={{
           backgroundImage: safeImageUrl(community.banner_url)
             ? `url("${safeImageUrl(community.banner_url)}")`
-            : 'linear-gradient(135deg, #2C1A0E 0%, #6B3F1F 50%, #A0522D 100%)',
+            : 'linear-gradient(135deg, #1B3A2E 0%, #2D5A3D 50%, #2D6A4F 100%)',
         }}
       >
         <div className="comm-banner-inner comm-banner-inner-rich">

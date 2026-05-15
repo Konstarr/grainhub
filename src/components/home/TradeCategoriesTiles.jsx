@@ -17,7 +17,7 @@ const TRADES = [
   { slug: 'finishing-coatings',   name: 'Finishing',           icon: '🎨', image: STORAGE + '/finishing.jpg',             color: 'linear-gradient(135deg, #5A2D3D, #A85670)' },
   { slug: 'cnc-machining',        name: 'CNC & Machining',     icon: '⚙️', image: STORAGE + '/cnc-and-machining.jpg',     color: 'linear-gradient(135deg, #1C3D5C, #3B83B8)' },
   { slug: 'wood-species',         name: 'Wood Species',        icon: '🌳', image: STORAGE + '/wood-species.jpg',          color: 'linear-gradient(135deg, #2D3F1F, #6A8A3F)' },
-  { slug: 'hardware-accessories', name: 'Hardware',            icon: '🔩', image: STORAGE + '/hardware.jpg',              color: 'linear-gradient(135deg, #4A2A12, #A0522D)' },
+  { slug: 'hardware-accessories', name: 'Hardware',            icon: '🔩', image: STORAGE + '/hardware.jpg',              color: 'linear-gradient(135deg, #4A2A12, #2D6A4F)' },
   { slug: 'safety-standards',     name: 'Safety & Standards',  icon: '🛡️', image: STORAGE + '/safety-and-standards.jpg',  color: 'linear-gradient(135deg, #5A3E0E, #B08A2E)' },
   { slug: 'business-ops',         name: 'Business & Ops',      icon: '📊', image: STORAGE + '/business-and-ops.jpg',      color: 'linear-gradient(135deg, #3D1F3A, #7A4970)' },
 ];
@@ -45,7 +45,7 @@ export default function TradeCategoriesTiles() {
               style={{
                 backgroundImage: `url('${t.image}')`,
                 // Fallback gradient behind the image in case the URL fails.
-                backgroundColor: '#3A2410',
+                backgroundColor: '#1F4534',
               }}
             >
               {/* Color-tinted scrim on top of the photo — pulls each tile

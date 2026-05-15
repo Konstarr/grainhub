@@ -8,7 +8,7 @@ export default function Gallery({ listing }) {
   if (images.length === 0) {
     return (
       <div className="gallery">
-        <div className="gallery-main" style={{ background: 'linear-gradient(135deg,#2C1A0E,#6B3F1F)' }}>
+        <div className="gallery-main" style={{ background: 'linear-gradient(135deg,#1B3A2E,#2D5A3D)' }}>
           <div className="gallery-badges">
             {listing && listing.condition && (
               <span className="gallery-badge gb-cond">{listing.condition}</span>
@@ -26,7 +26,7 @@ export default function Gallery({ listing }) {
     <div className="gallery">
       <div
         className="gallery-main"
-        style={{ background: 'url("' + activeUrl + '") center/cover no-repeat, #2C1A0E' }}
+        style={{ background: 'url("' + activeUrl + '") center/cover no-repeat, #1B3A2E' }}
       >
         <div className="gallery-badges">
           {listing && listing.condition && (

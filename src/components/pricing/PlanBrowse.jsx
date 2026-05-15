@@ -413,8 +413,8 @@ function MembershipStrip({ tiers, locked = false, currentMembershipId }) {
 }
 
 const PACK_VISUALS = {
-  recruiter: { icon: '👥', gradient: 'linear-gradient(135deg, #2D5016 0%, #5A8F3A 100%)' },
-  vendor:    { icon: '🛒', gradient: 'linear-gradient(135deg, #8B4316 0%, #C07A3C 100%)' },
+  recruiter: { icon: '👥', gradient: 'linear-gradient(135deg, #1B4332 0%, #5A8F3A 100%)' },
+  vendor:    { icon: '🛒', gradient: 'linear-gradient(135deg, #1F4534 0%, #6B8E5A 100%)' },
   supplier:  { icon: '🏭', gradient: 'linear-gradient(135deg, #1C4A6E 0%, #3B83B8 100%)' },
 };
 

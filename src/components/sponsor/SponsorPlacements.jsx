@@ -213,7 +213,7 @@ export default function SponsorPlacements() {
                     width: '26px',
                     height: '26px',
                     borderRadius: '50%',
-                    background: '#2D5016',
+                    background: '#1B4332',
                     flexShrink: 0,
                   }}
                 ></div>

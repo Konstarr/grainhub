@@ -31,7 +31,7 @@ export const HERO_STORY = {
   kicker: { label: 'Industry Report', color: 'default' },
   title: 'Cabinet & Millwork Revenue Up 8.4% in Q1 as Custom Residential Demand Accelerates Nationwide',
   excerpt: "AWMAC's quarterly index shows strong demand driven by high-end remodels and new custom residential builds, while commercial office millwork softens. Material costs are stabilizing after two years of significant volatility in hardwood and sheet goods.",
-  imgGradient: 'linear-gradient(135deg, #1C0E05 0%, #3D2010 35%, #6B3820 65%, #9A5030 100%)',
+  imgGradient: 'linear-gradient(135deg, #0F2A1F 0%, #3D2010 35%, #6B3820 65%, #9A5030 100%)',
   author: { initials: 'JK', name: 'JonahKirk' },
   publishedDate: '3 hours ago',
   readTime: '8 min read',

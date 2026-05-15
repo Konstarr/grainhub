@@ -54,7 +54,7 @@
   font-family: 'Montserrat', sans-serif;
   transition: background 0.15s;
 }
-.comm-new-btn:hover { background: #8B4316; text-decoration: none; }
+.comm-new-btn:hover { background: #1F4534; text-decoration: none; }
 
 /* ── Grid + cards ── */
 .comm-grid {
@@ -130,7 +130,7 @@
   border: 1px solid var(--border-light);
 }
 .comm-icon-fallback {
-  background: linear-gradient(135deg, #6B3F1F, #A0522D);
+  background: linear-gradient(135deg, #2D5A3D, #2D6A4F);
   color: #fff;
   border-radius: 50%;
   display: inline-flex;
@@ -166,7 +166,7 @@
   color: #fff;
   border-color: var(--wood-warm);
 }
-.comm-btn.primary:hover { background: #8B4316; color: #fff; }
+.comm-btn.primary:hover { background: #1F4534; color: #fff; }
 .comm-btn.ghost {
   background: transparent;
   color: var(--text-secondary);
@@ -452,7 +452,7 @@ textarea.comm-input { resize: vertical; min-height: 90px; }
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #6B3F1F, #A0522D);
+  background: linear-gradient(135deg, #2D5A3D, #2D6A4F);
   color: #fff;
   display: flex;
   align-items: center;
@@ -645,7 +645,7 @@ textarea.comm-input { resize: vertical; min-height: 90px; }
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #6B3F1F, #A0522D);
+  background: linear-gradient(135deg, #2D5A3D, #2D6A4F);
   color: #fff;
   display: flex;
   align-items: center;
@@ -720,7 +720,7 @@ textarea.comm-input { resize: vertical; min-height: 90px; }
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #6B3F1F, #A0522D);
+  background: linear-gradient(135deg, #2D5A3D, #2D6A4F);
   color: #fff;
   display: flex;
   align-items: center;
@@ -809,7 +809,7 @@ textarea.comm-input { resize: vertical; min-height: 90px; }
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #6B3F1F, #A0522D);
+  background: linear-gradient(135deg, #2D5A3D, #2D6A4F);
   color: #fff;
   display: flex;
   align-items: center;
@@ -931,7 +931,7 @@ textarea.comm-input { resize: vertical; min-height: 90px; }
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #6B3F1F, #A0522D);
+  background: linear-gradient(135deg, #2D5A3D, #2D6A4F);
   color: #fff;
   display: flex;
   align-items: center;
@@ -1042,8 +1042,8 @@ textarea.comm-input { resize: vertical; min-height: 90px; }
   height: 28px;
   border-radius: 50%;
   overflow: hidden;
-  border: 2px solid #3A2410;
-  background: linear-gradient(135deg, #6B3F1F, #A0522D);
+  border: 2px solid #1F4534;
+  background: linear-gradient(135deg, #2D5A3D, #2D6A4F);
   color: #fff;
   display: inline-flex;
   align-items: center;
@@ -1204,16 +1204,16 @@ textarea.comm-input { resize: vertical; min-height: 90px; }
 }
 
 /* Individual tints per post type (applied to .active and card-typebar chips) */
-.comm-type-chip.tint-discussion.active   { background: #6B3F1F; border-color: #6B3F1F; }
+.comm-type-chip.tint-discussion.active   { background: #2D5A3D; border-color: #2D5A3D; }
 .comm-type-chip.tint-question.active     { background: #2E6F8F; border-color: #2E6F8F; }
-.comm-type-chip.tint-showcase.active     { background: #8B4316; border-color: #8B4316; }
+.comm-type-chip.tint-showcase.active     { background: #1F4534; border-color: #1F4534; }
 .comm-type-chip.tint-announcement.active { background: #8E6A16; border-color: #8E6A16; }
 
 /* Inactive tint variations — subtle tinted background so the chip
    hints at its category even when you haven't picked it. */
-.comm-type-chip.tint-discussion:not(.active)   { background: #F5EAD6; color: #6B3F1F; border-color: #E0CEA5; }
+.comm-type-chip.tint-discussion:not(.active)   { background: #F5EAD6; color: #2D5A3D; border-color: #E0CEA5; }
 .comm-type-chip.tint-question:not(.active)     { background: #E6F1FB; color: #2E6F8F; border-color: #BFDCEF; }
-.comm-type-chip.tint-showcase:not(.active)     { background: #FBEDE0; color: #8B4316; border-color: #E5C9A6; }
+.comm-type-chip.tint-showcase:not(.active)     { background: #FBEDE0; color: #1F4534; border-color: #E5C9A6; }
 .comm-type-chip.tint-announcement:not(.active) { background: #FBF4D9; color: #8E6A16; border-color: #E5D8A0; }
 
 /* Pinned group ribbon + post-card pinned state */
@@ -1237,7 +1237,7 @@ textarea.comm-input { resize: vertical; min-height: 90px; }
 
 .post-card-pinned {
   border-color: var(--wood-warm);
-  box-shadow: 0 0 0 2px rgba(138, 80, 48, 0.06), 0 1px 3px rgba(43, 26, 14, 0.04);
+  box-shadow: 0 0 0 2px rgba(45, 106, 79, 0.06), 0 1px 3px rgba(43, 26, 14, 0.04);
 }
 .post-card-typebar {
   display: flex;
@@ -1253,7 +1253,7 @@ textarea.comm-input { resize: vertical; min-height: 90px; }
   letter-spacing: 1.2px;
   text-transform: uppercase;
   color: var(--wood-warm);
-  background: rgba(138, 80, 48, 0.08);
+  background: rgba(45, 106, 79, 0.08);
   padding: 3px 8px;
   border-radius: 999px;
 }

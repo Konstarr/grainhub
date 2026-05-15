@@ -185,12 +185,12 @@ export default function AdminWiki() {
 
 function KpiTile({ label, value, accent }) {
   const palette = accent === 'green' ? { bg: '#DDEFD3', fg: '#2E6F2E' }
-                : accent === 'amber' ? { bg: '#F5EAD6', fg: '#6B3F1F' }
+                : accent === 'amber' ? { bg: '#F5EAD6', fg: '#2D5A3D' }
                 : { bg: '#fff', fg: '#1c1c1c' };
   return (
     <div style={{
       background: palette.bg, color: palette.fg,
-      border: '1px solid var(--border-light, #EDD9B0)',
+      border: '1px solid var(--border-light, #DDE5D8)',
       borderRadius: 10, padding: '12px 14px',
     }}>
       <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.6, textTransform: 'uppercase', opacity: 0.7 }}>{label}</div>

@@ -13,7 +13,7 @@ export default function HeroStory({ story }) {
     teal: 'teal',
   };
 
-  const fallbackGradient = 'linear-gradient(135deg,#1C0E05,#6B3820)';
+  const fallbackGradient = 'linear-gradient(135deg,#0F2A1F,#6B3820)';
   const bg = s.coverImage
     ? `url("${s.coverImage}") center/cover no-repeat, ${s.imgGradient || fallbackGradient}`
     : (s.imgGradient || fallbackGradient);

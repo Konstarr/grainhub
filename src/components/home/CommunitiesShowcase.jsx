@@ -67,7 +67,7 @@ const ACCENTS = [
   'linear-gradient(135deg, #3A1F0A, #7A4420)',
   'linear-gradient(135deg, #2C4830, #5A8F3A)',
   'linear-gradient(135deg, #1C3D5C, #3B83B8)',
-  'linear-gradient(135deg, #4A2A12, #A0522D)',
+  'linear-gradient(135deg, #4A2A12, #2D6A4F)',
   'linear-gradient(135deg, #3D1F3A, #7A4970)',
   'linear-gradient(135deg, #5A3E0E, #B08A2E)',
 ];

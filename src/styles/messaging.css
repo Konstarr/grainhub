@@ -141,7 +141,7 @@
 }
 .msg-req-btn:hover { background: var(--wood-cream, #FBF6EC); border-color: var(--wood-warm); }
 .msg-req-btn.accept {
-  background: linear-gradient(135deg, #8A5030, #6B3D20);
+  background: linear-gradient(135deg, #2D6A4F, #6B3D20);
   color: #fff;
   border-color: transparent;
 }
@@ -192,7 +192,7 @@
 }
 .chat-msg.me {
   align-self: flex-end;
-  background: linear-gradient(135deg, #8A5030, #6B3D20);
+  background: linear-gradient(135deg, #2D6A4F, #6B3D20);
   color: #fff;
   border-bottom-right-radius: 4px;
 }
@@ -247,7 +247,7 @@
 .chat-send {
   padding: 0.6rem 1.25rem;
   border-radius: 999px;
-  background: linear-gradient(135deg, #8A5030, #6B3D20);
+  background: linear-gradient(135deg, #2D6A4F, #6B3D20);
   color: #fff;
   border: none;
   font: inherit;

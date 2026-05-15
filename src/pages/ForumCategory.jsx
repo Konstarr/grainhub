@@ -12,7 +12,7 @@ import { FORUM_GROUPS } from '../data/forumsData.js';
 
 const AV_PALETTE = ['av-a', 'av-b', 'av-c', 'av-d', 'av-e'];
 const CAT_COLORS = [
-  { bg: '#EDE0C4', text: '#6B3F1F' },
+  { bg: '#EDE0C4', text: '#2D5A3D' },
   { bg: '#E6F1FB', text: '#185FA5' },
   { bg: '#E9F5E6', text: '#2E6F2E' },
   { bg: '#FBEDE0', text: '#A05C1F' },

@@ -205,7 +205,7 @@ const labelStyle = {
 function pillBtn(variant) {
   if (variant === 'solid') {
     return {
-      background: 'var(--wood-warm, #8A5030)',
+      background: 'var(--wood-warm, #2D6A4F)',
       color: '#fff',
       border: 'none',
       borderRadius: 999,

@@ -153,7 +153,7 @@ export default function AdminForumReputation() {
             >
               {busy ? 'Saving…' : 'Save all settings'}
             </button>
-            {okMsg && <span style={{ color: '#2D5016', fontSize: 13 }}>{okMsg}</span>}
+            {okMsg && <span style={{ color: '#1B4332', fontSize: 13 }}>{okMsg}</span>}
             {err && <span style={{ color: '#991b1b', fontSize: 13 }}>{err}</span>}
           </div>
 

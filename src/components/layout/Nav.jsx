@@ -79,7 +79,7 @@ export default function Nav() {
 
   const avatarBg = profile?.avatar_url
     ? 'url(' + profile.avatar_url + ') center/cover no-repeat'
-    : 'linear-gradient(135deg, #6B3F1F, #A0522D)';
+    : 'linear-gradient(135deg, #2D5A3D, #2D6A4F)';
 
   return (
     <nav className="site-nav">
@@ -253,7 +253,7 @@ export default function Nav() {
                           justifyContent: 'center',
                           width: 18, height: 18,
                           borderRadius: 4,
-                          background: 'linear-gradient(135deg, #c07a3c, #8a5030)',
+                          background: 'linear-gradient(135deg, #6B8E5A, #2D6A4F)',
                               color: '#fff',
                           fontSize: 10,
                           fontWeight: 700,
@@ -321,7 +321,7 @@ function AccountTypePill({ accountType, membershipTier }) {
 
   const palette = isBusiness
     ? { bg: '#E6F1FB', fg: '#185FA5', border: '#BFDCEF' }
-    : { bg: '#F5EAD6', fg: '#6B3F1F', border: '#E0CDA7' };
+    : { bg: '#F5EAD6', fg: '#2D5A3D', border: '#E0CDA7' };
 
   return (
     <span

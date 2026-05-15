@@ -207,7 +207,7 @@ export default function EventDetail() {
                     alignItems: 'center',
                     padding: '0.6rem 1.25rem',
                     borderRadius: 999,
-                    background: 'linear-gradient(135deg, #8A5030, #6B3D20)',
+                    background: 'linear-gradient(135deg, #2D6A4F, #6B3D20)',
                     color: '#fff',
                     textDecoration: 'none',
                     fontSize: 14,

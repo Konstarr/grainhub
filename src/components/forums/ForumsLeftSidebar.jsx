@@ -294,7 +294,7 @@ function CommIconSmall({ c }) {
   return (
     <span style={{
       width: 20, height: 20, borderRadius: '50%',
-      background: 'linear-gradient(135deg, #6B3F1F, #A0522D)',
+      background: 'linear-gradient(135deg, #2D5A3D, #2D6A4F)',
       color: '#fff', fontSize: 9, fontWeight: 700,
       display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
       flexShrink: 0, letterSpacing: 0.3,

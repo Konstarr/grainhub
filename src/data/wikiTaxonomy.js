@@ -39,7 +39,7 @@ export const CLUSTERS = [
     ],
   },
   {
-    key: 'Joinery', slug: 'joinery', icon: 'JN', accent: '#8a5030',
+    key: 'Joinery', slug: 'joinery', icon: 'JN', accent: '#2D6A4F',
     desc: 'Every named joint, with diagrams and proportions.',
     longDesc: 'The full vocabulary of woodworking joints: how each one is cut, when to use it, and the trade-offs between traditions.',
     subtopics: [

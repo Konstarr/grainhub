@@ -281,7 +281,7 @@ function ReportTarget({ targetType, target }) {
 function ActionBtn({ children, onClick, busy, variant }) {
   const palette = {
     danger:  { bg: '#fef2f2', fg: '#991b1b', bd: '#fecaca' },
-    success: { bg: '#ECF6E4', fg: '#2D5016', bd: '#C9E0B6' },
+    success: { bg: '#ECF6E4', fg: '#1B4332', bd: '#C9E0B6' },
     default: { bg: '#fff',    fg: 'var(--text-secondary)', bd: 'var(--border)' },
   };
   const c = palette[variant] || palette.default;
@@ -341,7 +341,7 @@ function StatusPill({ status }) {
   const map = {
     open:      { bg: '#FEF3F0', fg: '#991b1b' },
     reviewing: { bg: '#FDF6E8', fg: '#92551E' },
-    resolved:  { bg: '#ECF6E4', fg: '#2D5016' },
+    resolved:  { bg: '#ECF6E4', fg: '#1B4332' },
     dismissed: { bg: 'var(--border-light)', fg: 'var(--text-muted)' },
   };
   const c = map[status] || map.open;

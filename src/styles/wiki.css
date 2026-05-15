@@ -14,7 +14,7 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse at top right, rgba(160, 82, 45, 0.08), transparent 60%);
+  background: radial-gradient(ellipse at top right, rgba(45, 106, 79, 0.08), transparent 60%);
   pointer-events: none;
 }
 .wiki-hero .hero-inner {
@@ -68,14 +68,14 @@
   background: var(--white);
   border: 1px solid var(--border);
   border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(44, 26, 14, 0.06);
+  box-shadow: 0 2px 8px rgba(27, 58, 46, 0.06);
   max-width: 640px;
   overflow: hidden;
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 .wiki-search:focus-within {
   border-color: var(--wood-warm);
-  box-shadow: 0 0 0 3px rgba(160, 82, 45, 0.15);
+  box-shadow: 0 0 0 3px rgba(45, 106, 79, 0.15);
 }
 .ws-icon {
   padding: 0 0.75rem 0 1rem;
@@ -136,10 +136,10 @@
   border-radius: 10px;
   padding: 1rem 1.25rem;
   min-width: 140px;
-  box-shadow: 0 1px 4px rgba(44, 26, 14, 0.04);
+  box-shadow: 0 1px 4px rgba(27, 58, 46, 0.04);
   transition: transform 0.15s, box-shadow 0.15s;
 }
-.hero-stat:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(44, 26, 14, 0.08); }
+.hero-stat:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(27, 58, 46, 0.08); }
 .hs-num {
   font-family: 'Montserrat', sans-serif;
   font-size: 28px;
@@ -174,7 +174,7 @@
   border: 1px solid var(--border-light);
   border-radius: 12px;
   padding: 1rem;
-  box-shadow: 0 1px 4px rgba(44, 26, 14, 0.04);
+  box-shadow: 0 1px 4px rgba(27, 58, 46, 0.04);
 }
 .wln-header {
   font-family: 'Montserrat', sans-serif;
@@ -287,11 +287,11 @@
   padding: 1.5rem 1.75rem;
   margin-bottom: 2rem;
   transition: transform 0.15s, box-shadow 0.15s;
-  box-shadow: 0 1px 4px rgba(44, 26, 14, 0.04);
+  box-shadow: 0 1px 4px rgba(27, 58, 46, 0.04);
 }
 .featured-article:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(44, 26, 14, 0.1);
+  box-shadow: 0 8px 20px rgba(27, 58, 46, 0.1);
 }
 .fa-img { display: none; }
 .fa-body { padding: 0; }
@@ -345,7 +345,7 @@
   border: 1px solid var(--border-light);
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 1px 4px rgba(44, 26, 14, 0.04);
+  box-shadow: 0 1px 4px rgba(27, 58, 46, 0.04);
 }
 .article-card {
   display: block;
@@ -403,7 +403,7 @@
   grid-template-columns: 1fr auto;
   gap: 2rem;
   align-items: center;
-  box-shadow: 0 4px 14px rgba(44, 26, 14, 0.18);
+  box-shadow: 0 4px 14px rgba(27, 58, 46, 0.18);
 }
 .cc-title {
   font-family: 'Montserrat', sans-serif;
@@ -467,7 +467,7 @@
   background: var(--white);
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 1px 4px rgba(44, 26, 14, 0.04);
+  box-shadow: 0 1px 4px rgba(27, 58, 46, 0.04);
 }
 .rs-header {
   background: var(--wood-cream);
@@ -541,7 +541,7 @@
   padding: 1.25rem;
   background: linear-gradient(135deg, var(--wood-paper), var(--wood-cream));
   border-radius: 12px;
-  box-shadow: 0 1px 4px rgba(44, 26, 14, 0.04);
+  box-shadow: 0 1px 4px rgba(27, 58, 46, 0.04);
 }
 .sp-label {
   font-family: 'Montserrat', sans-serif;

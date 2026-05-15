@@ -309,7 +309,7 @@ function RateLimitCard() {
         >
           {busy ? 'Saving…' : 'Save limits'}
         </button>
-        {saved && <span style={{ color: '#2D5016', fontSize: 12 }}>{saved}</span>}
+        {saved && <span style={{ color: '#1B4332', fontSize: 12 }}>{saved}</span>}
         {err && <span style={{ color: '#991b1b', fontSize: 12 }}>{err}</span>}
       </div>
       <div style={{ marginTop: 6, fontSize: 11.5, color: 'var(--text-muted)' }}>

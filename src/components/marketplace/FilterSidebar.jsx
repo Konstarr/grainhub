@@ -182,7 +182,7 @@ export default function FilterSidebar({ filters, onFilterChange, onClearAll }) {
                         fontSize: 12,
                         borderRadius: 999,
                         border: '1px solid var(--border)',
-                        background: (filters.distanceRadius || 50) === r ? 'var(--wood-warm, #8a5030)' : '#fff',
+                        background: (filters.distanceRadius || 50) === r ? 'var(--wood-warm, #2D6A4F)' : '#fff',
                         color: (filters.distanceRadius || 50) === r ? '#fff' : 'var(--text-primary)',
                         cursor: 'pointer',
                         fontWeight: 600,

@@ -208,7 +208,7 @@ export const RECENT_EDITS = [
   {
     title: 'Frameless Cabinet Construction',
     subtitle: 'Expanded installation sequence, added out-of-square steps',
-    category: { label: 'Construction', bgColor: '#EDE0C4', textColor: '#6B3F1F' },
+    category: { label: 'Construction', bgColor: '#EDE0C4', textColor: '#2D5A3D' },
     editor: { initials: 'MB', name: 'MikeBrosnan', bgColor: '#5F3091' },
     time: '2 hours ago',
   },
@@ -216,13 +216,13 @@ export const RECENT_EDITS = [
     title: 'KCMA A161.1 Performance Standard',
     subtitle: 'Updated to 2025 edition, added new load-cycle test table',
     category: { label: 'Standards', bgColor: '#E6F1FB', textColor: '#185FA5' },
-    editor: { initials: 'DL', name: 'DianeLachapelle', bgColor: '#2D5016' },
+    editor: { initials: 'DL', name: 'DianeLachapelle', bgColor: '#1B4332' },
     time: 'Yesterday',
   },
   {
     title: 'White Oak — Species Profile',
     subtitle: 'Added quartersawn section, updated pricing data',
-    category: { label: 'Species', bgColor: '#EAF3DE', textColor: '#2D5016' },
+    category: { label: 'Species', bgColor: '#EAF3DE', textColor: '#1B4332' },
     editor: { initials: 'SR', name: 'SaraRomero', bgColor: '#1565C0' },
     time: '3 days ago',
   },
@@ -237,13 +237,13 @@ export const RECENT_EDITS = [
     title: 'Troubleshooting Fish Eyes in Lacquer',
     subtitle: 'Added section on silicone contamination sources',
     category: { label: 'Finishing', bgColor: '#F3EAFE', textColor: '#5F3091' },
-    editor: { initials: 'KR', name: 'KarenReid', bgColor: '#A0522D' },
+    editor: { initials: 'KR', name: 'KarenReid', bgColor: '#2D6A4F' },
     time: '5 days ago',
   },
   {
     title: 'Shop Labor Rate Calculator',
     subtitle: 'Updated formula for 2025 burden rate benchmarks',
-    category: { label: 'Business', bgColor: '#EDE0C4', textColor: '#6B3F1F' },
+    category: { label: 'Business', bgColor: '#EDE0C4', textColor: '#2D5A3D' },
     editor: { initials: 'RG', name: 'RGarner', bgColor: '#0F6E56' },
     time: '1 week ago',
   },
@@ -269,8 +269,8 @@ export const FEATURED_QUALITY = [
 
 export const TOP_CONTRIBUTORS = [
   { initials: 'MB', name: 'MikeBrosnan', edits: '84 edits this month', points: '9,870 pts', bgColor: '#5F3091' },
-  { initials: 'DL', name: 'DianeLachapelle', edits: '52 edits this month', points: '4,210 pts', bgColor: '#2D5016' },
+  { initials: 'DL', name: 'DianeLachapelle', edits: '52 edits this month', points: '4,210 pts', bgColor: '#1B4332' },
   { initials: 'SR', name: 'SaraRomero', edits: '38 edits this month', points: '2,140 pts', bgColor: '#1565C0' },
   { initials: 'JP', name: 'JakeParsons', edits: '24 edits this month', points: '980 pts', bgColor: '#B45309' },
-  { initials: 'KR', name: 'KarenReid', edits: '19 edits this month', points: '842 pts', bgColor: '#A0522D' },
+  { initials: 'KR', name: 'KarenReid', edits: '19 edits this month', points: '842 pts', bgColor: '#2D6A4F' },
 ];
