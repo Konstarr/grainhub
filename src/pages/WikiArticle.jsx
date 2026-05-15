@@ -187,10 +187,10 @@ export default function WikiArticle() {
     <>
       <PageBack
         backTo="/wiki"
-        backLabel="Back to Wiki"
+        backLabel="Back to Resources"
         crumbs={[
           { label: 'Home', to: '/' },
-          { label: 'Wiki', to: '/wiki' },
+          { label: 'Resources', to: '/wiki' },
           { label: title },
         ]}
       />

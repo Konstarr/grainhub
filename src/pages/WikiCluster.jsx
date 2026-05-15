@@ -83,7 +83,7 @@ export default function WikiCluster() {
   if (!cluster) {
     return (
       <div className="wiki-dash">
-        <PageBack backTo="/wiki" backLabel="Back to Wiki" />
+        <PageBack backTo="/wiki" backLabel="Back to Resources" />
         <div style={{ maxWidth: 720, margin: '3rem auto', padding: '0 2rem' }}>
           <h1>Field not found</h1>
           <Link to="/wiki">Back to the encyclopedia</Link>
@@ -98,10 +98,10 @@ export default function WikiCluster() {
     <div className="wiki-dash">
       <PageBack
         backTo="/wiki"
-        backLabel="Back to Wiki"
+        backLabel="Back to Resources"
         crumbs={[
           { label: 'Home', to: '/' },
-          { label: 'Wiki', to: '/wiki' },
+          { label: 'Resources', to: '/wiki' },
           { label: cluster.key, to: '/wiki/cluster/' + cluster.slug },
           ...(activeTopic ? [{ label: activeTopic }] : []),
         ]}

@@ -71,7 +71,7 @@ import SupplierProfile from './pages/SupplierProfile.jsx';
 import Signup from './pages/Signup.jsx';
 import Login from './pages/Login.jsx';
 import AuthCallback from './pages/AuthCallback.jsx';
-import AccountSubscription from './pages/AccountSubscription.jsx';
+import Membership from './pages/Membership.jsx';
 import Events from './pages/Events.jsx';
 import EventDetail from './pages/EventDetail.jsx';
 import Profile from './pages/Profile.jsx';
@@ -163,7 +163,7 @@ export default function App() {
           <Route path="/suppliers" element={<Suppliers />} />
           <Route path="/events" element={<Events />} />
           <Route path="/events/:slug" element={<RequireAuth><EventDetail /></RequireAuth>} />
-          <Route path="/membership" element={<AccountSubscription />} />
+          <Route path="/membership" element={<Membership />} />
           <Route path="/account/subscription" element={<Navigate to="/membership" replace />} />
           <Route path="/pricing" element={<Navigate to="/membership" replace />} />
           {/* Decommissioned in the AWI Florida rebrand. Redirects keep old links working. */}
@@ -206,3 +206,4 @@ export default function App() {
     </AuthProvider>
   );
 }
+                           

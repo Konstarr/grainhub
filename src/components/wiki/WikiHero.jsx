@@ -55,9 +55,4 @@ export default function WikiHero({ searchQuery = '', onSearchChange, onSearchSub
             <span className="search-sug" onClick={() => { onSearchChange && onSearchChange('hard maple'); submit(); }}> · Hard Maple</span>
             <span className="search-sug" onClick={() => { onSearchChange && onSearchChange('edge banding'); submit(); }}> · Edge Banding</span>
             <span className="search-sug" onClick={() => { onSearchChange && onSearchChange('CNC'); submit(); }}> · CNC</span>
-          </div>
-        </div>
-      </div>
-    </>
-  );
-}
+        

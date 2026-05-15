@@ -99,13 +99,13 @@ export default function Suppliers() {
 
   // Landing mode: two preview lists (10 each).
   const { data: vendorRows } = useSupabaseList('suppliers', {
-    filter: (q) => q.eq('is_approved', true).eq('kind', 'vendor'),
+    filter: (q) => q.eq('is_approved', true).eq('kind', 'vendor').or('address.ilike.%, FL %,address.ilike.%, FL,%,address.ilike.%Florida%'),
     order:  { column: 'rating', ascending: false },
     limit:  PREVIEW_LIMIT,
     deps:   ['preview-vendor'],
   });
   const { data: mfrRows } = useSupabaseList('suppliers', {
-    filter: (q) => q.eq('is_approved', true).eq('kind', 'manufacturer'),
+    filter: (q) => q.eq('is_approved', true).eq('kind', 'manufacturer').or('address.ilike.%, FL %,address.ilike.%, FL,%,address.ilike.%Florida%'),
     order:  { column: 'rating', ascending: false },
     limit:  PREVIEW_LIMIT,
     deps:   ['preview-manufacturer'],
@@ -113,7 +113,7 @@ export default function Suppliers() {
 
   // Focused mode: one full list, by kind.
   const { data: focusedRows } = useSupabaseList('suppliers', {
-    filter: (q) => q.eq('is_approved', true).eq('kind', focusedKind || 'vendor'),
+    filter: (q) => q.eq('is_approved', true).eq('kind', focusedKind || 'vendor').or('address.ilike.%, FL %,address.ilike.%, FL,%,address.ilike.%Florida%'),
     order:  { column: 'rating', ascending: false },
     limit:  100,
     deps:   ['focused-' + (focusedKind || 'vendor')],

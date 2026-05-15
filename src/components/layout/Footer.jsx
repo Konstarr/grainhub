@@ -3,45 +3,36 @@ import { Link } from 'react-router-dom';
 
 const FOOTER_COLS = [
   {
+    heading: 'Chapter',
+    links: [
+      { label: 'Membership',        to: '/membership' },
+      { label: 'Member Directory',  to: '/suppliers' },
+      { label: 'Events Calendar',   to: '/events' },
+      { label: 'News',              to: '/news' },
+    ],
+  },
+  {
     heading: 'Community',
     links: [
-      { label: 'Forums', to: '/forums' },
-      { label: 'Industry Wiki', to: '/wiki' },
-      { label: 'News & Analysis', to: '/news' },
-      { label: 'Events Calendar', to: '/events' },
-      { label: 'Member Directory', to: '/suppliers' },
+      { label: 'Forums',            to: '/forums' },
+      { label: 'Resources',         to: '/wiki' },
+      { label: 'Forum Rules',       to: '/community-rules' },
     ],
   },
   {
-    heading: 'Marketplace',
+    heading: 'About AWI',
     links: [
-      { label: 'Machinery Listings', to: '/marketplace' },
-      { label: 'Job Board', to: '/jobs' },
-      { label: 'Supplier Directory', to: '/suppliers' },
-      { label: 'Post a Listing', to: '/sponsor' },
-      { label: 'List Your Shop', to: '/sponsor' },
+      { label: 'AWI National',      href: 'https://www.awinet.org' },
+      { label: 'QCP Program',       href: 'https://qcp.org' },
+      { label: 'Architectural Woodwork Standards', href: 'https://www.awinet.org/aws' },
     ],
   },
   {
-    heading: 'Resources',
+    heading: 'Legal',
     links: [
-      { label: 'Estimating Templates', to: '/wiki' },
-      { label: 'Standards Library', to: '/wiki' },
-      { label: 'Species Database', to: '/wiki' },
-      { label: 'Training Guides', to: '/wiki' },
-      { label: 'Newsletter', to: '/signup' },
-    ],
-  },
-  {
-    heading: 'Company',
-    links: [
-      { label: 'About AWI Florida Chapter', to: '/' },
-      { label: 'Advertise / Sponsor', to: '/sponsor' },
-      { label: 'Media Kit', to: '/sponsor' },
-      { label: 'Contact', to: '/sponsor' },
-      { label: 'Community Rules', to: '/community-rules' },
-      { label: 'Privacy Policy', to: '/privacy' },
-      { label: 'Terms of Service', to: '/terms' },
+      { label: 'Terms of Service',  to: '/terms' },
+      { label: 'Privacy Policy',    to: '/privacy' },
+      { label: 'Community Rules',   to: '/community-rules' },
     ],
   },
 ];
@@ -53,8 +44,8 @@ export default function Footer() {
         <div className="footer-brand">
           <Logo as="div" size={32} style={{ margin: 0 }} />
           <p>
-            The modern community platform for millwork and cabinet industry professionals.
-            Built by makers, for makers.
+            The official online home of the AWI Florida Chapter — the Florida region of the
+            Architectural Woodwork Institute. Built for our members, by our members.
           </p>
         </div>
 
@@ -62,20 +53,25 @@ export default function Footer() {
           <div key={col.heading} className="footer-col">
             <h4>{col.heading}</h4>
             {col.links.map((link) => (
-              <Link key={link.label} to={link.to}>
-                {link.label}
-              </Link>
+              link.href ? (
+                <a key={link.label} href={link.href} target="_blank" rel="noopener noreferrer">
+                  {link.label}
+                </a>
+              ) : (
+                <Link key={link.label} to={link.to}>
+                  {link.label}
+                </Link>
+              )
             ))}
           </div>
         ))}
       </div>
 
       <div className="footer-bottom">
-        <span>© {new Date().getFullYear()} AWI Florida Chapter LLC. All rights reserved.</span>
+        <span>© {new Date().getFullYear()} AWI Florida Chapter. All rights reserved.</span>
         <span>
-          <Link to="/terms">Terms of Service</Link> &nbsp;·&nbsp;{' '}
-          <Link to="/privacy">Privacy</Link> &nbsp;·&nbsp;{' '}
-          <Link to="/community-rules">Community Rules</Link>
+          AWI Florida Chapter is the Florida regional chapter of the{' '}
+          <a href="https://www.awinet.org" target="_blank" rel="noopener noreferrer">Architectural Woodwork Institute</a>.
         </span>
       </div>
     </footer>
