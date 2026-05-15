@@ -6,6 +6,7 @@ const FOOTER_COLS = [
     heading: 'Chapter',
     links: [
       { label: 'Membership',        to: '/membership' },
+      { label: 'Board of Directors', to: '/board' },
       { label: 'Member Directory',  to: '/suppliers' },
       { label: 'Events Calendar',   to: '/events' },
       { label: 'News',              to: '/news' },

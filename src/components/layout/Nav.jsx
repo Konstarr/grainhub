@@ -14,6 +14,7 @@ const NAV_ITEMS = [
   { label: 'Resources', to: '/wiki' },
   { label: 'Directory', to: '/suppliers' },
   { label: 'Membership',to: '/membership' },
+  { label: 'Board',     to: '/board' },
 ];
 
 function initialsFromProfile(profile, user) {
