@@ -9,7 +9,7 @@ const FOOTER_COLS = [
       { label: 'Board of Directors', to: '/board' },
       { label: 'Member Directory',  to: '/suppliers' },
       { label: 'Events Calendar',   to: '/events' },
-      { label: 'News',              to: '/news' },
+      { label: 'Education',         to: '/education' },
     ],
   },
   {

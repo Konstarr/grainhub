@@ -19,7 +19,7 @@ function templateFor(pathname) {
   // Exact static routes first.
   const exact = new Set([
     '/', '/forums', '/wiki', '/news',
-    '/suppliers', '/events', '/membership', '/board', '/signup', '/login',
+    '/suppliers', '/events', '/membership', '/board', '/education', '/signup', '/login',
     '/contact', '/inbox', '/messages',
     '/terms', '/privacy', '/community-rules',
   ]);
@@ -73,6 +73,7 @@ import Login from './pages/Login.jsx';
 import AuthCallback from './pages/AuthCallback.jsx';
 import Membership from './pages/Membership.jsx';
 import Board from './pages/Board.jsx';
+import Education from './pages/Education.jsx';
 import Events from './pages/Events.jsx';
 import EventDetail from './pages/EventDetail.jsx';
 import Profile from './pages/Profile.jsx';
@@ -166,6 +167,7 @@ export default function App() {
           <Route path="/events/:slug" element={<RequireAuth><EventDetail /></RequireAuth>} />
           <Route path="/membership" element={<Membership />} />
           <Route path="/board" element={<Board />} />
+          <Route path="/education" element={<Education />} />
           <Route path="/account/subscription" element={<Navigate to="/membership" replace />} />
           <Route path="/pricing" element={<Navigate to="/membership" replace />} />
           {/* Decommissioned in the AWI Florida rebrand. Redirects keep old links working. */}

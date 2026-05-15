@@ -10,7 +10,7 @@ const NAV_ITEMS = [
   { label: 'Home',      to: '/' },
   { label: 'Forums',    to: '/forums' },
   { label: 'Events',    to: '/events' },
-  { label: 'News',      to: '/news' },
+  { label: 'Education', to: '/education' },
   { label: 'Resources', to: '/wiki' },
   { label: 'Directory', to: '/suppliers' },
   { label: 'Membership',to: '/membership' },
