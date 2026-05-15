@@ -1030,6 +1030,17 @@ nav.site-nav {
 
 .sponsor-logos { display: flex; gap: 1.5rem; flex: 1; align-items: center; flex-wrap: wrap; }
 
+/* Empty-state strip: no sponsors yet, but the band still says "we have sponsors —
+   become one". Italic prose in the middle, gold CTA on the right. */
+.sponsor-strip-empty { background: #FFFDF7; }
+.sponsor-empty-msg {
+  flex: 1;
+  font-size: 13.5px;
+  color: var(--text-secondary);
+  font-style: italic;
+  text-align: center;
+}
+
 /* Marquee: viewport + a track that's 2x the content, translated across. */
 .sponsor-marquee {
   flex: 1;

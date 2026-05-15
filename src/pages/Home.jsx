@@ -1,4 +1,5 @@
 import Hero from '../components/home/Hero.jsx';
+import SponsorStrip from '../components/layout/SponsorStrip.jsx';
 import StatsStrip from '../components/home/StatsStrip.jsx';
 import TradeCategoriesTiles from '../components/home/TradeCategoriesTiles.jsx';
 import NewsSection from '../components/home/NewsSection.jsx';
@@ -24,6 +25,7 @@ export default function Home() {
   return (
     <>
       <Hero />
+      <SponsorStrip />
       <StatsStrip />
       <TradeCategoriesTiles />
 

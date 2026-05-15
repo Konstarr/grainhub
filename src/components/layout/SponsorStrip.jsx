@@ -60,7 +60,19 @@ export default function SponsorStrip() {
     return () => { cancelled = true; };
   }, []);
 
-  if (assets.length === 0) return null;
+  // Empty-state: keep the strip visible with a Become-a-Sponsor CTA so the
+  // page never has a missing band where sponsors should sit.
+  if (assets.length === 0) {
+    return (
+      <div className="sponsor-strip sponsor-strip-empty">
+        <span className="sponsor-label">Sponsors</span>
+        <div className="sponsor-empty-msg">
+          AWI Florida Chapter sponsors keep our events, education, and scholarships running.
+        </div>
+        <Link to="/sponsor" className="sponsor-cta">Become a Sponsor</Link>
+      </div>
+    );
+  }
 
   const sponsors = assets.map((a) => {
     const displayName =
