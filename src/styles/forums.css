@@ -1138,8 +1138,8 @@ a.hot-topic { text-decoration: none; }
   align-items: center;
   gap: 14px;
   margin-bottom: 0;
-  background: linear-gradient(135deg, #1B3A2E 0%, #4A2A12 50%, #2D5A3D 100%);
-  border: 1px solid #1A0E06;
+  background: linear-gradient(135deg, #1F4534 0%, #1B3A2E 60%, #2D5A3D 100%);
+  border: 1px solid #1B3A2E;
   border-radius: 12px 12px 0 0;
   padding: 1rem 1.25rem;
   box-shadow:
@@ -1173,7 +1173,7 @@ a.hot-topic { text-decoration: none; }
 }
 
 .fgh-icon.brown {
-  background: linear-gradient(135deg, #4A2A12, #2D6A4F);
+  background: linear-gradient(135deg, #1F4534, #2D6A4F);
 }
 
 .fgh-icon.green {

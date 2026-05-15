@@ -3,28 +3,28 @@ import { Link } from 'react-router-dom';
 export default function ForumGroup({ group }) {
   const getIconGradient = (color) => {
     const gradients = {
-      brown:  'linear-gradient(135deg, #4A2A12, #2D6A4F)',
-      green:  'linear-gradient(135deg, #1A3A10, #3A6A20)',
+      brown:  'linear-gradient(135deg, #1F4534, #2D6A4F)',
+      green:  'linear-gradient(135deg, #1B3A2E, #2D6A4F)',
       blue:   'linear-gradient(135deg, #1A2E48, #2D4A78)',
       purple: 'linear-gradient(135deg, #2A1A48, #5A3A88)',
       teal:   'linear-gradient(135deg, #0A2A28, #1A5A58)',
       red:    'linear-gradient(135deg, #3A0A0A, #7A2020)',
       gray:   'linear-gradient(135deg, #1A1A1A, #4A4A4A)',
-      amber:  'linear-gradient(135deg, #3A2808, #7A5020)',
+      amber:  'linear-gradient(135deg, #8C7A35, #B5A04A)',
     };
     return gradients[color] || gradients.gray;
   };
 
   const getCategoryIconGradient = (color) => {
     const gradients = {
-      brown:  'linear-gradient(135deg,#4A2A12,#2D6A4F)',
-      green:  'linear-gradient(135deg,#1A3010,#3A6A20)',
+      brown:  'linear-gradient(135deg,#1F4534,#2D6A4F)',
+      green:  'linear-gradient(135deg,#1B3A2E,#2D6A4F)',
       blue:   'linear-gradient(135deg,#1A2E48,#2D4A78)',
       purple: 'linear-gradient(135deg,#2A1A48,#5A3A88)',
       teal:   'linear-gradient(135deg,#0A2A28,#1A5A58)',
       red:    'linear-gradient(135deg,#3A1010,#7A2828)',
       gray:   'linear-gradient(135deg,#1A1A1A,#4A4A4A)',
-      amber:  'linear-gradient(135deg,#3A2808,#7A5020)',
+      amber:  'linear-gradient(135deg,#8C7A35,#B5A04A)',
     };
     return gradients[color] || gradients.gray;
   };
