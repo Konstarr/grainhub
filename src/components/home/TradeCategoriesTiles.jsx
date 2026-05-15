@@ -1,25 +1,24 @@
 import { Link } from 'react-router-dom';
 
 /**
- * Visual grid of the 8 primary trades. Each tile is a warm gradient
- * with a big emoji/symbol, the trade name, and a "Explore →" link
- * that filters the Forums to that trade via the existing ?trade=
- * URL param.
+ * Visual grid of Florida regions. Each tile is the chapter's regional
+ * meet-up category — clicking goes straight to the matching Regional
+ * Meet-ups forum via the ?region= URL param.
  *
- * Self-contained: no DB calls, no props — just a wall of
- * hand-picked presets. This is the "map of the site" moment.
+ * The eight background photos were chosen by the chapter and shouldn't
+ * be swapped — only the labels/links map to FL regions.
  */
 const STORAGE = 'https://ozjtreaqyxlgsmopvwif.supabase.co/storage/v1/object/public/media/homepage';
 
-const TRADES = [
-  { slug: 'cabinet-making',       name: 'Cabinet Making',      icon: '🪵', image: STORAGE + '/cabinet-maker.jpg',         color: 'linear-gradient(135deg, #3A1F0A, #7A4420)' },
-  { slug: 'millwork-moulding',    name: 'Millwork & Moulding', icon: '🏛️', image: STORAGE + '/millwork-and-moulding.jpg', color: 'linear-gradient(135deg, #2C4830, #5A8F3A)' },
-  { slug: 'finishing-coatings',   name: 'Finishing',           icon: '🎨', image: STORAGE + '/finishing.jpg',             color: 'linear-gradient(135deg, #5A2D3D, #A85670)' },
-  { slug: 'cnc-machining',        name: 'CNC & Machining',     icon: '⚙️', image: STORAGE + '/cnc-and-machining.jpg',     color: 'linear-gradient(135deg, #1C3D5C, #3B83B8)' },
-  { slug: 'wood-species',         name: 'Wood Species',        icon: '🌳', image: STORAGE + '/wood-species.jpg',          color: 'linear-gradient(135deg, #2D3F1F, #6A8A3F)' },
-  { slug: 'hardware-accessories', name: 'Hardware',            icon: '🔩', image: STORAGE + '/hardware.jpg',              color: 'linear-gradient(135deg, #4A2A12, #2D6A4F)' },
-  { slug: 'safety-standards',     name: 'Safety & Standards',  icon: '🛡️', image: STORAGE + '/safety-and-standards.jpg',  color: 'linear-gradient(135deg, #5A3E0E, #B08A2E)' },
-  { slug: 'business-ops',         name: 'Business & Ops',      icon: '📊', image: STORAGE + '/business-and-ops.jpg',      color: 'linear-gradient(135deg, #3D1F3A, #7A4970)' },
+const REGIONS = [
+  { slug: 'region-south-fl',        name: 'South Florida',           sub: 'Miami-Dade · Broward · Palm Beach · Monroe',         image: STORAGE + '/cabinet-maker.jpg',         color: 'linear-gradient(135deg, #1B3A2E, #2D6A4F)' },
+  { slug: 'region-treasure-coast',  name: 'Treasure Coast',          sub: 'Martin · St. Lucie · Indian River · Okeechobee',     image: STORAGE + '/millwork-and-moulding.jpg', color: 'linear-gradient(135deg, #1F4534, #2D5A3D)' },
+  { slug: 'region-central-fl',      name: 'Central Florida',         sub: 'Orlando · Volusia · Brevard · Lake · Polk · Seminole', image: STORAGE + '/finishing.jpg',           color: 'linear-gradient(135deg, #1B3A2E, #2D6A4F)' },
+  { slug: 'region-tampa-bay',       name: 'Tampa Bay',               sub: 'Hillsborough · Pinellas · Pasco · Manatee · Sarasota', image: STORAGE + '/cnc-and-machining.jpg',   color: 'linear-gradient(135deg, #1F4534, #2D5A3D)' },
+  { slug: 'region-southwest-fl',    name: 'Southwest Florida',       sub: 'Lee · Collier · Charlotte · Hendry',                 image: STORAGE + '/wood-species.jpg',          color: 'linear-gradient(135deg, #1B3A2E, #2D6A4F)' },
+  { slug: 'region-north-fl',        name: 'Northeast FL / Jax',      sub: 'Duval · Clay · St. Johns · Nassau',                  image: STORAGE + '/hardware.jpg',              color: 'linear-gradient(135deg, #1F4534, #2D5A3D)' },
+  { slug: 'region-north-central',   name: 'North Central Florida',   sub: 'Alachua · Marion · Gainesville · Ocala',             image: STORAGE + '/safety-and-standards.jpg',  color: 'linear-gradient(135deg, #1B3A2E, #2D6A4F)' },
+  { slug: 'region-panhandle',       name: 'Panhandle',               sub: 'Escambia · Santa Rosa · Okaloosa · Bay · Leon',      image: STORAGE + '/business-and-ops.jpg',      color: 'linear-gradient(135deg, #1F4534, #2D5A3D)' },
 ];
 
 export default function TradeCategoriesTiles() {
@@ -29,29 +28,29 @@ export default function TradeCategoriesTiles() {
         <div className="home-section-head">
           <div>
             <div className="home-section-eyebrow">Explore</div>
-            <h2 className="home-section-title">Browse by trade.</h2>
+            <h2 className="home-section-title">Browse by Regions of Florida.</h2>
             <p className="home-section-sub">
-              Jump into the corner of AWI Florida Chapter that matches what you build.
+              Jump into your corner of the AWI Florida Chapter — find regional meet-ups, local vendor talk, and the shops nearby.
             </p>
           </div>
         </div>
 
         <div className="home-trades-grid">
-          {TRADES.map((t) => (
+          {REGIONS.map((r) => (
             <Link
-              key={t.slug}
-              to={`/forums?trade=${t.slug}`}
+              key={r.slug}
+              to={`/forums?region=${r.slug}`}
               className="home-trade-tile"
               style={{
-                backgroundImage: `url('${t.image}')`,
+                backgroundImage: `url('${r.image}')`,
                 // Fallback gradient behind the image in case the URL fails.
                 backgroundColor: '#1F4534',
               }}
             >
               {/* Color-tinted scrim on top of the photo — pulls each tile
-                  into the palette AND keeps the title readable. */}
-              <span className="home-trade-scrim" style={{ backgroundImage: t.color }} aria-hidden="true" />
-              <span className="home-trade-name">{t.name}</span>
+                  into the AWI forest palette AND keeps the title readable. */}
+              <span className="home-trade-scrim" style={{ backgroundImage: r.color }} aria-hidden="true" />
+              <span className="home-trade-name">{r.name}</span>
               <span className="home-trade-arrow" aria-hidden="true">→</span>
             </Link>
           ))}
